@@ -1,0 +1,1306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This file conforms to the DTD xdc/bld/build.dtd -->
+<package name="ti.drivers" version="1, 0, 0" producerId="undefined">
+    <units>
+    </units>
+    <sources>
+        <srcFile name="package/package_ti.drivers.c"/>
+        <srcFile name="NVS.c"/>
+        <srcFile name="./nvs/NVSRAM.c"/>
+        <srcFile name="./nvs/NVSSPI25X.c"/>
+        <srcFile name="SD.c"/>
+        <srcFile name="./sd/SDSPI.c"/>
+        <srcFile name="SDFatFS.c"/>
+        <srcFile name="./utils/List.c"/>
+        <srcFile name="./utils/RingBuf.c"/>
+        <srcFile name="./utils/Random.c"/>
+        <srcFile name="ADC.c"/>
+        <srcFile name="./adc/ADCCC26XX.c"/>
+        <srcFile name="ADCBuf.c"/>
+        <srcFile name="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="AESCBC.c"/>
+        <srcFile name="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="AESCTR.c"/>
+        <srcFile name="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="AESCTRDRBG.c"/>
+        <srcFile name="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="AESCCM.c"/>
+        <srcFile name="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="AESECB.c"/>
+        <srcFile name="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="./dma/UDMACC26XX.c"/>
+        <srcFile name="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="I2C.c"/>
+        <srcFile name="./i2c/I2CCC26XX.c"/>
+        <srcFile name="I2S.c"/>
+        <srcFile name="./i2s/I2SCC26XX.c"/>
+        <srcFile name="./nvs/NVSCC26XX.c"/>
+        <srcFile name="./pdm/Codec1.c"/>
+        <srcFile name="./pdm/PDMCC26XX.c"/>
+        <srcFile name="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="./pin/PINCC26XX.c"/>
+        <srcFile name="./power/PowerCC26XX.c"/>
+        <srcFile name="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="PWM.c"/>
+        <srcFile name="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="SPI.c"/>
+        <srcFile name="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="TRNG.c"/>
+        <srcFile name="./trng/TRNGCC26XX.c"/>
+        <srcFile name="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="UART.c"/>
+        <srcFile name="./uart/UARTCC26XX.c"/>
+        <srcFile name="./uart/UARTCC26X0.c"/>
+        <srcFile name="Watchdog.c"/>
+        <srcFile name="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="pdm/pdm2pcm_ccs.asm"/>
+        <srcFile name="pdm/pdm2pcm_iar.asm"/>
+        <srcFile name="pdm/pdm2pcm_gnu.asm"/>
+        <srcFile name="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="AESGCM.c"/>
+        <srcFile name="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="ECDH.c"/>
+        <srcFile name="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="ECDSA.c"/>
+        <srcFile name="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="ECJPAKE.c"/>
+        <srcFile name="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="./power/PowerCC26X2.c"/>
+        <srcFile name="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="SHA2.c"/>
+        <srcFile name="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="./uart/UARTCC26X2.c"/>
+        <srcFile name="pdm/pdm2pcm_cc26x2_ccs.asm"/>
+        <srcFile name="pdm/pdm2pcm_cc26x2_gnu.asm"/>
+        <srcFile name="pdm/pdm2pcm_cc26x2_iar.asm"/>
+    </sources>
+    <configscripts>
+    </configscripts>
+    <makefiles>
+        <srcFile name="package.mak" src="package.bld"/>
+        <srcFile name="package/package.xdc.dep" src="package.xdc"/>
+        <srcFile name="package/package.cfg.dep" src="package.xdc"/>
+        <srcFile name="lib/drivers_cc13x0.aem3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/package/package_ti.drivers.oem3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/NVS.oem3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSRAM.oem3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSSPI25X.oem3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SD.oem3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./sd/SDSPI.oem3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SDFatFS.oem3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/List.oem3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/RingBuf.oem3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/Random.oem3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADC.oem3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adc/ADCCC26XX.oem3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADCBuf.oem3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adcbuf/ADCBufCC26XX.oem3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./crypto/CryptoCC26XX.oem3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCBC.oem3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aescbc/AESCBCCC26XX.oem3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTR.oem3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctr/AESCTRCC26XX.oem3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTRDRBG.oem3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctrdrbg/AESCTRDRBGXX.oem3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCCM.oem3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesccm/AESCCMCC26XX.oem3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESECB.oem3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesecb/AESECBCC26XX.oem3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.oem3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.oem3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./dma/UDMACC26XX.oem3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./gpio/GPIOCC26XX.oem3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2C.oem3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2c/I2CCC26XX.oem3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2S.oem3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2s/I2SCC26XX.oem3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSCC26XX.oem3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/Codec1.oem3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX.oem3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX_util.oem3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pin/PINCC26XX.oem3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX.oem3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX_calibrateRCOSC.oem3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/PWM.oem3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pwm/PWMTimerCC26XX.oem3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SPI.oem3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./spi/SPICC26XXDMA.oem3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/TRNG.oem3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./trng/TRNGCC26XX.oem3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./timer/GPTimerCC26XX.oem3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/UART.oem3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26XX.oem3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26X0.oem3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/Watchdog.oem3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./watchdog/WatchdogCC26XX.oem3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/pdm/pdm2pcm_ccs.oem3.dep" src="pdm/pdm2pcm_ccs.asm"/>
+        <srcFile name="lib/drivers_cc13x0.arm3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/package/package_ti.drivers.orm3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/NVS.orm3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSRAM.orm3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSSPI25X.orm3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SD.orm3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./sd/SDSPI.orm3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SDFatFS.orm3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/List.orm3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/RingBuf.orm3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/Random.orm3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADC.orm3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adc/ADCCC26XX.orm3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADCBuf.orm3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adcbuf/ADCBufCC26XX.orm3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./crypto/CryptoCC26XX.orm3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCBC.orm3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aescbc/AESCBCCC26XX.orm3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTR.orm3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctr/AESCTRCC26XX.orm3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTRDRBG.orm3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctrdrbg/AESCTRDRBGXX.orm3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCCM.orm3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesccm/AESCCMCC26XX.orm3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESECB.orm3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesecb/AESECBCC26XX.orm3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.orm3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.orm3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./dma/UDMACC26XX.orm3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./gpio/GPIOCC26XX.orm3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2C.orm3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2c/I2CCC26XX.orm3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2S.orm3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2s/I2SCC26XX.orm3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSCC26XX.orm3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/Codec1.orm3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX.orm3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX_util.orm3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pin/PINCC26XX.orm3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX.orm3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX_calibrateRCOSC.orm3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/PWM.orm3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pwm/PWMTimerCC26XX.orm3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SPI.orm3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./spi/SPICC26XXDMA.orm3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/TRNG.orm3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./trng/TRNGCC26XX.orm3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./timer/GPTimerCC26XX.orm3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/UART.orm3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26XX.orm3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26X0.orm3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/Watchdog.orm3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./watchdog/WatchdogCC26XX.orm3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/pdm/pdm2pcm_iar.orm3.dep" src="pdm/pdm2pcm_iar.asm"/>
+        <srcFile name="lib/drivers_cc13x0.am3g.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/package/package_ti.drivers.om3g.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/NVS.om3g.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSRAM.om3g.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSSPI25X.om3g.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SD.om3g.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./sd/SDSPI.om3g.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SDFatFS.om3g.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/List.om3g.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/RingBuf.om3g.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./utils/Random.om3g.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADC.om3g.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adc/ADCCC26XX.om3g.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/ADCBuf.om3g.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./adcbuf/ADCBufCC26XX.om3g.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./crypto/CryptoCC26XX.om3g.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCBC.om3g.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aescbc/AESCBCCC26XX.om3g.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTR.om3g.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctr/AESCTRCC26XX.om3g.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCTRDRBG.om3g.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesctrdrbg/AESCTRDRBGXX.om3g.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESCCM.om3g.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesccm/AESCCMCC26XX.om3g.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/AESECB.om3g.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./aesecb/AESECBCC26XX.om3g.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.om3g.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.om3g.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./dma/UDMACC26XX.om3g.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./gpio/GPIOCC26XX.om3g.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2C.om3g.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2c/I2CCC26XX.om3g.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/I2S.om3g.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./i2s/I2SCC26XX.om3g.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./nvs/NVSCC26XX.om3g.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/Codec1.om3g.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX.om3g.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pdm/PDMCC26XX_util.om3g.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pin/PINCC26XX.om3g.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX.om3g.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./power/PowerCC26XX_calibrateRCOSC.om3g.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/PWM.om3g.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./pwm/PWMTimerCC26XX.om3g.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/SPI.om3g.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./spi/SPICC26XXDMA.om3g.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/TRNG.om3g.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./trng/TRNGCC26XX.om3g.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./timer/GPTimerCC26XX.om3g.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/UART.om3g.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26XX.om3g.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./uart/UARTCC26X0.om3g.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/Watchdog.om3g.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/./watchdog/WatchdogCC26XX.om3g.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x0/pdm/pdm2pcm_gnu.om3g.dep" src="pdm/pdm2pcm_gnu.asm"/>
+        <srcFile name="lib/drivers_cc26x0.aem3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/package/package_ti.drivers.oem3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/NVS.oem3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSRAM.oem3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSSPI25X.oem3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SD.oem3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./sd/SDSPI.oem3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SDFatFS.oem3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/List.oem3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/RingBuf.oem3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/Random.oem3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADC.oem3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adc/ADCCC26XX.oem3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADCBuf.oem3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adcbuf/ADCBufCC26XX.oem3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./crypto/CryptoCC26XX.oem3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCBC.oem3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aescbc/AESCBCCC26XX.oem3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTR.oem3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctr/AESCTRCC26XX.oem3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTRDRBG.oem3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctrdrbg/AESCTRDRBGXX.oem3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCCM.oem3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesccm/AESCCMCC26XX.oem3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESECB.oem3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesecb/AESECBCC26XX.oem3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.oem3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.oem3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./dma/UDMACC26XX.oem3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./gpio/GPIOCC26XX.oem3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2C.oem3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2c/I2CCC26XX.oem3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2S.oem3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2s/I2SCC26XX.oem3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSCC26XX.oem3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/Codec1.oem3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX.oem3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX_util.oem3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pin/PINCC26XX.oem3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX.oem3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX_calibrateRCOSC.oem3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/PWM.oem3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pwm/PWMTimerCC26XX.oem3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SPI.oem3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./spi/SPICC26XXDMA.oem3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/TRNG.oem3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./trng/TRNGCC26XX.oem3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./timer/GPTimerCC26XX.oem3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/UART.oem3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26XX.oem3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26X0.oem3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/Watchdog.oem3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./watchdog/WatchdogCC26XX.oem3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/pdm/pdm2pcm_ccs.oem3.dep" src="pdm/pdm2pcm_ccs.asm"/>
+        <srcFile name="lib/drivers_cc26x0.arm3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/package/package_ti.drivers.orm3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/NVS.orm3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSRAM.orm3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSSPI25X.orm3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SD.orm3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./sd/SDSPI.orm3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SDFatFS.orm3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/List.orm3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/RingBuf.orm3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/Random.orm3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADC.orm3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adc/ADCCC26XX.orm3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADCBuf.orm3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adcbuf/ADCBufCC26XX.orm3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./crypto/CryptoCC26XX.orm3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCBC.orm3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aescbc/AESCBCCC26XX.orm3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTR.orm3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctr/AESCTRCC26XX.orm3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTRDRBG.orm3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctrdrbg/AESCTRDRBGXX.orm3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCCM.orm3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesccm/AESCCMCC26XX.orm3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESECB.orm3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesecb/AESECBCC26XX.orm3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.orm3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.orm3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./dma/UDMACC26XX.orm3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./gpio/GPIOCC26XX.orm3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2C.orm3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2c/I2CCC26XX.orm3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2S.orm3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2s/I2SCC26XX.orm3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSCC26XX.orm3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/Codec1.orm3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX.orm3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX_util.orm3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pin/PINCC26XX.orm3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX.orm3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX_calibrateRCOSC.orm3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/PWM.orm3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pwm/PWMTimerCC26XX.orm3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SPI.orm3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./spi/SPICC26XXDMA.orm3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/TRNG.orm3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./trng/TRNGCC26XX.orm3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./timer/GPTimerCC26XX.orm3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/UART.orm3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26XX.orm3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26X0.orm3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/Watchdog.orm3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./watchdog/WatchdogCC26XX.orm3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/pdm/pdm2pcm_iar.orm3.dep" src="pdm/pdm2pcm_iar.asm"/>
+        <srcFile name="lib/drivers_cc26x0.am3g.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/package/package_ti.drivers.om3g.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/NVS.om3g.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSRAM.om3g.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSSPI25X.om3g.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SD.om3g.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./sd/SDSPI.om3g.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SDFatFS.om3g.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/List.om3g.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/RingBuf.om3g.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./utils/Random.om3g.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADC.om3g.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adc/ADCCC26XX.om3g.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/ADCBuf.om3g.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./adcbuf/ADCBufCC26XX.om3g.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./crypto/CryptoCC26XX.om3g.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCBC.om3g.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aescbc/AESCBCCC26XX.om3g.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTR.om3g.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctr/AESCTRCC26XX.om3g.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCTRDRBG.om3g.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesctrdrbg/AESCTRDRBGXX.om3g.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESCCM.om3g.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesccm/AESCCMCC26XX.om3g.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/AESECB.om3g.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./aesecb/AESECBCC26XX.om3g.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.om3g.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./cryptoutils/sharedresources/CryptoResourceCC26XX.om3g.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./dma/UDMACC26XX.om3g.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./gpio/GPIOCC26XX.om3g.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2C.om3g.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2c/I2CCC26XX.om3g.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/I2S.om3g.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./i2s/I2SCC26XX.om3g.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./nvs/NVSCC26XX.om3g.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/Codec1.om3g.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX.om3g.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pdm/PDMCC26XX_util.om3g.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pin/PINCC26XX.om3g.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX.om3g.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./power/PowerCC26XX_calibrateRCOSC.om3g.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/PWM.om3g.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./pwm/PWMTimerCC26XX.om3g.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/SPI.om3g.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./spi/SPICC26XXDMA.om3g.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/TRNG.om3g.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./trng/TRNGCC26XX.om3g.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./timer/GPTimerCC26XX.om3g.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/UART.om3g.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26XX.om3g.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./uart/UARTCC26X0.om3g.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/Watchdog.om3g.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/./watchdog/WatchdogCC26XX.om3g.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0/pdm/pdm2pcm_gnu.om3g.dep" src="pdm/pdm2pcm_gnu.asm"/>
+        <srcFile name="lib/drivers_cc26x0r2.aem3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/package/package_ti.drivers.oem3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/NVS.oem3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSRAM.oem3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSSPI25X.oem3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SD.oem3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./sd/SDSPI.oem3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SDFatFS.oem3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/List.oem3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/RingBuf.oem3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/Random.oem3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADC.oem3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adc/ADCCC26XX.oem3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADCBuf.oem3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adcbuf/ADCBufCC26XX.oem3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./crypto/CryptoCC26XX.oem3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCBC.oem3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aescbc/AESCBCCC26XX.oem3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTR.oem3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctr/AESCTRCC26XX.oem3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTRDRBG.oem3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctrdrbg/AESCTRDRBGXX.oem3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCCM.oem3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesccm/AESCCMCC26XX.oem3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESECB.oem3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesecb/AESECBCC26XX.oem3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.oem3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/sharedresources/CryptoResourceCC26XX.oem3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./dma/UDMACC26XX.oem3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./gpio/GPIOCC26XX.oem3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2C.oem3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2c/I2CCC26XX.oem3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2S.oem3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2s/I2SCC26XX.oem3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSCC26XX.oem3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/Codec1.oem3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX.oem3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX_util.oem3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pin/PINCC26XX.oem3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX.oem3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX_calibrateRCOSC.oem3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/PWM.oem3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pwm/PWMTimerCC26XX.oem3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SPI.oem3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./spi/SPICC26XXDMA.oem3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/TRNG.oem3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./trng/TRNGCC26XX.oem3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./timer/GPTimerCC26XX.oem3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/UART.oem3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26XX.oem3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26X0.oem3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/Watchdog.oem3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./watchdog/WatchdogCC26XX.oem3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/pdm/pdm2pcm_ccs.oem3.dep" src="pdm/pdm2pcm_ccs.asm"/>
+        <srcFile name="lib/drivers_cc26x0r2.arm3.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/package/package_ti.drivers.orm3.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/NVS.orm3.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSRAM.orm3.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSSPI25X.orm3.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SD.orm3.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./sd/SDSPI.orm3.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SDFatFS.orm3.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/List.orm3.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/RingBuf.orm3.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/Random.orm3.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADC.orm3.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adc/ADCCC26XX.orm3.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADCBuf.orm3.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adcbuf/ADCBufCC26XX.orm3.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./crypto/CryptoCC26XX.orm3.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCBC.orm3.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aescbc/AESCBCCC26XX.orm3.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTR.orm3.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctr/AESCTRCC26XX.orm3.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTRDRBG.orm3.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctrdrbg/AESCTRDRBGXX.orm3.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCCM.orm3.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesccm/AESCCMCC26XX.orm3.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESECB.orm3.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesecb/AESECBCC26XX.orm3.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.orm3.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/sharedresources/CryptoResourceCC26XX.orm3.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./dma/UDMACC26XX.orm3.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./gpio/GPIOCC26XX.orm3.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2C.orm3.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2c/I2CCC26XX.orm3.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2S.orm3.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2s/I2SCC26XX.orm3.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSCC26XX.orm3.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/Codec1.orm3.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX.orm3.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX_util.orm3.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pin/PINCC26XX.orm3.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX.orm3.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX_calibrateRCOSC.orm3.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/PWM.orm3.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pwm/PWMTimerCC26XX.orm3.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SPI.orm3.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./spi/SPICC26XXDMA.orm3.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/TRNG.orm3.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./trng/TRNGCC26XX.orm3.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./timer/GPTimerCC26XX.orm3.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/UART.orm3.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26XX.orm3.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26X0.orm3.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/Watchdog.orm3.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./watchdog/WatchdogCC26XX.orm3.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/pdm/pdm2pcm_iar.orm3.dep" src="pdm/pdm2pcm_iar.asm"/>
+        <srcFile name="lib/drivers_cc26x0r2.am3g.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/package/package_ti.drivers.om3g.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/NVS.om3g.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSRAM.om3g.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSSPI25X.om3g.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SD.om3g.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./sd/SDSPI.om3g.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SDFatFS.om3g.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/List.om3g.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/RingBuf.om3g.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./utils/Random.om3g.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADC.om3g.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adc/ADCCC26XX.om3g.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/ADCBuf.om3g.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./adcbuf/ADCBufCC26XX.om3g.dep" src="./adcbuf/ADCBufCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./crypto/CryptoCC26XX.om3g.dep" src="./crypto/CryptoCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCBC.om3g.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aescbc/AESCBCCC26XX.om3g.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTR.om3g.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctr/AESCTRCC26XX.om3g.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCTRDRBG.om3g.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesctrdrbg/AESCTRDRBGXX.om3g.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESCCM.om3g.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesccm/AESCCMCC26XX.om3g.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/AESECB.om3g.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./aesecb/AESECBCC26XX.om3g.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.om3g.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./cryptoutils/sharedresources/CryptoResourceCC26XX.om3g.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./dma/UDMACC26XX.om3g.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./gpio/GPIOCC26XX.om3g.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2C.om3g.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2c/I2CCC26XX.om3g.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/I2S.om3g.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./i2s/I2SCC26XX.om3g.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./nvs/NVSCC26XX.om3g.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/Codec1.om3g.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX.om3g.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pdm/PDMCC26XX_util.om3g.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pin/PINCC26XX.om3g.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX.om3g.dep" src="./power/PowerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./power/PowerCC26XX_calibrateRCOSC.om3g.dep" src="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/PWM.om3g.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./pwm/PWMTimerCC26XX.om3g.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/SPI.om3g.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./spi/SPICC26XXDMA.om3g.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/TRNG.om3g.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./trng/TRNGCC26XX.om3g.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./timer/GPTimerCC26XX.om3g.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/UART.om3g.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26XX.om3g.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./uart/UARTCC26X0.om3g.dep" src="./uart/UARTCC26X0.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/Watchdog.om3g.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/./watchdog/WatchdogCC26XX.om3g.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x0r2/pdm/pdm2pcm_gnu.om3g.dep" src="pdm/pdm2pcm_gnu.asm"/>
+        <srcFile name="lib/drivers_cc13x2.aem4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/package/package_ti.drivers.oem4f.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/NVS.oem4f.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSRAM.oem4f.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSSPI25X.oem4f.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SD.oem4f.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sd/SDSPI.oem4f.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SDFatFS.oem4f.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/List.oem4f.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/RingBuf.oem4f.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/Random.oem4f.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADC.oem4f.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adc/ADCCC26XX.oem4f.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADCBuf.oem4f.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adcbuf/ADCBufCC26X2.oem4f.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCBC.oem4f.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aescbc/AESCBCCC26XX.oem4f.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTR.oem4f.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctr/AESCTRCC26XX.oem4f.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTRDRBG.oem4f.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctrdrbg/AESCTRDRBGXX.oem4f.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCCM.oem4f.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesccm/AESCCMCC26XX.oem4f.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESGCM.oem4f.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesgcm/AESGCMCC26XX.oem4f.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESECB.oem4f.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesecb/AESECBCC26XX.oem4f.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.oem4f.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/ecc/ECCParamsCC26X2.oem4f.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.oem4f.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/PKAResourceCC26XX.oem4f.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./dma/UDMACC26XX.oem4f.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDH.oem4f.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdh/ECDHCC26X2.oem4f.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDSA.oem4f.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdsa/ECDSACC26X2.oem4f.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECJPAKE.oem4f.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecjpake/ECJPAKECC26X2.oem4f.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./gpio/GPIOCC26XX.oem4f.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2C.oem4f.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2c/I2CCC26XX.oem4f.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2S.oem4f.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2s/I2SCC26XX.oem4f.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSCC26XX.oem4f.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/Codec1.oem4f.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX.oem4f.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX_util.oem4f.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pin/PINCC26XX.oem4f.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2.oem4f.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2_calibrateRCOSC.oem4f.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/PWM.oem4f.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pwm/PWMTimerCC26XX.oem4f.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SHA2.oem4f.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sha2/SHA2CC26X2.oem4f.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SPI.oem4f.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26XXDMA.oem4f.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26X2DMA.oem4f.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/TRNG.oem4f.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./trng/TRNGCC26XX.oem4f.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./timer/GPTimerCC26XX.oem4f.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/UART.oem4f.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26XX.oem4f.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26X2.oem4f.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/Watchdog.oem4f.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./watchdog/WatchdogCC26XX.oem4f.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/pdm/pdm2pcm_cc26x2_ccs.oem4f.dep" src="pdm/pdm2pcm_cc26x2_ccs.asm"/>
+        <srcFile name="lib/drivers_cc13x2.am4fg.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/package/package_ti.drivers.om4fg.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/NVS.om4fg.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSRAM.om4fg.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSSPI25X.om4fg.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SD.om4fg.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sd/SDSPI.om4fg.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SDFatFS.om4fg.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/List.om4fg.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/RingBuf.om4fg.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/Random.om4fg.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADC.om4fg.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adc/ADCCC26XX.om4fg.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADCBuf.om4fg.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adcbuf/ADCBufCC26X2.om4fg.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCBC.om4fg.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aescbc/AESCBCCC26XX.om4fg.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTR.om4fg.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctr/AESCTRCC26XX.om4fg.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTRDRBG.om4fg.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctrdrbg/AESCTRDRBGXX.om4fg.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCCM.om4fg.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesccm/AESCCMCC26XX.om4fg.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESGCM.om4fg.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesgcm/AESGCMCC26XX.om4fg.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESECB.om4fg.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesecb/AESECBCC26XX.om4fg.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.om4fg.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/ecc/ECCParamsCC26X2.om4fg.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.om4fg.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/PKAResourceCC26XX.om4fg.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./dma/UDMACC26XX.om4fg.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDH.om4fg.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdh/ECDHCC26X2.om4fg.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDSA.om4fg.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdsa/ECDSACC26X2.om4fg.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECJPAKE.om4fg.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecjpake/ECJPAKECC26X2.om4fg.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./gpio/GPIOCC26XX.om4fg.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2C.om4fg.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2c/I2CCC26XX.om4fg.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2S.om4fg.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2s/I2SCC26XX.om4fg.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSCC26XX.om4fg.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/Codec1.om4fg.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX.om4fg.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX_util.om4fg.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pin/PINCC26XX.om4fg.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2.om4fg.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2_calibrateRCOSC.om4fg.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/PWM.om4fg.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pwm/PWMTimerCC26XX.om4fg.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SHA2.om4fg.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sha2/SHA2CC26X2.om4fg.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SPI.om4fg.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26XXDMA.om4fg.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26X2DMA.om4fg.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/TRNG.om4fg.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./trng/TRNGCC26XX.om4fg.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./timer/GPTimerCC26XX.om4fg.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/UART.om4fg.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26XX.om4fg.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26X2.om4fg.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/Watchdog.om4fg.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./watchdog/WatchdogCC26XX.om4fg.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/pdm/pdm2pcm_cc26x2_gnu.om4fg.dep" src="pdm/pdm2pcm_cc26x2_gnu.asm"/>
+        <srcFile name="lib/drivers_cc13x2.arm4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/package/package_ti.drivers.orm4f.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/NVS.orm4f.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSRAM.orm4f.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSSPI25X.orm4f.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SD.orm4f.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sd/SDSPI.orm4f.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SDFatFS.orm4f.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/List.orm4f.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/RingBuf.orm4f.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./utils/Random.orm4f.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADC.orm4f.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adc/ADCCC26XX.orm4f.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ADCBuf.orm4f.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./adcbuf/ADCBufCC26X2.orm4f.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCBC.orm4f.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aescbc/AESCBCCC26XX.orm4f.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTR.orm4f.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctr/AESCTRCC26XX.orm4f.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCTRDRBG.orm4f.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesctrdrbg/AESCTRDRBGXX.orm4f.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESCCM.orm4f.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesccm/AESCCMCC26XX.orm4f.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESGCM.orm4f.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesgcm/AESGCMCC26XX.orm4f.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/AESECB.orm4f.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./aesecb/AESECBCC26XX.orm4f.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.orm4f.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/ecc/ECCParamsCC26X2.orm4f.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.orm4f.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./cryptoutils/sharedresources/PKAResourceCC26XX.orm4f.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./dma/UDMACC26XX.orm4f.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDH.orm4f.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdh/ECDHCC26X2.orm4f.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECDSA.orm4f.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecdsa/ECDSACC26X2.orm4f.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/ECJPAKE.orm4f.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./ecjpake/ECJPAKECC26X2.orm4f.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./gpio/GPIOCC26XX.orm4f.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2C.orm4f.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2c/I2CCC26XX.orm4f.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/I2S.orm4f.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./i2s/I2SCC26XX.orm4f.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./nvs/NVSCC26XX.orm4f.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/Codec1.orm4f.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX.orm4f.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pdm/PDMCC26XX_util.orm4f.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pin/PINCC26XX.orm4f.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2.orm4f.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./power/PowerCC26X2_calibrateRCOSC.orm4f.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/PWM.orm4f.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./pwm/PWMTimerCC26XX.orm4f.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SHA2.orm4f.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./sha2/SHA2CC26X2.orm4f.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/SPI.orm4f.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26XXDMA.orm4f.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./spi/SPICC26X2DMA.orm4f.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/TRNG.orm4f.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./trng/TRNGCC26XX.orm4f.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./timer/GPTimerCC26XX.orm4f.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/UART.orm4f.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26XX.orm4f.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./uart/UARTCC26X2.orm4f.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/Watchdog.orm4f.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/./watchdog/WatchdogCC26XX.orm4f.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc13x2/pdm/pdm2pcm_cc26x2_iar.orm4f.dep" src="pdm/pdm2pcm_cc26x2_iar.asm"/>
+        <srcFile name="lib/drivers_cc26x2.aem4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/package/package_ti.drivers.oem4f.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/NVS.oem4f.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSRAM.oem4f.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSSPI25X.oem4f.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SD.oem4f.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sd/SDSPI.oem4f.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SDFatFS.oem4f.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/List.oem4f.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/RingBuf.oem4f.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/Random.oem4f.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADC.oem4f.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adc/ADCCC26XX.oem4f.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADCBuf.oem4f.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adcbuf/ADCBufCC26X2.oem4f.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCBC.oem4f.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aescbc/AESCBCCC26XX.oem4f.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTR.oem4f.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctr/AESCTRCC26XX.oem4f.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTRDRBG.oem4f.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctrdrbg/AESCTRDRBGXX.oem4f.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCCM.oem4f.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesccm/AESCCMCC26XX.oem4f.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESGCM.oem4f.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesgcm/AESGCMCC26XX.oem4f.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESECB.oem4f.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesecb/AESECBCC26XX.oem4f.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.oem4f.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/ecc/ECCParamsCC26X2.oem4f.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.oem4f.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/PKAResourceCC26XX.oem4f.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./dma/UDMACC26XX.oem4f.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDH.oem4f.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdh/ECDHCC26X2.oem4f.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDSA.oem4f.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdsa/ECDSACC26X2.oem4f.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECJPAKE.oem4f.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecjpake/ECJPAKECC26X2.oem4f.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./gpio/GPIOCC26XX.oem4f.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2C.oem4f.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2c/I2CCC26XX.oem4f.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2S.oem4f.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2s/I2SCC26XX.oem4f.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSCC26XX.oem4f.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/Codec1.oem4f.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX.oem4f.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX_util.oem4f.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pin/PINCC26XX.oem4f.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2.oem4f.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2_calibrateRCOSC.oem4f.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/PWM.oem4f.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pwm/PWMTimerCC26XX.oem4f.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SHA2.oem4f.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sha2/SHA2CC26X2.oem4f.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SPI.oem4f.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26XXDMA.oem4f.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26X2DMA.oem4f.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/TRNG.oem4f.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./trng/TRNGCC26XX.oem4f.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./timer/GPTimerCC26XX.oem4f.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/UART.oem4f.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26XX.oem4f.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26X2.oem4f.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/Watchdog.oem4f.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./watchdog/WatchdogCC26XX.oem4f.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/pdm/pdm2pcm_cc26x2_ccs.oem4f.dep" src="pdm/pdm2pcm_cc26x2_ccs.asm"/>
+        <srcFile name="lib/drivers_cc26x2.am4fg.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/package/package_ti.drivers.om4fg.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/NVS.om4fg.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSRAM.om4fg.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSSPI25X.om4fg.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SD.om4fg.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sd/SDSPI.om4fg.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SDFatFS.om4fg.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/List.om4fg.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/RingBuf.om4fg.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/Random.om4fg.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADC.om4fg.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adc/ADCCC26XX.om4fg.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADCBuf.om4fg.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adcbuf/ADCBufCC26X2.om4fg.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCBC.om4fg.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aescbc/AESCBCCC26XX.om4fg.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTR.om4fg.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctr/AESCTRCC26XX.om4fg.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTRDRBG.om4fg.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctrdrbg/AESCTRDRBGXX.om4fg.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCCM.om4fg.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesccm/AESCCMCC26XX.om4fg.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESGCM.om4fg.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesgcm/AESGCMCC26XX.om4fg.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESECB.om4fg.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesecb/AESECBCC26XX.om4fg.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.om4fg.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/ecc/ECCParamsCC26X2.om4fg.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.om4fg.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/PKAResourceCC26XX.om4fg.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./dma/UDMACC26XX.om4fg.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDH.om4fg.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdh/ECDHCC26X2.om4fg.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDSA.om4fg.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdsa/ECDSACC26X2.om4fg.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECJPAKE.om4fg.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecjpake/ECJPAKECC26X2.om4fg.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./gpio/GPIOCC26XX.om4fg.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2C.om4fg.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2c/I2CCC26XX.om4fg.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2S.om4fg.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2s/I2SCC26XX.om4fg.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSCC26XX.om4fg.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/Codec1.om4fg.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX.om4fg.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX_util.om4fg.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pin/PINCC26XX.om4fg.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2.om4fg.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2_calibrateRCOSC.om4fg.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/PWM.om4fg.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pwm/PWMTimerCC26XX.om4fg.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SHA2.om4fg.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sha2/SHA2CC26X2.om4fg.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SPI.om4fg.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26XXDMA.om4fg.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26X2DMA.om4fg.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/TRNG.om4fg.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./trng/TRNGCC26XX.om4fg.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./timer/GPTimerCC26XX.om4fg.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/UART.om4fg.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26XX.om4fg.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26X2.om4fg.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/Watchdog.om4fg.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./watchdog/WatchdogCC26XX.om4fg.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/pdm/pdm2pcm_cc26x2_gnu.om4fg.dep" src="pdm/pdm2pcm_cc26x2_gnu.asm"/>
+        <srcFile name="lib/drivers_cc26x2.arm4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/package/package_ti.drivers.orm4f.dep" src="package/package_ti.drivers.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/NVS.orm4f.dep" src="NVS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSRAM.orm4f.dep" src="./nvs/NVSRAM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSSPI25X.orm4f.dep" src="./nvs/NVSSPI25X.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SD.orm4f.dep" src="SD.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sd/SDSPI.orm4f.dep" src="./sd/SDSPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SDFatFS.orm4f.dep" src="SDFatFS.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/List.orm4f.dep" src="./utils/List.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/RingBuf.orm4f.dep" src="./utils/RingBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./utils/Random.orm4f.dep" src="./utils/Random.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADC.orm4f.dep" src="ADC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adc/ADCCC26XX.orm4f.dep" src="./adc/ADCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ADCBuf.orm4f.dep" src="ADCBuf.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./adcbuf/ADCBufCC26X2.orm4f.dep" src="./adcbuf/ADCBufCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCBC.orm4f.dep" src="AESCBC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aescbc/AESCBCCC26XX.orm4f.dep" src="./aescbc/AESCBCCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTR.orm4f.dep" src="AESCTR.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctr/AESCTRCC26XX.orm4f.dep" src="./aesctr/AESCTRCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCTRDRBG.orm4f.dep" src="AESCTRDRBG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesctrdrbg/AESCTRDRBGXX.orm4f.dep" src="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESCCM.orm4f.dep" src="AESCCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesccm/AESCCMCC26XX.orm4f.dep" src="./aesccm/AESCCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESGCM.orm4f.dep" src="AESGCM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesgcm/AESGCMCC26XX.orm4f.dep" src="./aesgcm/AESGCMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/AESECB.orm4f.dep" src="AESECB.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./aesecb/AESECBCC26XX.orm4f.dep" src="./aesecb/AESECBCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.orm4f.dep" src="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/ecc/ECCParamsCC26X2.orm4f.dep" src="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/CryptoResourceCC26XX.orm4f.dep" src="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./cryptoutils/sharedresources/PKAResourceCC26XX.orm4f.dep" src="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./dma/UDMACC26XX.orm4f.dep" src="./dma/UDMACC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDH.orm4f.dep" src="ECDH.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdh/ECDHCC26X2.orm4f.dep" src="./ecdh/ECDHCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECDSA.orm4f.dep" src="ECDSA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecdsa/ECDSACC26X2.orm4f.dep" src="./ecdsa/ECDSACC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/ECJPAKE.orm4f.dep" src="ECJPAKE.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./ecjpake/ECJPAKECC26X2.orm4f.dep" src="./ecjpake/ECJPAKECC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./gpio/GPIOCC26XX.orm4f.dep" src="./gpio/GPIOCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2C.orm4f.dep" src="I2C.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2c/I2CCC26XX.orm4f.dep" src="./i2c/I2CCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/I2S.orm4f.dep" src="I2S.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./i2s/I2SCC26XX.orm4f.dep" src="./i2s/I2SCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./nvs/NVSCC26XX.orm4f.dep" src="./nvs/NVSCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/Codec1.orm4f.dep" src="./pdm/Codec1.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX.orm4f.dep" src="./pdm/PDMCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pdm/PDMCC26XX_util.orm4f.dep" src="./pdm/PDMCC26XX_util.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pin/PINCC26XX.orm4f.dep" src="./pin/PINCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2.orm4f.dep" src="./power/PowerCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./power/PowerCC26X2_calibrateRCOSC.orm4f.dep" src="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/PWM.orm4f.dep" src="PWM.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./pwm/PWMTimerCC26XX.orm4f.dep" src="./pwm/PWMTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SHA2.orm4f.dep" src="SHA2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./sha2/SHA2CC26X2.orm4f.dep" src="./sha2/SHA2CC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/SPI.orm4f.dep" src="SPI.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26XXDMA.orm4f.dep" src="./spi/SPICC26XXDMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./spi/SPICC26X2DMA.orm4f.dep" src="./spi/SPICC26X2DMA.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/TRNG.orm4f.dep" src="TRNG.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./trng/TRNGCC26XX.orm4f.dep" src="./trng/TRNGCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./timer/GPTimerCC26XX.orm4f.dep" src="./timer/GPTimerCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/UART.orm4f.dep" src="UART.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26XX.orm4f.dep" src="./uart/UARTCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./uart/UARTCC26X2.orm4f.dep" src="./uart/UARTCC26X2.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/Watchdog.orm4f.dep" src="Watchdog.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/./watchdog/WatchdogCC26XX.orm4f.dep" src="./watchdog/WatchdogCC26XX.c"/>
+        <srcFile name="package/lib/lib/drivers_cc26x2/pdm/pdm2pcm_cc26x2_iar.orm4f.dep" src="pdm/pdm2pcm_cc26x2_iar.asm"/>
+        <srcFile name="package/rel/ti_drivers.tar.dep" src="package/rel/ti_drivers.xdc.inc"/>
+    </makefiles>
+    <targets>
+        <target name="ti.targets.arm.elf.M3"
+            version="ti.targets.arm.elf.M3{1,0,18.12,2"
+            rawVersion="18.12.2"
+            platform="ti.platforms.simCM3"
+            isa="v7M"
+            suffix="em3"
+            rootDir="/db/vendors/ti/arm/18.12.2.LTS/Linux"
+            os="undefined"
+            rts="ti.targets.arm.rtsarm">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="iar.targets.arm.M3"
+            version="iar.targets.arm.M3{1,0,8.32,2"
+            rawVersion="8.32.2.178"
+            platform="ti.platforms.tiva:TM4C1294NCPDT:1"
+            isa="v7M"
+            suffix="rm3"
+            rootDir="/db/vendors/iar/arm/8.32.2/Linux"
+            os="undefined"
+            rts="iar.targets.arm.rts">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="gnu.targets.arm.M3"
+            version="gnu.targets.arm.M3{1,0,7.2,1"
+            rawVersion="7.2.1"
+            platform="ti.platforms.tiva:TM4C1294NCPDT"
+            isa="v7M"
+            suffix="m3g"
+            rootDir="/db/vendors/linaro/gcc-arm-none-eabi-7-2017-q4-major"
+            os="undefined"
+            rts="gnu.targets.arm.rtsv7M">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="ti.targets.arm.elf.M4F"
+            version="ti.targets.arm.elf.M4F{1,0,18.12,2"
+            rawVersion="18.12.2"
+            platform="ti.platforms.tiva:TM4C1294NCPDT:1"
+            isa="v7M4"
+            suffix="em4f"
+            rootDir="/db/vendors/ti/arm/18.12.2.LTS/Linux"
+            os="undefined"
+            rts="ti.targets.arm.rtsarm">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="gnu.targets.arm.M4F"
+            version="gnu.targets.arm.M4F{1,0,7.2,1"
+            rawVersion="7.2.1"
+            platform="ti.platforms.tiva:TM4C1294NCPDT"
+            isa="v7M4"
+            suffix="m4fg"
+            rootDir="/db/vendors/linaro/gcc-arm-none-eabi-7-2017-q4-major"
+            os="undefined"
+            rts="gnu.targets.arm.rtsv7M">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="iar.targets.arm.M4F"
+            version="iar.targets.arm.M4F{1,0,8.32,2"
+            rawVersion="8.32.2.178"
+            platform="ti.platforms.tiva:TM4C1294NCPDT:1"
+            isa="v7M4"
+            suffix="rm4f"
+            rootDir="/db/vendors/iar/arm/8.32.2/Linux"
+            os="undefined"
+            rts="iar.targets.arm.rts">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+    </targets>
+    <libraries>
+    <library name="lib/drivers_cc13x0"
+        pname="lib/drivers_cc13x0.aem3"
+        profile="release"
+        target="ti.targets.arm.elf.M3"/>
+    <library name="lib/drivers_cc13x0"
+        pname="lib/drivers_cc13x0.arm3"
+        profile="release"
+        target="iar.targets.arm.M3"/>
+    <library name="lib/drivers_cc13x0"
+        pname="lib/drivers_cc13x0.am3g"
+        profile="release"
+        target="gnu.targets.arm.M3"/>
+    <library name="lib/drivers_cc26x0"
+        pname="lib/drivers_cc26x0.aem3"
+        profile="release"
+        target="ti.targets.arm.elf.M3"/>
+    <library name="lib/drivers_cc26x0"
+        pname="lib/drivers_cc26x0.arm3"
+        profile="release"
+        target="iar.targets.arm.M3"/>
+    <library name="lib/drivers_cc26x0"
+        pname="lib/drivers_cc26x0.am3g"
+        profile="release"
+        target="gnu.targets.arm.M3"/>
+    <library name="lib/drivers_cc26x0r2"
+        pname="lib/drivers_cc26x0r2.aem3"
+        profile="release"
+        target="ti.targets.arm.elf.M3"/>
+    <library name="lib/drivers_cc26x0r2"
+        pname="lib/drivers_cc26x0r2.arm3"
+        profile="release"
+        target="iar.targets.arm.M3"/>
+    <library name="lib/drivers_cc26x0r2"
+        pname="lib/drivers_cc26x0r2.am3g"
+        profile="release"
+        target="gnu.targets.arm.M3"/>
+    <library name="lib/drivers_cc13x2"
+        pname="lib/drivers_cc13x2.aem4f"
+        profile="release"
+        target="ti.targets.arm.elf.M4F"/>
+    <library name="lib/drivers_cc13x2"
+        pname="lib/drivers_cc13x2.am4fg"
+        profile="release"
+        target="gnu.targets.arm.M4F"/>
+    <library name="lib/drivers_cc13x2"
+        pname="lib/drivers_cc13x2.arm4f"
+        profile="release"
+        target="iar.targets.arm.M4F"/>
+    <library name="lib/drivers_cc26x2"
+        pname="lib/drivers_cc26x2.aem4f"
+        profile="release"
+        target="ti.targets.arm.elf.M4F"/>
+    <library name="lib/drivers_cc26x2"
+        pname="lib/drivers_cc26x2.am4fg"
+        profile="release"
+        target="gnu.targets.arm.M4F"/>
+    <library name="lib/drivers_cc26x2"
+        pname="lib/drivers_cc26x2.arm4f"
+        profile="release"
+        target="iar.targets.arm.M4F"/>
+    </libraries>
+    <configurations>
+    </configurations>
+    <executables>
+    </executables>
+    <tests>
+    </tests>
+    <releases relDir="package/rel/">
+    <release name="ti_drivers"
+        pname="ti_drivers.tar"
+        label="default"
+    >
+        <file name="package/package.bld.xml"/>
+        <file name="package/build.cfg"/>
+        <file name="package/package.xdc.inc"/>
+        <file name="libBuilder.xs"/>
+        <file name="package.bld"/>
+        <file name="xdcArgParser.xs"/>
+        <file name="Board.h"/>
+        <file name="NVS.h"/>
+        <file name="./nvs/NVSRAM.h"/>
+        <file name="./nvs/NVSSPI25X.h"/>
+        <file name="SD.h"/>
+        <file name="./sd/SDSPI.h"/>
+        <file name="SDFatFS.h"/>
+        <file name="./dpl/ClockP.h"/>
+        <file name="./dpl/DebugP.h"/>
+        <file name="./dpl/HwiP.h"/>
+        <file name="./dpl/MutexP.h"/>
+        <file name="./dpl/SemaphoreP.h"/>
+        <file name="./dpl/SwiP.h"/>
+        <file name="./dpl/SystemP.h"/>
+        <file name="./utils/List.h"/>
+        <file name="./utils/RingBuf.h"/>
+        <file name="./utils/Random.h"/>
+        <file name="ADC.h"/>
+        <file name="./adc/ADCCC26XX.h"/>
+        <file name="ADCBuf.h"/>
+        <file name="./adcbuf/ADCBufCC26XX.h"/>
+        <file name="AESCBC.h"/>
+        <file name="./aescbc/AESCBCCC26XX.h"/>
+        <file name="AESCTR.h"/>
+        <file name="./aesctr/AESCTRCC26XX.h"/>
+        <file name="AESCTRDRBG.h"/>
+        <file name="./aesctrdrbg/AESCTRDRBGXX.h"/>
+        <file name="AESCCM.h"/>
+        <file name="./aesccm/AESCCMCC26XX.h"/>
+        <file name="AESECB.h"/>
+        <file name="./aesecb/AESECBCC26XX.h"/>
+        <file name="./cryptoutils/cryptokey/CryptoKey.h"/>
+        <file name="./cryptoutils/cryptokey/CryptoKeyPlaintext.h"/>
+        <file name="./cryptoutils/ecc/ECCParams.h"/>
+        <file name="./cryptoutils/sharedresources/CryptoResourceCC26XX.h"/>
+        <file name="./crypto/CryptoCC26XX.h"/>
+        <file name="./dma/UDMACC26XX.h"/>
+        <file name="GPIO.h"/>
+        <file name="./gpio/GPIOCC26XX.h"/>
+        <file name="I2C.h"/>
+        <file name="./i2c/I2CCC26XX.h"/>
+        <file name="I2S.h"/>
+        <file name="./i2s/I2SCC26XX.h"/>
+        <file name="./nvs/NVSCC26XX.h"/>
+        <file name="./pdm/Codec1.h"/>
+        <file name="./pdm/PDMCC26XX.h"/>
+        <file name="./pdm/PDMCC26XX_util.h"/>
+        <file name="PIN.h"/>
+        <file name="./pin/PINCC26XX.h"/>
+        <file name="Power.h"/>
+        <file name="./power/PowerCC26XX.h"/>
+        <file name="PWM.h"/>
+        <file name="./pwm/PWMTimerCC26XX.h"/>
+        <file name="SPI.h"/>
+        <file name="./spi/SPICC26XXDMA.h"/>
+        <file name="TRNG.h"/>
+        <file name="./trng/TRNGCC26XX.h"/>
+        <file name="./timer/GPTimerCC26XX.h"/>
+        <file name="UART.h"/>
+        <file name="./uart/UARTCC26XX.h"/>
+        <file name="./uart/UARTCC26X0.h"/>
+        <file name="Watchdog.h"/>
+        <file name="./watchdog/WatchdogCC26XX.h"/>
+        <file name="./adcbuf/ADCBufCC26X2.h"/>
+        <file name="AESGCM.h"/>
+        <file name="./aesgcm/AESGCMCC26XX.h"/>
+        <file name="./cryptoutils/sharedresources/PKAResourceCC26XX.h"/>
+        <file name="ECDH.h"/>
+        <file name="./ecdh/ECDHCC26X2.h"/>
+        <file name="ECDSA.h"/>
+        <file name="./ecdsa/ECDSACC26X2.h"/>
+        <file name="ECJPAKE.h"/>
+        <file name="./ecjpake/ECJPAKECC26X2.h"/>
+        <file name="./power/PowerCC26X2.h"/>
+        <file name="SHA2.h"/>
+        <file name="./sha2/SHA2CC26X2.h"/>
+        <file name="./spi/SPICC26X2DMA.h"/>
+        <file name="./uart/UARTCC26X2.h"/>
+        <file name=".meta"/>
+        <file name="package/package.cfg.xdc.inc"/>
+        <file name="lib/drivers_cc13x0.aem3"/>
+        <file name="package/package_ti.drivers.c"/>
+        <file name="NVS.c"/>
+        <file name="./nvs/NVSRAM.c"/>
+        <file name="./nvs/NVSSPI25X.c"/>
+        <file name="SD.c"/>
+        <file name="./sd/SDSPI.c"/>
+        <file name="SDFatFS.c"/>
+        <file name="./utils/List.c"/>
+        <file name="./utils/RingBuf.c"/>
+        <file name="./utils/Random.c"/>
+        <file name="ADC.c"/>
+        <file name="./adc/ADCCC26XX.c"/>
+        <file name="ADCBuf.c"/>
+        <file name="./adcbuf/ADCBufCC26XX.c"/>
+        <file name="./crypto/CryptoCC26XX.c"/>
+        <file name="AESCBC.c"/>
+        <file name="./aescbc/AESCBCCC26XX.c"/>
+        <file name="AESCTR.c"/>
+        <file name="./aesctr/AESCTRCC26XX.c"/>
+        <file name="AESCTRDRBG.c"/>
+        <file name="./aesctrdrbg/AESCTRDRBGXX.c"/>
+        <file name="AESCCM.c"/>
+        <file name="./aesccm/AESCCMCC26XX.c"/>
+        <file name="AESECB.c"/>
+        <file name="./aesecb/AESECBCC26XX.c"/>
+        <file name="./cryptoutils/cryptokey/CryptoKeyPlaintextCC26XX.c"/>
+        <file name="./cryptoutils/sharedresources/CryptoResourceCC26XX.c"/>
+        <file name="./dma/UDMACC26XX.c"/>
+        <file name="./gpio/GPIOCC26XX.c"/>
+        <file name="I2C.c"/>
+        <file name="./i2c/I2CCC26XX.c"/>
+        <file name="I2S.c"/>
+        <file name="./i2s/I2SCC26XX.c"/>
+        <file name="./nvs/NVSCC26XX.c"/>
+        <file name="./pdm/Codec1.c"/>
+        <file name="./pdm/PDMCC26XX.c"/>
+        <file name="./pdm/PDMCC26XX_util.c"/>
+        <file name="./pin/PINCC26XX.c"/>
+        <file name="./power/PowerCC26XX.c"/>
+        <file name="./power/PowerCC26XX_calibrateRCOSC.c"/>
+        <file name="PWM.c"/>
+        <file name="./pwm/PWMTimerCC26XX.c"/>
+        <file name="SPI.c"/>
+        <file name="./spi/SPICC26XXDMA.c"/>
+        <file name="TRNG.c"/>
+        <file name="./trng/TRNGCC26XX.c"/>
+        <file name="./timer/GPTimerCC26XX.c"/>
+        <file name="UART.c"/>
+        <file name="./uart/UARTCC26XX.c"/>
+        <file name="./uart/UARTCC26X0.c"/>
+        <file name="Watchdog.c"/>
+        <file name="./watchdog/WatchdogCC26XX.c"/>
+        <file name="pdm/pdm2pcm_ccs.asm"/>
+        <file name="lib/drivers_cc13x0.arm3"/>
+        <file name="pdm/pdm2pcm_iar.asm"/>
+        <file name="lib/drivers_cc13x0.am3g"/>
+        <file name="pdm/pdm2pcm_gnu.asm"/>
+        <file name="lib/drivers_cc26x0.aem3"/>
+        <file name="lib/drivers_cc26x0.arm3"/>
+        <file name="lib/drivers_cc26x0.am3g"/>
+        <file name="lib/drivers_cc26x0r2.aem3"/>
+        <file name="lib/drivers_cc26x0r2.arm3"/>
+        <file name="lib/drivers_cc26x0r2.am3g"/>
+        <file name="lib/drivers_cc13x2.aem4f"/>
+        <file name="./adcbuf/ADCBufCC26X2.c"/>
+        <file name="AESGCM.c"/>
+        <file name="./aesgcm/AESGCMCC26XX.c"/>
+        <file name="./cryptoutils/ecc/ECCParamsCC26X2.c"/>
+        <file name="./cryptoutils/sharedresources/PKAResourceCC26XX.c"/>
+        <file name="ECDH.c"/>
+        <file name="./ecdh/ECDHCC26X2.c"/>
+        <file name="ECDSA.c"/>
+        <file name="./ecdsa/ECDSACC26X2.c"/>
+        <file name="ECJPAKE.c"/>
+        <file name="./ecjpake/ECJPAKECC26X2.c"/>
+        <file name="./power/PowerCC26X2.c"/>
+        <file name="./power/PowerCC26X2_calibrateRCOSC.c"/>
+        <file name="SHA2.c"/>
+        <file name="./sha2/SHA2CC26X2.c"/>
+        <file name="./spi/SPICC26X2DMA.c"/>
+        <file name="./uart/UARTCC26X2.c"/>
+        <file name="pdm/pdm2pcm_cc26x2_ccs.asm"/>
+        <file name="lib/drivers_cc13x2.am4fg"/>
+        <file name="pdm/pdm2pcm_cc26x2_gnu.asm"/>
+        <file name="lib/drivers_cc13x2.arm4f"/>
+        <file name="pdm/pdm2pcm_cc26x2_iar.asm"/>
+        <file name="lib/drivers_cc26x2.aem4f"/>
+        <file name="lib/drivers_cc26x2.am4fg"/>
+        <file name="lib/drivers_cc26x2.arm4f"/>
+    </release>
+    </releases>
+    <repositories>
+    </repositories>
+</package>

@@ -1,0 +1,13 @@
+/*
+ *  Copyright 2018 by Texas Instruments Incorporated.
+ *
+ */
+
+Pkg.otherSrcs = ["std.h"];
+
+Pkg.otherFiles = Pkg.otherSrcs;
+/*
+ *  @(#) iar.targets.arm; 1, 0, 0,0; 1-23-2018 11:06:33; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+
+ */
+

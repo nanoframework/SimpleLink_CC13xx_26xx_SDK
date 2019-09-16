@@ -1,0 +1,11 @@
+/*
+ *  Copyright 2018 by Texas Instruments Incorporated.
+ *
+ */
+
+Pkg.otherFiles = ["select.h"];
+/*
+ *  @(#) iar.targets; 1, 0, 1,0; 1-23-2018 11:06:28; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+
+ */
+
