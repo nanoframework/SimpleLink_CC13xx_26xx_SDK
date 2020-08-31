@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 /*
@@ -36,10 +36,12 @@
 #define ti_sysbios_family_arm_lm4_Seconds__top__
 #endif
 
+#ifndef __extern
 #ifdef __cplusplus
 #define __extern extern "C"
 #else
 #define __extern extern
+#endif
 #endif
 
 #define ti_sysbios_family_arm_lm4_Seconds___VERS 200
@@ -240,6 +242,7 @@ struct ti_sysbios_family_arm_lm4_Seconds_Fxns__ {
     xdc_UInt32 (*get)(void);
     xdc_UInt32 (*getTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_Void (*set)(xdc_UInt32 seconds);
+    xdc_UInt32 (*setTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_runtime_Types_SysFxns2 __sfxns;
 };
 #ifndef ti_sysbios_family_arm_lm4_Seconds_Module__FXNS__CR
@@ -260,22 +263,27 @@ __extern const ti_sysbios_family_arm_lm4_Seconds_Fxns__ ti_sysbios_family_arm_lm
 
 /* Module__startupDone__S */
 xdc__CODESECT(ti_sysbios_family_arm_lm4_Seconds_Module__startupDone__S, "ti_sysbios_family_arm_lm4_Seconds_Module__startupDone__S")
-__extern xdc_Bool ti_sysbios_family_arm_lm4_Seconds_Module__startupDone__S( void );
+__extern xdc_Bool ti_sysbios_family_arm_lm4_Seconds_Module__startupDone__S( void);
 
 /* get__E */
 #define ti_sysbios_family_arm_lm4_Seconds_get ti_sysbios_family_arm_lm4_Seconds_get__E
 xdc__CODESECT(ti_sysbios_family_arm_lm4_Seconds_get__E, "ti_sysbios_family_arm_lm4_Seconds_get")
-__extern xdc_UInt32 ti_sysbios_family_arm_lm4_Seconds_get__E( void );
+__extern xdc_UInt32 ti_sysbios_family_arm_lm4_Seconds_get__E( void);
 
 /* getTime__E */
 #define ti_sysbios_family_arm_lm4_Seconds_getTime ti_sysbios_family_arm_lm4_Seconds_getTime__E
 xdc__CODESECT(ti_sysbios_family_arm_lm4_Seconds_getTime__E, "ti_sysbios_family_arm_lm4_Seconds_getTime")
-__extern xdc_UInt32 ti_sysbios_family_arm_lm4_Seconds_getTime__E( ti_sysbios_interfaces_ISeconds_Time *ts );
+__extern xdc_UInt32 ti_sysbios_family_arm_lm4_Seconds_getTime__E( ti_sysbios_interfaces_ISeconds_Time *ts);
 
 /* set__E */
 #define ti_sysbios_family_arm_lm4_Seconds_set ti_sysbios_family_arm_lm4_Seconds_set__E
 xdc__CODESECT(ti_sysbios_family_arm_lm4_Seconds_set__E, "ti_sysbios_family_arm_lm4_Seconds_set")
-__extern xdc_Void ti_sysbios_family_arm_lm4_Seconds_set__E( xdc_UInt32 seconds );
+__extern xdc_Void ti_sysbios_family_arm_lm4_Seconds_set__E( xdc_UInt32 seconds);
+
+/* setTime__E */
+#define ti_sysbios_family_arm_lm4_Seconds_setTime ti_sysbios_family_arm_lm4_Seconds_setTime__E
+xdc__CODESECT(ti_sysbios_family_arm_lm4_Seconds_setTime__E, "ti_sysbios_family_arm_lm4_Seconds_setTime")
+__extern xdc_UInt32 ti_sysbios_family_arm_lm4_Seconds_setTime__E( ti_sysbios_interfaces_ISeconds_Time *ts);
 
 
 /*
@@ -359,8 +367,11 @@ static inline xdc_Void ti_sysbios_family_arm_lm4_Seconds_Module_setMask(xdc_Bits
 
 /* Module_State */
 struct ti_sysbios_family_arm_lm4_Seconds_Module_State {
+    xdc_UInt32 setSecondsHi;
     xdc_UInt32 setSeconds;
     xdc_UInt32 refSeconds;
+    xdc_UInt32 deltaNSecs;
+    xdc_Int32 deltaSecs;
 };
 
 /* Module__state__V */
@@ -390,6 +401,7 @@ extern struct ti_sysbios_family_arm_lm4_Seconds_Module_State__ ti_sysbios_family
 #define Seconds_get ti_sysbios_family_arm_lm4_Seconds_get
 #define Seconds_getTime ti_sysbios_family_arm_lm4_Seconds_getTime
 #define Seconds_set ti_sysbios_family_arm_lm4_Seconds_set
+#define Seconds_setTime ti_sysbios_family_arm_lm4_Seconds_setTime
 #define Seconds_Module_name ti_sysbios_family_arm_lm4_Seconds_Module_name
 #define Seconds_Module_id ti_sysbios_family_arm_lm4_Seconds_Module_id
 #define Seconds_Module_startup ti_sysbios_family_arm_lm4_Seconds_Module_startup

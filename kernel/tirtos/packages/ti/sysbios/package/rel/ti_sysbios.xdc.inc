@@ -4,6 +4,7 @@ package/package.xdc.inc
 package.bld
 libFilter.xs
 makefile.xdt
+makefile_clang.xdt
 debugMakefile.xdt
 makefile_IAR.xdt
 makefile_gccArmLto.xdt
@@ -17,11 +18,8 @@ Overview.xml
 Overview.svg
 DescMsg.xdt
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.aem3
+lib/debug/ti.sysbios.aem4f
 package/package_ti.sysbios.c
 BIOS.c
-lib/sysbios/debug/ti.sysbios.am3g
-lib/sysbios/debug/ti.sysbios.arm3
-lib/sysbios/debug/ti.sysbios.aem4f
-lib/sysbios/debug/ti.sysbios.am4fg
-lib/sysbios/debug/ti.sysbios.arm4f
+lib/debug/ti.sysbios.am4fg
+lib/debug/ti.sysbios.arm4f

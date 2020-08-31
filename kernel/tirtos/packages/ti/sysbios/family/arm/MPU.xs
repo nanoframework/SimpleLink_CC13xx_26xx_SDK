@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,12 +52,13 @@ function getAsmFiles(targetName)
         case "ti.targets.arm.elf.R4F":
         case "ti.targets.arm.elf.R4Ft":
         case "ti.targets.arm.elf.R5F":
+        case "ti.targets.arm.elf.R5Ft":
             return (["MPU_asm.sv7R"]);
             break;
 
         default:
             return (null);
-	    break;
+            break;
     }
 }
 
@@ -82,9 +83,9 @@ if (xdc.om.$name == "cfg" || typeof(genCdoc) != "undefined") {
     };
 
     /* Cortex-R devices */
-    deviceTable["AWR14XX"]       = deviceTable["AWR16XX"];
-    deviceTable["IWR14XX"]       = deviceTable["AWR16XX"];
-    deviceTable["IWR16XX"]       = deviceTable["AWR16XX"];
+    deviceTable["AWR1.*"]        = deviceTable["AWR16XX"];
+    deviceTable["IWR1.*"]        = deviceTable["AWR16XX"];
+    deviceTable["IWR6.*"]        = deviceTable["AWR16XX"];
     deviceTable["RM48L.*"]       = deviceTable["AWR16XX"];
     deviceTable["RM57D8.*"]      = deviceTable["RM57D8XX"];
     deviceTable["RM57L8XX"]      = deviceTable["RM57D8XX"];
@@ -97,8 +98,14 @@ if (xdc.om.$name == "cfg" || typeof(genCdoc) != "undefined") {
     deviceTable["TM4C129CNCPDT"] = deviceTable["MSP432P401R"];
     deviceTable["TM4.*"]         = deviceTable["MSP432P401R"];
 
-    /* Simplelink devices */
+    /* SimpleLink devices */
+    deviceTable["CC13.1.*"] = deviceTable["CC26.2.*"];
+    deviceTable["CC26.1.*"] = deviceTable["CC26.2.*"];
     deviceTable["CC13.2.*"] = deviceTable["CC26.2.*"];
+
+    /* Keystone3 devices */
+    deviceTable["AM65.*"]     = deviceTable["RM57D8XX"];
+    deviceTable["J7.*"]       = deviceTable["RM57D8XX"];
 }
 
 /*
@@ -181,7 +188,7 @@ function module$use()
         var supportedDevices = new Object();
 
         for (var i = 0; i < catalog.$modules.length; i++) {
-            catalogName = catalog.$modules[i].$name.substring(
+            var catalogName = catalog.$modules[i].$name.substring(
                 Program.cpu.catalogName.length + 1);
 
             for (device in deviceTable) {
@@ -328,6 +335,14 @@ function setRegionMeta(regionId, regionBaseAddr, regionSize, attrs)
         MPU.regionEntry[regionId].sizeAndEnable =
             ((attrs.subregionDisableMask << 8) | regionSize | attrs.enable);
 
+        if ((attrs.tex == 1 &&
+             attrs.cacheable == false && attrs.bufferable == true) ||
+            (attrs.tex == 1 &&
+             attrs.cacheable == true && attrs.bufferable == false)) {
+
+            MPU.$logError("MPU Region attributes for region number " + regionId + " set to reserved combination: tex = 1, cacheable = " + attrs.cacheable + ", bufferable = " + attrs.bufferable, MPU);
+        }
+
         MPU.regionEntry[regionId].regionAttrs =
             convertToUInt32((attrs.noExecute << 12) | (attrs.accPerm << 8) |
             (attrs.tex << 3) | (attrs.shareable << 2) | (attrs.cacheable << 1) |
@@ -454,28 +469,7 @@ function viewMpuRegionAttrs(view)
         rawView = Program.scanRawView('ti.sysbios.family.arm.MPU');
     }
     catch (e) {
-        this.$logWarning("Caught exception while retrieving raw view: " + e,
-                this);
-    }
-
-    /* Get the module state */
-    var mod = rawView.modState;
-
-    /* Retrieve the MMU descriptor table */
-    try {
-        mpuRegionEntry = Program.fetchArray(
-            {
-                type: 'xdc.rov.support.ScalarStructs.S_UInt32',
-                isScalar: true
-            },
-            mod.regionEntry,
-            (MPUCfg.numRegions * 3),
-            false);
-    }
-    catch (e) {
-        this.$logWarning(
-            "Caught exception while trying to retrieve descriptor table: " +
-            e, this);
+        print(e.toString());
     }
 
     /* Walk through the level 1 descriptor table */
@@ -483,8 +477,9 @@ function viewMpuRegionAttrs(view)
         var elem = Program.newViewStruct('ti.sysbios.family.arm.MPU',
                 'MpuRegionAttrsView');
 
-        viewPopulateRegionAttrs(i, elem, mpuRegionEntry[i*3],
-            mpuRegionEntry[i*3 + 1], mpuRegionEntry[i*3 + 2]);
+        viewPopulateRegionAttrs(i, elem, MPUCfg.regionEntry[i].baseAddress,
+                MPUCfg.regionEntry[i].sizeAndEnable,
+                MPUCfg.regionEntry[i].regionAttrs);
 
         /* Add the element to the list. */
         view.elements.$add(elem);

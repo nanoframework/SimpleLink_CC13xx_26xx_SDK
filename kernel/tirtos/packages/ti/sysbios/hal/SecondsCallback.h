@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 /*
@@ -36,10 +36,12 @@
 #define ti_sysbios_hal_SecondsCallback__top__
 #endif
 
+#ifndef __extern
 #ifdef __cplusplus
 #define __extern extern "C"
 #else
 #define __extern extern
+#endif
 #endif
 
 #define ti_sysbios_hal_SecondsCallback___VERS 200
@@ -70,6 +72,12 @@ typedef xdc_UInt32 (*ti_sysbios_hal_SecondsCallback_GetFxn)(void);
 
 /* SetFxn */
 typedef xdc_Void (*ti_sysbios_hal_SecondsCallback_SetFxn)(xdc_UInt32 arg1);
+
+/* GetTimeFxn */
+typedef xdc_UInt32 (*ti_sysbios_hal_SecondsCallback_GetTimeFxn)(ti_sysbios_hal_SecondsCallback_Time* arg1);
+
+/* SetTimeFxn */
+typedef xdc_UInt32 (*ti_sysbios_hal_SecondsCallback_SetTimeFxn)(ti_sysbios_hal_SecondsCallback_Time* arg1);
 
 
 /*
@@ -252,6 +260,24 @@ __extern __FAR__ const CT__ti_sysbios_hal_SecondsCallback_setFxn ti_sysbios_hal_
 #define ti_sysbios_hal_SecondsCallback_setFxn (ti_sysbios_hal_SecondsCallback_setFxn__C)
 #endif
 
+/* getTimeFxn */
+typedef ti_sysbios_hal_SecondsCallback_GetTimeFxn CT__ti_sysbios_hal_SecondsCallback_getTimeFxn;
+__extern __FAR__ const CT__ti_sysbios_hal_SecondsCallback_getTimeFxn ti_sysbios_hal_SecondsCallback_getTimeFxn__C;
+#ifdef ti_sysbios_hal_SecondsCallback_getTimeFxn__CR
+#define ti_sysbios_hal_SecondsCallback_getTimeFxn (*((CT__ti_sysbios_hal_SecondsCallback_getTimeFxn*)(xdcRomConstPtr + ti_sysbios_hal_SecondsCallback_getTimeFxn__C_offset)))
+#else
+#define ti_sysbios_hal_SecondsCallback_getTimeFxn (ti_sysbios_hal_SecondsCallback_getTimeFxn__C)
+#endif
+
+/* setTimeFxn */
+typedef ti_sysbios_hal_SecondsCallback_SetTimeFxn CT__ti_sysbios_hal_SecondsCallback_setTimeFxn;
+__extern __FAR__ const CT__ti_sysbios_hal_SecondsCallback_setTimeFxn ti_sysbios_hal_SecondsCallback_setTimeFxn__C;
+#ifdef ti_sysbios_hal_SecondsCallback_setTimeFxn__CR
+#define ti_sysbios_hal_SecondsCallback_setTimeFxn (*((CT__ti_sysbios_hal_SecondsCallback_setTimeFxn*)(xdcRomConstPtr + ti_sysbios_hal_SecondsCallback_setTimeFxn__C_offset)))
+#else
+#define ti_sysbios_hal_SecondsCallback_setTimeFxn (ti_sysbios_hal_SecondsCallback_setTimeFxn__C)
+#endif
+
 
 /*
  * ======== VIRTUAL FUNCTIONS ========
@@ -264,6 +290,7 @@ struct ti_sysbios_hal_SecondsCallback_Fxns__ {
     xdc_UInt32 (*get)(void);
     xdc_UInt32 (*getTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_Void (*set)(xdc_UInt32 seconds);
+    xdc_UInt32 (*setTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_runtime_Types_SysFxns2 __sfxns;
 };
 #ifndef ti_sysbios_hal_SecondsCallback_Module__FXNS__CR
@@ -284,22 +311,27 @@ __extern const ti_sysbios_hal_SecondsCallback_Fxns__ ti_sysbios_hal_SecondsCallb
 
 /* Module__startupDone__S */
 xdc__CODESECT(ti_sysbios_hal_SecondsCallback_Module__startupDone__S, "ti_sysbios_hal_SecondsCallback_Module__startupDone__S")
-__extern xdc_Bool ti_sysbios_hal_SecondsCallback_Module__startupDone__S( void );
+__extern xdc_Bool ti_sysbios_hal_SecondsCallback_Module__startupDone__S( void);
 
 /* get__E */
 #define ti_sysbios_hal_SecondsCallback_get ti_sysbios_hal_SecondsCallback_get__E
 xdc__CODESECT(ti_sysbios_hal_SecondsCallback_get__E, "ti_sysbios_hal_SecondsCallback_get")
-__extern xdc_UInt32 ti_sysbios_hal_SecondsCallback_get__E( void );
+__extern xdc_UInt32 ti_sysbios_hal_SecondsCallback_get__E( void);
 
 /* getTime__E */
 #define ti_sysbios_hal_SecondsCallback_getTime ti_sysbios_hal_SecondsCallback_getTime__E
 xdc__CODESECT(ti_sysbios_hal_SecondsCallback_getTime__E, "ti_sysbios_hal_SecondsCallback_getTime")
-__extern xdc_UInt32 ti_sysbios_hal_SecondsCallback_getTime__E( ti_sysbios_interfaces_ISeconds_Time *ts );
+__extern xdc_UInt32 ti_sysbios_hal_SecondsCallback_getTime__E( ti_sysbios_interfaces_ISeconds_Time *ts);
 
 /* set__E */
 #define ti_sysbios_hal_SecondsCallback_set ti_sysbios_hal_SecondsCallback_set__E
 xdc__CODESECT(ti_sysbios_hal_SecondsCallback_set__E, "ti_sysbios_hal_SecondsCallback_set")
-__extern xdc_Void ti_sysbios_hal_SecondsCallback_set__E( xdc_UInt32 seconds );
+__extern xdc_Void ti_sysbios_hal_SecondsCallback_set__E( xdc_UInt32 seconds);
+
+/* setTime__E */
+#define ti_sysbios_hal_SecondsCallback_setTime ti_sysbios_hal_SecondsCallback_setTime__E
+xdc__CODESECT(ti_sysbios_hal_SecondsCallback_setTime__E, "ti_sysbios_hal_SecondsCallback_setTime")
+__extern xdc_UInt32 ti_sysbios_hal_SecondsCallback_setTime__E( ti_sysbios_interfaces_ISeconds_Time *ts);
 
 
 /*
@@ -399,11 +431,16 @@ static inline xdc_Void ti_sysbios_hal_SecondsCallback_Module_setMask(xdc_Bits16 
 #define SecondsCallback_Time ti_sysbios_hal_SecondsCallback_Time
 #define SecondsCallback_GetFxn ti_sysbios_hal_SecondsCallback_GetFxn
 #define SecondsCallback_SetFxn ti_sysbios_hal_SecondsCallback_SetFxn
+#define SecondsCallback_GetTimeFxn ti_sysbios_hal_SecondsCallback_GetTimeFxn
+#define SecondsCallback_SetTimeFxn ti_sysbios_hal_SecondsCallback_SetTimeFxn
 #define SecondsCallback_getFxn ti_sysbios_hal_SecondsCallback_getFxn
 #define SecondsCallback_setFxn ti_sysbios_hal_SecondsCallback_setFxn
+#define SecondsCallback_getTimeFxn ti_sysbios_hal_SecondsCallback_getTimeFxn
+#define SecondsCallback_setTimeFxn ti_sysbios_hal_SecondsCallback_setTimeFxn
 #define SecondsCallback_get ti_sysbios_hal_SecondsCallback_get
 #define SecondsCallback_getTime ti_sysbios_hal_SecondsCallback_getTime
 #define SecondsCallback_set ti_sysbios_hal_SecondsCallback_set
+#define SecondsCallback_setTime ti_sysbios_hal_SecondsCallback_setTime
 #define SecondsCallback_Module_name ti_sysbios_hal_SecondsCallback_Module_name
 #define SecondsCallback_Module_id ti_sysbios_hal_SecondsCallback_Module_id
 #define SecondsCallback_Module_startup ti_sysbios_hal_SecondsCallback_Module_startup

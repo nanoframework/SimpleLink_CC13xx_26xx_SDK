@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 #ifndef ti_sysbios_hal_SecondsClock__INTERNAL__
@@ -32,6 +32,10 @@
 /* set */
 #undef ti_sysbios_hal_SecondsClock_set
 #define ti_sysbios_hal_SecondsClock_set ti_sysbios_hal_SecondsClock_set__E
+
+/* setTime */
+#undef ti_sysbios_hal_SecondsClock_setTime
+#define ti_sysbios_hal_SecondsClock_setTime ti_sysbios_hal_SecondsClock_setTime__E
 
 /* increment */
 #define SecondsClock_increment ti_sysbios_hal_SecondsClock_increment__I

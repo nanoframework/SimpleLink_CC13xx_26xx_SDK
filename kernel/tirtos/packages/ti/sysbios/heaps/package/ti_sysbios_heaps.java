@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_heaps
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -291,7 +291,6 @@ public class ti_sysbios_heaps
         // module HeapMultiBuf
         om.bind("ti.sysbios.heaps.HeapMultiBuf.addrPairCompare", new Extern("ti_sysbios_heaps_HeapMultiBuf_addrPairCompare__I", "xdc_Int(*)(xdc_Void*,xdc_Void*)", true, false));
         om.bind("ti.sysbios.heaps.HeapMultiBuf.sizeAlignCompare", new Extern("ti_sysbios_heaps_HeapMultiBuf_sizeAlignCompare__I", "xdc_Int(*)(xdc_Void*,xdc_Void*)", true, false));
-        om.bind("ti.sysbios.heaps.HeapMultiBuf.moveToEnd", new Extern("ti_sysbios_heaps_HeapMultiBuf_moveToEnd__I", "xdc_Void(*)(ti_sysbios_heaps_HeapBuf_Handle*,xdc_UInt,xdc_UInt)", true, false));
         om.bind("ti.sysbios.heaps.HeapMultiBuf.borrowBlock", new Extern("ti_sysbios_heaps_HeapMultiBuf_borrowBlock__I", "xdc_Void*(*)(ti_sysbios_heaps_HeapMultiBuf_Object*,xdc_SizeT,xdc_SizeT,xdc_Int)", true, false));
     }
 
@@ -939,7 +938,7 @@ public class ti_sysbios_heaps
 
         so = (Proto.Str)om.findStrict("ti.sysbios.heaps.HeapTrack.Tracker", "ti.sysbios.heaps");
         sizes.clear();
-        sizes.add(Global.newArray("scribble", "UInt32"));
+        sizes.add(Global.newArray("scribble", "UIArg"));
         sizes.add(Global.newArray("queElem", "Sti.sysbios.knl.Queue;Elem"));
         sizes.add(Global.newArray("size", "USize"));
         sizes.add(Global.newArray("tick", "UInt32"));
@@ -1416,8 +1415,8 @@ public class ti_sysbios_heaps
         po = (Proto.Obj)om.findStrict("ti.sysbios.heaps.HeapTrack.Module", "ti.sysbios.heaps");
         po.init("ti.sysbios.heaps.HeapTrack.Module", om.findStrict("xdc.runtime.IHeap.Module", "ti.sysbios.heaps"));
                 po.addFld("$hostonly", $$T_Num, 0, "r");
-                po.addFld("STARTSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0xa5a5a5a5L, "rh");
-                po.addFld("NOSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0x05101920L, "rh");
+                po.addFld("STARTSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0xa5a5a5a5L, "rh");
+                po.addFld("NOSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0x05101920L, "rh");
         if (isCFG) {
             po.addFld("rovViewInfo", (Proto)om.findStrict("xdc.rov.ViewInfo.Instance", "ti.sysbios.heaps"), $$UNDEF, "wh");
             po.addFld("A_doubleFree", (Proto)om.findStrict("xdc.runtime.Assert$$Id", "ti.sysbios.heaps"), Global.newObject("msg", "A_doubleFree: Buffer already free"), "w");
@@ -1450,8 +1449,8 @@ public class ti_sysbios_heaps
         po = (Proto.Obj)om.findStrict("ti.sysbios.heaps.HeapTrack.Instance", "ti.sysbios.heaps");
         po.init("ti.sysbios.heaps.HeapTrack.Instance", om.findStrict("xdc.runtime.IHeap.Instance", "ti.sysbios.heaps"));
                 po.addFld("$hostonly", $$T_Num, 0, "r");
-                po.addFld("STARTSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0xa5a5a5a5L, "rh");
-                po.addFld("NOSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0x05101920L, "rh");
+                po.addFld("STARTSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0xa5a5a5a5L, "rh");
+                po.addFld("NOSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0x05101920L, "rh");
         if (isCFG) {
             po.addFld("heap", (Proto)om.findStrict("xdc.runtime.IHeap.Handle", "ti.sysbios.heaps"), null, "w");
                         po.addFld("instance", (Proto)om.findStrict("xdc.runtime.IInstance.Params", "ti.sysbios.heaps"), $$UNDEF, "w");
@@ -1459,8 +1458,8 @@ public class ti_sysbios_heaps
         po = (Proto.Obj)om.findStrict("ti.sysbios.heaps.HeapTrack$$Params", "ti.sysbios.heaps");
         po.init("ti.sysbios.heaps.HeapTrack.Params", om.findStrict("xdc.runtime.IHeap$$Params", "ti.sysbios.heaps"));
                 po.addFld("$hostonly", $$T_Num, 0, "r");
-                po.addFld("STARTSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0xa5a5a5a5L, "rh");
-                po.addFld("NOSCRIBBLE", Proto.Elm.newCNum("(xdc_UInt32)"), 0x05101920L, "rh");
+                po.addFld("STARTSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0xa5a5a5a5L, "rh");
+                po.addFld("NOSCRIBBLE", new Proto.Adr("xdc_UArg", "Pv"), 0x05101920L, "rh");
         if (isCFG) {
             po.addFld("heap", (Proto)om.findStrict("xdc.runtime.IHeap.Handle", "ti.sysbios.heaps"), null, "w");
                         po.addFld("instance", (Proto)om.findStrict("xdc.runtime.IInstance.Params", "ti.sysbios.heaps"), $$UNDEF, "w");
@@ -1501,7 +1500,7 @@ public class ti_sysbios_heaps
         po = (Proto.Obj)om.findStrict("ti.sysbios.heaps.HeapTrack$$Tracker", "ti.sysbios.heaps");
         po.init("ti.sysbios.heaps.HeapTrack.Tracker", null);
                 po.addFld("$hostonly", $$T_Num, 0, "r");
-                po.addFld("scribble", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
+                po.addFld("scribble", new Proto.Adr("xdc_UArg", "Pv"), $$UNDEF, "w");
                 po.addFld("queElem", (Proto)om.findStrict("ti.sysbios.knl.Queue.Elem", "ti.sysbios.heaps"), $$DEFAULT, "w");
                 po.addFld("size", Proto.Elm.newCNum("(xdc_SizeT)"), $$UNDEF, "w");
                 po.addFld("tick", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
@@ -1802,20 +1801,14 @@ public class ti_sysbios_heaps
             sb.append("pkg.packageRepository = xdc.om['ti.sysbios.heaps$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.aem3',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.am3g',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.arm3',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.aem4f',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.am4fg',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.heaps.arm4f',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.aem4f',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.am4fg',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.aem3', {target: 'ti.targets.arm.elf.M3', suffix: 'em3'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.am3g', {target: 'gnu.targets.arm.M3', suffix: 'm3g'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.arm3', {target: 'iar.targets.arm.M3', suffix: 'rm3'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.heaps.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }
@@ -2151,7 +2144,6 @@ public class ti_sysbios_heaps
         }//isCFG
         vo.bind("addrPairCompare", om.findStrict("ti.sysbios.heaps.HeapMultiBuf.addrPairCompare", "ti.sysbios.heaps"));
         vo.bind("sizeAlignCompare", om.findStrict("ti.sysbios.heaps.HeapMultiBuf.sizeAlignCompare", "ti.sysbios.heaps"));
-        vo.bind("moveToEnd", om.findStrict("ti.sysbios.heaps.HeapMultiBuf.moveToEnd", "ti.sysbios.heaps"));
         vo.bind("borrowBlock", om.findStrict("ti.sysbios.heaps.HeapMultiBuf.borrowBlock", "ti.sysbios.heaps"));
         vo.bind("$$fxntab", Global.newArray("ti_sysbios_heaps_HeapMultiBuf_Handle__label__E", "ti_sysbios_heaps_HeapMultiBuf_Module__startupDone__E", "ti_sysbios_heaps_HeapMultiBuf_Object__create__E", "ti_sysbios_heaps_HeapMultiBuf_Object__delete__E", "ti_sysbios_heaps_HeapMultiBuf_Object__get__E", "ti_sysbios_heaps_HeapMultiBuf_Object__first__E", "ti_sysbios_heaps_HeapMultiBuf_Object__next__E", "ti_sysbios_heaps_HeapMultiBuf_Params__init__E", "ti_sysbios_heaps_HeapMultiBuf_getStats__E", "ti_sysbios_heaps_HeapMultiBuf_alloc__E", "ti_sysbios_heaps_HeapMultiBuf_free__E", "ti_sysbios_heaps_HeapMultiBuf_isBlocking__E"));
         vo.bind("$$logEvtCfgs", Global.newArray());

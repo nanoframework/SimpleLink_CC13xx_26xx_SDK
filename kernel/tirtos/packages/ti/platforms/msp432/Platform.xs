@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Texas Instruments Incorporated
+ * Copyright (c) 2016-2018, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,17 +76,6 @@ function getExeContext(prog)
     cpu.deviceName = revision;
     cpu.revision = "";
 
-    if (prog.build.target.$name.match(/gnu/)) {
-        if (this.codeMemory == undefined) {
-            this.codeMemory = "REGION_TEXT";
-        }
-        if (this.dataMemory == undefined) {
-            this.dataMemory = "REGION_DATA";
-        }
-        if (this.stackMemory == undefined) {
-            this.stackMemory = "REGION_STACK";
-        }
-    }
     /* check for the overlap in the memory map */
     var overlap = Utils.checkOverlap(cpu.memoryMap);
 
@@ -187,12 +176,6 @@ function instance$meta$init(name)
             + "ignored.", this, this.externalMemoryMap);
     }
 
-    if (Program.build.target.$name.match(/gnu/)) {
-        this.codeMemory = "REGION_TEXT";
-        this.dataMemory = "REGION_DATA";
-        this.stackMemory = "REGION_STACK";
-    }
-
     /* if in the configuration model ... */
     if (xdc.om.$name == "cfg") {
         /* We use 'revision' to pass 'the real device name' to the generic
@@ -207,7 +190,7 @@ function instance$meta$init(name)
         }
         else if (this.deviceName.match(/^MSP432/)) {
             this.CPU.catalogName = "ti.catalog.arm.cortexm4";
-            this.CPU.clockRate = 48;
+            this.CPU.clockRate = 3;
         }
     }
 }

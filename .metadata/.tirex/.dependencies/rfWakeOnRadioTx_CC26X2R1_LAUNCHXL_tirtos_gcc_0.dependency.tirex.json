@@ -1,0 +1,13 @@
+[
+    {
+        "files": [
+            "+../../README.md -> README.md",
+            "+../../rfWakeOnRadioTx.syscfg -> rfWakeOnRadioTx.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../rfWakeOnRadioTx.c -> rfWakeOnRadioTx.c",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.lds -> CC26X2R1_LAUNCHXL_TIRTOS.lds"
+        ]
+    }
+]

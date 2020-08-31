@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017, Texas Instruments Incorporated
+ * Copyright (c) 2013-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,8 +54,11 @@ var Event = null;
 function module$use()
 {
     Event = this;
-    xdc.useModule('xdc.runtime.Log');
     BIOS = xdc.module('ti.sysbios.BIOS');
+    if (!(BIOS.libType == BIOS.LibType_Custom && BIOS.logsEnabled == false)) {
+        xdc.useModule('xdc.runtime.Log');
+    }
+
     Program = xdc.module('xdc.cfg.Program');
     Queue = xdc.useModule("ti.sysbios.knl.Queue");
     xdc.useModule("ti.sysbios.hal.Hwi");
@@ -242,4 +245,3 @@ function viewInitBasic(view, obj)
         view.timeout = timeout;
     }
 }
-

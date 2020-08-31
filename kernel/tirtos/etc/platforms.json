@@ -13,16 +13,6 @@
         "target": "iar.targets.arm.M.*",
         "platform": "ti.platforms.tiva"
     },
-    {
-        "target": "iar.targets.msp430.*",
-        "platform": "ti.platforms.msp430"
-    },
-
-
-    {
-        "target": "ti.targets.msp430(.elf)?.MSP430",
-        "platform": "ti.platforms.msp430"
-    },
 
 
     {
@@ -80,21 +70,6 @@
         "target": "ti.targets.arm.elf.M3",
         "device": "OMAP443",
         "platform": "ti.platforms.sdp4430"
-    },
-    {
-        "target": "ti.targets.arm.elf.M3",
-        "device": "^LM3S8",
-        "platform": "ti.platforms.evmLM3S8962"
-    },
-    {
-        "target": "ti.targets.arm.elf.M3",
-        "device": "^LM3S9",
-        "platform": "ti.platforms.evmLM3S9B92"
-    },
-    {
-        "target": "gnu.targets.arm.M3",
-        "device": "^LM3S9",
-        "platform": "ti.platforms.gccLM3S9B90RAM"
     },
     {
         "target": "ti.targets.arm.elf.M3",
@@ -159,6 +134,10 @@
         "target": "ti.targets.arm.elf.R4F",
         "device": "^IWR16.*",
         "platform": "ti.platforms.cortexR:IWR16XX"
+    },
+    {
+        "target": "ti.targets.arm.elf.R5F",
+        "platform": "ti.platforms.cortexR"
     },
     {
         "target": "ti.targets.arm.elf.M(3|4)",
@@ -353,8 +332,10 @@
         "target": "gnu.targets.arm.A15F",
         "platform": "ti.platforms.evmTCI66AK2G02"
     },
-
-
+    {
+         "target": "gnu.targets.arm.A53F",
+         "platform": "ti.platforms.cortexA"
+    },
     {
         "target": "ti.targets(.elf)?.C64P",
         "device": "TMS320C642[14]",
@@ -483,6 +464,11 @@
     },
     {
         "target": "ti.targets(.elf)?.C66",
+        "device": "66AK2",
+        "platform": "ti.platforms.evmTCI66AK2G02"
+    },
+    {
+        "target": "ti.targets(.elf)?.C66",
         "device": "DRA7XX",
         "platform": "ti.platforms.evmDRA7XX"
     },
@@ -508,6 +494,26 @@
     {
         "target": "ti.targets(.elf)?.C66",
         "platform": "ti.platforms.simKepler"
+    },
+    {
+        "target": "ti.targets(.elf)?.C674",
+        "device": "C6742",
+        "platform": "ti.platforms.evm6748"
+    },
+    {
+        "target": "ti.targets(.elf)?.C674",
+        "device": "C6743",
+        "platform": "ti.platforms.evm6747"
+    },
+    {
+        "target": "ti.targets(.elf)?.C674",
+        "device": "C6745",
+        "platform": "ti.platforms.evm6747"
+    },
+    {
+        "target": "ti.targets(.elf)?.C674",
+        "device": "C6746",
+        "platform": "ti.platforms.evm6748"
     },
     {
         "target": "ti.targets(.elf)?.C674",

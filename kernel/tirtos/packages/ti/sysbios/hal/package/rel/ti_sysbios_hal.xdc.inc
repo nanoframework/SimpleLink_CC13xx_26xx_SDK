@@ -12,7 +12,7 @@ Cache.xml
 Seconds.xml
 Seconds.xdt
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.hal.aem3
+lib/debug/ti.sysbios.hal.aem4f
 package/package_ti.sysbios.hal.c
 Cache.c
 CacheNull.c
@@ -28,8 +28,5 @@ SecondsCallback.c
 SecondsClock.c
 Timer.c
 TimerNull.c
-lib/sysbios/debug/ti.sysbios.hal.am3g
-lib/sysbios/debug/ti.sysbios.hal.arm3
-lib/sysbios/debug/ti.sysbios.hal.aem4f
-lib/sysbios/debug/ti.sysbios.hal.am4fg
-lib/sysbios/debug/ti.sysbios.hal.arm4f
+lib/debug/ti.sysbios.hal.am4fg
+lib/debug/ti.sysbios.hal.arm4f

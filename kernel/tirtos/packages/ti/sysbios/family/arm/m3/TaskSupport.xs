@@ -51,6 +51,9 @@ function getAsmFiles(targetName)
         case "gnu.targets.arm.M3":
         case "gnu.targets.arm.M4":
         case "gnu.targets.arm.M4F":
+        case "ti.targets.arm.clang.M3":
+        case "ti.targets.arm.clang.M4":
+        case "ti.targets.arm.clang.M4F":
             return (["TaskSupport_asm_gnu.sv7M"]);
             break;
 

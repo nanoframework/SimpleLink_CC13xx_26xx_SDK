@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Texas Instruments Incorporated
+ * Copyright (c) 2015-2018, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/hal/Hwi.h>
 
-#if (defined ti_targets_arm_elf_R5F)
+#if (defined ti_targets_arm_elf_R5F) || (defined ti_targets_arm_elf_R5Ft)
 #include <ti/sysbios/family/arm/v7r/Cache.h>
 #else
 #include <ti/sysbios/hal/Cache.h>
@@ -61,6 +61,10 @@
 Void MPU_startup()
 {
     UInt i;
+
+    if (MPU_isEnabled()) {
+        MPU_disable();
+    }
 
     MPU_disableBR();
 
@@ -247,6 +251,12 @@ Void MPU_setRegion(UInt8 regionId, Ptr regionBaseAddr,
     Assert_isTrue(regionBaseAddr ==
         (Ptr)((UInt32)regionBaseAddr & (~0 << ((regionSize >> 1) + 1))),
         MPU_A_unalignedBaseAddr);
+    Assert_isTrue(!(
+        (attrs->tex == 1 &&
+         attrs->cacheable == FALSE && attrs->bufferable == TRUE) ||
+        (attrs->tex == 1 &&
+         attrs->cacheable == TRUE && attrs->bufferable == FALSE)),
+        MPU_A_reservedAttrs);
 
     enabled = MPU_isEnabled();
 
@@ -280,5 +290,33 @@ Void MPU_setRegion(UInt8 regionId, Ptr regionBaseAddr,
 
     if (enabled) {
         MPU_enable();
+    }
+}
+
+/*
+ *  ======== MPU_setRegionRaw ========
+ *  Cortex-M specific implementation
+ */
+Void MPU_setRegionRaw(UInt32 rbar, UInt32 rasr)
+{
+    UInt32 key;
+    Bool   enabled;
+
+    if (MPU_isMemoryMapped) {
+        key = Hwi_disable();
+
+        enabled = MPU_isEnabled();
+
+        /* disable the MPU (if already disabled, does nothing) */
+        MPU_disable();
+
+        MPU_deviceRegs.RBAR = rbar;
+        MPU_deviceRegs.RASR = rasr;
+
+        if (enabled) {
+            MPU_enable();
+        }
+
+        Hwi_restore(key);
     }
 }

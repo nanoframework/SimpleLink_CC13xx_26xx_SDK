@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014, Texas Instruments Incorporated
+ * Copyright (c) 2012-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,9 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef ti_sysbios_knl_Task__epilogue__include
+#define ti_sysbios_knl_Task__epilogue__include
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,4 +45,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,8 @@ var Startup = null;
 var BIOS = null;
 var Build = null;
 var Core = null;
+var deviceTable;
+var deviceName;
 
 /*
  * ======== getAsmFiles ========
@@ -58,6 +60,9 @@ function getAsmFiles(targetName)
         case "gnu.targets.arm.M3":
         case "gnu.targets.arm.M4":
         case "gnu.targets.arm.M4F":
+        case "ti.targets.arm.clang.M3":
+        case "ti.targets.arm.clang.M4":
+        case "ti.targets.arm.clang.M4F":
             return (["Hwi_asm_gnu.sv7M", "Hwi_asm_switch_gnu.sv7M"]);
             break;
 
@@ -89,7 +94,7 @@ function getCFiles(targetName)
 }
 
 if (xdc.om.$name == "cfg") {
-    var deviceTable = {
+    deviceTable = {
         "CortexM3": {
             numInterrupts : 16 + 64,
             numPriorities : 8,
@@ -204,8 +209,12 @@ if (xdc.om.$name == "cfg") {
     deviceTable["OMAP5430"]      = deviceTable["OMAP4430"];
     deviceTable["Vayu"]          = deviceTable["OMAP4430"];
     deviceTable["DRA7XX"]        = deviceTable["OMAP4430"];
+    deviceTable["CC13.1.*"]      = deviceTable["CC26.2.*"];
+    deviceTable["CC26.1.*"]      = deviceTable["CC26.2.*"];
     deviceTable["CC13.2.*"]      = deviceTable["CC26.2.*"];
     deviceTable["CC13.*"]        = deviceTable["CC26.*"];
+    deviceTable["CC3235S"]       = deviceTable["CC3200"];
+    deviceTable["CC3235SF"]      = deviceTable["CC3220SF"];
     deviceTable["CC32.*S"]       = deviceTable["CC3200"];
     deviceTable["CC32.*SF"]      = deviceTable["CC3220SF"];
 }
@@ -259,7 +268,7 @@ function module$meta$init()
     GetSet.onSet(this, "enableException", _enableExceptionSet);
     GetSet.onSet(this, "excHandlerFunc", _excHandlerFuncSet);
 
-    var deviceName = deviceSupportCheck();
+    deviceName = deviceSupportCheck();
 
     /*
      * Most tiva derivative GNU linker cmd files require definitions for
@@ -271,6 +280,7 @@ function module$meta$init()
         Program.platformName.match(/ti\.platforms\.cc26xx/) ||
         Program.platformName.match(/ti\.platforms\.msp432/) ||
         Program.platformName.match(/ti\.platforms\.simplelink/) ||
+        Program.platformName.match(/ti\.platforms\.cortexM/) ||
         Program.cpu.deviceName.match(/CC26/) ||
         Program.cpu.deviceName.match(/CC13/) ||
         Program.cpu.deviceName.match(/CC25/) ||
@@ -309,13 +319,6 @@ function module$meta$init()
     /* kill xdc runtime's .bootVecs */
     Program.sectMap[".bootVecs"] = new Program.SectionSpec();
     Program.sectMap[".bootVecs"].type = "DSECT";
-
-    if (!Program.build.target.$name.match(/gnu/)) {
-        /* create our .vecs & .resetVecs SectionSpecs */
-        Program.sectMap[".resetVecs"] = new Program.SectionSpec();
-        Program.sectMap[".vecs"] = new Program.SectionSpec();
-        Program.sectMap[".vecs"].type = "NOLOAD";
-    }
 
     /*
      * Initialize meta-only Hwi object array
@@ -384,23 +387,32 @@ function module$use()
 {
     Startup = xdc.useModule('xdc.runtime.Startup');
 
-    xdc.useModule('xdc.runtime.Log');
-
     BIOS = xdc.useModule("ti.sysbios.BIOS");
     Build = xdc.module("ti.sysbios.Build");
+
+    if (!(BIOS.libType == BIOS.LibType_Custom && BIOS.logsEnabled == false)) {
+        xdc.useModule('xdc.runtime.Log');
+    }
 
     if (BIOS.smpEnabled == true) {
         Core = xdc.module("ti.sysbios.hal.Core");
     }
 
     /* only useModule(Memory) if needed */
-    var Defaults = xdc.useModule('xdc.runtime.Defaults');
+    var Defaults = xdc.module('xdc.runtime.Defaults');
     if (Defaults.common$.memoryPolicy ==
         xdc.module("xdc.runtime.Types").STATIC_POLICY) {
         Memory = xdc.module('xdc.runtime.Memory');
     }
     else {
         Memory = xdc.useModule('xdc.runtime.Memory');
+    }
+
+    if (Hwi.placeVectorTables && !Program.build.target.$name.match(/gnu/)) {
+        /* create our .vecs & .resetVecs SectionSpecs */
+        Program.sectMap[".resetVecs"] = new Program.SectionSpec();
+        Program.sectMap[".vecs"] = new Program.SectionSpec();
+        Program.sectMap[".vecs"].type = "NOLOAD";
     }
 
     if (Hwi.dispatcherSwiSupport == undefined) {
@@ -413,6 +425,7 @@ function module$use()
         if (BIOS.swiEnabled) {
             xdc.useModule("ti.sysbios.knl.Swi");
             Hwi.swiDisable = '&ti_sysbios_knl_Swi_disable__E';
+            Hwi.swiRestore = '&ti_sysbios_knl_Swi_restore__E';
             Hwi.swiRestoreHwi = '&ti_sysbios_knl_Swi_restoreHwi__E';
         }
         else {
@@ -420,7 +433,8 @@ function module$use()
         }
     }
     else {
-        Hwi.swiDisable = null;
+        Hwi.swiDisable = '&ti_sysbios_family_arm_m3_Hwi_swiDisableNull';
+        Hwi.swiRestore = '&ti_sysbios_family_arm_m3_Hwi_swiRestoreNull';
         Hwi.swiRestoreHwi = null;
     }
 
@@ -618,7 +632,7 @@ function module$static$init(mod, params)
     /*
      * Non GNU targets have to deal with legacy config files
      */
-    if (!Program.build.target.$name.match(/gnu/)) {
+    if (Hwi.placeVectorTables && !Program.build.target.$name.match(/gnu/)) {
 
         /*
          * Some legacy config files explicitly place the vector table sections
@@ -719,6 +733,10 @@ function module$static$init(mod, params)
 function instance$static$init(obj, intNum, fxn, params)
 {
     var mod = this.$module.$object;
+
+    if (intNum >= Hwi.NUM_INTERRUPTS) {
+        Hwi.$logError("intnum " + intNum + " is out of range!", this, intNum);
+    }
 
     if (intNum < 15) {
         Hwi.$logError("Only intNums > = 15 can be created.", this, intNum);
@@ -903,7 +921,7 @@ function viewScanDispatchTable(data, viewLevel)
             var alreadyScanned = false;
             /* skip Hwis that are already known to ROV */
             for (var j in rawView.instStates) {
-                rawInstance = rawView.instStates[j];
+                var rawInstance = rawView.instStates[j];
                 if (Number(rawInstance.$addr) == Number(hwiHandle.elem)) {
                     alreadyScanned = true;
                     break;
@@ -983,9 +1001,49 @@ function viewNvicFetch(that)
         that.ICSR = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_UInt', isScalar: true}, 0xe000ed04, 1, false);
         that.STCSR = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_UInt', isScalar: true}, 0xe000e010, 1, false);
         that.SHCSR = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_UInt', isScalar: true}, 0xe000ed24, 1, false);
+        that.VTOR = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_UInt', isScalar: true}, 0xe000ed08, 1, false);
     }
     catch (e) {
         print("Error: Problem fetching NVIC: " + e.toString());
+    }
+}
+
+/* used by ROV view Code */
+var subPriMasks = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
+
+/* used by ROV view Code */
+var numPriTable = {
+    "2" : {
+        mask : 0x80,
+        shift : 7
+    },
+    "4" : {
+        mask : 0xc0,
+        shift : 6
+    },
+    "8" : {
+        mask : 0xe0,
+        shift : 5
+    },
+    "16" : {
+        mask : 0xf0,
+        shift : 4
+    },
+    "32" : {
+        mask : 0xf8,
+        shift : 3
+    },
+    "64" : {
+        mask : 0xfc,
+        shift : 2
+    },
+    "128" : {
+        mask : 0xfe,
+        shift : 1
+    },
+    "256" : {
+        mask : 0xff,
+        shift : 0
     }
 }
 
@@ -1000,48 +1058,11 @@ function viewFillBasicInfo(view, obj)
     var halHwi = xdc.useModule('ti.sysbios.hal.Hwi');
     var hwiModCfg = Program.getModuleConfig('ti.sysbios.family.arm.m3.Hwi');
 
-    var subPriMasks = [0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff];
-
-    var numPriTable = {
-        "2" : {
-            mask : 0x80,
-            shift : 7
-        },
-        "4" : {
-            mask : 0xc0,
-            shift : 6
-        },
-        "8" : {
-            mask : 0xe0,
-            shift : 5
-        },
-        "16" : {
-            mask : 0xf0,
-            shift : 4
-        },
-        "32" : {
-            mask : 0xf8,
-            shift : 3
-        },
-        "64" : {
-            mask : 0xfc,
-            shift : 2
-        },
-        "128" : {
-            mask : 0xfe,
-            shift : 1
-        },
-        "256" : {
-            mask : 0xff,
-            shift : 0
-        }
-    }
-
     var pri = viewGetPriority(view, this, Math.abs(obj.intNum));
 
-    mask = numPriTable[hwiModCfg.NUM_PRIORITIES].mask;
+    var mask = numPriTable[hwiModCfg.NUM_PRIORITIES].mask;
 
-    shift = numPriTable[hwiModCfg.NUM_PRIORITIES].shift;
+    var shift = numPriTable[hwiModCfg.NUM_PRIORITIES].shift;
 
     view.priority = pri;
 
@@ -1064,6 +1085,12 @@ function viewFillBasicInfo(view, obj)
 
     if (obj.intNum >= 0) {
         view.type = "Dispatched";
+        if (view.priority < hwiModCfg.disablePriority) {
+            view.$status["type"] = view.$status["priority"] =
+                "Unsafe! This dispatched interrupt " +
+                "has a zero latency interrupt priority and is " +
+                "not disabled by Hwi_disable()!";
+        }
     }
     else {
         if (view.priority < hwiModCfg.disablePriority) {
@@ -1119,7 +1146,7 @@ function viewCheckForNullObject(mod, obj)
 function viewInitBasic(view, obj)
 {
     var Hwi = xdc.useModule('ti.sysbios.family.arm.m3.Hwi');
-    
+
     if (viewCheckForNullObject(Hwi, obj)) {
         view.halHwiHandle = "Uninitialized Hwi object";
         return;
@@ -1573,15 +1600,34 @@ function viewFillExceptionContext(excContext)
 {
     var Program = xdc.useModule('xdc.rov.Program');
     var CallStack = xdc.useModule('xdc.rov.CallStack');
-    CallStack.fetchRegisters(["R0", "R1"]); /* R0 contains excContext, R1 is LR */
+    var excReg, lrReg;
+
+    CallStack.fetchRegisters(["R0", "R1", "R2"]);
+
+    /* Use address of Hwi_excHandlerFunc to determine which register contains excContext address */
+    var excHandlerAddress = Program.lookupSymbolValue("ti_sysbios_family_arm_m3_Hwi_excHandler__I");
+    excHandlerAddress &= 0xfffffffe; /* mask off LSB to avoid any tool chain differences */
+
+    /* determine which registers are pointing to the excContext and LR */
+    switch (excHandlerAddress) {
+        case 0x1003ab6c:    /* CC13X2/CC26X2 ROM */
+        case 0x1002ddf4:    /* CC13X2V2/CC26X2V2 ROM */
+            excReg = "R2";
+            lrReg = "R1";
+            break;
+        default:            /* all other ROMs and non-ROM builds */
+            excReg = "R0";
+            lrReg = "R1";
+            break;
+    }
 
     excContext.$addr = "N/A"; /* excContext is not in physical memory */
 
     /* use $addr() to force ROV to render in HEX */
-    excContext.sp = $addr(CallStack.getRegister("R0") + 16);
+    excContext.sp = $addr(CallStack.getRegister(excReg) + 16);
 
-    /* R0 points to registerContext saved by ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I */
-    var registerContext = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_Ptr', isScalar: true}, CallStack.getRegister("R0"), 16, false);
+    /* excReg points to registerContext saved by ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I */
+    var registerContext = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_Ptr', isScalar: true}, CallStack.getRegister(excReg), 16, false);
 
 
     /* r4-r11 registers were programmatically pushed */
@@ -1759,17 +1805,291 @@ function viewInitException()
 }
 
 /*
+ *  ======== viewCheckVector ========
+ *  Depending on ROV/ROV2 and the toolchain used to build the
+ * .out file, the vale for a function symbol address may or may
+ *  not have its LSB set. This function attempts to normalize
+ *  the ROV view behavior for ALL permutations of toolchains
+ *  and ROV/ROV2.
+ */
+function viewCheckVector(vectorObj, expected, errorPrefix)
+{
+    var val = Program.lookupSymbolValue(expected);
+    var vector = vectorObj.vector;
+    var match = Number(vector&~1) == Number(val&~1);
+    if (match) {
+        vectorObj.vectorLabel = expected;
+    }
+    else {
+        vectorObj.vectorLabel = "error";
+        if (errorPrefix) {
+            vectorObj.$status["vector"] =
+            vectorObj.$status["vectorLabel"] =
+                errorPrefix + " vector is not as configured!\n" +
+                "Should be: " + expected;
+        }
+    }
+    return (match);
+}
+
+/*
+ *  ======== viewInitVectorTable ========
+ */
+function viewInitVectorTable(view)
+{
+    var Program = xdc.useModule('xdc.rov.Program');
+    var Hwi = xdc.useModule('ti.sysbios.family.arm.m3.Hwi');
+    var halHwi = xdc.useModule('ti.sysbios.hal.Hwi');
+    var hwiModCfg = Program.getModuleConfig(Hwi.$name);
+    var correctLabel;
+
+    var numInts = hwiModCfg.NUM_INTERRUPTS;
+
+    viewNvicFetch(this);
+
+    var vtor = Number(this.VTOR);
+
+    var vectorTable = Program.fetchArray({type: 'xdc.rov.support.ScalarStructs.S_UInt', isScalar: true}, vtor, numInts, false);
+
+    try {
+        var rawView = Program.scanRawView('ti.sysbios.family.arm.m3.Hwi');
+    }
+    catch (e) {
+        return null;
+    }
+
+    var dispatchTableAddr = rawView.modState.dispatchTable;
+
+    var ScalarStructs = xdc.useModule('xdc.rov.support.ScalarStructs');
+
+    /* Retrieve the dispatchTable array of handles */
+    var hwiHandles = Program.fetchArray(ScalarStructs.S_Ptr$fetchDesc,
+                                         dispatchTableAddr, numInts);
+    var vectors = new Array();
+
+    for (var i = 0; i < numInts; i++) {
+        var vector = Program.newViewStruct('ti.sysbios.family.arm.m3.Hwi', 'Vector Table');
+        vector.vectorNum = i;
+        vector.vector = "0x" + Number(vectorTable[i]).toString(16);
+
+        /* Tag priority info */
+        if (i >= 4) {
+            var pri = viewGetPriority(view, this, i);
+            var mask = numPriTable[hwiModCfg.NUM_PRIORITIES].mask;
+            var shift = numPriTable[hwiModCfg.NUM_PRIORITIES].shift;
+            vector.priority = "0x" + Number(pri).toString(16);
+            if (hwiModCfg.priGroup + 1 > shift) {
+                vector.preemptPriority = pri >> (hwiModCfg.priGroup + 1);
+            }
+            else {
+                vector.preemptPriority = pri >> shift;
+            }
+
+            vector.subPriority = (pri & subPriMasks[hwiModCfg.priGroup]) >> shift;
+        }
+
+        /* Hwi handles only exist for interrupts 15 thru NUM_INTERRUPTS */
+        if (i > 14) {
+            var hwiHandle = hwiHandles[i];
+
+            /* If a Hwi object exists for this vector */
+            if (Number(hwiHandle.elem) != 0) {
+                vector.type = "Dispatched";
+                vector.hwiHandle = '0x' + Number(hwiHandle.elem).toString(16);
+                /* fetch the Hwi object */
+                var hwi = Program.fetchStruct(Hwi.Instance_State$fetchDesc, hwiHandle.elem, false);
+
+                vector.hwiFxn = Program.lookupFuncName(Number(hwi.fxn))[0];
+                vector.hwiArg = hwi.arg;
+                vector.hwiIrp = hwi.irp;
+
+                if (!viewCheckVector(vector, "ti_sysbios_family_arm_m3_Hwi_dispatch__I")) {
+                    vector.$status["vector"] = vector.$status["vectorLabel"] =
+                        "The vector for this dispatched interrupt is not correct!\n" +
+                        "Should be: \"ti_sysbios_family_arm_m3_Hwi_dispatch__I\"";
+                }
+
+                if (vector.priority < hwiModCfg.disablePriority) {
+                    vector.$status["type"] = vector.$status["priority"] =
+                        "Unsafe! This dispatched interrupt " +
+                        "has a zero latency interrupt priority and is " +
+                        "not disabled by Hwi_disable()!";
+                }
+            }
+            else {
+                if (viewCheckVector(vector, "ti_sysbios_family_arm_m3_Hwi_excHandlerAsm__I")) {
+                    vector.type = "Unused";
+                }
+                else {
+                    vector.type = "Unmanaged";
+                    /*
+                     * Attempt to find a matching symbol for the vector
+                     * try with the LSB set to 1 first (ROV2 likes this)
+                     */
+                    var vectorLabel = Program.lookupFuncName(Number(vectorTable[i]));
+                    if (vectorLabel.length == 0) {
+                        /* clear LSB if label not found with LSB set (legacy ROV likes this) */
+                        vectorLabel = Program.lookupFuncName(Number(vectorTable[i]&0xfffffffe));
+                    }
+                    if (vectorLabel.length == 0) {
+                        vector.vectorLabel = "";
+                    }
+                    else {
+                        vector.vectorLabel = vectorLabel[0];
+                    }
+                    /* check for non-dispatched interrupts created with Hwi.create */
+                    for (var j in rawView.instStates) {
+                        /* non-dispatched interrupts are encoded with 2's complemented intNums */
+                        if (-(rawView.instStates[j].intNum) == i) {
+                            if (vector.priority < hwiModCfg.disablePriority) {
+                                vector.type = "Zero Latency";
+                            }
+                            else {
+                                vector.type = "Non Dispatched";
+                            }
+                            vector.hwiHandle = "0x" + Number(rawView.instStates[j].$addr).toString(16);
+                            vector.hwiFxn = Program.lookupFuncName(Number(rawView.instStates[j].fxn))[0];
+                            vector.hwiArg = "N/A";
+                            vector.hwiIrp = "N/A";
+                            if (rawView.instStates[j].fxn != vector.vector) {
+                                vector.$status["vector"] =
+                                vector.$status["vectorLabel"] =
+                                vector.$status["hwiFxn"] = "Vector does not match Hwi function!";
+                            }
+                        }
+                    }
+                }
+            }
+
+            var enabled = false;
+            var active = false;
+            var pending = false;
+
+            if (i > 15) {
+                var index = (i-16) >> 5;
+                var mask = 1 << ((i-16) & 0x1f);
+                enabled = this.ISER[index] & mask;
+                active = this.IABR[index] & mask;
+                pending = this.ISPR[index] & mask;
+            }
+            else {
+                switch(i) {
+                    case 15: /* SysTick */
+                        pending = this.ICSR & 0x100000000;
+                        enabled = this.STCSR & 0x00000002;
+                        active = this.SHCSR & 0x00000800;
+                        break;
+                    default:
+                        view.status = "unknown";
+                        return;
+                        break;
+                }
+            }
+
+            if (enabled) {
+                vector.status = "Enabled";
+            }
+            else {
+                vector.status = "Disabled";
+            }
+
+            if (active) {
+                vector.status += ", Active";
+            }
+
+            if (pending) {
+                vector.status += ", Pending";
+            }
+        }
+        vectors[vectors.length] = vector;
+    }
+
+    vectors[0].type = "MSP";
+    vectors[0].vectorLabel = "";
+
+    /* check exception handlers */
+
+    vectors[1].type = "Reset";
+    vectors[1].preemptPriority = -3;
+    correctLabel = String(hwiModCfg.resetFunc).substring(1);
+    viewCheckVector(vectors[1], correctLabel, "Reset");
+
+    vectors[2].type = "NMI";
+    vectors[2].preemptPriority = -2;
+    correctLabel = String(hwiModCfg.nmiFunc).substring(1);
+    viewCheckVector(vectors[2], correctLabel, "NMI");
+
+    vectors[3].type = "HardFault";
+    vectors[3].preemptPriority = -1;
+    correctLabel = String(hwiModCfg.hardFaultFunc).substring(1);
+    viewCheckVector(vectors[3], correctLabel, "Hard Fault");
+
+    vectors[4].type = "MemFault";
+    correctLabel = String(hwiModCfg.memFaultFunc).substring(1);
+    viewCheckVector(vectors[4], correctLabel, "Mem Fault");
+
+    vectors[5].type = "BusFault";
+    correctLabel = String(hwiModCfg.busFaultFunc).substring(1);
+    viewCheckVector(vectors[5], correctLabel, "Bus Fault");
+
+    vectors[6].type = "UsageFault";
+    correctLabel = String(hwiModCfg.usageFaultFunc).substring(1);
+    viewCheckVector(vectors[6], correctLabel, "Usage Fault");
+
+    vectors[7].type = "Reserved";
+    vectors[7].vectorLabel = "";
+    vectors[8].type = "Reserved";
+    vectors[8].vectorLabel = "";
+    vectors[9].type = "Reserved";
+    vectors[9].vectorLabel = "";
+    vectors[10].type = "Reserved";
+    vectors[10].vectorLabel = "";
+
+    vectors[11].type = "SVCall";
+    correctLabel = String(hwiModCfg.svCallFunc).substring(1);
+    viewCheckVector(vectors[11], correctLabel, "SVCall");
+
+    vectors[12].type = "DebugMon";
+    correctLabel = String(hwiModCfg.debugMonFunc).substring(1);
+    viewCheckVector(vectors[12], correctLabel, "Debug Mon");
+
+    vectors[13].type = "Reserved";
+    vectors[13].vectorLabel = "";
+
+    vectors[14].type = "PendSV";
+    correctLabel = "ti_sysbios_family_arm_m3_Hwi_pendSV__I";
+    viewCheckVector(vectors[14], correctLabel, "PendSV");
+
+    view.elements = vectors;
+}
+
+/*
  *  ======== viewInitModule ========
  */
 function viewInitModule(view, mod)
 {
     var Program = xdc.useModule('xdc.rov.Program');
+    var CallStack = xdc.useModule('xdc.rov.CallStack');
+
+    CallStack.fetchRegisters(["CTRL_FAULT_BASE_PRI"]);
+    var ctrlFaultBasePri = CallStack.getRegister("CTRL_FAULT_BASE_PRI");
+
     var halHwiModCfg = Program.getModuleConfig('ti.sysbios.hal.Hwi');
     var hwiModCfg = Program.getModuleConfig('ti.sysbios.family.arm.m3.Hwi');
 
     viewNvicFetch(this);
+
     view.activeInterrupt = String(this.ICSR & 0xff);
     view.pendingInterrupt = String((this.ICSR & 0xff000) >> 12);
+    if (view.activeInterrupt != "0") {
+        view.processorState = "Handler";
+    }
+    else if (ctrlFaultBasePri & 0x01000000) {
+        view.processorState = "Unpriv, Thread";
+    }
+    else {
+        view.processorState = "Priv, Thread";
+    }
 
     if ((view.activeInterrupt > 0) && (view.activeInterrupt < 14)) {
         view.exception = "Yes";

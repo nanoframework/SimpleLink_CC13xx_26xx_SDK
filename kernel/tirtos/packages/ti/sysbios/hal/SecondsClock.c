@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Texas Instruments Incorporated
+ * Copyright (c) 2014-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,10 @@
 #include <xdc/runtime/Types.h>
 
 #include "package/internal/SecondsClock.xdc.h"
+
+#define NSECSPERSEC 1000000000  /* nanoseconds per second */
+
+#define SECONDS_MAX 0xFFFFFFFF  /* Maximum number of seconds in 32 bits */
 
 /*
  *  ======== Clock_Module_startup ========
@@ -149,6 +153,7 @@ UInt32 SecondsClock_getTime(SecondsClock_Time *ts)
 
     key = Hwi_disable();
 
+    ts->secsHi = SecondsClock_module->secondsHi;
     ts->secs = SecondsClock_module->seconds;
     ticks = Clock_getTicks() - SecondsClock_module->ticks;
 
@@ -164,6 +169,9 @@ UInt32 SecondsClock_getTime(SecondsClock_Time *ts)
  */
 Void SecondsClock_increment(UArg arg)
 {
+    if (SecondsClock_module->seconds == SECONDS_MAX) {
+        SecondsClock_module->secondsHi++;
+    }
     SecondsClock_module->seconds++;
     SecondsClock_module->ticks = Clock_getTicks();
 
@@ -201,4 +209,59 @@ Void SecondsClock_increment(UArg arg)
 Void SecondsClock_set(UInt32 seconds)
 {
     SecondsClock_module->seconds = seconds;
+}
+
+/*
+ *  ======== SecondsClock_setTime ========
+ */
+UInt32 SecondsClock_setTime(SecondsClock_Time *ts)
+{
+    UInt   key;
+    UInt32 secs;
+    UInt32 nsecs;
+    UInt32 ticksNSecs;
+    UInt32 ticksClock;
+    UInt32 nsecsPerTick;
+    UInt32 timeout;
+    UInt32 period;
+
+    /* Adjust seconds if nanoseconds is over a second */
+    secs = ts->secs + (ts->nsecs / NSECSPERSEC);
+    nsecs = ts->nsecs - (ts->nsecs / NSECSPERSEC) * NSECSPERSEC;
+
+    key = Hwi_disable();
+
+    nsecsPerTick = Clock_tickPeriod * 1000;
+
+    Clock_stop(SecondsClock_Module_State_clock());
+
+    ticksClock = Clock_getTicks();
+
+    /*
+     *  Adjust nsces to be a multiple of Clock ticks (in nanosecond units).
+     *  Take the ceiling of nsecs and the next Clock tick.  This will ensure
+     *  that if SecondsClock_getTime() is called immediately after
+     *  SecondsClock_setTime(), the time returned will not be behind the
+     *  time set.
+     */
+    ticksNSecs = ((nsecs + nsecsPerTick - 1) / 1000) / Clock_tickPeriod;
+
+    SecondsClock_module->secondsHi = ts->secsHi;
+    SecondsClock_module->seconds = secs;
+    SecondsClock_module->ticks = ticksClock - ticksNSecs;
+
+    /* Set the SecondsClock timeout to ticks per second - ticks */
+    timeout = (1000000 / Clock_tickPeriod) - ticksNSecs;
+    period = Clock_getPeriod(SecondsClock_Module_State_clock());
+    if ((timeout == 0) || (timeout > period)) {
+        /* Should not happen */
+        timeout = period;
+    }
+
+    Clock_setTimeout(SecondsClock_Module_State_clock(), timeout);
+    Clock_startI(SecondsClock_Module_State_clock());
+
+    Hwi_restore(key);
+
+    return (0);
 }

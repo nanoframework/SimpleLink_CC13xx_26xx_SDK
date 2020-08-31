@@ -1,0 +1,20 @@
+[
+    {
+        "files": [
+            "+../../easylink/EasyLink.h -> EasyLink.h",
+            "+../../easylink/EasyLink.c -> EasyLink.c",
+            "+../../ConcentratorRadioTask.c -> ConcentratorRadioTask.c",
+            "+../../ConcentratorRadioTask.h -> ConcentratorRadioTask.h",
+            "+../../ConcentratorTask.c -> ConcentratorTask.c",
+            "+../../ConcentratorTask.h -> ConcentratorTask.h",
+            "+../../rfWsnConcentrator.c -> rfWsnConcentrator.c",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../README.md -> README.md",
+            "+../../RadioProtocol.h -> RadioProtocol.h",
+            "+../../rfWsnConcentrator.syscfg -> rfWsnConcentrator.syscfg",
+            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
+            "+CC1352P_4_LAUNCHXL_TIRTOS.icf -> CC1352P_4_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

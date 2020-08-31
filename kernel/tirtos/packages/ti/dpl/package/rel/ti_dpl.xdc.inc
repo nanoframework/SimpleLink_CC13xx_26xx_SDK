@@ -3,7 +3,7 @@ package/build.cfg
 package/package.xdc.inc
 package.bld
 package/package.cfg.xdc.inc
-lib/dpl_cc13x0.aem3
+lib/dpl_cc13x2.aem4f
 package/package_ti.dpl.c
 ./ClockP_tirtos.c
 ./DebugP_tirtos.c
@@ -12,16 +12,6 @@ package/package_ti.dpl.c
 ./SemaphoreP_tirtos.c
 ./SwiP_tirtos.c
 ./SystemP_tirtos.c
-./PowerCC26XX_tirtos.c
-lib/dpl_cc13x0.arm3
-lib/dpl_cc13x0.am3g
-lib/dpl_cc26x0.aem3
-lib/dpl_cc26x0.arm3
-lib/dpl_cc26x0.am3g
-lib/dpl_cc26x0r2.aem3
-lib/dpl_cc26x0r2.arm3
-lib/dpl_cc26x0r2.am3g
-lib/dpl_cc13x2.aem4f
 ./PowerCC26X2_tirtos.c
 lib/dpl_cc13x2.am4fg
 lib/dpl_cc13x2.arm4f

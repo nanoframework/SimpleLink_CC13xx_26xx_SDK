@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 #ifndef ti_sysbios_family_arm_MPU__INTERNAL__
@@ -48,6 +48,10 @@
 /* setRegion */
 #undef ti_sysbios_family_arm_MPU_setRegion
 #define ti_sysbios_family_arm_MPU_setRegion ti_sysbios_family_arm_MPU_setRegion__E
+
+/* setRegionRaw */
+#undef ti_sysbios_family_arm_MPU_setRegionRaw
+#define ti_sysbios_family_arm_MPU_setRegionRaw ti_sysbios_family_arm_MPU_setRegionRaw__E
 
 /* startup */
 #undef ti_sysbios_family_arm_MPU_startup

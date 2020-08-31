@@ -10,7 +10,7 @@ GateTask.xml
 GateAll.xml
 GateSpinlock.xml
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.gates.aem3
+lib/debug/ti.sysbios.gates.aem4f
 package/package_ti.sysbios.gates.c
 GateHwi.c
 GateAll.c
@@ -20,8 +20,5 @@ GateTest.c
 GateMutex.c
 GateMutexPri.c
 GateSpinlock.c
-lib/sysbios/debug/ti.sysbios.gates.am3g
-lib/sysbios/debug/ti.sysbios.gates.arm3
-lib/sysbios/debug/ti.sysbios.gates.aem4f
-lib/sysbios/debug/ti.sysbios.gates.am4fg
-lib/sysbios/debug/ti.sysbios.gates.arm4f
+lib/debug/ti.sysbios.gates.am4fg
+lib/debug/ti.sysbios.gates.arm4f

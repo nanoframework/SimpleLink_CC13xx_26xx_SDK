@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 #ifndef ti_sysbios_hal_SecondsCallback__INTERNAL__
@@ -32,6 +32,10 @@
 /* set */
 #undef ti_sysbios_hal_SecondsCallback_set
 #define ti_sysbios_hal_SecondsCallback_set ti_sysbios_hal_SecondsCallback_set__E
+
+/* setTime */
+#undef ti_sysbios_hal_SecondsCallback_setTime
+#define ti_sysbios_hal_SecondsCallback_setTime ti_sysbios_hal_SecondsCallback_setTime__E
 
 /* Module_startup */
 #undef ti_sysbios_hal_SecondsCallback_Module_startup

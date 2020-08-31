@@ -3,10 +3,7 @@ package/build.cfg
 package/package.xdc.inc
 package.bld
 package/package.cfg.xdc.inc
-lib/release/ti.uia.family.aem3
-package/package_ti.uia.family.c
-lib/release/ti.uia.family.am3g
-lib/release/ti.uia.family.arm3
 lib/release/ti.uia.family.aem4f
+package/package_ti.uia.family.c
 lib/release/ti.uia.family.am4fg
 lib/release/ti.uia.family.arm4f

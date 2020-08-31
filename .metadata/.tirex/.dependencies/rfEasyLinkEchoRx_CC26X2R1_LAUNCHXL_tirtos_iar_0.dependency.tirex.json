@@ -1,0 +1,19 @@
+[
+    {
+        "files": [
+            "+../../easylink/EasyLink.h -> EasyLink.h",
+            "+../../easylink/EasyLink.c -> EasyLink.c",
+            "+../../README.md -> README.md",
+            "+../../EasyLinkEcho_PerfectEcho.png -> EasyLinkEcho_PerfectEcho.png",
+            "+../../EasyLinkEcho_MissedFirstPacket.png -> EasyLinkEcho_MissedFirstPacket.png",
+            "+../../EasyLinkEcho_MissingFirstCouplePackets.png -> EasyLinkEcho_MissingFirstCouplePackets.png",
+            "+../../EasyLinkEcho_ErrorTxRx.png -> EasyLinkEcho_ErrorTxRx.png",
+            "+../../rfEasyLinkEchoRx.syscfg -> rfEasyLinkEchoRx.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../rfEasyLinkEchoRx.c -> rfEasyLinkEchoRx.c",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.icf -> CC26X2R1_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

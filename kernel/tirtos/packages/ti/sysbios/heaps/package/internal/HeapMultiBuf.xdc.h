@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 #ifndef ti_sysbios_heaps_HeapMultiBuf__INTERNAL__
@@ -42,9 +42,6 @@
 
 /* sizeAlignCompare */
 #define HeapMultiBuf_sizeAlignCompare ti_sysbios_heaps_HeapMultiBuf_sizeAlignCompare__I
-
-/* moveToEnd */
-#define HeapMultiBuf_moveToEnd ti_sysbios_heaps_HeapMultiBuf_moveToEnd__I
 
 /* borrowBlock */
 #define HeapMultiBuf_borrowBlock ti_sysbios_heaps_HeapMultiBuf_borrowBlock__I

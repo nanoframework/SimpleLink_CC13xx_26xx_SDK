@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_targets_arm_rtsarm
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -168,17 +168,11 @@ public class ti_targets_arm_rtsarm
             sb.append("pkg.packageRepository = xdc.om['ti.targets.arm.rtsarm$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/ti.targets.arm.rtsarm.aem3',\n");
-            sb.append("'lib/boot.aem3',\n");
-            sb.append("'lib/auto_init.aem3',\n");
             sb.append("'lib/ti.targets.arm.rtsarm.aem4f',\n");
             sb.append("'lib/boot.aem4f',\n");
             sb.append("'lib/auto_init.aem4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/ti.targets.arm.rtsarm.aem3', {target: 'ti.targets.arm.elf.M3', suffix: 'em3'}],\n");
-            sb.append("['lib/boot.aem3', {target: 'ti.targets.arm.elf.M3', suffix: 'em3'}],\n");
-            sb.append("['lib/auto_init.aem3', {target: 'ti.targets.arm.elf.M3', suffix: 'em3'}],\n");
             sb.append("['lib/ti.targets.arm.rtsarm.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/boot.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/auto_init.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");

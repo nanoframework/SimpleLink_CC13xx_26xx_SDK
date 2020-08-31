@@ -1,20 +1,5 @@
 [
     {
-        "CompilerBuildOptionsPattern": "--core=430X.*--data_model=small($|\\s)",
-        "baseTargetName": "MSP430X_small",
-        "packageName": "iar.targets.msp430"
-    },
-    {
-        "CompilerBuildOptionsPattern": "--core=430X.*--data_model=large($|\\s)",
-        "baseTargetName": "MSP430X_large",
-        "packageName": "iar.targets.msp430"
-    },
-    {
-        "CompilerBuildOptionsPattern": "-D__MSP430.*--dlib_config($|\\s)",
-        "baseTargetName": "MSP430",
-        "packageName": "iar.targets.msp430"
-    },
-    {
         "CompilerBuildOptionsPattern": "--cpu=Cortex-M3($|\\s)",
         "baseTargetName": "M3",
         "packageName": "iar.targets.arm"
@@ -55,55 +40,6 @@
         "elf": "true",
         "toolChain": "TI",
         "packageName": "ti.targets.arm"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "CC430.*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430CG.*|MSP430BT.*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430F2[46]1[6789]",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430FG6[46].*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430F471.*|MSP430FG?46.*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430X",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430X.*|MSP430FR?[56].*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
-    },
-    {
-        "baseTargetName": "MSP430",
-        "deviceFamilyPattern": "MSP430.*",
-        "deviceNamePattern": "MSP430.*",
-        "toolChain": "TI",
-        "packageName": "ti.targets.msp430"
     },
     {
         "CompilerBuildOptionsPattern": "--float_support=fpu32($|\\s)",
@@ -196,6 +132,14 @@
         "packageName": "ti.targets"
     },
     {
+        "baseTargetName": "M4F",
+        "deviceNamePattern": "CC26\\d2.*|CC13\\d2.*",
+        "deviceFamilyPattern": "ARM.*",
+        "elf": "true",
+        "toolChain": "TI",
+        "packageName": "ti.targets.arm"
+    },
+    {
         "CompilerBuildOptionsPattern": "-silicon_version=7M3($|\\s)",
         "baseTargetName": "M3",
         "deviceFamilyPattern": "ARM.*",
@@ -273,6 +217,15 @@
         "baseTargetName": "R5F",
         "deviceFamilyPattern": "ARM.*",
         "deviceNamePattern": "RM57D8.*",
+        "elf": "true",
+        "toolChain": "TI",
+        "packageName": "ti.targets.arm"
+    },
+    {
+        "CompilerBuildOptionsPattern": "-silicon_version=7R5($|\\s)",
+        "baseTargetName": "R5F",
+        "deviceFamilyPattern": "ARM.*",
+        "deviceNamePattern": "AM65.*",
         "elf": "true",
         "toolChain": "TI",
         "packageName": "ti.targets.arm"
@@ -468,6 +421,12 @@
     {
         "GNUCompilerBuildOptions": "-mcpu=cortex-a15",
         "baseTargetName": "A15F",
+        "toolChain": "GNU",
+        "packageName": "gnu.targets.arm"
+    },
+    {
+        "GNUCompilerBuildOptions": "-mcpu=cortex-a53+fp+simd",
+        "baseTargetName": "A53F",
         "toolChain": "GNU",
         "packageName": "gnu.targets.arm"
     }

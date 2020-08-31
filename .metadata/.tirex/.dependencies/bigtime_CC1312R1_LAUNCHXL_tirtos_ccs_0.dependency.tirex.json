@@ -1,0 +1,16 @@
+[
+    {
+        "files": [
+            "+../../bigtime.cpp -> bigtime.cpp",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../bigtime.syscfg -> bigtime.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../bigtime.cfg -> bigtime.cfg",
+            "+../../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
+            "+CC1312R1_LAUNCHXL_TIRTOS.cmd -> CC1312R1_LAUNCHXL_TIRTOS.cmd",
+            "+../makefile.defs -> makefile.defs"
+        ]
+    }
+]

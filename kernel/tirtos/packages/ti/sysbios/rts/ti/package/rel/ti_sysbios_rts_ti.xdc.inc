@@ -6,11 +6,8 @@ aeabi_portable.c
 linkcmd.xdt
 tls_get_tp.asm
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.rts.ti.aem3
+lib/debug/ti.sysbios.rts.ti.aem4f
 package/package_ti.sysbios.rts.ti.c
 ReentSupport.c
-lib/sysbios/debug/ti.sysbios.rts.ti.am3g
-lib/sysbios/debug/ti.sysbios.rts.ti.arm3
-lib/sysbios/debug/ti.sysbios.rts.ti.aem4f
-lib/sysbios/debug/ti.sysbios.rts.ti.am4fg
-lib/sysbios/debug/ti.sysbios.rts.ti.arm4f
+lib/debug/ti.sysbios.rts.ti.am4fg
+lib/debug/ti.sysbios.rts.ti.arm4f

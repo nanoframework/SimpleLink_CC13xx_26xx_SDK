@@ -10,13 +10,10 @@ LoggerStreamer.xml
 LoggerStreamer2.xml
 java/package.jar
 package/package.cfg.xdc.inc
-lib/release/ti.uia.sysbios.aem3
+lib/release/ti.uia.sysbios.aem4f
 package/package_ti.uia.sysbios.c
 LoggerStreamer.c
 LoggerStreamer2.c
 LoggerIdle.c
-lib/release/ti.uia.sysbios.am3g
-lib/release/ti.uia.sysbios.arm3
-lib/release/ti.uia.sysbios.aem4f
 lib/release/ti.uia.sysbios.am4fg
 lib/release/ti.uia.sysbios.arm4f

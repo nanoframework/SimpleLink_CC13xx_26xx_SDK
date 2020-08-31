@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2015-2020 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,17 @@ var BIOS = null;
 var Build = null;
 
 var custom28xOpts = " -q -mo ";
-var custom430xOpts = " -q --advice:power=1 ";
-var customIar430xOpts = " --silent --diag_suppress=Pa050,Go005,Pe1053 -D_DLIB_FILE_DESCRIPTOR=1";
 var custom6xOpts = " -q -mi10 -mo -pdr -pden -pds=238 -pds=880 -pds1110 ";
 var customARP32xOpts = " -q --gen_func_subsections ";
 var customArmOpts = " -q -ms --opt_for_speed=2 ";
+
+/*
+ * '-Wno-buildin-requires-header' is a workaround to suppress pthread.h
+ * warnings. This should be removed. Removal is tracked by TIRTOS-1906.
+ */
+var customArmClangM3Opts = " ";
+var customArmClangM4Opts = " ";
+var customArmClangM4FOpts = " ";
 var customGnuArmM3Opts = " ";
 var customGnuArmM4Opts = " ";
 var customGnuArmM4FOpts = " ";
@@ -56,12 +62,6 @@ var ccOptsList = {
     "ti.targets.C28_large"                      : custom28xOpts,
     "ti.targets.C28_float"                      : custom28xOpts,
     "ti.targets.elf.C28_float"                  : custom28xOpts,
-    "ti.targets.msp430.elf.MSP430"              : custom430xOpts,
-    "ti.targets.msp430.elf.MSP430X"             : custom430xOpts,
-    "ti.targets.msp430.elf.MSP430X_small"       : custom430xOpts,
-    "iar.targets.msp430.MSP430"                 : customIar430xOpts,
-    "iar.targets.msp430.MSP430X_small"          : customIar430xOpts,
-    "iar.targets.msp430.MSP430X_large"          : customIar430xOpts,
     "ti.targets.elf.C674"                       : custom6xOpts,
     "ti.targets.elf.C67P"                       : custom6xOpts,
     "ti.targets.elf.C66"                        : custom6xOpts,
@@ -78,6 +78,9 @@ var ccOptsList = {
     "ti.targets.arm.elf.R4Ft"                   : customArmOpts,
     "ti.targets.arm.elf.R5F"                    : customArmOpts,
     "ti.targets.arm.elf.R5F_big_endian"         : customArmOpts,
+    "ti.targets.arm.clang.M3"                   : customArmClangM3Opts,
+    "ti.targets.arm.clang.M4"                   : customArmClangM4Opts,
+    "ti.targets.arm.clang.M4F"                  : customArmClangM4FOpts,
     "gnu.targets.arm.M3"                        : customGnuArmM3Opts,
     "gnu.targets.arm.M4"                        : customGnuArmM4Opts,
     "gnu.targets.arm.M4F"                       : customGnuArmM4FOpts,
@@ -317,7 +320,6 @@ var biosPackages = [
     "ti.sysbios.family.c67p",
     "ti.sysbios.family.c674",
     "ti.sysbios.family.c7x",
-    "ti.sysbios.family.msp430",
     "ti.sysbios.family.arp32",
     "ti.sysbios.family.shared.keystone3",
     "ti.sysbios.family.shared.vayu",
@@ -388,6 +390,12 @@ function getDefaultCustomCCOpts()
             customCCOpts += " --mfc -Ohs ";
         }
     }
+    else if (Program.build.target.$name.match(/clang/)) {
+        customCCOpts += " -Oz -g ";
+        /* add any target unique CC options provided in config.bld */
+        customCCOpts = Program.build.target.ccOpts.prefix + " " + customCCOpts;
+        customCCOpts += Program.build.target.ccOpts.suffix + " ";
+    }
     else {
         /* ti targets do program level compile */
         customCCOpts += " --program_level_compile -o3 -g ";
@@ -408,6 +416,9 @@ function getDefaultCustomCCOpts()
         else if (Program.build.target.$name.match(/iar/)) {
             customCCOpts = customCCOpts.replace("-Ohs","--debug");
             customCCOpts = customCCOpts.replace("-Ohz","--debug");
+        }
+        else if (Program.build.target.$name.match(/clang/)) {
+            customCCOpts = customCCOpts.replace(" -Oz","");
         }
         else {
             customCCOpts = customCCOpts.replace(" -o3","");
@@ -447,11 +458,15 @@ function getDefs()
                + " -Dti_sysbios_knl_Task_objectCheckFlag__D=" + (Task.objectCheckFlag ? "TRUE" : "FALSE");
 
     if (xdc.module(HwiDelegate).hooks.length == 0) {
-        defs += " -Dti_sysbios_hal_Hwi_DISABLE_ALL_HOOKS";
+        if (!(BIOS.codeCoverageEnabled)) {
+            defs += " -Dti_sysbios_hal_Hwi_DISABLE_ALL_HOOKS";
+        }
     }
 
     if (Swi.hooks.length == 0) {
-        defs += " -Dti_sysbios_knl_Swi_DISABLE_ALL_HOOKS";
+        if (!(BIOS.codeCoverageEnabled)) {
+            defs += " -Dti_sysbios_knl_Swi_DISABLE_ALL_HOOKS";
+        }
     }
 
     defs += " -Dti_sysbios_BIOS_smpEnabled__D="
@@ -475,7 +490,9 @@ function getDefs()
         }
 
         if (Task.hooks.length == 0) {
-            defs += " -Dti_sysbios_knl_Task_DISABLE_ALL_HOOKS";
+            if (!(BIOS.codeCoverageEnabled)) {
+                defs += " -Dti_sysbios_knl_Task_DISABLE_ALL_HOOKS";
+            }
         }
 
         /*
@@ -691,10 +708,6 @@ function getCFiles(target)
         }
     }
     
-    if (Program.build.target.name.match(/430/)) {
-        biosSources += "./HwiFuncs.c ";
-    }
-
     if (BIOS.includeXdcRuntime == true) {
         biosSources += "xdc/runtime/xdc_noinit.c ";
         for each (var mod in Program.targetModules()) {
@@ -849,7 +862,7 @@ function getCommandLineDefs()
      * absorb all the "-Dxyz"'s and "--define"'s in the compiler command line
      */
     for (i = 0; i < tokens.length; i++) {
-        if (tokens[i].match(/-D/) || tokens[i].match(/--define/)) {
+        if (tokens[i].match(/^-D/) || tokens[i].match(/--define/)) {
             defs += tokens[i];
             if (tokens[i] == "-D") {
                 defs += tokens[++i];  /* intentionally removes spaces for IAR Assembler */
@@ -1004,33 +1017,7 @@ function getCcArgs()
  */
 function getLibs(pkg)
 {
-    var BIOS = xdc.module("ti.sysbios.BIOS");
-
-    switch (BIOS.libType) {
-        case BIOS.LibType_Custom:
-        case BIOS.LibType_Instrumented:
-        case BIOS.LibType_NonInstrumented:
-        case BIOS.LibType_Debug:
-            return null;
-            break;
-    }
-
-    var lib = "";
-    var name = pkg.$name + ".a" + prog.build.target.suffix;
-
-    if (BIOS.smpEnabled == true) {
-        lib = "lib/smpbios/debug/" + name;
-    }
-    else {
-        lib = "lib/sysbios/debug/" + name;
-    }
-
-    if (java.io.File(pkg.packageBase + lib).exists()) {
-        return lib;
-    }
-
-    /* could not find any library, throw exception */
-    throw Error("Library not found: " + name);
+    return null;
 }
 
 
@@ -1076,78 +1063,40 @@ function buildLibs(objList, relList, filter, xdcArgs, incs)
             continue;
         }
 
-        var profiles = getProfiles(xdcArgs);
+        var profile = "debug";
+        var libPath = "lib/debug/";
 
-        /* If no profiles were assigned, use only the default one. */
-        if (profiles.length == 0) {
-            profiles[0] = "debug";
-        }
+        /*
+         * These defines are referenced in a few assembly files. They must be
+         * defined when building the sanity libraries or the assembly files will
+         * not build. These are defined via the .cfg file for real application
+         * builds.
+         */
+        var asmopts = "";
+        var ccopts = "";
 
-        for (var j = 0; j < profiles.length; j++) {
-            var ccopts = "";
-            var asmopts = "";
+        ccopts += " -Dti_sysbios_Build_useIndirectReferences=FALSE"
 
-            ccopts += " -Dti_sysbios_Build_useIndirectReferences=FALSE"
-            asmopts += " -Dti_sysbios_Build_useIndirectReferences=FALSE"
+        asmopts += " -Dti_sysbios_Build_useIndirectReferences=FALSE"
+        asmopts += " -Dti_sysbios_BIOS_smpEnabled__D=FALSE";
+        asmopts += " -Dti_sysbios_BIOS_mpeEnabled__D=FALSE";
+        asmopts += " -Dti_sysbios_hal_Core_numCores__D=1";
+        asmopts += " -Dti_sysbios_family_arm_v7r_vim_Hwi_lockstepDevice__D=FALSE";
+        asmopts += " -Dti_sysbios_family_arm_a8_intcps_Hwi_enableAsidTagging__D=FALSE";
+        asmopts += " -Dti_sysbios_family_arm_m3_TaskSupport_usesMonitors__D=0";
 
-            if (profiles[j] == "smp") {
-                var libPath = "lib/smpbios/debug/";
-                ccopts += " -Dti_sysbios_BIOS_smpEnabled__D=TRUE";
-                asmopts += " -Dti_sysbios_BIOS_smpEnabled__D=TRUE";
-            }
-            else {
-                var libPath = "lib/sysbios/debug/";
-                /* build all package libs using Hwi macros */
-                ccopts += " -Dti_sysbios_Build_useHwiMacros";
-                ccopts += " -Dti_sysbios_BIOS_smpEnabled__D=FALSE";
-                asmopts += " -Dti_sysbios_BIOS_smpEnabled__D=FALSE";
+        var lib = Pkg.addLibrary(libPath + Pkg.name,
+                            targ, {
+                            profile: profile,
+                            copts: ccopts,
+                            aopts: asmopts,
+                            releases: relList,
+                            incs: incs,
+                            });
+        lib.addObjects(objList);
 
-                if ((targ.$name == "ti.targets.arm.elf.A8") ||
-                    (targ.$name == "ti.targets.arm.elf.A8F") ||
-                    (targ.$name == "ti.targets.arm.elf.A8Fnv") ||
-                    (targ.$name == "gnu.targets.arm.A8F")) {
-                    ccopts +=
-                        " -Dti_sysbios_family_arm_a8_intcps_Hwi_enableAsidTagging__D=FALSE";
-                    asmopts +=
-                        " -Dti_sysbios_family_arm_a8_intcps_Hwi_enableAsidTagging__D=FALSE";
-                }
-
-                if (targ.$name == "gnu.targets.arm.A15F") {
-                    ccopts +=
-                        " -Dti_sysbios_family_arm_gic_Hwi_enableAsidTagging__D=FALSE";
-                    asmopts +=
-                        " -Dti_sysbios_family_arm_gic_Hwi_enableAsidTagging__D=FALSE";
-                }
-
-                if ((targ.$name == "ti.targets.arm.elf.R4F") ||
-                    (targ.$name == "ti.targets.arm.elf.R4Ft") ||
-                    (targ.$name == "ti.targets.arm.elf.R5F")) {
-                    ccopts += " -Dti_sysbios_hal_Core_numCores__D=1 " +
-                        "-Dti_sysbios_family_arm_v7r_vim_Hwi_lockstepDevice__D=FALSE";
-                    asmopts += " -Dti_sysbios_hal_Core_numCores__D=1 " +
-                        "-Dti_sysbios_family_arm_v7r_vim_Hwi_lockstepDevice__D=FALSE";
-                }
-                /* insert rts includes before "." in command line */
-                if (targ.$name.match("iar.targets.arm")) {
-                    ccopts += " -I" + targ.rootDir+"/inc/c";
-                }
-            }
-            /* confirm that this target supports this profile */
-            if (targ.profiles[profiles[j]] !== undefined) {
-                var profile = profiles[j];
-                var lib = Pkg.addLibrary(libPath + Pkg.name,
-                                targ, {
-                                profile: profile,
-                                copts: ccopts,
-                                aopts: asmopts,
-                                releases: relList,
-                                incs: incs,
-                                });
-                lib.addObjects(objList);
-                /* suppress debug libs from exports */
-                Pkg.attrs.relScript = "ti/sysbios/libFilter.xs";
-            }
-        }
+        /* suppress debug libs from exports */
+        Pkg.attrs.relScript = "ti/sysbios/libFilter.xs";
     }
 }
 

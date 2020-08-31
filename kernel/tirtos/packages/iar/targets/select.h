@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018 by Texas Instruments Incorporated.
+ *  Copyright 2020 by Texas Instruments Incorporated.
  *
  */
 
@@ -32,18 +32,6 @@
 #      endif
 #  endif
 
-#elif defined (__ICC430__)
-#  define xdc_target_types__ iar/targets/msp430/std.h
-
-#  if (__CORE__ == __430__)
-#      define xdc_target_name__ MSP430
-#  elif (__CORE__ == __430X__)
-#      if (__DATA_MODEL__ == __DATA_MODEL_SMALL__)
-#          define xdc_target_name__ MSP430X_small
-#      elif (__DATA_MODEL__ == __DATA_MODEL_LARGE__)
-#          define xdc_target_name__ MSP430X_large
-#      endif
-#  endif
 #endif
 
 #if defined(xdc_target_name__) && defined(xdc_target_types__)
@@ -67,7 +55,7 @@
 #  endif
 #endif
 /*
- *  @(#) iar.targets; 1, 0, 1,0; 1-23-2018 11:06:28; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) iar.targets; 1, 0, 1,; 5-11-2020 15:30:16; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

@@ -21,7 +21,7 @@ Event__prologue.h
 Event__epilogue.h
 Event.xml
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.knl.aem3
+lib/debug/ti.sysbios.knl.aem4f
 package/package_ti.sysbios.knl.c
 Clock.c
 Idle.c
@@ -32,8 +32,5 @@ Event.c
 Semaphore.c
 Mailbox.c
 Queue.c
-lib/sysbios/debug/ti.sysbios.knl.am3g
-lib/sysbios/debug/ti.sysbios.knl.arm3
-lib/sysbios/debug/ti.sysbios.knl.aem4f
-lib/sysbios/debug/ti.sysbios.knl.am4fg
-lib/sysbios/debug/ti.sysbios.knl.arm4f
+lib/debug/ti.sysbios.knl.am4fg
+lib/debug/ti.sysbios.knl.arm4f

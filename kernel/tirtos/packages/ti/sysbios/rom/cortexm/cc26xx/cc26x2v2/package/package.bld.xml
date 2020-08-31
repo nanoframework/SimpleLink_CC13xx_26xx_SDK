@@ -28,7 +28,7 @@
         <target name="ti.targets.arm.elf.M4F"
             version="ti.targets.arm.elf.M4F{1,0,16.9,0"
             rawVersion="16.9.0"
-            platform="ti.platforms.tiva:TM4C1294NCPDT:1"
+            platform="ti.platforms.simplelink:CC2642:1"
             isa="v7M4"
             suffix="em4f"
             rootDir="/db/vendors/ti/arm/16.9.0/Linux"
@@ -85,8 +85,11 @@
         <file name="CC26xx_custom_outpolicies.cfg.xs"/>
         <file name="CC26xx_custom_makefile_gnu.xdt"/>
         <file name="CC26xx_custom_outpolicies_gnu.cfg.xs"/>
+        <file name="CC26xx_custom_makefile_clang.xdt"/>
         <file name="CC26xx_custom_outpolicies_iar.cfg.xs"/>
         <file name="linkcmd.xdt"/>
+        <file name="mangleAsmFile.xs"/>
+        <file name="processMapFile.xs"/>
         <file name="mangleCFile.xs"/>
         <file name="createRomFuncs.xs"/>
         <file name="createLinkCmdFile.xs"/>

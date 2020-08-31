@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Texas Instruments Incorporated
+ * Copyright (c) 2013-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@
 var Program = xdc.module('xdc.cfg.Program');
 
 var Timer = null;
+var TimestampProvider = null;
 var Hwi = null;
 var BIOS = null;
 
@@ -64,6 +65,7 @@ function module$use()
 {
     Hwi = xdc.useModule("ti.sysbios.family.arm.m3.Hwi");
     BIOS = xdc.useModule('ti.sysbios.BIOS');
+    TimestampProvider = xdc.module('ti.sysbios.family.arm.m3.TimestampProvider');
 
     if ((BIOS.smpEnabled == true) && (BIOS.buildingAppLib == true)) {
         Timer.$logError("This Timer module is not supported in SMP mode", this);
@@ -99,7 +101,7 @@ function module$static$init(mod, params)
 function instance$meta$init()
 {
     Timer.timerInUse = true;  /* Inform TimestampProvider that */
-                              /* does not need to be configured */ 
+                              /* does not need to be configured */
 }
 
 /*
@@ -109,8 +111,11 @@ function instance$static$init(obj, id, tickFxn, params)
 {
     var modObj = this.$module.$object;
 
-    /* set flag because static instances need to be started */
-    Timer.startupNeeded = true;
+    /* If TimestampProvider is used, it will start the timer */
+    if (TimestampProvider.$used == false) {
+        /* set flag because static instances need to be started */
+        Timer.startupNeeded = true;
+    }
 
     obj.staticInst = true;
 

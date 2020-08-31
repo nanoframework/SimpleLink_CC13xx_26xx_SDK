@@ -1,5 +1,5 @@
 /* 
- *  Copyright (c) 2008 Texas Instruments and others.
+ *  Copyright (c) 2008-2018 Texas Instruments and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -31,11 +31,24 @@ function close()
  */
 function getLibs(prog)
 {
-    var libs = "lib/boot.a" + prog.build.target.suffix
-        + ";lib/auto_init.a" + prog.build.target.suffix;
+    var libs;
+
+    if (Program.build.target.$name.match(/clang/)) {
+        libs = "lib/startup.a" + prog.build.target.suffix;
+    }
+    else {
+        libs = "lib/boot.a" + prog.build.target.suffix
+            + ";lib/auto_init.a" + prog.build.target.suffix;
+    }
+
     if (prog.targetModules().length > 0 && this.Settings.bootOnly == false) {
-        libs = "lib/" + this.$name + ".a" + prog.build.target.suffix + ";"
-            + libs;
+        if (libs == "") {
+            libs = "lib/" + this.$name + ".a" + prog.build.target.suffix;
+        }
+        else {
+            libs = "lib/" + this.$name + ".a" + prog.build.target.suffix + ";"
+                + libs;
+        }
     }
     return (libs);
 
@@ -50,7 +63,7 @@ function getSects() {
     }
 }
 /*
- *  @(#) ti.targets.arm.rtsarm; 1, 0, 0,0; 1-23-2018 11:37:40; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) ti.targets.arm.rtsarm; 1, 0, 0,; 5-11-2020 15:37:56; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

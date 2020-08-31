@@ -102,6 +102,9 @@
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_excSvCall__I__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_excSvCall__I__mangled__
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_excUsageFault__I__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_excUsageFault__I__mangled__
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_flushVnvic__E	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_flushVnvic__E
+00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getCoreStackInfo__E	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_getCoreStackInfo__E
+00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getCoreStackInfo__E	00000000 .hidden ti_sysbios_hal_Hwi_getCoreStackInfo__E
+00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getCoreStackInfo__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_getCoreStackInfo__E
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getFunc__E	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_getFunc__E
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getHandle__E__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_getHandle__E__mangled__
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_getHookContext__E	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_getHookContext__E
@@ -135,6 +138,8 @@
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_setHookContext__E	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_setHookContext__E
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_setPriority__E__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_setPriority__E__mangled__
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_startup__E__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_startup__E__mangled__
+00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_swiDisableNull__I	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_swiDisableNull__I
+00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_swiRestoreNull__I	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_swiRestoreNull__I
 00000000 g     F .text:ti_sysbios_family_arm_m3_Hwi_switchFromBootStack__E__mangled__	00000000 .hidden ti_sysbios_family_arm_m3_Hwi_switchFromBootStack__E__mangled__
 00000000 g     F .text:ti_sysbios_family_arm_m3_IntrinsicsSupport_maxbit__E	00000000 .hidden ti_sysbios_family_arm_m3_IntrinsicsSupport_maxbit__E
 00000000 g     F .text:ti_sysbios_family_arm_m3_TaskSupport_checkStack__E	00000000 .hidden ti_sysbios_family_arm_m3_TaskSupport_checkStack__E
@@ -190,11 +195,8 @@
 00000000 g     F .text:ti_sysbios_hal_Hwi_create__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_create__mangled__
 00000000 g     F .text:ti_sysbios_hal_Hwi_delete__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_delete__mangled__
 00000000 g     F .text:ti_sysbios_hal_Hwi_destruct	00000000 .hidden ti_sysbios_hal_Hwi_destruct
-00000000 g     F .text:ti_sysbios_hal_Hwi_disable__E:ti_sysbios_hal_Hwi_disable__E	00000000 .hidden ti_sysbios_hal_Hwi_disable__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_disableInterrupt__E__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_disableInterrupt__E__mangled__
-00000000 g     F .text:ti_sysbios_hal_Hwi_enable__E:ti_sysbios_hal_Hwi_enable__E	00000000 .hidden ti_sysbios_hal_Hwi_enable__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_enableInterrupt__E__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_enableInterrupt__E__mangled__
-00000000 g     F .text:ti_sysbios_hal_Hwi_getCoreStackInfo__E	00000000 .hidden ti_sysbios_hal_Hwi_getCoreStackInfo__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_getFunc__E	00000000 .hidden ti_sysbios_hal_Hwi_getFunc__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_getHookContext__E	00000000 .hidden ti_sysbios_hal_Hwi_getHookContext__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_getIrp__E	00000000 .hidden ti_sysbios_hal_Hwi_getIrp__E
@@ -207,7 +209,6 @@
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_disableInterrupt__E__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_disableInterrupt__E__mangled__
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_enable__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_enable__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_enableInterrupt__E__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_enableInterrupt__E__mangled__
-00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_getCoreStackInfo__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_getCoreStackInfo__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_getFunc__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_getFunc__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_getHookContext__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_getHookContext__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_HwiProxy_getIrp__E	00000000 .hidden ti_sysbios_hal_Hwi_HwiProxy_getIrp__E
@@ -235,7 +236,6 @@
 00000000 g     F .text:ti_sysbios_hal_Hwi_Object__get__S	00000000 .hidden ti_sysbios_hal_Hwi_Object__get__S
 00000000 g     F .text:ti_sysbios_hal_Hwi_Object__next__S	00000000 .hidden ti_sysbios_hal_Hwi_Object__next__S
 00000000 g     F .text:ti_sysbios_hal_Hwi_Params__init__S	00000000 .hidden ti_sysbios_hal_Hwi_Params__init__S
-00000000 g     F .text:ti_sysbios_hal_Hwi_restore__E:ti_sysbios_hal_Hwi_restore__E	00000000 .hidden ti_sysbios_hal_Hwi_restore__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_setFunc__E	00000000 .hidden ti_sysbios_hal_Hwi_setFunc__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_setHookContext__E	00000000 .hidden ti_sysbios_hal_Hwi_setHookContext__E
 00000000 g     F .text:ti_sysbios_hal_Hwi_startup__E__mangled__	00000000 .hidden ti_sysbios_hal_Hwi_startup__E__mangled__
@@ -428,7 +428,7 @@
 00000000 g     F .text:ti_sysbios_knl_Queue_Object__get__S__mangled__	00000000 .hidden ti_sysbios_knl_Queue_Object__get__S__mangled__
 00000000 g     F .text:ti_sysbios_knl_Queue_Object__next__S	00000000 .hidden ti_sysbios_knl_Queue_Object__next__S
 00000000 g     F .text:ti_sysbios_knl_Queue_Params__init__S	00000000 .hidden ti_sysbios_knl_Queue_Params__init__S
-00000000 g     F .text:ti_sysbios_knl_Queue_prev__E	00000000 .hidden ti_sysbios_knl_Queue_prev__E
+00000000 g     F .text:ti_sysbios_knl_Queue_prev__E__mangled__	00000000 .hidden ti_sysbios_knl_Queue_prev__E__mangled__
 00000000 g     F .text:ti_sysbios_knl_Queue_put__E__mangled__	00000000 .hidden ti_sysbios_knl_Queue_put__E__mangled__
 00000000 g     F .text:ti_sysbios_knl_Queue_putHead__E	00000000 .hidden ti_sysbios_knl_Queue_putHead__E
 00000000 g     F .text:ti_sysbios_knl_Queue_remove__E__mangled__	00000000 .hidden ti_sysbios_knl_Queue_remove__E__mangled__
@@ -561,13 +561,11 @@
 00000000 g     F .text:ti_sysbios_knl_Task_yield__E__mangled__	00000000 .hidden ti_sysbios_knl_Task_yield__E__mangled__
 00000000 g     F .text:__xdc__init	00000000 .hidden __xdc__init
 00000000 g     F .text:xdc_runtime_Assert_raise__I__mangled__	00000000 .hidden xdc_runtime_Assert_raise__I__mangled__
-00000000 g     F .text:xdc_runtime_Core_allocObject__I	00000000 .hidden xdc_runtime_Core_allocObject__I
-00000000 g     F .text:xdc_runtime_Core_assignLabel__I__mangled__	00000000 .hidden xdc_runtime_Core_assignLabel__I__mangled__
+00000000 g     F .text:xdc_runtime_Core_assignLabel__I	00000000 .hidden xdc_runtime_Core_assignLabel__I
 00000000 g     F .text:xdc_runtime_Core_assignParams__I__mangled__	00000000 .hidden xdc_runtime_Core_assignParams__I__mangled__
 00000000 g     F .text:xdc_runtime_Core_constructObject__I__mangled__	00000000 .hidden xdc_runtime_Core_constructObject__I__mangled__
 00000000 g     F .text:xdc_runtime_Core_createObject__I__mangled__	00000000 .hidden xdc_runtime_Core_createObject__I__mangled__
 00000000 g     F .text:xdc_runtime_Core_deleteObject__I__mangled__	00000000 .hidden xdc_runtime_Core_deleteObject__I__mangled__
-00000000 g     F .text:xdc_runtime_Core_delistObject__I	00000000 .hidden xdc_runtime_Core_delistObject__I
 00000000 g     F .text:xdc_runtime_Core_destructObject__I__mangled__	00000000 .hidden xdc_runtime_Core_destructObject__I__mangled__
 00000000 g     F .text:xdc_runtime_Diags_setMask__E	00000000 .hidden xdc_runtime_Diags_setMask__E
 00000000 g     F .text:xdc_runtime_Error_check__E__mangled__	00000000 .hidden xdc_runtime_Error_check__E__mangled__

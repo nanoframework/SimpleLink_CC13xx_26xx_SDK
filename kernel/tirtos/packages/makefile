@@ -19,9 +19,6 @@ include $(CORESDK_INSTALL_DIR)/imports.mak
 #     http://rtsc.eclipse.org/docs-tip/Command_-_xdc#Environment_Variables
 #
 XDCARGS= \
-    ti.targets.arm.elf.M3=\"$(CCS_ARMCOMPILER)\" \
-    gnu.targets.arm.M3=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M3=\"$(IAR_ARMCOMPILER)\" \
     ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
     gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
     iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \

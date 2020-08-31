@@ -1,0 +1,14 @@
+[
+    {
+        "files": [
+            "+../README.md -> README.md",
+            "+../README.html -> README.html",
+            "+../fatsd_nortos.c -> fatsd_nortos.c",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../fatsd.syscfg -> fatsd.syscfg",
+            "+../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_NoRTOS.cmd -> CC26X2R1_LAUNCHXL_NoRTOS.cmd"
+        ]
+    }
+]

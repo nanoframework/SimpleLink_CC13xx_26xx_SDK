@@ -1,0 +1,43 @@
+[
+    {
+        "files": [
+            "+../../otsupport/otrtosapi.h -> otrtosapi.h",
+            "+../../otsupport/otrtosapi.c -> otrtosapi.c",
+            "+../../otsupport/otinstance.h -> otinstance.h",
+            "+../../platform/alarm.c -> alarm.c",
+            "+../../platform/alarm_micro.c -> alarm_micro.c",
+            "+../../platform/radio.h -> radio.h",
+            "+../../platform/diag.c -> diag.c",
+            "+../../platform/DIAG.md -> DIAG.md",
+            "+../../platform/entropy.c -> entropy.c",
+            "+../../platform/misc.c -> misc.c",
+            "+../../platform/settings.c -> settings.c",
+            "+../../platform/system.c -> system.c",
+            "+../../platform/system.h -> system.h",
+            "+../../platform/radio.c -> radio.c",
+            "+../../platform/uart.c -> uart.c",
+            "+../../platform/debug_uart.c -> debug_uart.c",
+            "+../../platform/crypto/aes_alt.c -> aes_alt.c",
+            "+../../platform/crypto/sha256_alt.c -> sha256_alt.c",
+            "+../../platform/crypto/ecjpake_alt.c -> ecjpake_alt.c",
+            "+../../platform/crypto/crypto_misc.c -> crypto_misc.c",
+            "+../../platform/nv/crc.c -> crc.c",
+            "+../../platform/nv/crc.h -> crc.h",
+            "+../../platform/nv/nvocmp.c -> nvocmp.c",
+            "+../../platform/nv/nvocmp.h -> nvocmp.h",
+            "+../../platform/nv/nvintf.h -> nvintf.h",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../cli_mtd.syscfg -> cli_mtd.syscfg",
+            "+../../main.c -> main.c",
+            "+../../task_config.h -> task_config.h",
+            "+../../otstack.c -> otstack.c",
+            "+../../otstack.h -> otstack.h",
+            "+../../release.cfg -> release.cfg",
+            "+../../cli.c -> cli.c",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.icf -> CC26X2R1_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

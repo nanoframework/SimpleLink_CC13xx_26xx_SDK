@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../easylink/EasyLink.h -> EasyLink.h",
+            "+../../easylink/EasyLink.c -> EasyLink.c",
+            "+../../README.md -> README.md",
+            "+../../rfEasyLinkListenBeforeTalk.syscfg -> rfEasyLinkListenBeforeTalk.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../rfEasylinkListenBeforeTalk.c -> rfEasylinkListenBeforeTalk.c",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.icf -> CC26X2R1_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

@@ -1,0 +1,19 @@
+[
+    {
+        "files": [
+            "+../README.md -> README.md",
+            "+../EasyLinkEcho_PerfectEcho.png -> EasyLinkEcho_PerfectEcho.png",
+            "+../EasyLinkEcho_MissedFirstPacket.png -> EasyLinkEcho_MissedFirstPacket.png",
+            "+../EasyLinkEcho_MissingFirstCouplePackets.png -> EasyLinkEcho_MissingFirstCouplePackets.png",
+            "+../EasyLinkEcho_ErrorTxRx.png -> EasyLinkEcho_ErrorTxRx.png",
+            "+../easylink/EasyLink.h -> easylink/EasyLink.h",
+            "+../rfEasyLinkEchoTx_nortos.c -> rfEasyLinkEchoTx_nortos.c",
+            "+../easylink/EasyLink_nortos.c -> easylink/EasyLink_nortos.c",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../rfEasyLinkEchoTx_nortos.syscfg -> rfEasyLinkEchoTx_nortos.syscfg",
+            "+../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1352P1_LAUNCHXL_fxns.c -> CC1352P1_LAUNCHXL_fxns.c",
+            "+CC1352P1_LAUNCHXL_NoRTOS.cmd -> CC1352P1_LAUNCHXL_NoRTOS.cmd"
+        ]
+    }
+]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017, Texas Instruments Incorporated
+ * Copyright (c) 2014-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,30 +51,104 @@
 
 volatile UInt32 curShadow;
 
+static Void getTime(Seconds_Time *ts);
+
 /*
  *  ======== Seconds_get ========
  */
 UInt32 Seconds_get(Void)
 {
-    volatile UInt32 curSeconds;
-    UInt            key;
+    Seconds_Time ts;
 
-    key = Hwi_disable();
-
-    curSeconds = AONRTCSecGet();
-
-    curSeconds = (curSeconds - Seconds_module->refSeconds) +
-        Seconds_module->setSeconds;
-
-    Hwi_restore(key);
-
-    return (curSeconds);
+    Seconds_getTime(&ts);
+    return (ts.secs);
 }
 
 /*
  *  ======== Seconds_getTime ========
  */
 UInt32 Seconds_getTime(Seconds_Time *ts)
+{
+    Seconds_Time curTs;
+    UInt         key;
+
+    key = Hwi_disable();
+
+    getTime(&curTs);
+
+    ts->secsHi = Seconds_module->setSecondsHi;
+    ts->secs = curTs.secs - Seconds_module->refSeconds +
+            Seconds_module->setSeconds;
+    ts->nsecs = curTs.nsecs + Seconds_module->deltaNSecs;
+    if (ts->nsecs >= 1000000000) {
+        ts->secs = ts->secs + 1;
+        ts->nsecs = ts->nsecs - 1000000000;
+    }
+
+    /* Add 0 or -1, depending on relation of ref nsecs to nsecs at set time */
+    ts->secs = ts->secs + Seconds_module->deltaSecs;
+
+    if (ts->secs < Seconds_module->setSeconds) {
+        /*
+         *  Seconds have wrapped because setSeconds is close to 0xFFFFFFFF.
+         *  This shouldn't happen again for another 136 years.
+         */
+        ts->secsHi++;
+    }
+
+    Hwi_restore(key);
+
+    return (0);
+}
+
+/*
+ *  ======== Seconds_set ========
+ */
+Void Seconds_set(UInt32 seconds)
+{
+    Seconds_Time ts;
+
+    ts.secsHi = 0;
+    ts.secs = seconds;
+    ts.nsecs = 0;
+
+    Seconds_setTime(&ts);
+}
+
+/*
+ *  ======== Seconds_setTime ========
+ */
+UInt32 Seconds_setTime(Seconds_Time *ts)
+{
+    Seconds_Time refTs;
+    UInt         key;
+
+    key = Hwi_disable();
+
+    getTime(&refTs);
+
+    Seconds_module->setSecondsHi = ts->secsHi;
+    Seconds_module->setSeconds = ts->secs;
+    Seconds_module->refSeconds = refTs.secs;
+
+    if (refTs.nsecs > ts->nsecs) {
+        Seconds_module->deltaNSecs = 1000000000 + ts->nsecs - refTs.nsecs;
+        Seconds_module->deltaSecs = -1;
+    }
+    else {
+        Seconds_module->deltaNSecs = ts->nsecs - refTs.nsecs;
+        Seconds_module->deltaSecs = 0;
+    }
+
+    Hwi_restore(key);
+
+    return (0);
+}
+
+/*
+ *  ======== getTime ========
+ */
+static Void getTime(Seconds_Time *ts)
 {
     volatile UInt32 seconds;
     volatile UInt32 subseconds;
@@ -85,38 +159,16 @@ UInt32 Seconds_getTime(Seconds_Time *ts)
     temp = AONRTCCurrent64BitValueGet();
     seconds = (UInt32) (temp >> 32);
     subseconds = (UInt32) (temp & 0xFFFFFFFF);
-
-    /* adjust seconds count with refSeconds and setSeconds */
-    seconds = (seconds - Seconds_module->refSeconds) +
-        Seconds_module->setSeconds;
-
     ts->secs = seconds;
+    ts->secsHi = 0;  // It will take 136 years for seconds to roll over.
 
     /*
      *  Throw away the lower 16 bits of the subseconds since this
-     *  used for temparature correction and does not accurately
+     *  is used for temparature correction and does not accurately
      *  reflect the time.
      */
     subseconds = subseconds >> 16;
 
-    nsecs = (1000000000 * (UInt64)subseconds) / 65536;
+    nsecs = ((UInt64)1000000000 * (UInt64)subseconds) / (UInt64)65536;
     ts->nsecs = (UInt32)nsecs;
-
-    return (0);
-}
-
-/*
- *  ======== Seconds_set ========
- */
-Void Seconds_set(UInt32 seconds)
-{
-    UInt            key;
-
-    key = Hwi_disable();
-
-    Seconds_module->refSeconds = AONRTCSecGet();
-
-    Seconds_module->setSeconds = seconds;
-
-    Hwi_restore(key);
 }

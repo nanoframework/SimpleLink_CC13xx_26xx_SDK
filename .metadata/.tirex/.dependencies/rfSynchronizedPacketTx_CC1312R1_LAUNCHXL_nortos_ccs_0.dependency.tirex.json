@@ -1,0 +1,17 @@
+[
+    {
+        "files": [
+            "+../rfSynchronizedPacket.h -> rfSynchronizedPacket.h",
+            "+../README.md -> README.md",
+            "+../state-machine.png -> state-machine.png",
+            "+../rfSynchronizedPacketTx.syscfg -> rfSynchronizedPacketTx.syscfg",
+            "+../rfSynchronizedPacketTx_nortos.c -> rfSynchronizedPacketTx_nortos.c",
+            "+../StateMachine_nortos.c -> StateMachine_nortos.c",
+            "+../StateMachine_nortos.h -> StateMachine_nortos.h",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
+            "+CC1312R1_LAUNCHXL_NoRTOS.cmd -> CC1312R1_LAUNCHXL_NoRTOS.cmd"
+        ]
+    }
+]

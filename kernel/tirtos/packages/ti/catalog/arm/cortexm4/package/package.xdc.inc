@@ -19,11 +19,13 @@ CC13xx.xdc
 CC13xx.xs
 CC26xx.xdc
 CC26xx.xs
+CortexM.xdc
+CortexM.xs
 package/ti.catalog.arm.cortexm4.sch
 package/.vers_g200
 package/.vers_r200
 package/.vers_b200
-package/.xdc-F14
+package/.xdc-I11
 package/ti_catalog_arm_cortexm4.java
 package/ti_catalog_arm_cortexm4.class
 package/package_ti.catalog.arm.cortexm4.c

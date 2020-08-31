@@ -4,12 +4,9 @@ package/package.xdc.inc
 package.bld
 Load.xml
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.utils.aem3
+lib/debug/ti.sysbios.utils.aem4f
 package/package_ti.sysbios.utils.c
 Load.c
 Load_CPU.c
-lib/sysbios/debug/ti.sysbios.utils.am3g
-lib/sysbios/debug/ti.sysbios.utils.arm3
-lib/sysbios/debug/ti.sysbios.utils.aem4f
-lib/sysbios/debug/ti.sysbios.utils.am4fg
-lib/sysbios/debug/ti.sysbios.utils.arm4f
+lib/debug/ti.sysbios.utils.am4fg
+lib/debug/ti.sysbios.utils.arm4f

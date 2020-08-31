@@ -33,7 +33,6 @@
         <file name="package/build.cfg"/>
         <file name="package/package.xdc.inc"/>
         <file name="package.bld"/>
-        <file name="linkcmd.xdt"/>
         <file name="package/package.cfg.xdc.inc"/>
     </release>
     </releases>

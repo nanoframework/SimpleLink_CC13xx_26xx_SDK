@@ -23,17 +23,18 @@ typedef struct {
 } ROM_ExternFuncPtrs;
 
 /* xdcRomExternFuncsPtr */
-#ifdef __ti__sect
-#pragma DATA_SECTION(ROM_externFuncPtrs, ".const:ROM_externFuncPtrs");
-#endif
-#ifdef __IAR_SYSTEMS_ICC__
+%if (Program.build.target.$name.match(/iar/)) {
 #pragma location = ".const_ROM_externFuncPtrs"
-#endif
-#ifdef __GNUC__
-#ifndef __TI_COMPILER_VERSION__
+%}
+%else if (Program.build.target.$name.match(/gnu/)) {
 const ROM_ExternFuncPtrs ROM_externFuncPtrs __attribute__ ((section(".const_ROM_externFuncPtrs")));
-#endif
-#endif
+%}
+%else if (Program.build.target.$name.match(/clang/)) {
+const ROM_ExternFuncPtrs ROM_externFuncPtrs __attribute__ ((section(".const:ROM_externFuncPtrs")));
+%}
+%else {
+#pragma DATA_SECTION(ROM_externFuncPtrs, ".const:ROM_externFuncPtrs");
+%}
 const ROM_ExternFuncPtrs ROM_externFuncPtrs = {
 %   for (var i = 0; i < ROM.excludeFuncs.length; i++) {
     `ROM.excludeFuncs[i].name`,
@@ -41,17 +42,18 @@ const ROM_ExternFuncPtrs ROM_externFuncPtrs = {
 };
 
 /* xdcRomExternFuncsPtr */
-#ifdef __ti__sect
-#pragma DATA_SECTION(xdcRomExternFuncPtr, ".data:xdcRomExternFuncPtr");
-#endif
-#ifdef __IAR_SYSTEMS_ICC__
+%if (Program.build.target.$name.match(/iar/)) {
 #pragma location = ".data_xdcRomExternFuncPtr"
-#endif
-#ifdef __GNUC__
-#ifndef __TI_COMPILER_VERSION__
+%}
+%else if (Program.build.target.$name.match(/gnu/)) {
 const ROM_ExternFuncPtrs *xdcRomExternFuncPtr __attribute__ ((section(".data_xdcRomExternFuncPtr")));
-#endif
-#endif
+%}
+%else if (Program.build.target.$name.match(/clang/)) {
+const ROM_ExternFuncPtrs *xdcRomExternFuncPtr __attribute__ ((section(".data:xdcRomExternFuncPtr")));
+%}
+%else {
+#pragma DATA_SECTION(xdcRomExternFuncPtr, ".data:xdcRomExternFuncPtr");
+%}
 const ROM_ExternFuncPtrs *xdcRomExternFuncPtr = &ROM_externFuncPtrs;
 
 %   if ((ROM.excludeFuncs.length != 0) && 

@@ -1,5 +1,5 @@
 /* 
- *  Copyright (c) 2008-2015 Texas Instruments Incorporated
+ *  Copyright (c) 2008-2018 Texas Instruments Incorporated
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -27,16 +27,6 @@ function genAliases(prog)
     switch (prog.build.target.isa[0]) {
         case "2": {   /* C2000 */
             newLinker = targetVers >= 6.0 ? true : false;
-            break;
-        }
-
-        case "4": {
-            if (prog.build.target.isa[1] == '3') {  /* MSP430 */
-                newLinker = targetVers >= 3.0 ? true : false;
-                newLinkDiags =
-                    "/* ignore error about def and ref in the same file */\n"
-                    + "--diag_remark=10268";
-            }
             break;
         }
 
@@ -124,13 +114,6 @@ function genElfSymbols(prog)
             break;
         }
 
-        case "4": {
-            if (prog.build.target.isa[1] == '3') {  /* MSP430 */
-                newLinker = targetVers >= 3.0 ? true : false;
-            }
-            break;
-        }
-
         case "v": { /* ARM */
             newLinker = true;
             break;
@@ -155,18 +138,7 @@ function genElfSymbols(prog)
         + prog.build.target.asmName('_STACK_SIZE') + "\n";
     res += "--symbol_map " + prog.build.target.asmName('__TI_STATIC_BASE') + "="
         + prog.build.target.asmName('__bss__') + "\n";
-    if (prog.build.target.isa != "430") {
-        res += "--symbol_map __c_int00=_c_int00\n";
-    }
-
-    /* Newer compiler have __TI prefixed definitions */ 
-    if (prog.build.target.isa.match(/430/) && targetVers < 4.2) {
-        res += "--symbol_map " + prog.build.target.asmName('_cleanup_ptr')
-            + "=" + prog.build.target.asmName('__TI_cleanup_ptr') + "\n";
-
-        res += "--symbol_map " + prog.build.target.asmName('_dtors_ptr')
-            + "=" + prog.build.target.asmName('__TI_dtors_ptr') + "\n";
-    }
+    res += "--symbol_map __c_int00=_c_int00\n";
 
     return (res);
 
@@ -307,7 +279,7 @@ function sectLine(sectMap, sn, split)
 }
 
 /*
- *  @(#) ti.targets; 1, 0, 3,0; 1-23-2018 11:06:49; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) ti.targets; 1, 0, 3,; 5-11-2020 15:30:20; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

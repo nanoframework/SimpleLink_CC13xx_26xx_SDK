@@ -1,5 +1,5 @@
 /* 
- *  Copyright (c) 2008-2017 Texas Instruments Incorporated
+ *  Copyright (c) 2008-2018 Texas Instruments Incorporated
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -63,7 +63,7 @@
 
     #define __FAR__ far
 
-#elif defined(__TMS470__)                       /* ARM */
+#elif defined(__ARM_ARCH)                       /* ARM (was __TMS470__) */
     #define xdc__LONGLONG__
     #define xdc__BITS8__
     #define xdc__BITS16__
@@ -72,14 +72,6 @@
     #define xdc__INT64__
 
 #elif defined(__ARP32__)
-    #define xdc__LONGLONG__
-    #define xdc__BITS8__
-    #define xdc__BITS16__
-    #define xdc__BITS32__
-    #define xdc__BITS64__
-    #define xdc__INT64__
-
-#elif defined(__MSP430__)                       /* MSP430 */
     #define xdc__LONGLONG__
     #define xdc__BITS8__
     #define xdc__BITS16__
@@ -173,6 +165,13 @@ typedef uintptr_t       xdc_UArg;
 #define xdc__META(n,s)                               \
     ti_targets_mkPragma(DATA_SECTION(n, "xdc.meta")) \
     const char (n)[] = {s}
+
+#elif defined(__clang__)
+
+#define xdc__META(n,s) \
+    __attribute__ ((section ("xdc.meta"))) \
+    const char (n)[] = {(s)}
+
 #else
 
 #define xdc__META(n,s)                               \
@@ -203,7 +202,7 @@ static inline xdc_Fxn xdc_uargToFxn(xdc_UArg a) { return ((xdc_Fxn)(int)a); }
 
 #endif /* ti_targets_STD_ */
 /*
- *  @(#) ti.targets; 1, 0, 3,0; 1-23-2018 11:06:50; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) ti.targets; 1, 0, 3,; 5-11-2020 15:30:21; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

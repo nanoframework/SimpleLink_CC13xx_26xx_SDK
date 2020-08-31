@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 /*
@@ -32,10 +32,12 @@
 #define ti_sysbios_interfaces_ISeconds__top__
 #endif
 
+#ifndef __extern
 #ifdef __cplusplus
 #define __extern extern "C"
 #else
 #define __extern extern
+#endif
 #endif
 
 #define ti_sysbios_interfaces_ISeconds___VERS 200
@@ -60,6 +62,7 @@
 
 /* Time */
 struct ti_sysbios_interfaces_ISeconds_Time {
+    xdc_UInt32 secsHi;
     xdc_UInt32 secs;
     xdc_UInt32 nsecs;
 };
@@ -76,6 +79,7 @@ struct ti_sysbios_interfaces_ISeconds_Fxns__ {
     xdc_UInt32 (*get)(void);
     xdc_UInt32 (*getTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_Void (*set)(xdc_UInt32 seconds);
+    xdc_UInt32 (*setTime)(ti_sysbios_interfaces_ISeconds_Time* ts);
     xdc_runtime_Types_SysFxns2 __sfxns;
 };
 #ifndef ti_sysbios_interfaces_ISeconds_Module__BASE__CR
@@ -119,6 +123,13 @@ static inline xdc_Void ti_sysbios_interfaces_ISeconds_set( ti_sysbios_interfaces
     mod->set(seconds);
 }
 
+/* setTime */
+static inline xdc_UInt32 ti_sysbios_interfaces_ISeconds_setTime(ti_sysbios_interfaces_ISeconds_Module mod, ti_sysbios_interfaces_ISeconds_Time *ts);
+static inline xdc_UInt32 ti_sysbios_interfaces_ISeconds_setTime( ti_sysbios_interfaces_ISeconds_Module mod, ti_sysbios_interfaces_ISeconds_Time *ts )
+{
+    return mod->setTime(ts);
+}
+
 
 /*
  * ======== FUNCTION SELECTORS ========
@@ -155,6 +166,14 @@ static inline ti_sysbios_interfaces_ISeconds_set_FxnT ti_sysbios_interfaces_ISec
     return (ti_sysbios_interfaces_ISeconds_set_FxnT)mod->set;
 }
 
+/* setTime_{FxnT,fxnP} */
+typedef xdc_UInt32 (*ti_sysbios_interfaces_ISeconds_setTime_FxnT)(ti_sysbios_interfaces_ISeconds_Time* ts);
+static inline ti_sysbios_interfaces_ISeconds_setTime_FxnT ti_sysbios_interfaces_ISeconds_setTime_fxnP(ti_sysbios_interfaces_ISeconds_Module mod);
+static inline ti_sysbios_interfaces_ISeconds_setTime_FxnT ti_sysbios_interfaces_ISeconds_setTime_fxnP(ti_sysbios_interfaces_ISeconds_Module mod)
+{
+    return (ti_sysbios_interfaces_ISeconds_setTime_FxnT)mod->setTime;
+}
+
 
 /*
  * ======== EPILOGUE ========
@@ -188,6 +207,9 @@ static inline ti_sysbios_interfaces_ISeconds_set_FxnT ti_sysbios_interfaces_ISec
 #define ISeconds_set ti_sysbios_interfaces_ISeconds_set
 #define ISeconds_set_fxnP ti_sysbios_interfaces_ISeconds_set_fxnP
 #define ISeconds_set_FxnT ti_sysbios_interfaces_ISeconds_set_FxnT
+#define ISeconds_setTime ti_sysbios_interfaces_ISeconds_setTime
+#define ISeconds_setTime_fxnP ti_sysbios_interfaces_ISeconds_setTime_fxnP
+#define ISeconds_setTime_FxnT ti_sysbios_interfaces_ISeconds_setTime_FxnT
 #define ISeconds_Module_name ti_sysbios_interfaces_ISeconds_Module_name
 
 #endif /* ti_sysbios_interfaces_ISeconds__localnames__done */

@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../README.md -> README.md",
+            "+../easylink/EasyLink.h -> easylink/EasyLink.h",
+            "+../rfEasyLinkRx_nortos.c -> rfEasyLinkRx_nortos.c",
+            "+../easylink/EasyLink_nortos.c -> easylink/EasyLink_nortos.c",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../rfEasyLinkRx_nortos.syscfg -> rfEasyLinkRx_nortos.syscfg",
+            "+../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
+            "+CC1352R1_LAUNCHXL_NoRTOS.cmd -> CC1352R1_LAUNCHXL_NoRTOS.cmd"
+        ]
+    }
+]

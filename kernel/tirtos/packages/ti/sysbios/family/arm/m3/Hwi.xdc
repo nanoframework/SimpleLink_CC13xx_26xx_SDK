@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -485,12 +485,29 @@ module Hwi inherits ti.sysbios.interfaces.IHwi
     /*! @_nodoc */
     metaonly struct ModuleView {
         String      options[4];
+        String      processorState;
         String      activeInterrupt;
         String      pendingInterrupt;
         String      exception;
         String      hwiStackPeak;
         SizeT       hwiStackSize;
         Ptr         hwiStackBase;
+    };
+
+    /*! @_nodoc */
+    metaonly struct VectorTableView {
+        UInt        vectorNum;
+        Ptr         vector;
+        String      vectorLabel;
+        String      type;
+        String      priority;
+        Int         preemptPriority;
+        Int         subPriority;
+        String      status;
+        String      hwiHandle;
+        String      hwiFxn;
+        UArg        hwiArg;
+        Ptr         hwiIrp;
     };
 
     /*! @_nodoc */
@@ -525,6 +542,13 @@ module Hwi inherits ti.sysbios.interfaces.IHwi
                         viewInitFxn: 'viewInitException',
                         structName: 'ExcContext'
                     }
+                ],
+                ['Vector Table',
+                    {
+                        type: ViewInfo.MODULE_DATA,
+                        viewInitFxn: 'viewInitVectorTable',
+                        structName: 'VectorTableView'
+                    }
                 ]
             ]
         });
@@ -557,6 +581,14 @@ module Hwi inherits ti.sysbios.interfaces.IHwi
     };
 
     // Errors
+
+    /*!
+     *  Error raised if an attempt is made to create a Hwi
+     *  with an interrupt number greater than Hwi_NUM_INTERRUPTS - 1.
+     */
+    config Error.Id E_badIntNum = {
+        msg: "E_badIntNum, intnum: %d is out of range"
+    };
 
     /*!
      *  Error raised when Hwi is already defined
@@ -929,6 +961,31 @@ module Hwi inherits ti.sysbios.interfaces.IHwi
      */
     config UInt priGroup = 0;
 
+    /*!
+     *  Generate linker commands to place vector tables. Default is true.
+     *
+     *  When set to true (the default), then 
+     *  {@link #resetVectorAddress Hwi.resetVectorAddress}
+     *  and {@link #vectorTableAddress Hwi.vectorTableAddress} are used to place
+     *  the reset and runtime vector tables.
+     *
+     *  When set to false, it is up to the user to provide linker commands
+     *  to place the sections the vector tables are contained in.
+     *
+     *  The following  table maps the tool chain used with the section names
+     *  for the reset and runtime vector tables:
+     *
+     *  @p(code)
+     *  Tool Chain       Reset Vectors          Runtime Vectors
+     *  TI               .resetVecs             .vecs
+     *  TI CLANG         .resetVecs             .vecs
+     *  GNU              .intvecs               .vtable
+     *  IAR              .intvec                .vecs
+     *  @p
+     *
+     */
+    metaonly config Bool placeVectorTables = true;
+
     // -------- Module Functions --------
 
     /*!
@@ -1276,6 +1333,7 @@ internal:   /* not for client use */
      * dispatcherTaskSupport is false.
      */
     config UInt (*swiDisable)();
+    config Void (*swiRestore)(UInt);
     config Void (*swiRestoreHwi)(UInt);
     config UInt (*taskDisable)();
     config Void (*taskRestoreHwi)(UInt);
@@ -1397,6 +1455,23 @@ internal:   /* not for client use */
      * Used by dispatcher
      */
     Void pendSV();
+
+    /*
+     *  ======== setStackLimit ========
+     */
+    Void setStackLimit(Ptr stackBase);
+
+    /*
+     *  ======== swiDisableNull ========
+     *  Empty Hwi_swiDisable()
+     */
+    UInt swiDisableNull();
+
+    /*
+     *  ======== swiRestoreNull ========
+     *  Empty Hwi_swiRestore()
+     */
+    Void swiRestoreNull(UInt key);
 
     /*! Hwi vector function type definition. */
     typedef Void (*HandlerFuncPtr)(Handle, UInt);

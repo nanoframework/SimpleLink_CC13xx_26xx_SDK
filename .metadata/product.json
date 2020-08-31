@@ -1,0 +1,33 @@
+{
+    "name": "simplelink_cc13x2_26x2_sdk",
+    "displayName": "simplelink_cc13x2_26x2_sdk",
+    "version": "4.20.01.04",
+    "documentationPath": "../docs",
+    "includePaths": [
+        "../source"
+    ],
+    "components": [
+        "/ti/ble5stack/ble.component.js",
+        "/ti/ti154stack/ti154stack.component.js",
+        "/ti/thread/thread.component.js",
+        "/ti/zstack/zstack.component.js",
+        "/ti/easylink/easylink.component.js",
+        "/ti/dmm/dmm.component.js",
+        "/ti/devices/devices.component.js",
+        "/ti/devices/radioconfig/radioconfig.component.js",
+        "/ti/drivers/drivers.component.js",
+        "/ti/drivers/rflib.component.js",
+        "/ti/utils/build/build.component.js",
+        "/ti/utils/rov/rov.component.js",
+        "/ti/utils/runtime/runtime.component.js"
+    ],
+    "devices": [
+        "CC1312R1F3RGZ",
+        "CC1352P1F3RGZ",
+        "CC1352R1F3RGZ",
+        "CC2642R1FRGZ",
+        "CC2652R1FRGZ",
+        "CC2652RB"
+    ],
+    "minToolVersion": "1.4.0"
+}

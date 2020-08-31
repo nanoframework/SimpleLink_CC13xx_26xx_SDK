@@ -5,10 +5,10 @@ package.bld
 Timer.xml
 TimestampProvider.xml
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.family.arm.lm4.aem4f
+lib/debug/ti.sysbios.family.arm.lm4.aem4f
 package/package_ti.sysbios.family.arm.lm4.c
 Seconds.c
 Timer.c
 TimestampProvider.c
-lib/sysbios/debug/ti.sysbios.family.arm.lm4.am4fg
-lib/sysbios/debug/ti.sysbios.family.arm.lm4.arm4f
+lib/debug/ti.sysbios.family.arm.lm4.am4fg
+lib/debug/ti.sysbios.family.arm.lm4.arm4f

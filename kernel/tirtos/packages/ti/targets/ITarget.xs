@@ -1,19 +1,41 @@
-/* --COPYRIGHT--,EPL
- *  Copyright (c) 2008-2016 Texas Instruments Incorporated
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+/*
+ * Copyright (c) 2008-2019 Texas Instruments Incorporated
+ * All rights reserved.
  *
- *  Contributors:
- *      Texas Instruments - initial implementation
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
- * --/COPYRIGHT--*/
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /*
  *  ======== ITarget.xs ========
  *
  *! Revision History
  *! ================
+ *! 21-Feb-2018 ashish  add TI LLVM support
  *! 01-Sep-2011 sg      added v7M4
  *! 26-Jul-2010 kw      added "--diag_suppress=23000" to avoid spurious type
  *!                     errors starting with 7.1 codegen (workaround from Anbu)
@@ -71,14 +93,15 @@ var _isaChainMap = {
     isa_v7M: ["v7M"],
     isa_v7M4:["v7M", "v7M4"],
     isa_v7R: ["470", "v4T", "v5T", "v6", "v7R"],
+    isa_v8M: ["v8M", "v7M"],
     isa_arp32: ["arp32"]
 };
 
 /*
  *  ======== _targetCmds ========
- *  Hash table of commands (indexed by target.suffix).  Commands are
- *  themselves hashtables (indexed by file type: "asm", "c", ...) that
- *  define the commands for cc, asm , etc.
+ *  Hash table of commands (indexed by target.suffix).  Commands are themselves
+ *  hashtables (indexed by file type: "asm", "c", ...) that define the commands
+ *  for cc, asm , etc.
  */
 var _targetCmds = null;
 
@@ -169,7 +192,7 @@ function genConstCustom(names, types)
     }
 
     var pragmaOnly = false;
-    if (this.binaryParser == "ti.targets.omf.elf.Elf32") {
+    if (this.binaryParser != "ti.targets.omf.cof.Coff") {
         pragmaOnly = true;
     }
 
@@ -257,10 +280,22 @@ function getVersion()
                         cver = va[0];
                     }
                     else {
-                        print(target.$name
-                            + ": warning: version match failed on '"
-                            + status.output + "'");
-                        cver = "0.0.0";
+                        va = status.output.match(/clang\sversion\s[0-9]+\.[0-9]+\.[0-9]+/g);
+                        if (va != null) {
+                            cver = va[0].replace(/[clang\sversion\s]/g, "");
+                        }
+                        else {
+                            va = status.output.match(/Clang\sCompiler\s[0-9]+\.[0-9]+\.[0-9]+/g);
+                            if (va != null) {
+                                cver = va[0].replace(/[Clang\sCompiler\s]/g, "");
+                            }
+                            else {
+                                print(target.$name
+                                    + ": warning: version match failed on '"
+                                    + status.output + "'");
+                                cver = "0.0.0";
+                            }
+                        }
                     }
                 }
             }
@@ -382,18 +417,29 @@ function link(goal)
 
         var lib = "";
         if (("linkLib" in target) && target.linkLib != null) {
-            lib = " -l $(rootDir)/lib/" + target.linkLib;
+            if (target.$name.match(/clang/)) {
+                lib = " -l $(rootDir)/lib/generic/" + target.linkLib;
+            }
+            else {
+                lib = " -l $(rootDir)/lib/" + target.linkLib;
+            }
         }
 
         var cmd = tool2cmd["link"];
-        var pre = target.lnkOpts == null ? "" :
-            (goal.dllMode ? "-q" : target.lnkOpts.prefix);
-        var suf = "";
+        var pre;
+        if (target.$name.match(/clang/)) {
+            pre = target.lnkOpts == null ? "" :
+                (goal.dllMode ? "-Wl,-q" : target.lnkOpts.prefix);
+        }
+        else {
+            pre = target.lnkOpts == null ? "" :
+                (goal.dllMode ? "-q" : target.lnkOpts.prefix);
+        }
 
         var compString = this.getVersion().split('{')[1];
         var compVersion = compString.split(',');
 
-        if (_newLinker(target)) {
+        if (!target.$name.match(/clang/)) {
             var fsopt = "-fs $(XDCCFGDIR)$(dir $@)";
             if (Build.hostOSName == "Windows") {
                 /* This is a workaround for a CodeGen bug when '/' is the
@@ -404,11 +450,23 @@ function link(goal)
             pre = fsopt + " " + pre;
         }
 
+        var suf = "";
+        if (target.$name.match(/clang/)) {
+            suf = target.lnkOpts == null ? suf : suf + " " +
+                (goal.dllMode ? "-Wl,-r -Wl,-m,$(XDCCFGDIR)/$@.map" :
+                target.lnkOpts.suffix + lib);
+            goal.files = goal.files.replace(/(^|\s+)(\S+\.xdl)($|\s+)/,
+                " -Xlinker $2 ");
+        }
+        else {
+            suf = target.lnkOpts == null ? suf : suf + " " +
+                (goal.dllMode ? "-r -m $(XDCCFGDIR)/$@.map" :
+                target.lnkOpts.suffix + lib);
+        }
+
         result.cmds = _bldUtils.expandString(cmd, {
             LOPTS_P: pre,
-            LOPTS_S: target.lnkOpts == null ? suf :
-                suf + " " + (goal.dllMode ? "-r -m $(XDCCFGDIR)/$@.map" :
-                                target.lnkOpts.suffix + lib),
+            LOPTS_S: suf,
             lopts:   goal.opts,
             files:   goal.files
         });
@@ -495,21 +553,40 @@ function _compile(target, goal, asm)
             }
 
             _setEnv(target, result);
-            result.cmds = _bldUtils.expandString(tool2cmd[cmdType], {
-                COPTS_P:    ccoptsPre,
-                COPTS_S:    ccoptsSuf,
-                AOPTS_P:    target.asmOpts.prefix,
-                AOPTS_S:    target.asmOpts.suffix,
-                ASMONLY:    asm ? "-n -s --symdebug:none" : "",
-                dstDir:     dstDir,
-                srcExt:     goal.srcSuffix,
-                copts:      (goal.configOpts && "cfgcopts" in goal.opts)
-                            ? goal.opts.cfgcopts : goal.opts.copts,
-                aopts:      goal.opts.aopts,
-                defs:       goal.opts.defs,
-                incs:       goal.opts.incs,
-                langOpt:    langOpt
-            });
+            if (target.$name.match(/clang/)) {
+                result.cmds = _bldUtils.expandString(tool2cmd[cmdType], {
+                    COPTS_P:    ccoptsPre,
+                    COPTS_S:    ccoptsSuf,
+                    AOPTS_P:    target.asmOpts.prefix,
+                    AOPTS_S:    target.asmOpts.suffix,
+                    ASMONLY:    "",
+                    dstDir:     dstDir,
+                    srcExt:     goal.srcSuffix,
+                    copts:      (goal.configOpts && "cfgcopts" in goal.opts)
+                                ? goal.opts.cfgcopts : goal.opts.copts,
+                    aopts:      goal.opts.aopts,
+                    defs:       goal.opts.defs,
+                    incs:       goal.opts.incs,
+                    langOpt:    ""
+                });
+            }
+            else {
+                result.cmds = _bldUtils.expandString(tool2cmd[cmdType], {
+                    COPTS_P:    ccoptsPre,
+                    COPTS_S:    ccoptsSuf,
+                    AOPTS_P:    target.asmOpts.prefix,
+                    AOPTS_S:    target.asmOpts.suffix,
+                    ASMONLY:    asm ? "-n -s --symdebug:none" : "",
+                    dstDir:     dstDir,
+                    srcExt:     goal.srcSuffix,
+                    copts:      (goal.configOpts && "cfgcopts" in goal.opts)
+                                ? goal.opts.cfgcopts : goal.opts.copts,
+                    aopts:      goal.opts.aopts,
+                    defs:       goal.opts.defs,
+                    incs:       goal.opts.incs,
+                    langOpt:    langOpt
+                });
+            }
         }
     }
 
@@ -570,14 +647,24 @@ function _mkCmds(target)
             + target.suffix + " $< -C ";
 
     /* define assembly options */
-    cmdOpts = " $(AOPTS_P) " + target.asm.opts + " -eo.o" + target.suffix
+    if (target.$name.match(/clang/)) {
+        cmdOpts = " $(AOPTS_P) " + target.asm.opts 
+          + " $(AOPTS_S) $(defs) $(aopts) $(incs) $(XDCINCS) "
+          + target.includeOpts;
+        /* define assemble command template */
+        cmd = cmdPrefix + target.asm.cmd + cmdOpts
+          + " $(langOpt) -o $@ $<\n";
+    }
+    else {
+        cmdOpts = " $(AOPTS_P) " + target.asm.opts
+          + " -eo.o" + target.suffix
           + " -ea.s" + target.suffix
           + " $(AOPTS_S) $(defs) $(aopts) $(incs) $(XDCINCS) "
           + target.includeOpts;
-
-    /* define assemble command template */
-    cmd  = cmdPrefix + target.asm.cmd + cmdOpts
-             + " -fr=./$(dstDir) $(langOpt) $<\n";
+        /* define assemble command template */
+        cmd = cmdPrefix + target.asm.cmd + cmdOpts
+          + " -fr=./$(dstDir) $(langOpt) $<\n";
+    }
     cmd = cmd.concat(mkdep + cmdOpts);
     tool2cmd["asm"] = cmd;
 
@@ -589,10 +676,21 @@ function _mkCmds(target)
      * The users who build with XDC still get the extension functionality that
      * allows us to build for multiple targets.
      */
-    cmdOpts = " $(ASMONLY) $(COPTS_P) " + target.cc.opts + " -eo.o"
+    if (target.$name.match(/clang/)) {
+        cmdOpts = " $(ASMONLY) $(COPTS_P) $(COPTS_S) $(defs) $(copts) "
+            + "$(incs) $(XDCINCS) " + target.includeOpts;
+        /* define the C compile command template */
+        cmd =  cmdPrefix + target.cc.cmd + " " + target.cc.opts + cmdOpts +
+            " $(langOpt) -o $@ $<\n";
+    }
+    else {
+        cmdOpts = " $(ASMONLY) $(COPTS_P) " + target.cc.opts + " -eo.o"
           + target.suffix + " -ea.s" + target.suffix
           + " $(COPTS_S) $(defs) $(copts) $(incs) $(XDCINCS) "
           + target.includeOpts + " -fs=./$(dstDir) -fr=./$(dstDir)";
+        /* define the C compile command template */
+        cmd =  cmdPrefix + target.cc.cmd + cmdOpts + " $(langOpt) $<\n";
+    }
 
     if (0) {
          /* redefine MKDEP command template to use compiler.  This gives us
@@ -608,8 +706,6 @@ function _mkCmds(target)
             + "@$(MV) $(patsubst %$(srcExt),%.pp,$<) $@.dep\n#";
     }
 
-    /* define the C compile command template */
-    cmd =  cmdPrefix + target.cc.cmd + cmdOpts + " $(langOpt) $<\n";
     cmd = cmd.concat(mkdep + cmdOpts);
     tool2cmd["c"] = cmd;
 
@@ -660,24 +756,4 @@ function _setEnv(target, result)
 
     result.path = path;
     result.envs = ["C_DIR="];
-}
-
-/*
- *  ======== _newLinker ========
- *  This function checks if the linker supports '-fs' and '-ea' options, and
- *  if the generated asm file has the prefix 'lto'.
- */
-function _newLinker(target)
-{
-    var compString = target.getVersion().split('{')[1];
-    var compVersion = compString.split(',');
-
-    if ((target.isa[0] == "6" && compVersion[2] >= "7.1")
-        || (target.isa.substring(0, 3) == "430" && compVersion[2] >= "3.3")
-        || (target.isa.substring(0, 2) == "28" && compVersion[2] >= "6.0")
-        || (target.isa[0] == 'v')  // old Arm compilers are detected elsewhere
-        || (target.isa == "arp32")) {
-        return (true);
-    }
-    return (false);
 }

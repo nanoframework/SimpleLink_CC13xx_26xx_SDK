@@ -3,7 +3,7 @@ package/build.cfg
 package/package.xdc.inc
 package.bld
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.xdcruntime.aem3
+lib/debug/ti.sysbios.xdcruntime.aem4f
 package/package_ti.sysbios.xdcruntime.c
 GateThreadSupport.c
 GateProcessSupport.c
@@ -11,8 +11,5 @@ SemThreadSupport.c
 SemProcessSupport.c
 ThreadSupport.c
 CacheSupport.c
-lib/sysbios/debug/ti.sysbios.xdcruntime.am3g
-lib/sysbios/debug/ti.sysbios.xdcruntime.arm3
-lib/sysbios/debug/ti.sysbios.xdcruntime.aem4f
-lib/sysbios/debug/ti.sysbios.xdcruntime.am4fg
-lib/sysbios/debug/ti.sysbios.xdcruntime.arm4f
+lib/debug/ti.sysbios.xdcruntime.am4fg
+lib/debug/ti.sysbios.xdcruntime.arm4f

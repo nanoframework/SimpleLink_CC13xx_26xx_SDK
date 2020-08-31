@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_family_arm_msp432
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -219,6 +219,7 @@ public class ti_sysbios_family_arm_msp432
         om.bind("ti.sysbios.family.arm.msp432.Seconds.get", new Extern("ti_sysbios_family_arm_msp432_Seconds_get__E", "xdc_UInt32(*)(xdc_Void)", true, false));
         om.bind("ti.sysbios.family.arm.msp432.Seconds.getTime", new Extern("ti_sysbios_family_arm_msp432_Seconds_getTime__E", "xdc_UInt32(*)(ti_sysbios_interfaces_ISeconds_Time*)", true, false));
         om.bind("ti.sysbios.family.arm.msp432.Seconds.set", new Extern("ti_sysbios_family_arm_msp432_Seconds_set__E", "xdc_Void(*)(xdc_UInt32)", true, false));
+        om.bind("ti.sysbios.family.arm.msp432.Seconds.setTime", new Extern("ti_sysbios_family_arm_msp432_Seconds_setTime__E", "xdc_UInt32(*)(ti_sysbios_interfaces_ISeconds_Time*)", true, false));
     }
 
     void Timer$$CREATES()
@@ -790,14 +791,14 @@ public class ti_sysbios_family_arm_msp432
             sb.append("pkg.packageRepository = xdc.om['ti.sysbios.family.arm.msp432$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.msp432.aem4f',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.msp432.am4fg',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.msp432.arm4f',\n");
+            sb.append("'lib/debug/ti.sysbios.family.arm.msp432.aem4f',\n");
+            sb.append("'lib/debug/ti.sysbios.family.arm.msp432.am4fg',\n");
+            sb.append("'lib/debug/ti.sysbios.family.arm.msp432.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.msp432.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.msp432.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.msp432.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.family.arm.msp432.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.family.arm.msp432.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/debug/ti.sysbios.family.arm.msp432.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }
@@ -1159,8 +1160,8 @@ public class ti_sysbios_family_arm_msp432
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray());
         Value.Map atmap = (Value.Map)vo.getv("$attr");
-        atmap.setElem("", true);
         atmap.setElem("", "./ClockFreqs.xdt");
+        atmap.setElem("", true);
         atmap.seal("length");
         vo.bind("MODULE_STARTUP$", 0);
         vo.bind("PROXY$", 0);
@@ -1252,7 +1253,8 @@ public class ti_sysbios_family_arm_msp432
         vo.bind("get", om.findStrict("ti.sysbios.family.arm.msp432.Seconds.get", "ti.sysbios.family.arm.msp432"));
         vo.bind("getTime", om.findStrict("ti.sysbios.family.arm.msp432.Seconds.getTime", "ti.sysbios.family.arm.msp432"));
         vo.bind("set", om.findStrict("ti.sysbios.family.arm.msp432.Seconds.set", "ti.sysbios.family.arm.msp432"));
-        vo.bind("$$fxntab", Global.newArray("ti_sysbios_family_arm_msp432_Seconds_Module__startupDone__E", "ti_sysbios_family_arm_msp432_Seconds_get__E", "ti_sysbios_family_arm_msp432_Seconds_getTime__E", "ti_sysbios_family_arm_msp432_Seconds_set__E"));
+        vo.bind("setTime", om.findStrict("ti.sysbios.family.arm.msp432.Seconds.setTime", "ti.sysbios.family.arm.msp432"));
+        vo.bind("$$fxntab", Global.newArray("ti_sysbios_family_arm_msp432_Seconds_Module__startupDone__E", "ti_sysbios_family_arm_msp432_Seconds_get__E", "ti_sysbios_family_arm_msp432_Seconds_getTime__E", "ti_sysbios_family_arm_msp432_Seconds_set__E", "ti_sysbios_family_arm_msp432_Seconds_setTime__E"));
         vo.bind("$$logEvtCfgs", Global.newArray());
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray());

@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-D20
+ * @(#) xdc-I08
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_rom_cortexm_cc26xx_cc26x2v2
 {
-    static final String VERS = "@(#) xdc-D20\n";
+    static final String VERS = "@(#) xdc-I08\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -282,8 +282,8 @@ public class ti_sysbios_rom_cortexm_cc26xx_cc26x2v2
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray());
         Value.Map atmap = (Value.Map)vo.getv("$attr");
-        atmap.setElem("", "./CC26xx.xdt");
         atmap.setElem("", true);
+        atmap.setElem("", "./CC26xx.xdt");
         atmap.seal("length");
         vo.bind("MODULE_STARTUP$", 0);
         vo.bind("PROXY$", 0);

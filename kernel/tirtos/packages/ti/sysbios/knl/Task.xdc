@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Texas Instruments Incorporated
+ * Copyright (c) 2015-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
  */
 /*
  *  ======== Task.xdc ========
- *
  */
 
 package ti.sysbios.knl;
@@ -384,6 +383,7 @@ import ti.sysbios.knl.Queue;
  */
 
 @DirectCall
+/* REQ_TAG(SYSBIOS-464) */
 @ModuleStartup      /* generate a call to Task_Module_startup at startup */
 @InstanceInitStatic /* Construct/Destruct CAN becalled at runtime */
 @InstanceFinalize   /* generate call to Task_Instance_finalize on delete */
@@ -453,6 +453,7 @@ module Task
      *  Sets of hook functions can be specified for the Task module.
      *  See {@link #hookfunc Hook Functions} for details.
      */
+    /* REQ_TAG(SYSBIOS-454) */
     struct HookSet {
         Void (*registerFxn)(Int);
         Void (*createFxn)(Handle, Error.Block *);
@@ -716,7 +717,7 @@ module Task
      *  target specific and depends on the number of
      *  bits in a UInt data type. For 6x and ARM devices
      *  the maximum number of priorities is therefore 32.
-     *  For 28x, 55x, and MSP430 devices, the maximum number of
+     *  For C28x devices, the maximum number of
      *  priorities is 16.
      */
     config UInt numPriorities = 16;
@@ -1465,6 +1466,7 @@ module Task
      *
      *  @b(returns)     address of currently executing task object
      */
+    /* REQ_TAG(SYSBIOS-511) */
     Handle self();
 
     /*!
@@ -1576,6 +1578,7 @@ module Task
      *
      *  nticks cannot be {@link ti.sysbios.BIOS#WAIT_FOREVER BIOS_WAIT_FOREVER}.
      */
+    /* REQ_TAG(SYSBIOS-518) */
     Void sleep(UInt32 nticks);
 
     /*!
@@ -1731,6 +1734,7 @@ instance:
     create(FuncPtr fxn);
 
     // -------- Handle Parameters --------
+    /* REQ_TAG(SYSBIOS-463) */
 
     /*! Task function argument. Default is 0 */
     config UArg arg0 = 0;
@@ -1862,6 +1866,7 @@ instance:
      *
      *  @b(returns)     Task function
      */
+    /* REQ_TAG(SYSBIOS-455) */
     FuncPtr getFunc(UArg *arg0, UArg *arg1);
 
     /*!
@@ -1889,6 +1894,7 @@ instance:
      *  @param(id)      hook set ID
      *  @b(returns)     hook set context for task
      */
+    /* REQ_TAG(SYSBIOS-454) */
     Ptr getHookContext(Int id);
 
     /*!
@@ -1899,6 +1905,7 @@ instance:
      *
      *  @b(returns)     task priority
      */
+    /* REQ_TAG(SYSBIOS-510) */
     Int getPri();
 
     /*!
@@ -1956,6 +1963,7 @@ instance:
      *  @param(id)              hook set ID
      *  @param(hookContext)     value to write to context
      */
+    /* REQ_TAG(SYSBIOS-454) */
     Void setHookContext(Int id, Ptr hookContext);
 
     /*!
@@ -2010,7 +2018,8 @@ instance:
      *  The new priority should not be zero (0). This priority level is
      *  reserved for the Idle task.
      */
-    UInt setPri(Int newpri);
+    /* REQ_TAG(SYSBIOS-510) */
+    Int setPri(Int newpri);
 
     /*!
      *  ======== stat ========
@@ -2152,6 +2161,7 @@ internal:   /* not for client use */
      *
      *  Must be called with interrupts disabled.
      */
+    /* REQ_TAG(SYSBIOS-456) */
     Void schedule();
 
     /*
@@ -2263,7 +2273,7 @@ internal:   /* not for client use */
     struct Module_State {
         volatile Bool   locked;         // Task scheduler locked flag
         volatile UInt   curSet;         // Bitmask reflects readyQ states
-        Bool            workFlag;       // Scheduler work is pending.
+        volatile Bool   workFlag;       // Scheduler work is pending.
                                         // Optimization. Must be set
                                         // whenever readyQs are modified.
         UInt            vitalTasks;     // number of tasks with

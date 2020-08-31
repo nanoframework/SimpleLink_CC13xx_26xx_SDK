@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017, Texas Instruments Incorporated
+ * Copyright (c) 2014-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- /*
+/*
  *  ======== Timer.c ========
  */
 
@@ -897,7 +897,7 @@ UInt32 Timer_getCurrentTick(Timer_Object *obj, Bool saveFlag)
  */
 Void Timer_getFreq(Timer_Object *obj, Types_FreqHz *freq)
 {
-    if (obj->extFreq.lo != NULL) {
+    if (obj->extFreq.lo != 0U) {
         *freq = obj->extFreq;
     }
     else {
@@ -1009,7 +1009,7 @@ Void Timer_write(Bool altclk, volatile UInt32 *pReg, UInt32 val)
 /*
  *  ======== Timer_masterDisable ========
  */
-#if defined(__GNUC__) && !defined(__ti__)
+#if (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Bool __attribute__((naked)) Timer_masterDisable(Void)
 {
     /* read PRIMASK bit to R0 and call CPSID to disable interrupts */
@@ -1044,7 +1044,7 @@ Bool Timer_masterDisable(Void)
 /*
  *  ======== Timer_masterEnable ========
  */
-#if defined(__GNUC__) && !defined(__ti__)
+#if (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Void __attribute__((naked)) Timer_masterEnable(Void)
 {
     __asm__ __volatile__(
@@ -1079,7 +1079,7 @@ Void Timer_masterEnable(Void)
 #define INVALID_TIMER_ID ~0
 #if defined(__IAR_SYSTEMS_ICC__)
 __weak Void Timer_enableCC26xx(Int id)
-#elif defined(__GNUC__) && !defined(__ti__)
+#elif (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Void __attribute__((weak)) Timer_enableCC26xx(Int id)
 #else
 #pragma WEAK (Timer_enableCC26xx)
@@ -1110,10 +1110,9 @@ Void Timer_enableCC26xx(Int id)
     if (gpt != INVALID_TIMER_ID) {
 
         /* if it is not already on, turn on the PERIPH domain */
-        if (PRCMPowerDomainStatus(PRCM_DOMAIN_PERIPH) !=
-            PRCM_DOMAIN_POWER_ON) {
+        if (PRCMPowerDomainsAllOn(PRCM_DOMAIN_PERIPH) != PRCM_DOMAIN_POWER_ON) {
             PRCMPowerDomainOn(PRCM_DOMAIN_PERIPH);
-            while (PRCMPowerDomainStatus(PRCM_DOMAIN_PERIPH) !=
+            while (PRCMPowerDomainsAllOn(PRCM_DOMAIN_PERIPH) !=
                 PRCM_DOMAIN_POWER_ON) {};
         }
 
@@ -1132,7 +1131,7 @@ Void Timer_enableCC26xx(Int id)
  */
 #if defined(__IAR_SYSTEMS_ICC__)
 __weak Void Timer_enableCC3200(Int id)
-#elif defined(__GNUC__) && !defined(__ti__)
+#elif (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Void __attribute__((weak)) Timer_enableCC3200(Int id)
 #else
 #pragma WEAK (Timer_enableCC3200)
@@ -1222,7 +1221,7 @@ Void Timer_enableTiva(Int id)
  */
 #if defined(__IAR_SYSTEMS_ICC__)
 __weak Void Timer_disableCC26xx(Int id)
-#elif defined(__GNUC__) && !defined(__ti__)
+#elif (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Void __attribute__((weak)) Timer_disableCC26xx(Int id)
 #else
 #pragma WEAK (Timer_disableCC26xx)
@@ -1237,7 +1236,7 @@ Void Timer_disableCC26xx(Int id)
  */
 #if defined(__IAR_SYSTEMS_ICC__)
 __weak Void Timer_disableCC3200(Int id)
-#elif defined(__GNUC__) && !defined(__ti__)
+#elif (defined(__GNUC__) && !defined(__ti__)) || (defined(__GNUC__) && defined(__clang__))
 Void __attribute__((weak)) Timer_disableCC3200(Int id)
 #else
 #pragma WEAK (Timer_disableCC3200)

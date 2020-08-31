@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 /*
@@ -34,10 +34,12 @@
 #define ti_sysbios_BIOS__top__
 #endif
 
+#ifndef __extern
 #ifdef __cplusplus
 #define __extern extern "C"
 #else
 #define __extern extern
+#endif
 #endif
 
 #define ti_sysbios_BIOS___VERS 200
@@ -94,16 +96,16 @@ enum ti_sysbios_BIOS_LibType {
 typedef enum ti_sysbios_BIOS_LibType ti_sysbios_BIOS_LibType;
 
 /* WAIT_FOREVER */
-#define ti_sysbios_BIOS_WAIT_FOREVER (~(0))
+#define ti_sysbios_BIOS_WAIT_FOREVER (~(0U))
 
 /* NO_WAIT */
-#define ti_sysbios_BIOS_NO_WAIT (0)
+#define ti_sysbios_BIOS_NO_WAIT (0U)
 
 /* StartupFuncPtr */
 typedef xdc_Void (*ti_sysbios_BIOS_StartupFuncPtr)(xdc_Void );
 
 /* version */
-#define ti_sysbios_BIOS_version (0x65501)
+#define ti_sysbios_BIOS_version (0x68101)
 
 
 /*
@@ -439,87 +441,87 @@ __extern __FAR__ const CT__ti_sysbios_BIOS_installedErrorHook ti_sysbios_BIOS_in
 
 /* Module__startupDone__S */
 xdc__CODESECT(ti_sysbios_BIOS_Module__startupDone__S, "ti_sysbios_BIOS_Module__startupDone__S")
-__extern xdc_Bool ti_sysbios_BIOS_Module__startupDone__S( void );
+__extern xdc_Bool ti_sysbios_BIOS_Module__startupDone__S( void);
 
 /* linkedWithIncorrectBootLibrary__E */
 #define ti_sysbios_BIOS_linkedWithIncorrectBootLibrary ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E
 xdc__CODESECT(ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E, "ti_sysbios_BIOS_linkedWithIncorrectBootLibrary")
-__extern xdc_Void ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E( void );
+__extern xdc_Void ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E( void);
 
 /* start__E */
 #define ti_sysbios_BIOS_start ti_sysbios_BIOS_start__E
 xdc__CODESECT(ti_sysbios_BIOS_start__E, "ti_sysbios_BIOS_start")
-__extern xdc_Void ti_sysbios_BIOS_start__E( void );
+__extern xdc_Void ti_sysbios_BIOS_start__E( void);
 
 /* exit__E */
 #define ti_sysbios_BIOS_exit ti_sysbios_BIOS_exit__E
 xdc__CODESECT(ti_sysbios_BIOS_exit__E, "ti_sysbios_BIOS_exit")
-__extern xdc_Void ti_sysbios_BIOS_exit__E( xdc_Int stat );
+__extern xdc_Void ti_sysbios_BIOS_exit__E( xdc_Int stat);
 
 /* getThreadType__E */
 #define ti_sysbios_BIOS_getThreadType ti_sysbios_BIOS_getThreadType__E
 xdc__CODESECT(ti_sysbios_BIOS_getThreadType__E, "ti_sysbios_BIOS_getThreadType")
-__extern ti_sysbios_BIOS_ThreadType ti_sysbios_BIOS_getThreadType__E( void );
+__extern ti_sysbios_BIOS_ThreadType ti_sysbios_BIOS_getThreadType__E( void);
 
 /* setThreadType__E */
 #define ti_sysbios_BIOS_setThreadType ti_sysbios_BIOS_setThreadType__E
 xdc__CODESECT(ti_sysbios_BIOS_setThreadType__E, "ti_sysbios_BIOS_setThreadType")
-__extern ti_sysbios_BIOS_ThreadType ti_sysbios_BIOS_setThreadType__E( ti_sysbios_BIOS_ThreadType ttype );
+__extern ti_sysbios_BIOS_ThreadType ti_sysbios_BIOS_setThreadType__E( ti_sysbios_BIOS_ThreadType ttype);
 
 /* setCpuFreq__E */
 #define ti_sysbios_BIOS_setCpuFreq ti_sysbios_BIOS_setCpuFreq__E
 xdc__CODESECT(ti_sysbios_BIOS_setCpuFreq__E, "ti_sysbios_BIOS_setCpuFreq")
-__extern xdc_Void ti_sysbios_BIOS_setCpuFreq__E( xdc_runtime_Types_FreqHz *freq );
+__extern xdc_Void ti_sysbios_BIOS_setCpuFreq__E( xdc_runtime_Types_FreqHz *freq);
 
 /* getCpuFreq__E */
 #define ti_sysbios_BIOS_getCpuFreq ti_sysbios_BIOS_getCpuFreq__E
 xdc__CODESECT(ti_sysbios_BIOS_getCpuFreq__E, "ti_sysbios_BIOS_getCpuFreq")
-__extern xdc_Void ti_sysbios_BIOS_getCpuFreq__E( xdc_runtime_Types_FreqHz *freq );
+__extern xdc_Void ti_sysbios_BIOS_getCpuFreq__E( xdc_runtime_Types_FreqHz *freq);
 
 /* errorRaiseHook__I */
 #define ti_sysbios_BIOS_errorRaiseHook ti_sysbios_BIOS_errorRaiseHook__I
 xdc__CODESECT(ti_sysbios_BIOS_errorRaiseHook__I, "ti_sysbios_BIOS_errorRaiseHook")
-__extern xdc_Void ti_sysbios_BIOS_errorRaiseHook__I( xdc_runtime_Error_Block *eb );
+__extern xdc_Void ti_sysbios_BIOS_errorRaiseHook__I( xdc_runtime_Error_Block *eb);
 
 /* startFunc__I */
 #define ti_sysbios_BIOS_startFunc ti_sysbios_BIOS_startFunc__I
 xdc__CODESECT(ti_sysbios_BIOS_startFunc__I, "ti_sysbios_BIOS_startFunc")
-__extern xdc_Void ti_sysbios_BIOS_startFunc__I( void );
+__extern xdc_Void ti_sysbios_BIOS_startFunc__I( void);
 
 /* atExitFunc__I */
 #define ti_sysbios_BIOS_atExitFunc ti_sysbios_BIOS_atExitFunc__I
 xdc__CODESECT(ti_sysbios_BIOS_atExitFunc__I, "ti_sysbios_BIOS_atExitFunc")
-__extern xdc_Void ti_sysbios_BIOS_atExitFunc__I( xdc_Int stat );
+__extern xdc_Void ti_sysbios_BIOS_atExitFunc__I( xdc_Int stat);
 
 /* exitFunc__I */
 #define ti_sysbios_BIOS_exitFunc ti_sysbios_BIOS_exitFunc__I
 xdc__CODESECT(ti_sysbios_BIOS_exitFunc__I, "ti_sysbios_BIOS_exitFunc")
-__extern xdc_Void ti_sysbios_BIOS_exitFunc__I( xdc_Int stat );
+__extern xdc_Void ti_sysbios_BIOS_exitFunc__I( xdc_Int stat);
 
 /* registerRTSLock__I */
 #define ti_sysbios_BIOS_registerRTSLock ti_sysbios_BIOS_registerRTSLock__I
 xdc__CODESECT(ti_sysbios_BIOS_registerRTSLock__I, "ti_sysbios_BIOS_registerRTSLock")
-__extern xdc_Void ti_sysbios_BIOS_registerRTSLock__I( void );
+__extern xdc_Void ti_sysbios_BIOS_registerRTSLock__I( void);
 
 /* removeRTSLock__I */
 #define ti_sysbios_BIOS_removeRTSLock ti_sysbios_BIOS_removeRTSLock__I
 xdc__CODESECT(ti_sysbios_BIOS_removeRTSLock__I, "ti_sysbios_BIOS_removeRTSLock")
-__extern xdc_Void ti_sysbios_BIOS_removeRTSLock__I( void );
+__extern xdc_Void ti_sysbios_BIOS_removeRTSLock__I( void);
 
 /* rtsLock__I */
 #define ti_sysbios_BIOS_rtsLock ti_sysbios_BIOS_rtsLock__I
 xdc__CODESECT(ti_sysbios_BIOS_rtsLock__I, "ti_sysbios_BIOS_rtsLock")
-__extern xdc_Void ti_sysbios_BIOS_rtsLock__I( void );
+__extern xdc_Void ti_sysbios_BIOS_rtsLock__I( void);
 
 /* rtsUnlock__I */
 #define ti_sysbios_BIOS_rtsUnlock ti_sysbios_BIOS_rtsUnlock__I
 xdc__CODESECT(ti_sysbios_BIOS_rtsUnlock__I, "ti_sysbios_BIOS_rtsUnlock")
-__extern xdc_Void ti_sysbios_BIOS_rtsUnlock__I( void );
+__extern xdc_Void ti_sysbios_BIOS_rtsUnlock__I( void);
 
 /* nullFunc__I */
 #define ti_sysbios_BIOS_nullFunc ti_sysbios_BIOS_nullFunc__I
 xdc__CODESECT(ti_sysbios_BIOS_nullFunc__I, "ti_sysbios_BIOS_nullFunc")
-__extern xdc_Void ti_sysbios_BIOS_nullFunc__I( void );
+__extern xdc_Void ti_sysbios_BIOS_nullFunc__I( void);
 
 
 /*

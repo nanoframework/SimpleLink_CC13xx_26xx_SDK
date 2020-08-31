@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../spiffsinternal.c -> spiffsinternal.c",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_spiffs_tirtos.c -> tirtos/main_spiffs_tirtos.c",
+            "+../spiffsinternal.syscfg -> spiffsinternal.syscfg",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.lds -> CC26X2R1_LAUNCHXL_TIRTOS.lds"
+        ]
+    }
+]

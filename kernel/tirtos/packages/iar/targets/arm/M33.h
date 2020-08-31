@@ -30,6 +30,8 @@
  *  The following definitions enable clients to conditionally compile for any
  *  compatible subset of the actual target ISA.
  */
+#define xdc_target__isaCompatible_v8M  1
+#define xdc_target__isaCompatible_v7M  1
 
 /*
  *  ======== xdc_target__isa_v8M ========

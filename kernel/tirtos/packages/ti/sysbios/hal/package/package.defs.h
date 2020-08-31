@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 
 #ifndef ti_sysbios_hal__
@@ -47,7 +47,6 @@ typedef struct ti_sysbios_hal_Hwi_Params ti_sysbios_hal_Hwi_Params;
 typedef struct ti_sysbios_hal_Hwi_Object ti_sysbios_hal_Hwi_Object;
 typedef struct ti_sysbios_hal_Hwi_Struct ti_sysbios_hal_Hwi_Struct;
 typedef ti_sysbios_hal_Hwi_Object* ti_sysbios_hal_Hwi_Handle;
-typedef struct ti_sysbios_hal_Hwi_Object__ ti_sysbios_hal_Hwi_Instance_State;
 typedef ti_sysbios_hal_Hwi_Object* ti_sysbios_hal_Hwi_Instance;
 
 /*
@@ -96,7 +95,6 @@ typedef struct ti_sysbios_hal_Timer_Params ti_sysbios_hal_Timer_Params;
 typedef struct ti_sysbios_hal_Timer_Object ti_sysbios_hal_Timer_Object;
 typedef struct ti_sysbios_hal_Timer_Struct ti_sysbios_hal_Timer_Struct;
 typedef ti_sysbios_hal_Timer_Object* ti_sysbios_hal_Timer_Handle;
-typedef struct ti_sysbios_hal_Timer_Object__ ti_sysbios_hal_Timer_Instance_State;
 typedef ti_sysbios_hal_Timer_Object* ti_sysbios_hal_Timer_Instance;
 
 /*
@@ -109,7 +107,6 @@ typedef struct ti_sysbios_hal_TimerNull_Params ti_sysbios_hal_TimerNull_Params;
 typedef struct ti_sysbios_hal_TimerNull_Object ti_sysbios_hal_TimerNull_Object;
 typedef struct ti_sysbios_hal_TimerNull_Struct ti_sysbios_hal_TimerNull_Struct;
 typedef ti_sysbios_hal_TimerNull_Object* ti_sysbios_hal_TimerNull_Handle;
-typedef struct ti_sysbios_hal_TimerNull_Object__ ti_sysbios_hal_TimerNull_Instance_State;
 typedef ti_sysbios_hal_TimerNull_Object* ti_sysbios_hal_TimerNull_Instance;
 
 /*

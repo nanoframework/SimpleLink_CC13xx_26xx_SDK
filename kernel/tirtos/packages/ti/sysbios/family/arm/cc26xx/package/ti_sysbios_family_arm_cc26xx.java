@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_family_arm_cc26xx
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -205,6 +205,7 @@ public class ti_sysbios_family_arm_cc26xx
         om.bind("ti.sysbios.family.arm.cc26xx.Seconds.get", new Extern("ti_sysbios_family_arm_cc26xx_Seconds_get__E", "xdc_UInt32(*)(xdc_Void)", true, false));
         om.bind("ti.sysbios.family.arm.cc26xx.Seconds.getTime", new Extern("ti_sysbios_family_arm_cc26xx_Seconds_getTime__E", "xdc_UInt32(*)(ti_sysbios_interfaces_ISeconds_Time*)", true, false));
         om.bind("ti.sysbios.family.arm.cc26xx.Seconds.set", new Extern("ti_sysbios_family_arm_cc26xx_Seconds_set__E", "xdc_Void(*)(xdc_UInt32)", true, false));
+        om.bind("ti.sysbios.family.arm.cc26xx.Seconds.setTime", new Extern("ti_sysbios_family_arm_cc26xx_Seconds_setTime__E", "xdc_UInt32(*)(ti_sysbios_interfaces_ISeconds_Time*)", true, false));
     }
 
     void Timer$$CONSTS()
@@ -472,7 +473,10 @@ public class ti_sysbios_family_arm_cc26xx
         so = (Proto.Str)om.findStrict("ti.sysbios.family.arm.cc26xx.Seconds.Module_State", "ti.sysbios.family.arm.cc26xx");
         sizes.clear();
         sizes.add(Global.newArray("setSeconds", "UInt32"));
+        sizes.add(Global.newArray("setSecondsHi", "UInt32"));
         sizes.add(Global.newArray("refSeconds", "UInt32"));
+        sizes.add(Global.newArray("deltaNSecs", "UInt32"));
+        sizes.add(Global.newArray("deltaSecs", "TInt32"));
         so.bind("$$sizes", Global.newArray(sizes.toArray()));
         fxn = Global.eval("function() { return $$sizeof(xdc.om['ti.sysbios.family.arm.cc26xx.Seconds.Module_State']); }");
         so.bind("$sizeof", fxn);
@@ -720,7 +724,10 @@ public class ti_sysbios_family_arm_cc26xx
         po.init("ti.sysbios.family.arm.cc26xx.Seconds.Module_State", null);
                 po.addFld("$hostonly", $$T_Num, 0, "r");
                 po.addFld("setSeconds", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
+                po.addFld("setSecondsHi", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
                 po.addFld("refSeconds", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
+                po.addFld("deltaNSecs", Proto.Elm.newCNum("(xdc_UInt32)"), $$UNDEF, "w");
+                po.addFld("deltaSecs", Proto.Elm.newCNum("(xdc_Int32)"), $$UNDEF, "w");
     }
 
     void Timer$$TYPES()
@@ -984,14 +991,8 @@ public class ti_sysbios_family_arm_cc26xx
             sb.append("pkg.packageRepository = xdc.om['ti.sysbios.family.arm.cc26xx$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.aem3',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.am3g',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.arm3',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.aem3', {target: 'ti.targets.arm.elf.M3', suffix: 'em3'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.am3g', {target: 'gnu.targets.arm.M3', suffix: 'm3g'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.family.arm.cc26xx.arm3', {target: 'iar.targets.arm.M3', suffix: 'rm3'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }
@@ -1172,8 +1173,8 @@ public class ti_sysbios_family_arm_cc26xx
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray());
         Value.Map atmap = (Value.Map)vo.getv("$attr");
-        atmap.setElem("", "./Boot.xdt");
         atmap.setElem("", true);
+        atmap.setElem("", "./Boot.xdt");
         atmap.seal("length");
         vo.bind("MODULE_STARTUP$", 0);
         vo.bind("PROXY$", 0);
@@ -1308,7 +1309,8 @@ public class ti_sysbios_family_arm_cc26xx
         vo.bind("get", om.findStrict("ti.sysbios.family.arm.cc26xx.Seconds.get", "ti.sysbios.family.arm.cc26xx"));
         vo.bind("getTime", om.findStrict("ti.sysbios.family.arm.cc26xx.Seconds.getTime", "ti.sysbios.family.arm.cc26xx"));
         vo.bind("set", om.findStrict("ti.sysbios.family.arm.cc26xx.Seconds.set", "ti.sysbios.family.arm.cc26xx"));
-        vo.bind("$$fxntab", Global.newArray("ti_sysbios_family_arm_cc26xx_Seconds_Module__startupDone__E", "ti_sysbios_family_arm_cc26xx_Seconds_get__E", "ti_sysbios_family_arm_cc26xx_Seconds_getTime__E", "ti_sysbios_family_arm_cc26xx_Seconds_set__E"));
+        vo.bind("setTime", om.findStrict("ti.sysbios.family.arm.cc26xx.Seconds.setTime", "ti.sysbios.family.arm.cc26xx"));
+        vo.bind("$$fxntab", Global.newArray("ti_sysbios_family_arm_cc26xx_Seconds_Module__startupDone__E", "ti_sysbios_family_arm_cc26xx_Seconds_get__E", "ti_sysbios_family_arm_cc26xx_Seconds_getTime__E", "ti_sysbios_family_arm_cc26xx_Seconds_set__E", "ti_sysbios_family_arm_cc26xx_Seconds_setTime__E"));
         vo.bind("$$logEvtCfgs", Global.newArray());
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray());

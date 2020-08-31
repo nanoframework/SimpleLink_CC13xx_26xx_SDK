@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../timerled.c -> timerled.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../timerled.syscfg -> timerled.syscfg",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.lds -> CC26X2R1_LAUNCHXL_TIRTOS.lds"
+        ]
+    }
+]

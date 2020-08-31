@@ -1,0 +1,21 @@
+[
+    {
+        "files": [
+            "+../config.c -> config.c",
+            "+../config.h -> config.h",
+            "+../menu.h -> menu.h",
+            "+../README.md -> README.md",
+            "+../rx.c -> rx.c",
+            "+../tx.c -> tx.c",
+            "+../RFQueue.h -> RFQueue.h",
+            "+../RFQueue.c -> RFQueue.c",
+            "+../rfPacketErrorRate.syscfg -> rfPacketErrorRate.syscfg",
+            "+../menu_nortos.c -> menu_nortos.c",
+            "+../rfPacketErrorRate_nortos.c -> rfPacketErrorRate_nortos.c",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
+            "+CC1352P_2_LAUNCHXL_NoRTOS.cmd -> CC1352P_2_LAUNCHXL_NoRTOS.cmd"
+        ]
+    }
+]

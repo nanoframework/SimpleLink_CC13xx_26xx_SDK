@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../spislave.c -> spislave.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../spislave.syscfg -> spislave.syscfg",
+            "+../../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
+            "+CC1312R1_LAUNCHXL_TIRTOS.lds -> CC1312R1_LAUNCHXL_TIRTOS.lds"
+        ]
+    }
+]

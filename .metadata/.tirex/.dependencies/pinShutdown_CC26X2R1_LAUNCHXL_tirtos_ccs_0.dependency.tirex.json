@@ -1,0 +1,14 @@
+[
+    {
+        "files": [
+            "+../../pinShutdown.c -> pinShutdown.c",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../pinShutdown.syscfg -> pinShutdown.syscfg",
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_TIRTOS.cmd -> CC26X2R1_LAUNCHXL_TIRTOS.cmd"
+        ]
+    }
+]

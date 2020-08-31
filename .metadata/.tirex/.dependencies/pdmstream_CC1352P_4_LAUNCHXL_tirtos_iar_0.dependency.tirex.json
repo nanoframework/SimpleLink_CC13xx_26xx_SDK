@@ -1,0 +1,19 @@
+[
+    {
+        "files": [
+            "+../../pdmstream.c -> pdmstream.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
+            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board_legacy.html -> Board_legacy.html",
+            "+../../Board.h -> Board.h",
+            "+../../CC1352P_4_LAUNCHXL.c -> CC1352P_4_LAUNCHXL.c",
+            "+../../CC1352P_4_LAUNCHXL.h -> CC1352P_4_LAUNCHXL.h",
+            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
+            "+../../ccfg.c -> ccfg.c",
+            "+CC1352P_4_LAUNCHXL_TIRTOS.icf -> CC1352P_4_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

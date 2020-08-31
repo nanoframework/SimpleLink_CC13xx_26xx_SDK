@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../README.md -> README.md",
+            "+../../easylink/EasyLink.h -> easylink/EasyLink.h",
+            "+../../rfEasyLinkListenBeforeTalk.syscfg -> rfEasyLinkListenBeforeTalk.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../../easylink/EasyLink.c -> easylink/EasyLink.c",
+            "+../../rfEasylinkListenBeforeTalk.c -> rfEasylinkListenBeforeTalk.c",
+            "+../../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
+            "+CC1352P_2_LAUNCHXL_TIRTOS.cmd -> CC1352P_2_LAUNCHXL_TIRTOS.cmd"
+        ]
+    }
+]

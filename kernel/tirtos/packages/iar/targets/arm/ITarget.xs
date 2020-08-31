@@ -41,7 +41,8 @@ var _versionCache = {};
  */
 var _isaChainMap = {
     isa_v7M4 : ["v7M", "v7M4"],
-    isa_v7M  : ["v7M"]
+    isa_v7M  : ["v7M"],
+    isa_v8M  : ["v8M", "v7M"]
 };
 
 /*
@@ -357,7 +358,7 @@ function _mkCmds(target)
     _targetCmds[target.suffix] = tool2cmd;
 }
 /*
- *  @(#) iar.targets.arm; 1, 0, 0,0; 1-23-2018 11:06:32; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) iar.targets.arm; 1, 0, 0,; 5-11-2020 15:30:18; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

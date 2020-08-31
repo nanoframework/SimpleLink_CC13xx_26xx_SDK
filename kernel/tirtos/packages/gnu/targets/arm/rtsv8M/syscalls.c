@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018 by Texas Instruments Incorporated.
+ *  Copyright 2020 by Texas Instruments Incorporated.
  *
  */
 
@@ -58,7 +58,7 @@ void __attribute__ ((naked)) _exit(int code)
     );
 }
 /*
- *  @(#) gnu.targets.arm.rtsv8M; 1, 0, 0,0; 1-23-2018 11:36:38; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) gnu.targets.arm.rtsv8M; 1, 0, 0,; 5-11-2020 15:37:43; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 

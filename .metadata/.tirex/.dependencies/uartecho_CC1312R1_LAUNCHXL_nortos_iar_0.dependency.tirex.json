@@ -1,0 +1,14 @@
+[
+    {
+        "files": [
+            "+../uartecho.c -> uartecho.c",
+            "+../README.md -> README.md",
+            "+../README.html -> README.html",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../uartecho.syscfg -> uartecho.syscfg",
+            "+../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
+            "+CC1312R1_LAUNCHXL_NoRTOS.icf -> CC1312R1_LAUNCHXL_NoRTOS.icf"
+        ]
+    }
+]

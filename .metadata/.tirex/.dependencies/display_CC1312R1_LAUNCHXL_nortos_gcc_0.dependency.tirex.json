@@ -1,0 +1,16 @@
+[
+    {
+        "files": [
+            "+../display.c -> display.c",
+            "+../splash_image.c -> splash_image.c",
+            "+../splash_image.h -> splash_image.h",
+            "+../README.md -> README.md",
+            "+../README.html -> README.html",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../display.syscfg -> display.syscfg",
+            "+../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
+            "+CC1312R1_LAUNCHXL_NoRTOS.lds -> CC1312R1_LAUNCHXL_NoRTOS.lds"
+        ]
+    }
+]

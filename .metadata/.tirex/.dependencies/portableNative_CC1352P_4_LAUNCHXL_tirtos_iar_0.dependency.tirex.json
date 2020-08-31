@@ -1,0 +1,16 @@
+[
+    {
+        "files": [
+            "+../console_tirtos.c -> console_tirtos.c",
+            "+../temperature_tirtos.c -> temperature_tirtos.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../portableNative.syscfg -> portableNative.syscfg",
+            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
+            "+CC1352P_4_LAUNCHXL_TIRTOS.icf -> CC1352P_4_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

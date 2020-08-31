@@ -1,0 +1,13 @@
+[
+    {
+        "files": [
+            "+../rfCarrierWave.c -> rfCarrierWave.c",
+            "+../README.md -> README.md",
+            "+../rfCarrierWave.syscfg -> rfCarrierWave.syscfg",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
+            "+CC26X2R1_LAUNCHXL_NoRTOS.icf -> CC26X2R1_LAUNCHXL_NoRTOS.icf"
+        ]
+    }
+]

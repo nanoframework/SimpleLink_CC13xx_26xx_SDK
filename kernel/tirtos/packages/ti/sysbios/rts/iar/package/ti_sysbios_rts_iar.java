@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_rts_iar
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -221,12 +221,10 @@ public class ti_sysbios_rts_iar
             sb.append("pkg.packageRepository = xdc.om['ti.sysbios.rts.iar$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.rts.iar.arm3',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.rts.iar.arm4f',\n");
+            sb.append("'lib/debug/ti.sysbios.rts.iar.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.rts.iar.arm3', {target: 'iar.targets.arm.M3', suffix: 'rm3'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.rts.iar.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.rts.iar.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

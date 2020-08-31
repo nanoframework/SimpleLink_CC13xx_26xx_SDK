@@ -5,7 +5,6 @@ linkcmd.xdt
 MultithreadSupport.xdt
 package.bld
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.rts.iar.arm3
+lib/debug/ti.sysbios.rts.iar.arm4f
 package/package_ti.sysbios.rts.iar.c
 MultithreadSupport.c
-lib/sysbios/debug/ti.sysbios.rts.iar.arm4f

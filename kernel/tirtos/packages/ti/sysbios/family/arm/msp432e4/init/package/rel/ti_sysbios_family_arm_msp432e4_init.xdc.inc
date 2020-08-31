@@ -9,9 +9,6 @@ hw_sysctl.h
 hw_types.h
 package.bld
 package/package.cfg.xdc.inc
-lib/Boot.aem3
-lib/Boot.am3g
-lib/Boot.arm3
 lib/Boot.aem4f
 lib/Boot.am4fg
 lib/Boot.arm4f

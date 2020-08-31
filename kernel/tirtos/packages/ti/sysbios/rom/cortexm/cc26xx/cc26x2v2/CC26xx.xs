@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, Texas Instruments Incorporated
+ * Copyright (c) 2016-2019, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -175,6 +175,11 @@ function module$use()
 	    }
 	    else if (Program.build.target.$name.match(/gnu/)) {
 		CC26xx.templateName = "CC26xx_custom_makefile_gnu.xdt";
+                xdc.includeFile(String(CC26xx.$package.packageBase
+                     + "CC26xx_custom_outpolicies_gnu.cfg.xs"));
+	    }
+	    else if (Program.build.target.$name.match(/clang/)) {
+		CC26xx.templateName = "CC26xx_custom_makefile_clang.xdt";
                 xdc.includeFile(String(CC26xx.$package.packageBase
                      + "CC26xx_custom_outpolicies_gnu.cfg.xs"));
 	    }

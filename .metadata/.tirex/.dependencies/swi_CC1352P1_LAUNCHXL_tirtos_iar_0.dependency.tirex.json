@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../swi.c -> swi.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../swi.syscfg -> swi.syscfg",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../swi.cfg -> swi.cfg",
+            "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1352P1_LAUNCHXL_fxns.c -> CC1352P1_LAUNCHXL_fxns.c",
+            "+CC1352P1_LAUNCHXL_TIRTOS.icf -> CC1352P1_LAUNCHXL_TIRTOS.icf"
+        ]
+    }
+]

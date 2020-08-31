@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-F14
+ * @(#) xdc-I11
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_rts_gnu
 {
-    static final String VERS = "@(#) xdc-F14\n";
+    static final String VERS = "@(#) xdc-I11\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -294,12 +294,10 @@ public class ti_sysbios_rts_gnu
             sb.append("pkg.packageRepository = xdc.om['ti.sysbios.rts.gnu$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.rts.gnu.am3g',\n");
-            sb.append("'lib/sysbios/debug/ti.sysbios.rts.gnu.am4fg',\n");
+            sb.append("'lib/debug/ti.sysbios.rts.gnu.am4fg',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.rts.gnu.am3g', {target: 'gnu.targets.arm.M3', suffix: 'm3g'}],\n");
-            sb.append("['lib/sysbios/debug/ti.sysbios.rts.gnu.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/debug/ti.sysbios.rts.gnu.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }
@@ -391,8 +389,8 @@ public class ti_sysbios_rts_gnu
         vo.bind("$$errorDescCfgs", Global.newArray());
         vo.bind("$$assertDescCfgs", Global.newArray("A_badThreadType"));
         Value.Map atmap = (Value.Map)vo.getv("$attr");
-        atmap.setElem("", "./ReentSupport.xdt");
         atmap.setElem("", true);
+        atmap.setElem("", "./ReentSupport.xdt");
         atmap.seal("length");
         vo.bind("MODULE_STARTUP$", 1);
         vo.bind("PROXY$", 0);

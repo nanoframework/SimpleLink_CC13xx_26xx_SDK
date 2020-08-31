@@ -1,0 +1,17 @@
+[
+    {
+        "files": [
+            "+../rfDualModeRx.c -> rfDualModeRx.c",
+            "+../README.md -> README.md",
+            "+../rfDualMode_MissedBlePacket.png -> rfDualMode_MissedBlePacket.png",
+            "+../rfDualMode_MissedPropPacket.png -> rfDualMode_MissedPropPacket.png",
+            "+../RFQueue.h -> RFQueue.h",
+            "+../RFQueue.c -> RFQueue.c",
+            "+../rfDualModeRx.syscfg -> rfDualModeRx.syscfg",
+            "+../main_nortos.c -> main_nortos.c",
+            "+../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
+            "+../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
+            "+CC1352P_2_LAUNCHXL_NoRTOS.lds -> CC1352P_2_LAUNCHXL_NoRTOS.lds"
+        ]
+    }
+]

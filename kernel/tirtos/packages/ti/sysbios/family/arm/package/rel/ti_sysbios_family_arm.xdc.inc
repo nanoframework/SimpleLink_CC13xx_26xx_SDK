@@ -10,8 +10,8 @@ Settings.xml
 MPU.xml
 MPU_link.xdt
 package/package.cfg.xdc.inc
-lib/sysbios/debug/ti.sysbios.family.arm.aem4f
+lib/debug/ti.sysbios.family.arm.aem4f
 package/package_ti.sysbios.family.arm.c
 MPU.c
-lib/sysbios/debug/ti.sysbios.family.arm.am4fg
-lib/sysbios/debug/ti.sysbios.family.arm.arm4f
+lib/debug/ti.sysbios.family.arm.am4fg
+lib/debug/ti.sysbios.family.arm.arm4f

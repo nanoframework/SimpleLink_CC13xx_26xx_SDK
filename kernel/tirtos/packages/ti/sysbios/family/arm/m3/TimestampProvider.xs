@@ -54,7 +54,7 @@ function module$use()
     Startup = xdc.useModule('xdc.runtime.Startup');
     BIOS = xdc.useModule('ti.sysbios.BIOS');
 
-    var Diags = xdc.useModule('xdc.runtime.Diags');
+    var Diags = xdc.module('xdc.runtime.Diags');
 
     for (var dl in TimestampProvider.common$) {
         if (dl.match(/^diags_/) && dl != 'diags_ASSERT') {
@@ -85,7 +85,7 @@ function module$static$init(mod, params)
 	}
     }
     else {
-	configTimer = TimestampProvider.configTimer;
+        configTimer = TimestampProvider.configTimer;
     }
 
     if (configTimer == true) {
@@ -99,8 +99,6 @@ function module$static$init(mod, params)
         mod.timer = Timer.create(Timer.ANY, 
                      TimestampProvider.rolloverFunc,
                      timerParams);
-
-        Startup.lastFxns.$add(TimestampProvider.startTimer);
     }
     else {
         mod.timer = null;

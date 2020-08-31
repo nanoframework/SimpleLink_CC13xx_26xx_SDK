@@ -3,15 +3,12 @@
 <package name="ti.targets" version="1, 0, 3" producerId="undefined">
     <units>
         <interface name="ITarget"/>
-        <module name="C64P"/>
-        <module name="C64P_big_endian"/>
-        <module name="C674"/>
-        <module name="C674_big_endian"/>
-        <module name="C66"/>
-        <module name="C66_big_endian"/>
         <module name="C28"/>
         <module name="C28_large"/>
         <module name="C28_float"/>
+        <module name="C64P"/>
+        <module name="C674"/>
+        <module name="C66"/>
     </units>
     <sources>
         <srcFile name="ccs_exec.xdt"/>

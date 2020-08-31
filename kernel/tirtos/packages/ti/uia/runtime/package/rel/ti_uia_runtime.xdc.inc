@@ -6,7 +6,7 @@ LogUC.h
 java/package.jar
 ServiceMgr.xml
 package/package.cfg.xdc.inc
-lib/release/ti.uia.runtime.aem3
+lib/release/ti.uia.runtime.aem4f
 package/package_ti.uia.runtime.c
 CtxFilter.c
 LoggerSM.c
@@ -15,8 +15,5 @@ LogSync.c
 QueueDescriptor.c
 ServiceMgr.c
 UIAPacket.c
-lib/release/ti.uia.runtime.am3g
-lib/release/ti.uia.runtime.arm3
-lib/release/ti.uia.runtime.aem4f
 lib/release/ti.uia.runtime.am4fg
 lib/release/ti.uia.runtime.arm4f

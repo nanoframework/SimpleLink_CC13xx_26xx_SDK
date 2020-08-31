@@ -1,0 +1,15 @@
+[
+    {
+        "files": [
+            "+../../adcBufContinuousSampling.c -> adcBufContinuousSampling.c",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../overview.rov.json -> overview.rov.json",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../adcbufcontinuous.syscfg -> adcbufcontinuous.syscfg",
+            "+../../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
+            "+../../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
+            "+CC1352P_2_LAUNCHXL_TIRTOS.cmd -> CC1352P_2_LAUNCHXL_TIRTOS.cmd"
+        ]
+    }
+]

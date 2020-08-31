@@ -7,13 +7,10 @@ LoggerRunMode.xml
 LoggerStopMode.xml
 LoggerMin.xml
 package/package.cfg.xdc.inc
-lib/release/ti.uia.loggers.aem3
+lib/release/ti.uia.loggers.aem4f
 package/package_ti.uia.loggers.c
 LoggerRunMode.c
 LoggerStopMode.c
 LoggerMin.c
-lib/release/ti.uia.loggers.am3g
-lib/release/ti.uia.loggers.arm3
-lib/release/ti.uia.loggers.aem4f
 lib/release/ti.uia.loggers.am4fg
 lib/release/ti.uia.loggers.arm4f

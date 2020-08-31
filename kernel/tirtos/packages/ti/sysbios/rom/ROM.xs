@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -232,24 +232,13 @@ function _setRomName(field, val)
                 ROM, "romName");
         case ROM.CC13X2:
         case ROM.CC26X2:
-            RomModule = xdc.useModule('ti.sysbios.rom.cortexm.cc26xx.agama.CC26xx');
-            break;
-
         case ROM.CC13X2V2:
         case ROM.CC26X2V2:
             RomModule = xdc.useModule('ti.sysbios.rom.cortexm.cc26xx.cc26x2v2.CC26xx');
             break;
 
-        case ROM.CC26X2_NO_OAD:
-            RomModule = xdc.useModule('ti.sysbios.rom.cortexm.cc26xx.agama_r2.CC26xx');
-            break;
-
         case ROM.CC1350:
             RomModule = xdc.useModule('ti.sysbios.rom.cortexm.cc13xx.CC13xx');
-            break;
-
-        case ROM.F28004x:
-            RomModule = xdc.useModule('ti.sysbios.rom.c28.f28004x.F28004x');
             break;
 
 	default:

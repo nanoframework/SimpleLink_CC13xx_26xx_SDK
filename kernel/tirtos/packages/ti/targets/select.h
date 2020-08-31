@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018 by Texas Instruments Incorporated.
+ *  Copyright 2020 by Texas Instruments Incorporated.
  *
  */
 
@@ -20,30 +20,9 @@
  */
 
 /*
- *  ======== MSP430 ========
- */
-#if defined(__MSP430__)
-#  if defined(__MSP430X__)
-     /* --silicon_version=mspx is specified */
-#    if defined(__LARGE_CODE_MODEL__)
-       /* --code_model=large is specified */
-#      define xdc_target_name__ MSP430X
-#    else
-#      define xdc_target_name__ MSP430X_small
-#    endif
-#  else
-#    define xdc_target_name__ MSP430
-#  endif
-#  if __TI_EABI__ == 1
-#    define xdc_target_types__ ti/targets/msp430/elf/std.h
-#  else
-#    define xdc_target_types__ ti/targets/msp430/std.h
-#  endif
-
-/*
  *  ======== TMS320C6X ========
  */
-#elif defined(_TMS320C6X)
+#if defined(_TMS320C6X)
 #  if __TI_EABI__ == 1
      /* set to 1 if compiling for EABI (ELF) and is set to 0 otherwise. */
 #    define xdc_target_types__ ti/targets/elf/std.h
@@ -156,6 +135,23 @@
 #  endif
 
 /*
+ *  ======== TIARMCLANG ========
+ */
+#elif defined(__ti_version__)
+#  if (__ARM_ARCH == 8) && defined(__ARM_FP)
+#      define xdc_target_name__ M33F
+#  elif (__ARM_ARCH == 8)
+#      define xdc_target_name__ M33
+#  elif (__ARM_ARCH == 7) && defined(__ARM_FP)
+#      define xdc_target_name__ M4F
+#  elif (__ARM_ARCH == 7)
+#      define xdc_target_name__ M4
+#  else
+#      error unknown TIARMCLANG target
+#  endif
+#  define xdc_target_types__ ti/targets/arm/clang/std.h
+
+/*
  *  ======== TMS320C28XX ========
  */
 #elif defined(__TMS320C28XX__)
@@ -201,7 +197,7 @@
 #  endif
 #endif
 /*
- *  @(#) ti.targets; 1, 0, 3,0; 1-23-2018 11:06:50; /db/ztree/library/trees/xdctargets/xdctargets-p06/src/ xlibrary
+ *  @(#) ti.targets; 1, 0, 3,; 5-11-2020 15:30:21; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
 
  */
 
