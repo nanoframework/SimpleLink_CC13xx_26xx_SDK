@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_targets_elf
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -214,6 +214,30 @@ public class ti_targets_elf
         om.bind("ti.targets.elf.C28_float.Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"));
     }
 
+    void C28_float64$$OBJECTS()
+    {
+        Proto.Obj po, spo;
+        Value.Obj vo;
+
+        po = (Proto.Obj)om.bind("ti.targets.elf.C28_float64.Module", new Proto.Obj());
+        vo = (Value.Obj)om.bind("ti.targets.elf.C28_float64", new Value.Obj("ti.targets.elf.C28_float64", po));
+        pkgV.bind("C28_float64", vo);
+        // decls 
+        om.bind("ti.targets.elf.C28_float64.Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"));
+        om.bind("ti.targets.elf.C28_float64.Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"));
+    }
+
     void ITarget$$CONSTS()
     {
         // interface ITarget
@@ -242,6 +266,11 @@ public class ti_targets_elf
     void C28_float$$CONSTS()
     {
         // module C28_float
+    }
+
+    void C28_float64$$CONSTS()
+    {
+        // module C28_float64
     }
 
     void ITarget$$CREATES()
@@ -286,6 +315,13 @@ public class ti_targets_elf
 
     }
 
+    void C28_float64$$CREATES()
+    {
+        Proto.Fxn fxn;
+        StringBuilder sb;
+
+    }
+
     void ITarget$$FUNCTIONS()
     {
         Proto.Fxn fxn;
@@ -322,6 +358,12 @@ public class ti_targets_elf
 
     }
 
+    void C28_float64$$FUNCTIONS()
+    {
+        Proto.Fxn fxn;
+
+    }
+
     void ITarget$$SIZES()
     {
     }
@@ -343,6 +385,10 @@ public class ti_targets_elf
     }
 
     void C28_float$$SIZES()
+    {
+    }
+
+    void C28_float64$$SIZES()
     {
     }
 
@@ -546,9 +592,9 @@ public class ti_targets_elf
         po.addFld("lnk", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl7x", "opts", "-z"), "rh");
         po.addFld("asmOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "-qq", "suffix", ""), "wh");
         po.addFld("ccOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "-qq -pdsw225", "suffix", ""), "wh");
-        po.addFld("ccConfigOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "$(ccOpts.prefix) -mo", "suffix", "$(ccOpts.suffix)"), "wh");
-        po.addFld("includeOpts", $$T_Str, "-I$(rootDir)/include", "wh");
-        po.addFld("stdTypes", (Proto)om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"), Global.newObject("t_IArg", Global.newObject("size", 4L, "align", 4L), "t_Char", Global.newObject("size", 1L, "align", 1L), "t_Double", Global.newObject("size", 8L, "align", 8L), "t_Float", Global.newObject("size", 4L, "align", 4L), "t_Fxn", Global.newObject("size", 8L, "align", 8L), "t_Int", Global.newObject("size", 4L, "align", 4L), "t_Int8", Global.newObject("size", 1L, "align", 1L), "t_Int16", Global.newObject("size", 2L, "align", 2L), "t_Int32", Global.newObject("size", 4L, "align", 4L), "t_Int40", Global.newObject("size", 8L, "align", 8L), "t_Int64", Global.newObject("size", 8L, "align", 8L), "t_Long", Global.newObject("size", 8L, "align", 8L), "t_LDouble", Global.newObject("size", 8L, "align", 8L), "t_LLong", Global.newObject("size", 8L, "align", 8L), "t_Ptr", Global.newObject("size", 8L, "align", 8L), "t_Short", Global.newObject("size", 2L, "align", 2L), "t_Size", Global.newObject("size", 8L, "align", 8L)), "rh");
+        po.addFld("ccConfigOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "UNDEFINED -mo", "suffix", "UNDEFINED"), "wh");
+        po.addFld("includeOpts", $$T_Str, "-IUNDEFINED/include", "wh");
+        po.addFld("stdTypes", (Proto)om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"), Global.newObject("t_IArg", Global.newObject("size", 8L, "align", 8L), "t_Char", Global.newObject("size", 1L, "align", 1L), "t_Double", Global.newObject("size", 8L, "align", 8L), "t_Float", Global.newObject("size", 4L, "align", 4L), "t_Fxn", Global.newObject("size", 8L, "align", 8L), "t_Int", Global.newObject("size", 4L, "align", 4L), "t_Int8", Global.newObject("size", 1L, "align", 1L), "t_Int16", Global.newObject("size", 2L, "align", 2L), "t_Int32", Global.newObject("size", 4L, "align", 4L), "t_Int40", Global.newObject("size", 8L, "align", 8L), "t_Int64", Global.newObject("size", 8L, "align", 8L), "t_Long", Global.newObject("size", 8L, "align", 8L), "t_LDouble", Global.newObject("size", 8L, "align", 8L), "t_LLong", Global.newObject("size", 8L, "align", 8L), "t_Ptr", Global.newObject("size", 8L, "align", 8L), "t_Short", Global.newObject("size", 2L, "align", 2L), "t_Size", Global.newObject("size", 8L, "align", 8L)), "rh");
         po.addFld("stdInclude", $$T_Str, "ti/targets/elf/std.h", "wh");
         po.addFld("bitsPerChar", Proto.Elm.newCNum("(xdc_Int)"), 8L, "rh");
                 po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "ti.targets.elf"), $$UNDEF);
@@ -588,7 +634,7 @@ public class ti_targets_elf
         po.addFld("rts", $$T_Str, "ti.targets.rts2800", "rh");
         po.addFld("compatibleSuffixes", new Proto.Arr($$T_Str, false), Global.newArray(new Object[]{"e28L"}), "wh");
         po.addFld("alignDirectiveSupported", $$T_Bool, false, "rh");
-        po.addFld("cc", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000 -c", "opts", "-v28 -DLARGE_MODEL=1 -ml --float_support=fpu32 --abi=eabi"), "rh");
+        po.addFld("cc", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000 -c", "opts", "-v28 -DLARGE_MODEL=1 -ml --float_support=fpu32 --diag_suppress=3195 --abi=eabi"), "rh");
         po.addFld("asm", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000 -c", "opts", "-v28 -ml -DLARGE_MODEL=1 --float_support=fpu32 --abi=eabi"), "rh");
         po.addFld("lnk", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000", "opts", "--abi=eabi -z"), "rh");
         po.addFld("lnkOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "-q -u _c_int00", "suffix", "-w -c -m $(XDCCFGDIR)/$@.map -l $(rootDir)/lib/libc.a"), "wh");
@@ -609,6 +655,79 @@ public class ti_targets_elf
         if (fxn != null) po.addFxn("module$meta$init", $$T_Met, fxn);
         fxn = Global.get(cap, "module$validate");
         if (fxn != null) om.bind("ti.targets.elf.C28_float$$module$validate", true);
+        if (fxn != null) po.addFxn("module$validate", $$T_Met, fxn);
+                fxn = Global.get(cap, "archive");
+                if (fxn != null) po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "compile");
+                if (fxn != null) po.addFxn("compile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$compile", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "scompile");
+                if (fxn != null) po.addFxn("scompile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$scompile", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "link");
+                if (fxn != null) po.addFxn("link", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$link", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "getVersion");
+                if (fxn != null) po.addFxn("getVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getVersion", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "getISAChain");
+                if (fxn != null) po.addFxn("getISAChain", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getISAChain", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "findSuffix");
+                if (fxn != null) po.addFxn("findSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$findSuffix", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "selectSuffix");
+                if (fxn != null) po.addFxn("selectSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$selectSuffix", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "genConstCustom");
+                if (fxn != null) po.addFxn("genConstCustom", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genConstCustom", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "genVisibleData");
+                if (fxn != null) po.addFxn("genVisibleData", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleData", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "genVisibleFxns");
+                if (fxn != null) po.addFxn("genVisibleFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleFxns", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "genVisibleLibFxns");
+                if (fxn != null) po.addFxn("genVisibleLibFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleLibFxns", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "getRawVersion");
+                if (fxn != null) po.addFxn("getRawVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget3$$getRawVersion", "ti.targets.elf"), fxn);
+                fxn = Global.get(cap, "asmName");
+                if (fxn != null) po.addFxn("asmName", (Proto.Fxn)om.findStrict("ti.targets.ITarget$$asmName", "ti.targets.elf"), fxn);
+    }
+
+    void C28_float64$$TYPES()
+    {
+        Scriptable cap;
+        Proto.Obj po;
+        Proto.Str ps;
+        Proto.Typedef pt;
+        Object fxn;
+
+        cap = (Scriptable)Global.callFxn("loadCapsule", xdcO, "ti/targets/elf/C28_float64.xs");
+        om.bind("ti.targets.elf.C28_float64$$capsule", cap);
+        po = (Proto.Obj)om.findStrict("ti.targets.elf.C28_float64.Module", "ti.targets.elf");
+        po.init("ti.targets.elf.C28_float64.Module", om.findStrict("ti.targets.ITarget.Module", "ti.targets.elf"));
+                po.addFld("$hostonly", $$T_Num, 1, "r");
+        po.addFld("name", $$T_Str, "C28_float64", "rh");
+        po.addFld("suffix", $$T_Str, "e28FP64", "rh");
+        po.addFld("isa", $$T_Str, "28FP64", "rh");
+        po.addFld("model", (Proto)om.findStrict("xdc.bld.ITarget.Model", "ti.targets.elf"), Global.newObject("dataModel", "large", "endian", "little"), "rh");
+        po.addFld("base", (Proto)om.findStrict("xdc.bld.ITarget.Module", "ti.targets.elf"), om.find("ti.targets.C28_float"), "rh");
+        po.addFld("rts", $$T_Str, "ti.targets.rts2800", "rh");
+        po.addFld("compatibleSuffixes", new Proto.Arr($$T_Str, false), Global.newArray(new Object[]{"e28L"}), "wh");
+        po.addFld("alignDirectiveSupported", $$T_Bool, false, "rh");
+        po.addFld("cc", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000 -c", "opts", "-v28 -DLARGE_MODEL=1 -ml --float_support=fpu64 --abi=eabi"), "rh");
+        po.addFld("asm", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000 -c", "opts", "-v28 -ml -DLARGE_MODEL=1 --float_support=fpu64 --abi=eabi"), "rh");
+        po.addFld("lnk", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000", "opts", "--abi=eabi -z"), "rh");
+        po.addFld("lnkOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"), Global.newObject("prefix", "-q -u _c_int00", "suffix", "-w -c -m $(XDCCFGDIR)/$@.map -l $(rootDir)/lib/libc.a"), "wh");
+        po.addFld("vers", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "cl2000", "opts", "--compiler_revision"), "rh");
+        po.addFld("ar", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"), Global.newObject("cmd", "ar2000", "opts", "rq"), "rh");
+        po.addFld("sectMap", new Proto.Map($$T_Str), Global.newArray(new Object[]{Global.newArray(new Object[]{".text", "code"}), Global.newArray(new Object[]{".switch", "data"}), Global.newArray(new Object[]{".data", "data"}), Global.newArray(new Object[]{".rodata", "data"}), Global.newArray(new Object[]{".neardata", "data"}), Global.newArray(new Object[]{".fardata", "data"}), Global.newArray(new Object[]{".far", "data"}), Global.newArray(new Object[]{".cinit", "data"}), Global.newArray(new Object[]{".bss", "data"}), Global.newArray(new Object[]{".const", "data"}), Global.newArray(new Object[]{".stack", "stack"}), Global.newArray(new Object[]{".sysmem", "data"}), Global.newArray(new Object[]{".init_array", "data"}), Global.newArray(new Object[]{".args", "data"}), Global.newArray(new Object[]{".bss:.cio", "data"}), Global.newArray(new Object[]{".c28xabi.exidx", "data"}), Global.newArray(new Object[]{".c28xabi.extab", "data"})}), "rh");
+        po.addFld("splitMap", new Proto.Map($$T_Bool), Global.newArray(new Object[]{Global.newArray(new Object[]{".text", true}), Global.newArray(new Object[]{".const", true}), Global.newArray(new Object[]{".econst", true}), Global.newArray(new Object[]{".ebss", true}), Global.newArray(new Object[]{".data", true}), Global.newArray(new Object[]{".switch", true}), Global.newArray(new Object[]{".far", true}), Global.newArray(new Object[]{".args", true}), Global.newArray(new Object[]{".cio", true})}), "rh");
+        po.addFld("stdTypes", (Proto)om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"), Global.newObject("t_IArg", Global.newObject("size", 2L, "align", 2L), "t_Char", Global.newObject("size", 1L, "align", 1L), "t_Double", Global.newObject("size", 4L, "align", 4L), "t_Float", Global.newObject("size", 2L, "align", 2L), "t_Fxn", Global.newObject("size", 2L, "align", 2L), "t_Int", Global.newObject("size", 1L, "align", 1L), "t_Int8", Global.newObject("size", 1L, "align", 1L), "t_Int16", Global.newObject("size", 1L, "align", 1L), "t_Int32", Global.newObject("size", 2L, "align", 2L), "t_Int64", Global.newObject("size", 4L, "align", 2L), "t_Long", Global.newObject("size", 2L, "align", 2L), "t_LDouble", Global.newObject("size", 2L, "align", 2L), "t_LLong", Global.newObject("size", 4L, "align", 2L), "t_Ptr", Global.newObject("size", 2L, "align", 2L), "t_Short", Global.newObject("size", 1L, "align", 1L), "t_Size", Global.newObject("size", 2L, "align", 2L)), "rh");
+        po.addFld("includeOpts", $$T_Str, "-I$(rootDir)/include", "wh");
+        po.addFld("stdInclude", $$T_Str, "ti/targets/elf/std.h", "wh");
+        po.addFld("binaryParser", $$T_Str, "xdc.targets.omf.Elf", "wh");
+        po.addFld("bitsPerChar", Proto.Elm.newCNum("(xdc_Int)"), 16L, "rh");
+        fxn = Global.get(cap, "module$use");
+        if (fxn != null) om.bind("ti.targets.elf.C28_float64$$module$use", true);
+        if (fxn != null) po.addFxn("module$use", $$T_Met, fxn);
+        fxn = Global.get(cap, "module$meta$init");
+        if (fxn != null) om.bind("ti.targets.elf.C28_float64$$module$meta$init", true);
+        if (fxn != null) po.addFxn("module$meta$init", $$T_Met, fxn);
+        fxn = Global.get(cap, "module$validate");
+        if (fxn != null) om.bind("ti.targets.elf.C28_float64$$module$validate", true);
         if (fxn != null) po.addFxn("module$validate", $$T_Met, fxn);
                 fxn = Global.get(cap, "archive");
                 if (fxn != null) po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "ti.targets.elf"), fxn);
@@ -661,6 +780,10 @@ public class ti_targets_elf
     }
 
     void C28_float$$ROV()
+    {
+    }
+
+    void C28_float64$$ROV()
     {
     }
 
@@ -1151,6 +1274,82 @@ public class ti_targets_elf
         ((Value.Arr)pkgV.getv("$unitNames")).add("C28_float");
     }
 
+    void C28_float64$$SINGLETONS()
+    {
+        Proto.Obj po;
+        Value.Obj vo;
+
+        vo = (Value.Obj)om.findStrict("ti.targets.elf.C28_float64", "ti.targets.elf");
+        po = (Proto.Obj)om.findStrict("ti.targets.elf.C28_float64.Module", "ti.targets.elf");
+        vo.init2(po, "ti.targets.elf.C28_float64", $$DEFAULT, false);
+        vo.bind("Module", po);
+        vo.bind("$category", "Module");
+        vo.bind("$capsule", om.findStrict("ti.targets.elf.C28_float64$$capsule", "ti.targets.elf"));
+        vo.bind("$package", om.findStrict("ti.targets.elf", "ti.targets.elf"));
+        tdefs.clear();
+        proxies.clear();
+        mcfgs.clear();
+        icfgs.clear();
+        inherits.clear();
+        vo.bind("Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Model", "ti.targets.elf"));
+        vo.bind("DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.elf"));
+        vo.bind("Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.elf"));
+        vo.bind("CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.elf"));
+        vo.bind("OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.elf"));
+        vo.bind("CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.elf"));
+        vo.bind("LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.elf"));
+        vo.bind("ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.elf"));
+        vo.bind("CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.elf"));
+        vo.bind("StringArray", om.findStrict("xdc.bld.ITarget.StringArray", "ti.targets.elf"));
+        vo.bind("TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.elf"));
+        vo.bind("StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.elf"));
+        vo.bind("Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.elf"));
+        vo.bind("Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.elf"));
+        vo.bind("$$tdefs", Global.newArray(tdefs.toArray()));
+        vo.bind("$$proxies", Global.newArray(proxies.toArray()));
+        vo.bind("$$mcfgs", Global.newArray(mcfgs.toArray()));
+        vo.bind("$$icfgs", Global.newArray(icfgs.toArray()));
+        inherits.add("ti.targets");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        vo.bind("$$inherits", Global.newArray(inherits.toArray()));
+        ((Value.Arr)pkgV.getv("$modules")).add(vo);
+        ((Value.Arr)om.findStrict("$modules", "ti.targets.elf")).add(vo);
+        vo.bind("$$instflag", 0);
+        vo.bind("$$iobjflag", 1);
+        vo.bind("$$sizeflag", 1);
+        vo.bind("$$dlgflag", 0);
+        vo.bind("$$iflag", 1);
+        vo.bind("$$romcfgs", "|");
+        vo.bind("$$nortsflag", 0);
+        Proto.Str ps = (Proto.Str)vo.find("Module_State");
+        if (ps != null) vo.bind("$object", ps.newInstance());
+        vo.bind("$$meta_iobj", om.has("ti.targets.elf.C28_float64$$instance$static$init", null) ? 1 : 0);
+        vo.bind("$$fxntab", Global.newArray());
+        vo.bind("$$logEvtCfgs", Global.newArray());
+        vo.bind("$$errorDescCfgs", Global.newArray());
+        vo.bind("$$assertDescCfgs", Global.newArray());
+        Value.Map atmap = (Value.Map)vo.getv("$attr");
+        atmap.setElem("", "xdc/bld/stddefs.xdt");
+        atmap.seal("length");
+        pkgV.bind("C28_float64", vo);
+        ((Value.Arr)pkgV.getv("$unitNames")).add("C28_float64");
+    }
+
     void $$INITIALIZATION()
     {
         Value.Obj vo;
@@ -1162,6 +1361,7 @@ public class ti_targets_elf
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.elf.C66", "ti.targets.elf"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.elf.C71", "ti.targets.elf"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.elf.C28_float", "ti.targets.elf"));
+        Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.elf.C28_float64", "ti.targets.elf"));
         Global.callFxn("init", pkgV);
         ((Value.Obj)om.getv("ti.targets.elf.ITarget")).bless();
         ((Value.Obj)om.getv("ti.targets.elf.C64P")).bless();
@@ -1169,6 +1369,7 @@ public class ti_targets_elf
         ((Value.Obj)om.getv("ti.targets.elf.C66")).bless();
         ((Value.Obj)om.getv("ti.targets.elf.C71")).bless();
         ((Value.Obj)om.getv("ti.targets.elf.C28_float")).bless();
+        ((Value.Obj)om.getv("ti.targets.elf.C28_float64")).bless();
         ((Value.Arr)om.findStrict("$packages", "ti.targets.elf")).add(pkgV);
     }
 
@@ -1191,36 +1392,42 @@ public class ti_targets_elf
         C66$$OBJECTS();
         C71$$OBJECTS();
         C28_float$$OBJECTS();
+        C28_float64$$OBJECTS();
         ITarget$$CONSTS();
         C64P$$CONSTS();
         C674$$CONSTS();
         C66$$CONSTS();
         C71$$CONSTS();
         C28_float$$CONSTS();
+        C28_float64$$CONSTS();
         ITarget$$CREATES();
         C64P$$CREATES();
         C674$$CREATES();
         C66$$CREATES();
         C71$$CREATES();
         C28_float$$CREATES();
+        C28_float64$$CREATES();
         ITarget$$FUNCTIONS();
         C64P$$FUNCTIONS();
         C674$$FUNCTIONS();
         C66$$FUNCTIONS();
         C71$$FUNCTIONS();
         C28_float$$FUNCTIONS();
+        C28_float64$$FUNCTIONS();
         ITarget$$SIZES();
         C64P$$SIZES();
         C674$$SIZES();
         C66$$SIZES();
         C71$$SIZES();
         C28_float$$SIZES();
+        C28_float64$$SIZES();
         ITarget$$TYPES();
         C64P$$TYPES();
         C674$$TYPES();
         C66$$TYPES();
         C71$$TYPES();
         C28_float$$TYPES();
+        C28_float64$$TYPES();
         if (isROV) {
             ITarget$$ROV();
             C64P$$ROV();
@@ -1228,6 +1435,7 @@ public class ti_targets_elf
             C66$$ROV();
             C71$$ROV();
             C28_float$$ROV();
+            C28_float64$$ROV();
         }//isROV
         $$SINGLETONS();
         ITarget$$SINGLETONS();
@@ -1236,6 +1444,7 @@ public class ti_targets_elf
         C66$$SINGLETONS();
         C71$$SINGLETONS();
         C28_float$$SINGLETONS();
+        C28_float64$$SINGLETONS();
         $$INITIALIZATION();
     }
 }

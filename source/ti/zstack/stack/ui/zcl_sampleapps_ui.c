@@ -254,7 +254,7 @@
 
 *********************************************************************/
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 
 
 #if (BDB_INSTALL_CODE_USE!=BDB_INSTALL_CODE_USE_IC_CRC)
@@ -264,6 +264,7 @@
 /*********************************************************************
  * INCLUDES
  */
+#include "ti_zstack_config.h"
 #include "rom_jt_154.h"
 
 #include "bdb_interface.h"
@@ -292,8 +293,8 @@
 #include "gp_common.h"
 #endif
 
-#if defined (OTA_CLIENT_CC26XX)
-#include "ota_client_app.h"
+#if (defined OTA_CLIENT_STANDALONE) || (defined OTA_CLIENT_INTEGRATED)
+#include "ota_client.h"
 #endif
 
 
@@ -572,6 +573,15 @@ static uint16_t events = 0;
 static Button_Handle  keys;
 
 #if defined(USE_DMM) && defined(BLOCK_MODE_TEST)
+DMMPolicy_StackRole DMMPolicy_StackRole_ZigbeeDevice =
+#if ZG_BUILD_ENDDEVICE_TYPE
+    DMMPolicy_StackRole_ZigbeeEndDevice;
+#elif ZG_BUILD_RTRONLY_TYPE
+    DMMPolicy_StackRole_ZigbeeRouter;
+#elif ZG_BUILD_COORDINATOR_TYPE
+    DMMPolicy_StackRole_ZigbeeCoordinator;
+#endif
+
 static uint16_t ZCL_BLOCK_MODE_ON_PERIOD  = 0x01F4;    // Default 500  ms
 static uint16_t ZCL_BLOCK_MODE_OFF_PERIOD = 0x03E8;    // Default 1000 ms
 #endif
@@ -1900,9 +1910,9 @@ void UI_UpdateGpStatusLine(void)
         gppCommissioningTimeout--;
         if(gppCommissioningTimeout > 0)
         {
-            if(Timer_isActive(&uiGppClkStruct) != true)
+            if(UtilTimer_isActive(&uiGppClkStruct) != true)
             {
-               Timer_start(&uiGppClkStruct);
+               UtilTimer_start(&uiGppClkStruct);
             }
         }
 
@@ -2085,7 +2095,7 @@ static void UI_processKey(Button_Handle _buttonHandle,
 static void zclSampleApps_initializeClocks(void)
 {
     // Construct the timer to update the Bdb and Nwk Info Line
-    Clock_Handle uiBdbNwkLineUpdate = Timer_construct(
+    Clock_Handle uiBdbNwkLineUpdate = UtilTimer_construct(
     &uiBdbNwkLineUpdateClk,
     uiRaiseBdbNwkLineUpdateEvt,
     UI_AUTO_REFRESH_INTERVAL_INFO_LINE,
@@ -2095,7 +2105,7 @@ static void zclSampleApps_initializeClocks(void)
 
 #if !defined (DISABLE_GREENPOWER_BASIC_PROXY) && (ZG_BUILD_RTR_TYPE)
     // Construct the timer used to update gpp timeout screen
-    uiGppClkHandle = Timer_construct(
+    uiGppClkHandle = UtilTimer_construct(
     &uiGppClkStruct,
     zclSampleAppsUI_ProcessGPPUpdateTimeoutCallback,
     UI_AUTO_REFRESH_INTERVAL_INFO_LINE,
@@ -2105,7 +2115,7 @@ static void zclSampleApps_initializeClocks(void)
 #endif
 
 #if defined(USE_DMM) &&  defined(BLOCK_MODE_TEST)
-    clkBlockModeTestHandle = Timer_construct(&clkBlockModeTestStruct,
+    clkBlockModeTestHandle = UtilTimer_construct(&clkBlockModeTestStruct,
                                              zclSampleApps_blockModeTestClockHandler,
                                              ZCL_BLOCK_MODE_ON_PERIOD, ZCL_BLOCK_MODE_ON_PERIOD, false,
                                              0);
@@ -2132,8 +2142,8 @@ static void uiRaiseBdbNwkLineUpdateEvt(UArg a0)
     // Wake up the application thread when it waits for clock event
     Semaphore_post(uiAppSem);
 
-    if(Timer_isActive(&uiBdbNwkLineUpdateClk) != true) {
-        Timer_start(&uiBdbNwkLineUpdateClk);
+    if(UtilTimer_isActive(&uiBdbNwkLineUpdateClk) != true) {
+        UtilTimer_start(&uiBdbNwkLineUpdateClk);
     }
 }
 
@@ -2184,7 +2194,7 @@ static void zclSampleAppsUI_changeKeyCallback(Button_Handle _buttonHandle, Butto
     {
         keys = _buttonHandle;
 
-        events |= SAMPLEAPP_KEY_EVT;
+        events |= SAMPLEAPP_KEY_EVT_UI;
 
         // Wake up the application thread when it waits for clock event
         Semaphore_post(uiAppSem);
@@ -2236,12 +2246,12 @@ CUI_clientHandle_t UI_Init(uint8_t  zclSampleApp_Entity, uint32_t *zclSampleAppE
   // Set button callback
   Button_setCallback(gRightButtonHandle, zclSampleAppsUI_changeKeyCallback);
 
-#if defined (OTA_CLIENT_CC26XX)
+#if (defined OTA_CLIENT_STANDALONE) || (defined OTA_CLIENT_INTEGRATED)
   // Read button state
   if (!GPIO_read(((Button_HWAttrs*)gLeftButtonHandle->hwAttrs)->gpioIndex))
   {
       //Return to FN image
-      OTA_loadExtImage(ST_FULL_FACTORY_IMAGE);
+      otaClient_loadExtImage(ST_FULL_FACTORY_IMAGE);
   }
 #endif
 
@@ -2541,9 +2551,9 @@ void UI_SetGPPCommissioningMode( zstack_gpCommissioningMode_t *Req )
     if(Req->time > 0)
     {
       gppCommissioningTimeout = Req->time + 1;
-      Timer_stop(&uiGppClkStruct);
-      Timer_setTimeout(uiGppClkHandle,1000);
-      Timer_start(&uiGppClkStruct);
+      UtilTimer_stop(&uiGppClkStruct);
+      UtilTimer_setTimeout(uiGppClkHandle,1000);
+      UtilTimer_start(&uiGppClkStruct);
     }
     else
     {
@@ -2553,8 +2563,8 @@ void UI_SetGPPCommissioningMode( zstack_gpCommissioningMode_t *Req )
   else
   {
     gppCommissioningTimeout = 0;
-    Timer_stop(&uiGppClkStruct);
-    Timer_setTimeout(uiGppClkHandle, 0);
+    UtilTimer_stop(&uiGppClkStruct);
+    UtilTimer_setTimeout(uiGppClkHandle, 0);
   }
 
   UI_UpdateGpStatusLine();
@@ -2598,7 +2608,7 @@ static CUI_clientHandle_t UI_InitCUI(CONST char* pAppStr)
 #endif
 
   gCuiHandle = CUI_clientOpen(&clientParams);
-  if (gCuiHandle == NULL)
+  if (gCuiHandle == 0U)
       while(1){};
 
   return gCuiHandle;
@@ -2617,8 +2627,8 @@ void zclsampleApp_ui_event_loop(void)
     UI_UpdateDeviceInfoLine();
     UI_UpdateNwkStatusLine();
     UI_UpdateBdbStatusLine(NULL);
-#if defined (OTA_CLIENT_CC26XX)
-    OTA_UpdateStatusLine();
+#if (defined OTA_CLIENT_STANDALONE) || (defined OTA_CLIENT_INTEGRATED)
+    otaClient_UpdateStatusLine();
 #endif
     events &= ~SAMPLEAPP_UI_BDB_NWK_LINE_UPDATE_EVT;
   }
@@ -2644,10 +2654,10 @@ void zclsampleApp_ui_event_loop(void)
   }
 #endif
 
-  if (events & SAMPLEAPP_KEY_EVT)
+  if (events & SAMPLEAPP_KEY_EVT_UI)
   {
     UI_processKey(keys, Button_EV_CLICKED);
-    events &= ~SAMPLEAPP_KEY_EVT;
+    events &= ~SAMPLEAPP_KEY_EVT_UI;
   }
 
 
@@ -2667,25 +2677,25 @@ void zclsampleApp_ui_event_loop(void)
 static void zclSampleApps_blockModeTestClockHandler(UArg arg)
 {
   // stop the timer
-  Timer_stop(&clkBlockModeTestStruct);
+  UtilTimer_stop(&clkBlockModeTestStruct);
 
-  if (DMMPolicy_getBlockModeStatus(DMMPolicy_StackRole_154Sensor))
+  if (DMMPolicy_getBlockModeStatus(DMMPolicy_StackRole_ZigbeeDevice))
   {
     // update the DMM Block Mode status
-    DMMPolicy_setBlockModeOff(DMMPolicy_StackRole_154Sensor);
+    DMMPolicy_setBlockModeOff(DMMPolicy_StackRole_ZigbeeDevice);
 
     // restart the timer with new timeout value
-    Timer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_OFF_PERIOD);
-    Timer_start(&clkBlockModeTestStruct);
+    UtilTimer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_OFF_PERIOD);
+    UtilTimer_start(&clkBlockModeTestStruct);
   }
   else
   {
     // update the DMM Block Mode status
-    DMMPolicy_setBlockModeOn(DMMPolicy_StackRole_154Sensor);
+    DMMPolicy_setBlockModeOn(DMMPolicy_StackRole_ZigbeeDevice);
 
     // restart the timer with new timeout value
-    Timer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_ON_PERIOD);
-    Timer_start(&clkBlockModeTestStruct);
+    UtilTimer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_ON_PERIOD);
+    UtilTimer_start(&clkBlockModeTestStruct);
   }
 }
 
@@ -2698,11 +2708,11 @@ static void zclSampleApps_blockModeTestClockHandler(UArg arg)
  */
 static void zclSampleApps_blockModeTestOn(int32_t menuEntryIndex)
 {
-  if (!Timer_isActive(&clkBlockModeTestStruct))
+  if (!UtilTimer_isActive(&clkBlockModeTestStruct))
   {
-    Timer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_ON_PERIOD);
-    Timer_start(&clkBlockModeTestStruct);
-    DMMPolicy_setBlockModeOn(DMMPolicy_StackRole_154Sensor);
+    UtilTimer_setTimeout(clkBlockModeTestHandle, ZCL_BLOCK_MODE_ON_PERIOD);
+    UtilTimer_start(&clkBlockModeTestStruct);
+    DMMPolicy_setBlockModeOn(DMMPolicy_StackRole_ZigbeeDevice);
     CUI_statusLinePrintf(gCuiHandle, gBlockModeTestInfoLine, "Enabled");
   }
 }
@@ -2716,11 +2726,11 @@ static void zclSampleApps_blockModeTestOn(int32_t menuEntryIndex)
  */
 static void zclSampleApps_blockModeTestOff(int32_t menuEntryIndex)
 {
-  if (Timer_isActive(&clkBlockModeTestStruct))
+  if (UtilTimer_isActive(&clkBlockModeTestStruct))
   {
-      Timer_stop(&clkBlockModeTestStruct);
+      UtilTimer_stop(&clkBlockModeTestStruct);
   }
-  DMMPolicy_setBlockModeOff(DMMPolicy_StackRole_154Sensor);
+  DMMPolicy_setBlockModeOff(DMMPolicy_StackRole_ZigbeeDevice);
   CUI_statusLinePrintf(gCuiHandle, gBlockModeTestInfoLine, "Disabled");
 }
 
@@ -2877,6 +2887,6 @@ static uint8_t moveCursorRight(uint8_t col, uint8_t left_boundary, uint8_t right
 
 #endif
 
-#endif //USE_ZCL_SAMPLEAPP_UI
+#endif //CUI_DISABLE
 
 

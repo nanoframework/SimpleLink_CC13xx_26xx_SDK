@@ -57,7 +57,7 @@
 
 #include <ti/display/Display.h>
 
-#if !(defined __TI_COMPILER_VERSION__)
+#if !(defined __TI_COMPILER_VERSION__) && !(defined __clang__)
 #include <intrinsics.h>
 #endif
 
@@ -662,7 +662,7 @@ static void SimplePeripheral_taskFxn(UArg a0, UArg a1)
       // OAD events
       if(events & OAD_QUEUE_EVT)
       {
-          DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_OAD);
+          DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_OAD);
           // Process the OAD Message Queue
           uint8_t status = OAD_processQueue();
 
@@ -676,7 +676,7 @@ static void SimplePeripheral_taskFxn(UArg a0, UArg a1)
           }
           else if(status != OAD_SUCCESS)
           {
-              DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
+              DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
           }
       }
 
@@ -1144,7 +1144,7 @@ void SimplePeripheral_bleFastStateUpdateCb(uint32_t StackRole, uint32_t stackSta
     if( !(prevStackState & LL_TASK_ID_SLAVE) && (stackState & LL_TASK_ID_SLAVE))
     {
         /* update DMM policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
     }
     prevStackState = stackState;
   }
@@ -1311,7 +1311,7 @@ static void SimplePeripheral_processAdvEvent(spGapAdvEventData_t *pEventData)
   switch (pEventData->event)
   {
     case GAP_EVT_ADV_START_AFTER_ENABLE:
-      DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_ADV);
+      DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_ADV);
 
       CUI_statusLinePrintf(simplePeripheralCuiHndl, spStatusLineAdvState, "Adv Set %d Enabled", *(uint8_t *)(pEventData->pBuf));
       break;

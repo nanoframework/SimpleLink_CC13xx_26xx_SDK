@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       rom.h
-*  Revised:        2020-03-03 13:22:52 +0100 (Tue, 03 Mar 2020)
-*  Revision:       56913
+*  Revised:        2020-09-17 15:26:49 +0200 (Thu, 17 Sep 2020)
+*  Revision:       58682
 *
 *  Description:    Prototypes for the ROM utility functions.
 *
@@ -263,7 +263,6 @@ typedef struct
 #define ROM_API_UART_TABLE       ((uint32_t*) (ROM_API_TABLE[20]))
 #define ROM_API_UDMA_TABLE       ((uint32_t*) (ROM_API_TABLE[21]))
 #define ROM_API_VIMS_TABLE       ((uint32_t*) (ROM_API_TABLE[22]))
-#define ROM_API_CRYPTO_TABLE     ((uint32_t*) (ROM_API_TABLE[23]))
 #define ROM_API_OSC_TABLE        ((uint32_t*) (ROM_API_TABLE[24]))
 #define ROM_API_AUX_ADC_TABLE    ((uint32_t*) (ROM_API_TABLE[25]))
 #define ROM_API_SYS_CTRL_TABLE   ((uint32_t*) (ROM_API_TABLE[26]))
@@ -332,14 +331,6 @@ typedef struct
 
 
 // FLASH FUNCTIONS
-#define ROM_FlashPowerModeSet \
-    ((void (*)(uint32_t ui32PowerMode, uint32_t ui32BankGracePeriod, uint32_t ui32PumpGracePeriod)) \
-    ROM_API_FLASH_TABLE[0])
-
-#define ROM_FlashPowerModeGet \
-    ((uint32_t (*)(void)) \
-    ROM_API_FLASH_TABLE[1])
-
 #define ROM_FlashProtectionSet \
     ((void (*)(uint32_t ui32SectorAddress, uint32_t ui32ProtectMode)) \
     ROM_API_FLASH_TABLE[2])
@@ -726,7 +717,7 @@ typedef struct
     ((void (*)(uint32_t refSource, uint32_t trigger)) \
     ROM_API_AUX_ADC_TABLE[3])
 
-#define ROM_AUXADCEnableSync \
+#define ROM_AUXADCEnableSyncNoBugWorkaround \
     ((void (*)(uint32_t refSource, uint32_t sampleTime, uint32_t trigger)) \
     ROM_API_AUX_ADC_TABLE[4])
 

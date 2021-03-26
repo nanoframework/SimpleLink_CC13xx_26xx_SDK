@@ -54,6 +54,22 @@
         <srcFile name="package/lib/lib/debug/ti.sysbios.hal/SecondsClock.oem4f.dep" src="SecondsClock.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Timer.oem4f.dep" src="Timer.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.hal/TimerNull.oem4f.dep" src="TimerNull.c"/>
+        <srcFile name="lib/debug/ti.sysbios.hal.am4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/package/package_ti.sysbios.hal.om4f.dep" src="package/package_ti.sysbios.hal.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Cache.om4f.dep" src="Cache.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/CacheNull.om4f.dep" src="CacheNull.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Core.om4f.dep" src="Core.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/CoreNull.om4f.dep" src="CoreNull.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Hwi.om4f.dep" src="Hwi.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Hwi_stack.om4f.dep" src="Hwi_stack.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Hwi_startup.om4f.dep" src="Hwi_startup.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Power.om4f.dep" src="Power.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/PowerNull.om4f.dep" src="PowerNull.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Seconds.om4f.dep" src="Seconds.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/SecondsCallback.om4f.dep" src="SecondsCallback.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/SecondsClock.om4f.dep" src="SecondsClock.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Timer.om4f.dep" src="Timer.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.hal/TimerNull.om4f.dep" src="TimerNull.c"/>
         <srcFile name="lib/debug/ti.sysbios.hal.am4fg.mak" src="package.bld"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.hal/package/package_ti.sysbios.hal.om4fg.dep" src="package/package_ti.sysbios.hal.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.hal/Cache.om4fg.dep" src="Cache.c"/>
@@ -95,7 +111,23 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="em4f"
-            rootDir="/db/vendors/ti/arm/20.2.1.LTS/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/ticodegen/20.2.1.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
+            os="undefined"
+            rts="ti.targets.arm.rtsarm">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="ti.targets.arm.clang.M4F"
+            version="ti.targets.arm.clang.M4F{1,0,1.0,0"
+            rawVersion="TI Arm Clang Compiler 1.0.0+STSTarget: arm-ti-none-eabi
+Thread model: posix
+InstalledDir: /scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/bin
+"
+            platform="ti.platforms.cortexM:MTL1_VSOC:1"
+            isa="v7M4"
+            suffix="m4f"
+            rootDir="/scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"
@@ -108,7 +140,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT"
             isa="v7M4"
             suffix="m4fg"
-            rootDir="/db/vendors/arm/gcc-arm-none-eabi-9-2019-q4-major"
+            rootDir="/scratch/xlibrary/.conan/data/arm-none-eabi-gcc/9.2019.q4.major-0/library-msp/ga/package/44fcf6b9a7fb86b2586303e3db40189d3b511830"
             os="undefined"
             rts="gnu.targets.arm.rtsv7M">
             <model endian="little"
@@ -121,7 +153,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="rm4f"
-            rootDir="/db/vendors/iar/arm/8.50.1/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/iarcodegen/8.50.1.245-0/library-msp/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9"
             os="undefined"
             rts="iar.targets.arm.rts">
             <model endian="little"
@@ -134,6 +166,10 @@
         pname="lib/debug/ti.sysbios.hal.aem4f"
         profile="debug"
         target="ti.targets.arm.elf.M4F"/>
+    <library name="lib/debug/ti.sysbios.hal"
+        pname="lib/debug/ti.sysbios.hal.am4f"
+        profile="debug"
+        target="ti.targets.arm.clang.M4F"/>
     <library name="lib/debug/ti.sysbios.hal"
         pname="lib/debug/ti.sysbios.hal.am4fg"
         profile="debug"
@@ -184,6 +220,7 @@
         <file name="SecondsClock.c"/>
         <file name="Timer.c"/>
         <file name="TimerNull.c"/>
+        <file name="lib/debug/ti.sysbios.hal.am4f"/>
         <file name="lib/debug/ti.sysbios.hal.am4fg"/>
         <file name="lib/debug/ti.sysbios.hal.arm4f"/>
     </release>

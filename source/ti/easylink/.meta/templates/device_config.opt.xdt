@@ -1,0 +1,6 @@
+%%{
+const Common = system.getScript("/ti/easylink/easylink_common.js");
+const devFamily = Common.device2DeviceFamily(system.deviceData.deviceId);
+%%}
+
+-D`devFamily`

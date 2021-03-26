@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -89,6 +89,7 @@
 #include "gap_advertiser_internal.h"
 #include "gap_advertiser.h"
 #include "gap_scanner_internal.h"
+#include "gap_scanner.h"
 #include "gap_initiator.h"
 
 #include <ti/drivers/rf/RF.h>
@@ -446,6 +447,8 @@ typedef void (*RT_Init_fp)(void);
 #if defined ( FLASH_ROM_BUILD )
 #if defined __TI_COMPILER_VERSION || defined __TI_COMPILER_VERSION__
 #pragma DATA_ALIGN(ROM_Flash_JT, 4)
+#elif defined(__GNUC__) || defined(__clang__)
+__attribute__ ((aligned (4)))
 #else
 #pragma data_alignment=4
 #endif
@@ -1010,7 +1013,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)llVerifyConnParamReqParams,                        // ROM_JT_OFFSET[412]
   (uint32)llWriteTxData,                                     // ROM_JT_OFFSET[413]
 #ifdef HOST_CONFIG
-  (uint32)linkDB_Add,                                        // ROM_JT_OFFSET[414]
+  (uint32)linkDB_Add_sPatch,                                 // ROM_JT_OFFSET[414]
   (uint32)linkDB_Authen,                                     // ROM_JT_OFFSET[415]
   (uint32)linkDB_Find,                                       // ROM_JT_OFFSET[416]
   (uint32)linkDB_Init,                                       // ROM_JT_OFFSET[417]
@@ -2110,8 +2113,9 @@ void llScheduler_hook( void )
 /*******************************************************************************
  * RTLS hooks
  */
-extern uint8 llGetCteInfo( llConnState_t *connPtr );
+extern uint8 llGetCteInfo( uint8 id, void *ptr );
 extern uint8 RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *pEvtData);
+extern uint8 RTLSSrv_processPeriodicAdvEvent(void *pMsg);
 extern uint8 LL_EnhancedCteRxTest( uint8 rxChan,
                                         uint8 rxPhy,
                                         uint8 modIndex,
@@ -2245,10 +2249,10 @@ uint8 MAP_LL_EnhancedCteRxTest( uint8 rxChan,
 #endif
 }
 
-uint8 MAP_llGetCteInfo( void *connPtr )
+uint8 MAP_llGetCteInfo( uint8 id, void *ptr )
 {
 #ifdef USE_RTLS
-  return llGetCteInfo(connPtr);
+  return llGetCteInfo(id, ptr);
 #else
   return 1;
 #endif
@@ -2263,6 +2267,90 @@ uint8 MAP_RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *p
 #endif
 }
 
+uint8 MAP_LL_SetConnectionCteReceiveParams( uint16 connHandle, uint8 samplingEnable,
+                                            uint8 slotDurations, uint8 length, uint8 *pAntenna )
+{
+#ifdef USE_RTLS
+  return LL_SetConnectionCteReceiveParams( connHandle, samplingEnable, slotDurations, length, pAntenna );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LL_SetConnectionCteTransmitParams( uint16 connHandle, uint8  types,
+                                             uint8 length, uint8 *pAntenna )
+{
+#ifdef USE_RTLS
+  return LL_SetConnectionCteTransmitParams( connHandle, types, length, pAntenna );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LL_SetConnectionCteRequestEnable( uint16 connHandle, uint8 enable,
+                                             uint16 interval, uint8 length, uint8 type )
+{
+#ifdef USE_RTLS
+  return LL_SetConnectionCteRequestEnable( connHandle, enable, interval, length, type );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LL_SetConnectionCteResponseEnable( uint16 connHandle, uint8 enable )
+{
+#ifdef USE_RTLS
+  return LL_SetConnectionCteResponseEnable( connHandle, enable );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LL_ReadAntennaInformation( uint8 *sampleRates, uint8 *maxNumOfAntennas,
+                                     uint8 *maxSwitchPatternLen, uint8 *maxCteLen)
+{
+#ifdef USE_RTLS
+  return LL_ReadAntennaInformation( sampleRates, maxNumOfAntennas, maxSwitchPatternLen, maxCteLen );
+#else
+  return 1;
+#endif
+}
+
+void MAP_llUpdateCteState( void *connPtr )
+{
+#ifdef USE_DMM
+  llUpdateCteState(connPtr);
+#endif
+}
+
+uint8 MAP_llSetupCte( void *connPtr, uint8 req)
+{
+#ifdef USE_RTLS
+  return llSetupCte( connPtr, req );
+#else
+  return 0;
+#endif
+}
+
+uint8 MAP_llFreeCteSamplesEntryQueue( void )
+{
+#ifdef USE_RTLS
+  return llFreeCteSamplesEntryQueue();
+#else
+  return 0;
+#endif
+}
+
+uint8 MAP_LL_EXT_SetLocationingAccuracy( uint16 handle, uint8  sampleRate1M, uint8  sampleSize1M,
+                                         uint8  sampleRate2M, uint8  sampleSize2M, uint8  sampleCtrl)
+{
+#ifdef USE_RTLS
+  return LL_EXT_SetLocationingAccuracy( handle, sampleRate1M, sampleSize1M,
+                                        sampleRate2M, sampleSize2M, sampleCtrl);
+#else
+  return 1;
+#endif
+}
 /*******************************************************************************
  * RF hooks
  */
@@ -2270,10 +2358,11 @@ extern void  rf_patch_cpe_bt5();
 extern void  rf_patch_cpe_multi_protocol();
 extern void  rf_patch_cpe_multi_protocol_rtls();
 extern void  rf_patch_cpe_multi_bt5_coex(void);
+extern void  rf_patch_rfe_ble_coex(void);
 
 void MAP_rf_patch_cpe( void )
 {
-#ifdef USE_RTLS
+#if (defined USE_RTLS || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
   rf_patch_cpe_multi_protocol_rtls();
 #else
   #ifdef USE_DMM
@@ -2285,6 +2374,13 @@ void MAP_rf_patch_cpe( void )
       rf_patch_cpe_bt5();
     #endif
   #endif
+#endif
+}
+
+void MAP_rf_patch_rfe( void )
+{
+#ifdef USE_COEX
+  rf_patch_rfe_ble_coex();
 #endif
 }
 
@@ -2366,6 +2462,368 @@ void *MAP_llCoexGetParams(uint16 cmdNum)
 }
 
 /*******************************************************************************
+ * Periodic Adv hooks
  */
+uint8 MAP_LE_SetPeriodicAdvParams( uint8 advHandle,
+                                   uint16 periodicAdvIntervalMin,
+                                   uint16 periodicAdvIntervalMax,
+                                   uint16 periodicAdvProp )
+{
+#ifdef USE_PERIODIC_ADV
+  return LE_SetPeriodicAdvParams(advHandle,
+                                 periodicAdvIntervalMin,
+                                 periodicAdvIntervalMax,
+                                 periodicAdvProp);
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetPeriodicAdvData( uint8 advHandle, uint8 operation,
+                                 uint8 dataLength, uint8 *data )
+{
+#ifdef USE_PERIODIC_ADV
+  return LE_SetPeriodicAdvData( advHandle,operation,dataLength,data );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetPeriodicAdvEnable( uint8 enable,uint8 advHandle )
+{
+#ifdef USE_PERIODIC_ADV
+  return LE_SetPeriodicAdvEnable( enable, advHandle);
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetConnectionlessCteTransmitParams( uint8 advHandle, uint8 cteLen, uint8 cteType,
+                                                 uint8 cteCount, uint8 length, uint8 *pAntenna )
+{
+#if defined ( USE_PERIODIC_ADV ) && defined ( USE_RTLS )
+  return LE_SetConnectionlessCteTransmitParams( advHandle, cteLen, cteType, cteCount, length, pAntenna );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetConnectionlessCteTransmitEnable( uint8 advHandle, uint8 enable )
+{
+#if defined ( USE_PERIODIC_ADV ) && defined ( USE_RTLS )
+  return LE_SetConnectionlessCteTransmitEnable( advHandle, enable);
+#else
+  return 1;
+#endif
+}
+
+void *MAP_llGetPeriodicAdv( uint8 handle )
+{
+#ifdef USE_PERIODIC_ADV
+  return llGetPeriodicAdv( handle );
+#else
+  return NULL;
+#endif
+}
+
+void MAP_llUpdatePeriodicAdvChainPacket( void )
+{
+#ifdef USE_PERIODIC_ADV
+  llUpdatePeriodicAdvChainPacket();
+#endif
+}
+
+void MAP_llSetPeriodicAdvChmapUpdate( uint8 set )
+{
+#ifdef USE_PERIODIC_ADV
+  llSetPeriodicAdvChmapUpdate( set );
+#endif
+}
+
+void MAP_llPeriodicAdv_PostProcess( void )
+{
+#ifdef USE_PERIODIC_ADV
+  llPeriodicAdv_PostProcess();
+#endif
+}
+
+uint8 MAP_llTrigPeriodicAdv( void *pAdvSet, void *pPeriodicAdv )
+{
+#ifdef USE_PERIODIC_ADV
+  return llTrigPeriodicAdv( pAdvSet, pPeriodicAdv);
+#else
+  return 0;
+#endif
+}
+
+uint8 MAP_llSetupPeriodicAdv( void *pAdvSet )
+{
+#ifdef USE_PERIODIC_ADV
+  return llSetupPeriodicAdv( pAdvSet );
+#else
+  return 0;
+#endif
+}
+
+void MAP_llEndPeriodicAdvTask( void *pPeriodicAdv )
+{
+#ifdef USE_PERIODIC_ADV
+  llEndPeriodicAdvTask( pPeriodicAdv );
+#endif
+}
+
+void *MAP_llFindNextPeriodicAdv( void )
+{
+#ifdef USE_PERIODIC_ADV
+  return llFindNextPeriodicAdv();
+#else
+  return NULL;
+#endif
+}
+
+void MAP_llSetPeriodicSyncInfo( void *pAdvSet, uint8 *pBuf )
+{
+#ifdef USE_PERIODIC_ADV
+  llSetPeriodicSyncInfo(pAdvSet,pBuf);
+#endif
+}
+
+void *MAP_llGetCurrentPeriodicAdv( void )
+{
+#ifdef USE_PERIODIC_ADV
+  return llGetCurrentPeriodicAdv();
+#else
+  return NULL;
+#endif
+}
+
+uint8 MAP_gapAdv_periodicAdvCmdCompleteCBs( void *pMsg )
+{
+#ifdef USE_PERIODIC_ADV
+  return gapAdv_periodicAdvCmdCompleteCBs(pMsg);
+#else
+  return TRUE;
+#endif
+}
+
+void MAP_llClearPeriodicAdvSets( void )
+{
+#ifdef USE_PERIODIC_ADV
+  llClearPeriodicAdvSets();
+#endif
+}
+
+/*******************************************************************************
+ * Periodic Scan hooks
+ */
+extern uint8 llProcessExtScanRxFIFO_hook(void);
+extern void llProcessPeriodicScanSyncInfo( uint8 *pPkt, aeExtAdvRptEvt_t *advEvent, uint32 timeStamp, uint8 phy );
+extern ble5OpCmd_t *llFindNextPeriodicScan( void );
+extern void llUpdateExtScanAcceptSyncInfo( void );
+
+uint8 MAP_LE_PeriodicAdvCreateSync( uint8  options, uint8  advSID, uint8  advAddrType, uint8  *advAddress,
+                                    uint16 skip, uint16 syncTimeout, uint8  syncCteType )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_PeriodicAdvCreateSync( options, advSID, advAddrType, advAddress, skip,syncTimeout,syncCteType);
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_PeriodicAdvCreateSyncCancel( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_PeriodicAdvCreateSyncCancel();
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_PeriodicAdvTerminateSync( uint16 syncHandle )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_PeriodicAdvTerminateSync( syncHandle );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_AddDeviceToPeriodicAdvList( uint8 advAddrType, uint8 *advAddress, uint8 advSID )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_AddDeviceToPeriodicAdvList( advAddrType, advAddress, advSID );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_RemoveDeviceFromPeriodicAdvList( uint8 advAddrType, uint8 *advAddress, uint8 advSID )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_RemoveDeviceFromPeriodicAdvList( advAddrType, advAddress, advSID);
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_ClearPeriodicAdvList( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_ClearPeriodicAdvList();
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_ReadPeriodicAdvListSize( uint8 *listSize )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_ReadPeriodicAdvListSize( listSize );
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetPeriodicAdvReceiveEnable( uint16 syncHandle, uint8  enable )
+{
+#ifdef USE_PERIODIC_SCAN
+  return LE_SetPeriodicAdvReceiveEnable( syncHandle, enable);
+#else
+  return 1;
+#endif
+}
+
+uint8 MAP_LE_SetConnectionlessIqSamplingEnable( uint16 syncHandle, uint8 samplingEnable,
+                                                uint8 slotDurations, uint8 maxSampledCtes,
+                                                uint8 length, uint8 *pAntenna )
+{
+#if defined ( USE_PERIODIC_SCAN ) && defined ( USE_RTLS )
+  return LE_SetConnectionlessIqSamplingEnable( syncHandle, samplingEnable, slotDurations, maxSampledCtes, length, pAntenna );
+#else
+  return 1;
+#endif
+}
 
 
+uint8 MAP_llProcessExtScanRxFIFO_hook(void)
+{
+#ifdef USE_PERIODIC_SCAN
+  return llProcessExtScanRxFIFO_hook();
+#else
+  return 0;
+#endif
+}
+
+void MAP_llProcessPeriodicScanSyncInfo( uint8 *pPkt, void *advEvent, uint32 timeStamp, uint8 phy )
+{
+#ifdef USE_PERIODIC_SCAN
+  llProcessPeriodicScanSyncInfo( pPkt, advEvent, timeStamp, phy );
+#endif
+}
+
+void MAP_llEndPeriodicScanTask( void *pPeriodicScan )
+{
+#ifdef USE_PERIODIC_SCAN
+  llEndPeriodicScanTask( pPeriodicScan );
+#endif
+}
+
+void MAP_llPeriodicScan_PostProcess( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  llPeriodicScan_PostProcess();
+#endif
+}
+
+void MAP_llProcessPeriodicScanRxFIFO( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  llProcessPeriodicScanRxFIFO();
+#endif
+}
+
+void *MAP_llFindNextPeriodicScan( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  return llFindNextPeriodicScan();
+#else
+  return NULL;
+#endif
+}
+
+void *MAP_llGetCurrentPeriodicScan( uint8 state )
+{
+#ifdef USE_PERIODIC_SCAN
+  return llGetCurrentPeriodicScan(state);
+#else
+  return NULL;
+#endif
+}
+
+uint8 MAP_llGetPeriodicScanCteTasks( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  return llGetPeriodicScanCteTasks();
+#else
+  return 0;
+#endif
+}
+
+uint8_t MAP_gapScan_periodicAdvCmdCompleteCBs( void *pMsg )
+{
+#ifdef USE_PERIODIC_SCAN
+  #ifdef USE_PERIODIC_RTLS
+    hciEvt_CmdComplete_t *pEvt = (hciEvt_CmdComplete_t *)pMsg;
+    return RTLSSrv_processHciEvent(pEvt->cmdOpcode, sizeof(pEvt->pReturnParam), pEvt->pReturnParam);
+  #else
+    return gapScan_periodicAdvCmdCompleteCBs(pMsg);
+  #endif
+#else
+  return TRUE;
+#endif
+}
+
+uint8_t MAP_gapScan_periodicAdvCmdStatusCBs( void *pMsg )
+{
+#ifdef USE_PERIODIC_SCAN
+  #ifdef USE_PERIODIC_RTLS
+	hciEvt_CommandStatus_t *pEvt = (hciEvt_CommandStatus_t *)pMsg;
+	return RTLSSrv_processHciEvent(pEvt->cmdOpcode, sizeof(pEvt->cmdStatus), &pEvt->cmdStatus);
+ #else
+    return gapScan_periodicAdvCmdStatusCBs(pMsg);
+ #endif
+#else
+  return TRUE;
+#endif
+}
+
+uint8_t MAP_gapScan_processBLEPeriodicAdvCBs( void *pMsg )
+{
+#ifdef USE_PERIODIC_SCAN
+  #ifdef USE_PERIODIC_RTLS
+    return RTLSSrv_processPeriodicAdvEvent(pMsg);
+  #else
+    return gapScan_processBLEPeriodicAdvCBs(pMsg);
+  #endif
+#else
+  return TRUE;
+#endif
+}
+
+void MAP_llClearPeriodicScanSets( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  llClearPeriodicScanSets();
+#endif
+}
+
+void MAP_llUpdateExtScanAcceptSyncInfo( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  llUpdateExtScanAcceptSyncInfo();
+#endif
+}
+
+/*******************************************************************************
+ */

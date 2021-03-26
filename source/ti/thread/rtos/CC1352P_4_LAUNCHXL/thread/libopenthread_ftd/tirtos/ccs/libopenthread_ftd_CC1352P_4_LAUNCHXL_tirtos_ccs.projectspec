@@ -42,17 +42,15 @@
             --plain_char=unsigned
             --diag_suppress=23000
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms
-            -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1
-            -DSIMPLELINK_OPENTHREAD_CONFIG_CC1352=1
-            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc1352-ccs.h&quot;&apos;
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source
-            -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_ccs/config
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include
             -DHAVE_CONFIG_H
             -D_BSD_SOURCE=1
             -D_DEFAULT_SOURCE=1
+            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc1352-ccs.h&quot;&apos;
+            -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_ccs/config
             -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc1352-config-ide.h&quot;&apos;
             -DOPENTHREAD_FTD=1
             -DOPENTHREAD_CONFIG_FILE=&apos;&quot;openthread-config-cc1352-ccs-ftd.h&quot;&apos;
@@ -72,7 +70,6 @@
         description="This is the primary (mode: ftd) stack library for OpenThread">
 
         <property name="isHybrid" value="true"/>
-        <group id="libopenthread_ftd_CC1352P_4_LAUNCHXL_tirtos_ccs.SIMPLELINK_CC13X2_26X2_SDK.thread.TI"/>
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core/openthread-core-config.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="src/core">
         </file>
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core/api/backbone_router_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="src/core/api">

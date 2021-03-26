@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -100,6 +100,8 @@
 #define MAP_LL_EXT_GetConnInfo                                       LL_EXT_GetConnInfo
 #define MAP_LL_EXT_GetActiveConnInfo                                 LL_EXT_GetActiveConnInfo
 #define MAP_LL_EXT_SetExtScanChannels                                LL_EXT_SetExtScanChannels
+#define MAP_LL_EXT_SetQOSParameters                                  LL_EXT_SetQOSParameters
+#define MAP_LL_EXT_SetQOSDefaultParameters                           LL_EXT_SetQOSDefaultParameters
 #define MAP_LL_EXT_HaltDuringRf                                      LL_EXT_HaltDuringRf
 #define MAP_LL_EXT_MapPmIoPort                                       LL_EXT_MapPmIoPort
 #define MAP_LL_EXT_ModemHopTestTx                                    LL_EXT_ModemHopTestTx
@@ -480,6 +482,8 @@
 #define MAP_HCI_EXT_SetVirtualAdvAddrCmd                             HCI_EXT_SetVirtualAdvAddrCmd
 #define MAP_HCI_EXT_ReadRandAddr                                     HCI_EXT_ReadRandAddr
 #define MAP_HCI_EXT_SetExtScanChannels                               HCI_EXT_SetExtScanChannels
+#define MAP_HCI_EXT_SetQOSParameters                                 HCI_EXT_SetQOSParameters
+#define MAP_HCI_EXT_SetQOSDefaultParameters                          HCI_EXT_SetQOSDefaultParameters
 #define MAP_HCI_HardwareErrorEvent                                   HCI_HardwareErrorEvent
 #define MAP_HCI_HostBufferSizeCmd                                    HCI_HostBufferSizeCmd
 #define MAP_HCI_HostNumCompletedPktCmd                               HCI_HostNumCompletedPktCmd
@@ -639,7 +643,7 @@
 #define MAP_llSetupRatCompare                                        llSetupRatCompare
 #define MAP_llClearRatCompare                                        llClearRatCompare
 // Link DB
-#define MAP_linkDB_Add                                               linkDB_Add
+#define MAP_linkDB_Add                                               linkDB_Add_sPatch
 #define MAP_linkDB_Authen                                            linkDB_Authen
 #define MAP_linkDB_Find                                              linkDB_Find
 #define MAP_linkDB_Init                                              linkDB_Init
@@ -1293,7 +1297,7 @@
 /*******************************************************************************
  * RTLS hooks
  */
-extern uint8 MAP_llGetCteInfo( void *connPtr );
+extern uint8 MAP_llGetCteInfo( uint8 id, void *ptr );
 extern uint8 MAP_RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *pEvtData);
 extern uint8 MAP_LL_EnhancedCteRxTest( uint8 rxChan,
                                             uint8 rxPhy,
@@ -1331,11 +1335,26 @@ extern uint8 MAP_LL_DirectCteTestRxTest( uint8 rxChan,
                                           uint8 length,
                                           uint8 *pAntenna);
 
+extern uint8 MAP_LL_SetConnectionCteReceiveParams( uint16 connHandle, uint8 samplingEnable,
+                                                   uint8 slotDurations, uint8 length, uint8 *pAntenna );
+extern uint8 MAP_LL_SetConnectionCteTransmitParams( uint16 connHandle, uint8  types,
+                                                    uint8 length, uint8 *pAntenna );
+extern uint8 MAP_LL_SetConnectionCteRequestEnable( uint16 connHandle, uint8 enable,
+                                                   uint16 interval, uint8 length, uint8 type );
+extern uint8 MAP_LL_SetConnectionCteResponseEnable( uint16 connHandle, uint8 enable );
+extern uint8 MAP_LL_ReadAntennaInformation( uint8 *sampleRates, uint8 *maxNumOfAntennas,
+                                            uint8 *maxSwitchPatternLen, uint8 *maxCteLen);
+extern void MAP_llUpdateCteState( void *connPtr);
+extern uint8 MAP_llSetupCte( void *connPtr, uint8 req);
+extern uint8 MAP_llFreeCteSamplesEntryQueue( void );
+extern uint8 MAP_LL_EXT_SetLocationingAccuracy( uint16 handle, uint8  sampleRate1M, uint8  sampleSize1M,
+                                                uint8  sampleRate2M, uint8  sampleSize2M, uint8  sampleCtrl);
 
 /*******************************************************************************
  * RF hooks
  */
-extern void  MAP_rf_patch_cpe();
+extern void  MAP_rf_patch_cpe(void);
+extern void  MAP_rf_patch_rfe(void);
 
 /*******************************************************************************
  * DMM hooks
@@ -1353,4 +1372,71 @@ extern uint32_t MAP_LL_AbortedCback( uint8 preempted );
  */
 extern void  *MAP_llCoexGetParams(uint16 cmdNum);
 
+/*******************************************************************************
+ * Periodic Adv hooks
+ */
+extern uint8 MAP_LE_SetPeriodicAdvParams( uint8 advHandle,
+                                          uint16 periodicAdvIntervalMin,
+                                          uint16 periodicAdvIntervalMax,
+                                          uint16 periodicAdvProp );
+
+extern uint8 MAP_LE_SetPeriodicAdvData( uint8 advHandle, uint8 operation,
+                                        uint8 dataLength, uint8 *data );
+
+extern uint8 MAP_LE_SetPeriodicAdvEnable( uint8 enable, uint8 advHandle );
+extern uint8 MAP_LE_SetConnectionlessCteTransmitParams( uint8 advHandle, uint8 cteLen,
+                                                        uint8 cteType, uint8 cteCount,
+                                                        uint8 length, uint8 *pAntenna );
+extern uint8 MAP_LE_SetConnectionlessCteTransmitEnable( uint8 advHandle, uint8 enable );
+extern void *MAP_llGetPeriodicAdv( uint8 handle );
+extern void MAP_llUpdatePeriodicAdvChainPacket( void );
+extern void MAP_llSetPeriodicAdvChmapUpdate( uint8 set );
+extern void MAP_llPeriodicAdv_PostProcess( void );
+extern uint8 MAP_llTrigPeriodicAdv( void *pAdvSet, void *pPeriodicAdv );
+extern uint8 MAP_llSetupPeriodicAdv( void *pAdvSet );
+extern void MAP_llEndPeriodicAdvTask( void *pPeriodicAdv );
+extern void *MAP_llFindNextPeriodicAdv( void );
+extern void MAP_llSetPeriodicSyncInfo( void *pAdvSet, uint8 *pBuf );
+extern void *MAP_llGetCurrentPeriodicAdv( void );
+extern uint8 MAP_gapAdv_periodicAdvCmdCompleteCBs( void *pMsg );
+extern void MAP_llClearPeriodicAdvSets( void );
+
+/*******************************************************************************
+ * Periodic Scan hooks
+ */
+extern uint8 MAP_LE_PeriodicAdvCreateSync( uint8  options,
+                                                uint8  advSID,
+                                                uint8  advAddrType,
+                                                uint8  *advAddress,
+                                                uint16 skip,
+                                                uint16 syncTimeout,
+                                                uint8  syncCteType );
+extern uint8 MAP_LE_PeriodicAdvCreateSyncCancel( void );
+extern uint8 MAP_LE_PeriodicAdvTerminateSync( uint16 syncHandle );
+extern uint8 MAP_LE_AddDeviceToPeriodicAdvList( uint8 advAddrType,
+                                                     uint8 *advAddress,
+                                                     uint8 advSID );
+extern uint8 MAP_LE_RemoveDeviceFromPeriodicAdvList( uint8 advAddrType,
+                                                          uint8 *advAddress,
+                                                          uint8 advSID );
+extern uint8 MAP_LE_ClearPeriodicAdvList( void );
+extern uint8 MAP_LE_ReadPeriodicAdvListSize( uint8 *listSize );
+extern uint8 MAP_LE_SetPeriodicAdvReceiveEnable( uint16 syncHandle, uint8  enable );
+extern uint8 MAP_LE_SetConnectionlessIqSamplingEnable( uint16 syncHandle, uint8 samplingEnable,
+                                                       uint8 slotDurations, uint8 maxSampledCtes,
+                                                       uint8 length, uint8 *pAntenna );
+
+extern uint8 MAP_llProcessExtScanRxFIFO_hook(void);
+extern void MAP_llProcessPeriodicScanSyncInfo( uint8 *pPkt, void *advEvent, uint32 timeStamp, uint8 phy );
+extern void MAP_llEndPeriodicScanTask( void *pPeriodicScan );
+extern void MAP_llPeriodicScan_PostProcess( void );
+extern void MAP_llProcessPeriodicScanRxFIFO( void );
+extern void *MAP_llFindNextPeriodicScan( void );
+extern void *MAP_llGetCurrentPeriodicScan( uint8 state );
+extern uint8 MAP_llGetPeriodicScanCteTasks( void );
+extern uint8_t MAP_gapScan_periodicAdvCmdCompleteCBs( void *pMsg );
+extern uint8_t MAP_gapScan_periodicAdvCmdStatusCBs( void *pMsg );
+extern uint8_t MAP_gapScan_processBLEPeriodicAdvCBs( void *pMsg );
+extern void MAP_llClearPeriodicScanSets( void );
+extern void MAP_llUpdateExtScanAcceptSyncInfo( void );
 #endif // MAP_DIRECT_H

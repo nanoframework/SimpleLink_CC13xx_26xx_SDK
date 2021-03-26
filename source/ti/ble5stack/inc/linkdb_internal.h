@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -199,6 +199,10 @@ extern uint8 linkDB_Register( pfnLinkDBCB_t pFunc );
                            uint8 *pAddrPriv, uint8 connRole, uint16 connInterval,
                            uint16 MTU, uint16 connTimeout, uint16 connLatency );
 
+  extern uint8 linkDB_Add_sPatch( uint8 taskID, uint16 connectionHandle,
+                           uint8 stateFlags, uint8 addrType, uint8 *pAddr,
+                           uint8 *pAddrPriv, uint8 connRole, uint16 connInterval,
+                           uint16 MTU, uint16 connTimeout, uint16 connLatency );
 /**
  * Remove a record from the link database.
  *

@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_drivers
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -110,20 +110,72 @@ public class ti_drivers
             sb.append("pkg.packageRepository = xdc.om['ti.drivers$$stat$root'];\n");
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
+            sb.append("'lib/ticlang/m4f/drivers_cc13x2.a',\n");
+            sb.append("'lib/drivers_cc13x2.am4f',\n");
+            sb.append("'lib/ccs/m4f/drivers_cc13x2.a',\n");
             sb.append("'lib/drivers_cc13x2.aem4f',\n");
+            sb.append("'lib/gcc/m4f/drivers_cc13x2.a',\n");
             sb.append("'lib/drivers_cc13x2.am4fg',\n");
+            sb.append("'lib/iar/m4f/drivers_cc13x2.a',\n");
             sb.append("'lib/drivers_cc13x2.arm4f',\n");
+            sb.append("'lib/ticlang/m4f/drivers_cc26x2.a',\n");
+            sb.append("'lib/drivers_cc26x2.am4f',\n");
+            sb.append("'lib/ccs/m4f/drivers_cc26x2.a',\n");
             sb.append("'lib/drivers_cc26x2.aem4f',\n");
+            sb.append("'lib/gcc/m4f/drivers_cc26x2.a',\n");
             sb.append("'lib/drivers_cc26x2.am4fg',\n");
+            sb.append("'lib/iar/m4f/drivers_cc26x2.a',\n");
             sb.append("'lib/drivers_cc26x2.arm4f',\n");
+            sb.append("'lib/ticlang/m4f/drivers_cc13x2x7.a',\n");
+            sb.append("'lib/drivers_cc13x2x7.am4f',\n");
+            sb.append("'lib/ccs/m4f/drivers_cc13x2x7.a',\n");
+            sb.append("'lib/drivers_cc13x2x7.aem4f',\n");
+            sb.append("'lib/gcc/m4f/drivers_cc13x2x7.a',\n");
+            sb.append("'lib/drivers_cc13x2x7.am4fg',\n");
+            sb.append("'lib/iar/m4f/drivers_cc13x2x7.a',\n");
+            sb.append("'lib/drivers_cc13x2x7.arm4f',\n");
+            sb.append("'lib/ticlang/m4f/drivers_cc26x2x7.a',\n");
+            sb.append("'lib/drivers_cc26x2x7.am4f',\n");
+            sb.append("'lib/ccs/m4f/drivers_cc26x2x7.a',\n");
+            sb.append("'lib/drivers_cc26x2x7.aem4f',\n");
+            sb.append("'lib/gcc/m4f/drivers_cc26x2x7.a',\n");
+            sb.append("'lib/drivers_cc26x2x7.am4fg',\n");
+            sb.append("'lib/iar/m4f/drivers_cc26x2x7.a',\n");
+            sb.append("'lib/drivers_cc26x2x7.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
+            sb.append("['lib/ticlang/m4f/drivers_cc13x2.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/drivers_cc13x2.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ccs/m4f/drivers_cc13x2.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/drivers_cc13x2.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/gcc/m4f/drivers_cc13x2.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/drivers_cc13x2.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/iar/m4f/drivers_cc13x2.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
             sb.append("['lib/drivers_cc13x2.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/ticlang/m4f/drivers_cc26x2.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/drivers_cc26x2.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ccs/m4f/drivers_cc26x2.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/drivers_cc26x2.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/gcc/m4f/drivers_cc26x2.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/drivers_cc26x2.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/iar/m4f/drivers_cc26x2.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
             sb.append("['lib/drivers_cc26x2.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/ticlang/m4f/drivers_cc13x2x7.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/drivers_cc13x2x7.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ccs/m4f/drivers_cc13x2x7.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/drivers_cc13x2x7.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/gcc/m4f/drivers_cc13x2x7.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/drivers_cc13x2x7.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/iar/m4f/drivers_cc13x2x7.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/drivers_cc13x2x7.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/ticlang/m4f/drivers_cc26x2x7.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/drivers_cc26x2x7.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ccs/m4f/drivers_cc26x2x7.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/drivers_cc26x2x7.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/gcc/m4f/drivers_cc26x2x7.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/drivers_cc26x2x7.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/iar/m4f/drivers_cc26x2x7.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/drivers_cc26x2x7.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

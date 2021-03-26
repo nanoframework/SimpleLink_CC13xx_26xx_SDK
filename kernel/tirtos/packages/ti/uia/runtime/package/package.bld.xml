@@ -48,6 +48,15 @@
         <srcFile name="package/lib/lib/release/ti.uia.runtime/QueueDescriptor.oem4f.dep" src="QueueDescriptor.c"/>
         <srcFile name="package/lib/lib/release/ti.uia.runtime/ServiceMgr.oem4f.dep" src="ServiceMgr.c"/>
         <srcFile name="package/lib/lib/release/ti.uia.runtime/UIAPacket.oem4f.dep" src="UIAPacket.c"/>
+        <srcFile name="lib/release/ti.uia.runtime.am4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/package/package_ti.uia.runtime.om4f.dep" src="package/package_ti.uia.runtime.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/CtxFilter.om4f.dep" src="CtxFilter.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/LoggerSM.om4f.dep" src="LoggerSM.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/LogSnapshot.om4f.dep" src="LogSnapshot.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/LogSync.om4f.dep" src="LogSync.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/QueueDescriptor.om4f.dep" src="QueueDescriptor.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/ServiceMgr.om4f.dep" src="ServiceMgr.c"/>
+        <srcFile name="package/lib/lib/release/ti.uia.runtime/UIAPacket.om4f.dep" src="UIAPacket.c"/>
         <srcFile name="lib/release/ti.uia.runtime.am4fg.mak" src="package.bld"/>
         <srcFile name="package/lib/lib/release/ti.uia.runtime/package/package_ti.uia.runtime.om4fg.dep" src="package/package_ti.uia.runtime.c"/>
         <srcFile name="package/lib/lib/release/ti.uia.runtime/CtxFilter.om4fg.dep" src="CtxFilter.c"/>
@@ -75,7 +84,23 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="em4f"
-            rootDir="/db/vendors/ti/arm/20.2.1.LTS/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/ticodegen/20.2.1.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
+            os="undefined"
+            rts="ti.targets.arm.rtsarm">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="ti.targets.arm.clang.M4F"
+            version="ti.targets.arm.clang.M4F{1,0,1.0,0"
+            rawVersion="TI Arm Clang Compiler 1.0.0+STSTarget: arm-ti-none-eabi
+Thread model: posix
+InstalledDir: /scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/bin
+"
+            platform="ti.platforms.cortexM:MTL1_VSOC:1"
+            isa="v7M4"
+            suffix="m4f"
+            rootDir="/scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"
@@ -88,7 +113,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT"
             isa="v7M4"
             suffix="m4fg"
-            rootDir="/db/vendors/arm/gcc-arm-none-eabi-9-2019-q4-major"
+            rootDir="/scratch/xlibrary/.conan/data/arm-none-eabi-gcc/9.2019.q4.major-0/library-msp/ga/package/44fcf6b9a7fb86b2586303e3db40189d3b511830"
             os="undefined"
             rts="gnu.targets.arm.rtsv7M">
             <model endian="little"
@@ -101,7 +126,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="rm4f"
-            rootDir="/db/vendors/iar/arm/8.50.1/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/iarcodegen/8.50.1.245-0/library-msp/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9"
             os="undefined"
             rts="iar.targets.arm.rts">
             <model endian="little"
@@ -114,6 +139,10 @@
         pname="lib/release/ti.uia.runtime.aem4f"
         profile="release"
         target="ti.targets.arm.elf.M4F"/>
+    <library name="lib/release/ti.uia.runtime"
+        pname="lib/release/ti.uia.runtime.am4f"
+        profile="release"
+        target="ti.targets.arm.clang.M4F"/>
     <library name="lib/release/ti.uia.runtime"
         pname="lib/release/ti.uia.runtime.am4fg"
         profile="release"
@@ -151,6 +180,7 @@
         <file name="QueueDescriptor.c"/>
         <file name="ServiceMgr.c"/>
         <file name="UIAPacket.c"/>
+        <file name="lib/release/ti.uia.runtime.am4f"/>
         <file name="lib/release/ti.uia.runtime.am4fg"/>
         <file name="lib/release/ti.uia.runtime.arm4f"/>
     </release>

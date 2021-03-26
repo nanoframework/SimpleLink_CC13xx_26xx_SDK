@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2020, Texas Instruments Incorporated
+ Copyright (c) 2014-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -140,6 +140,7 @@ void setBleUserConfig( icall_userCfg_t *userCfg )
     llUserConfig_maxPduSize    = bleUserCfg_maxPduSize;
     llUserConfig.maxWlElems    = stackConfig->maxWhiteListElems;
     llUserConfig.maxRlElems    = stackConfig->maxResolvListElems;
+    llUserConfig.maxNumCteBufs = stackConfig->maxNumCteBuffers;
 
     // RF Front End Mode and Bias (based on package)
     llUserConfig.rfFeModeBias  = userCfg->boardConfig->rfFeModeBias;

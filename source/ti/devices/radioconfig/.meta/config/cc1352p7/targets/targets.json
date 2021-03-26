@@ -1,0 +1,21 @@
+{
+    "targets": {
+        "Default": "target_launchxl-cc1352p7-1.json:LP_CC1352P7-1",
+        "VirtualTarget": [
+            {
+                "_name": "LP_CC1352P7-1",
+                "Target": [
+                    "target_launchxl-cc1352p7-1.json",
+                    "target_launchxl-cc1352p7-1_highPA.json"
+                ]
+            },
+            {
+                "_name": "LP_CC1352P7-4",
+                "Target": [
+                    "target_launchxl-cc1352p7-4.json",
+                    "target_launchxl-cc1352p7-4_highPA.json"
+                ]
+            }
+        ]
+    }
+}

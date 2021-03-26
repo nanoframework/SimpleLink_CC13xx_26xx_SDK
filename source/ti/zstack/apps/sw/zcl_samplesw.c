@@ -76,9 +76,9 @@
 #include "bdb_interface.h"
 #include "nwk_util.h"
 
-#if defined (OTA_CLIENT_CC26XX)
+#if defined (OTA_CLIENT_INTEGRATED)
 #include "zcl_ota.h"
-#include "ota_client_app.h"
+#include "ota_client.h"
 #endif
 
 #include "ti_drivers_config.h"
@@ -86,15 +86,17 @@
 #include "zstackmsg.h"
 #include "zcl_port.h"
 
+#include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Semaphore.h>
+#include <ti/sysbios/knl/Task.h>
 #include "zstackapi.h"
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif
 #include <ti/drivers/apps/Button.h>
-#include <ti/drivers/apps/LED.h>
 #include "util_timer.h"
 
 #include "ti_zstack_config.h"
-
 #if !defined (DISABLE_GREENPOWER_BASIC_PROXY) && (ZG_BUILD_RTR_TYPE)
 #include "gp_common.h"
 #endif
@@ -148,7 +150,7 @@
 
 uint8_t zclSampleSwSeqNum;
 
-uint8_t zclSampleSw_OnOffSwitchType = ON_OFF_SWITCH_TYPE_MOMENTARY;
+uint8_t zclSampleSw_OnOffSwitchType = ON_OFF_SWITCH_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
 
 uint8_t zclSampleSw_OnOffSwitchActions;
 
@@ -186,19 +188,17 @@ afAddrType_t zclSampleSw_DstAddr;
 
 #define SAMPLESW_TOGGLE_TEST_EVT   0x1000
 
-
-#if defined(USE_ZCL_SAMPLEAPP_UI)
+#if !defined(CUI_DISABLE)
 CONST char zclSampleSw_appStr[] = APP_TITLE_STR;
 CUI_clientHandle_t gCuiHandle;
-static LED_Handle gRedLedHandle;
 static uint32_t gSampleSwInfoLine;
 #endif
 
-#if defined(USE_DMM) && defined(BLE_START) || defined(USE_ZCL_SAMPLEAPP_UI)
+#if defined(USE_DMM) && defined(BLE_START) || !defined(CUI_DISABLE)
 static uint16_t zclSampleSw_BdbCommissioningModes;
-#endif // defined(USE_DMM) && defined(BLE_START) || defined(USE_ZCL_SAMPLEAPP_UI)
+#endif // defined(USE_DMM) && defined(BLE_START) || !defined(CUI_DISABLE)
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 static uint8_t  remoteLightIsOn = LIGHT_UNKNOWN;
 static uint16_t remoteLightAddr = 0xFFFF;
 #endif
@@ -219,7 +219,6 @@ static void zclSampleSw_processEndDeviceRejoinTimeoutCallback(UArg a0);
 static void zclSampleSw_Init( void );
 
 static void zclSampleSw_BasicResetCB( void );
-static void zclSampleSw_RemoveAppNvmData(void);
 static void zclSampleSw_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *bdbCommissioningModeMsg);
 
 // Functions to process ZCL Foundation incoming Command/Response messages
@@ -241,11 +240,17 @@ static uint8_t zclSampleSw_ProcessInDiscAttrsExtRspCmd( zclIncoming_t *pInMsg );
 static void zclSampleSw_ProcessInReportCmd( zclIncoming_t *pInMsg );
 #endif
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 static void zclSampleSw_InitializeStatusLine(CUI_clientHandle_t gCuiHandle);
 static void zclSampleSw_UpdateStatusLine(void);
 static void zclSampleSw_processKey(uint8_t key, Button_EventMask buttonEvents);
+static void zclSampleSw_RemoveAppNvmData(void);
 #endif
+
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+// Touchlink BDB Finding and Binding callback function
+static void tl_BDBFindingBindingCb(void);
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
 
 #if defined(USE_DMM) && defined(BLE_START)
 // Clock callback functions
@@ -312,6 +317,7 @@ static zclGeneral_AppCallbacks_t zclSampleSw_CmdCallbacks =
   NULL,                                   // Level Control Move command
   NULL,                                   // Level Control Step command
   NULL,                                   // Level Control Stop command
+  NULL,                                   // Level Control Move to Closest Frequency command
 #endif
 #ifdef ZCL_GROUPS
   NULL,                                   // Group Response commands
@@ -331,6 +337,13 @@ static zclGeneral_AppCallbacks_t zclSampleSw_CmdCallbacks =
   NULL,                                   // RSSI Location command
   NULL                                    // RSSI Location Response command
 };
+
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+tl_BDBFindingBindingCb_t tl_FindingBindingCb =
+{
+  tl_BDBFindingBindingCb
+};
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
 
 #if defined(USE_DMM) && defined(BLE_START)
 RemoteDisplay_clientProvisioningtCbs_t zclSwitch_ProvissioningCbs =
@@ -358,6 +371,16 @@ zstack_DevState provState = zstack_DevState_HOLD;
 uint16_t provPanId = ZDAPP_CONFIG_PAN_ID;
 uint32_t provChanMask = DEFAULT_CHANLIST;
 zstack_sysNwkInfoReadRsp_t *nwkInfo;
+
+DMMPolicy_StackRole DMMPolicy_StackRole_Zigbee =
+#if ZG_BUILD_ENDDEVICE_TYPE
+    DMMPolicy_StackRole_ZigbeeEndDevice;
+#elif ZG_BUILD_RTRONLY_TYPE
+    DMMPolicy_StackRole_ZigbeeRouter;
+#elif ZG_BUILD_COORDINATOR_TYPE
+    DMMPolicy_StackRole_ZigbeeCoordinator;
+#endif
+
 #endif // defined(USE_DMM) && defined(BLE_START)
 
 #if defined(DMM_ZCSWITCH) && defined(NWK_TOPOLOGY_DISCOVERY)
@@ -391,9 +414,6 @@ void sampleApp_task(NVINTF_nvFuncts_t *pfnNV)
   zclSampleSw_process_loop();
 }
 
-
-
-
 /*******************************************************************************
  * @fn          zclSampleSw_initialization
  *
@@ -421,10 +441,16 @@ static void zclSampleSw_initialization(void)
     //Initialize stack
     zclSampleSw_Init();
 
-#if defined (OTA_CLIENT_CC26XX)
-    OTAClient_SetEndpoint(SAMPLESW_ENDPOINT);
-    OTA_Client_Init ( appSemHandle, appServiceTaskId, gCuiHandle );
+#if defined (OTA_CLIENT_INTEGRATED)
+    otaClient_SetEndpoint(SAMPLESW_ENDPOINT);
+    otaClient_setAttributes(zclSampleSw_Attrs, zclSampleSw_NumAttributes);
+    zclOTA_setAttributes(zclSampleSw_Attrs, zclSampleSw_NumAttributes);
+#ifndef CUI_DISABLE
+    otaClient_Init ( appSemHandle, appServiceTaskId, gCuiHandle );
+#else
+    otaClient_Init ( appSemHandle, appServiceTaskId, NULL );
 #endif
+#endif // OTA_CLIENT_INTEGRATED
 
 #if defined (Z_POWER_TEST)
     zstack_sysSetTxPowerReq_t txPowerReq;
@@ -436,7 +462,7 @@ static void zclSampleSw_initialization(void)
 
 #ifdef DMM_OAD
     // register the app callbacks
-    DMMPolicy_registerAppCbs(dmmPolicyAppCBs, DMMPolicy_StackRole_154Sensor);
+    DMMPolicy_registerAppCbs(dmmPolicyAppCBs, DMMPolicy_StackRole_Zigbee);
 #endif
 }
 
@@ -471,7 +497,7 @@ static void zclSampleSw_Init( void )
   zcl_registerAttrList( SAMPLESW_ENDPOINT, zclSampleSw_NumAttributes, zclSampleSw_Attrs );
 
   // Register the Application to receive the unprocessed Foundation command/response messages
-  zclport_registerZclHandleExternal(zclSampleSw_ProcessIncomingMsg);
+  zclport_registerZclHandleExternal(SAMPLESW_ENDPOINT, zclSampleSw_ProcessIncomingMsg);
 
   //Write the bdb initialization parameters
   zclSampleSw_initParameters();
@@ -506,6 +532,10 @@ static void zclSampleSw_Init( void )
   }
 #endif
 
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+  touchLinkApp_registerFindingBindingCb(tl_FindingBindingCb);
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
+
 #if defined(USE_DMM) && defined(BLE_START)
   RemoteDisplay_registerClientProvCbs(zclSwitch_ProvissioningCbs);
   RemoteDisplay_registerLightCbs(zclSwitch_LightCbs);
@@ -514,11 +544,11 @@ static void zclSampleSw_Init( void )
 #endif
 #endif // defined(USE_DMM) && defined(BLE_START)
 
-#if defined(USE_ZCL_SAMPLEAPP_UI) || defined(USE_DMM) && defined(BLE_START)
+#if !defined(CUI_DISABLE) || defined(USE_DMM) && defined(BLE_START)
   zclSampleSw_BdbCommissioningModes = DEFAULT_COMISSIONING_MODE;
-#endif // defined(USE_ZCL_SAMPLEAPP_UI) || defined(USE_DMM) && defined(BLE_START)
+#endif // !defined(CUI_DISABLE) || defined(USE_DMM) && defined(BLE_START)
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 #ifdef BDB_TL_INITIATOR
   zclSampleSw_BdbCommissioningModes |= BDB_COMMISSIONING_MODE_INITIATOR_TL;
 #endif
@@ -536,16 +566,7 @@ static void zclSampleSw_Init( void )
   //Initialize the sampleLight UI status line
   zclSampleSw_InitializeStatusLine(gCuiHandle);
 
-#endif
-
-#ifndef Z_POWER_TEST
-  //Request the Red LED for App
-  LED_Params ledParams;
-  LED_Params_init(&ledParams);
-  gRedLedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-  (void) gRedLedHandle;
-#endif
-
+#endif // CUI_DISABLE
 
 #if defined ( BDB_TL_INITIATOR )
     touchLinkInitiatorApp_Init(appServiceTaskId);
@@ -559,8 +580,12 @@ static void zclSampleSw_Init( void )
 #endif
 
 #ifdef PER_TEST
-  PERTest_init(appSemHandle, appServiceTaskId, gCuiHandle );
+#ifndef CUI_DISABLE
+  PERTest_init( appSemHandle, appServiceTaskId, gCuiHandle );
+#else
+  PERTest_init( appSemHandle, appServiceTaskId, NULL );
 #endif
+#endif // PER_TEST
 
 #if defined(DMM_ZCSWITCH) && defined(NWK_TOPOLOGY_DISCOVERY)
   {
@@ -594,7 +619,7 @@ static void zclSampleSw_Init( void )
   Zstackapi_bdbStartCommissioningReq(appServiceTaskId,&zstack_bdbStartCommissioningReq);
 }
 
-
+#ifndef CUI_DISABLE
 /*********************************************************************
  * @fn          zclSampleSw_RemoveAppNvmData
  *
@@ -609,7 +634,7 @@ static void zclSampleSw_RemoveAppNvmData(void)
 {
 
 }
-
+#endif
 
 static void zclSampleSw_initParameters(void)
 {
@@ -654,7 +679,7 @@ static void zclSampleSw_initializeClocks(void)
 {
 #if ZG_BUILD_ENDDEVICE_TYPE
     // Initialize the timers needed for this application
-    EndDeviceRejoinClkHandle = Timer_construct(
+    EndDeviceRejoinClkHandle = UtilTimer_construct(
     &EndDeviceRejoinClkStruct,
     zclSampleSw_processEndDeviceRejoinTimeoutCallback,
     SAMPLEAPP_END_DEVICE_REJOIN_DELAY,
@@ -662,7 +687,7 @@ static void zclSampleSw_initializeClocks(void)
 #endif
 #if defined(USE_DMM) && defined(BLE_START) && !defined(Z_POWER_TEST)
     // Clock for synchronizing application configuration parameters for BLE
-    Timer_construct(
+    UtilTimer_construct(
     &SyncAttrClkStruct,
     zclSampleSw_processSyncAttrTimeoutCallback,
     SAMPLEAPP_CONFIG_SYNC_TIMEOUT,
@@ -715,7 +740,7 @@ static void SetupZStackCallbacks(void)
     zdoCBReq.has_simpleDescRsp = true;
     zdoCBReq.simpleDescRsp = true;
 #endif // defined(USE_DMM) && defined(BLE_START)
-#if defined(OTA_CLIENT_CC26XX)
+#if defined(OTA_CLIENT_INTEGRATED)
     zdoCBReq.has_matchDescRsp = true;
     zdoCBReq.matchDescRsp = true;
     zdoCBReq.has_ieeeAddrRsp = true;
@@ -774,13 +799,23 @@ static void zclSampleSw_process_loop(void)
 #ifdef PER_TEST
             PERTest_process();
 #endif
-#if defined (OTA_CLIENT_CC26XX)
-            zclOTA_event_loop();
+#if defined (OTA_CLIENT_INTEGRATED)
+            otaClient_event_loop();
 #endif
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
             zclsampleApp_ui_event_loop();
 #endif
+
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+            if(appServiceTaskEvents & TL_BDB_FB_EVT)
+            {
+                zstack_bdbStartCommissioningReq_t zstack_bdbStartCommissioningReq;
+                zstack_bdbStartCommissioningReq.commissioning_mode = BDB_COMMISSIONING_MODE_FINDING_BINDING;
+                Zstackapi_bdbStartCommissioningReq(appServiceTaskId, &zstack_bdbStartCommissioningReq);
+                appServiceTaskEvents &= ~TL_BDB_FB_EVT;
+            }
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
 
 #if defined(USE_DMM) && defined(BLE_START)
             if(appServiceTaskEvents & SAMPLEAPP_PROV_CONNECT_EVT)
@@ -807,20 +842,20 @@ static void zclSampleSw_process_loop(void)
                // If uninitialized
                if( (provState < zstack_DevState_INIT) && (stackState != DMMPOLICY_ZB_UNINIT) )
                {
-                   DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_ZB_UNINIT);
+                   DMMPolicy_updateApplicationState(DMMPolicy_StackRole_Zigbee, DMMPOLICY_ZB_UNINIT);
                }
                // If provisioning
                else if( (((provState > zstack_DevState_INIT) && (provState < zstack_DevState_DEV_ZB_COORD)) ||
                          (provState > zstack_DevState_DEV_ZB_COORD) ) &&
                         (stackState != DMMPOLICY_ZB_PROVISIONING) )
                {
-                   DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_ZB_PROVISIONING);
+                   DMMPolicy_updateApplicationState(DMMPolicy_StackRole_Zigbee, DMMPOLICY_ZB_PROVISIONING);
                }
                // If connected
                else if( (provState == zstack_DevState_DEV_ZB_COORD) &&
                         (stackState != DMMPOLICY_ZB_CONNECTED) )
                {
-                   DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_ZB_CONNECTED);
+                   DMMPolicy_updateApplicationState(DMMPolicy_StackRole_Zigbee, DMMPOLICY_ZB_CONNECTED);
                }
 
                appServiceTaskEvents &= ~SAMPLEAPP_POLICY_UPDATE_EVT;
@@ -953,6 +988,13 @@ static void zclSampleSw_postNwkDiscoveryEvent()
  Semaphore_post(appSemHandle);
 }
 #endif
+
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+static void tl_BDBFindingBindingCb(void)
+{
+  OsalPortTimers_startTimer(appServiceTaskId, TL_BDB_FB_EVT, TL_BDB_FB_DELAY);
+}
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
 
 #if defined(USE_DMM) && defined(BLE_START)
 static void provisionConnectCb(void)
@@ -1242,7 +1284,7 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
 
           case zstackmsg_CmdIDs_BDB_IDENTIFY_TIME_CB:
               {
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
                   zstackmsg_bdbIdentifyTimeoutInd_t *pInd;
                   pInd = (zstackmsg_bdbIdentifyTimeoutInd_t*) pMsg;
                   uiProcessIdentifyTimeChange(&(pInd->EndPoint));
@@ -1252,7 +1294,7 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
 
           case zstackmsg_CmdIDs_BDB_BIND_NOTIFICATION_CB:
               {
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
                   zstackmsg_bdbBindNotificationInd_t *pInd;
                   pInd = (zstackmsg_bdbBindNotificationInd_t*) pMsg;
                   uiProcessBindNotification(&(pInd->Req));
@@ -1298,11 +1340,11 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
           case zstackmsg_CmdIDs_DEV_STATE_CHANGE_IND:
           {
               // The ZStack Thread is indicating a State change
-#if defined(USE_DMM) && defined(BLE_START) || defined(USE_ZCL_SAMPLEAPP_UI)
+#if defined(USE_DMM) && defined(BLE_START) || !defined(CUI_DISABLE)
               zstackmsg_devStateChangeInd_t *pInd = (zstackmsg_devStateChangeInd_t *)pMsg;
-#endif // defined(USE_DMM) && defined(BLE_START) || defined(USE_ZCL_SAMPLEAPP_UI)
+#endif // defined(USE_DMM) && defined(BLE_START) || !defined(CUI_DISABLE)
 
-#if defined(USE_ZCL_SAMPLEAPP_UI)
+#if !defined(CUI_DISABLE)
               UI_DeviceStateUpdated(&(pInd->req));
               UI_UpdateBdbStatusLine(NULL);
 #endif
@@ -1367,28 +1409,28 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
           }
           break;
 
-#ifdef BOARD_DISPLAY_USE_UART
           case zstackmsg_CmdIDs_GP_COMMISSIONING_MODE_IND:
           {
+#ifndef CUI_DISABLE
             zstackmsg_gpCommissioningModeInd_t *pInd;
             pInd = (zstackmsg_gpCommissioningModeInd_t*)pMsg;
             UI_SetGPPCommissioningMode( &(pInd->Req) );
+#endif
           }
           break;
-#endif
 #endif
 
 #ifdef BDB_TL_TARGET
           case zstackmsg_CmdIDs_BDB_TOUCHLINK_TARGET_ENABLE_IND:
           {
+#ifndef CUI_DISABLE
               UI_UpdateBdbStatusLine(NULL);
+#endif
           }
           break;
 #endif
-
-
           case zstackmsg_CmdIDs_ZDO_MATCH_DESC_RSP:
-#if defined (OTA_CLIENT_CC26XX)
+#if defined (OTA_CLIENT_INTEGRATED)
           {
             zstackmsg_zdoMatchDescRspInd_t  *pInd =
                (zstackmsg_zdoMatchDescRspInd_t *) pMsg;
@@ -1408,7 +1450,7 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
               pRsp->cnt = pInd->rsp.n_matchList;
               OsalPort_memcpy(pRsp->epList, pInd->rsp.pMatchList, pInd->rsp.n_matchList);
 
-              OTA_ProcessMatchDescRsp ( pRsp );
+              otaClient_ProcessMatchDescRsp ( pRsp );
               OsalPort_msgDeallocate((uint8_t *)pRsp);
             }
           }
@@ -1435,7 +1477,7 @@ static void zclSampleSw_processZStackMsgs(zstackmsg_genericReq_t *pMsg)
               // Set endpoint if not set by user
               if (zclSampleSw_DstAddr.endPoint == 0x00) {
                   for (i = 0; i < pInd->rsp.simpleDesc.n_inputClusters; i++) {
-                      if (pInd->rsp.simpleDesc.pInputClusters[i] == ZCL_CLUSTER_ID_GEN_ON_OFF)
+                      if (pInd->rsp.simpleDesc.pInputClusters[i] == ZCL_CLUSTER_ID_GENERAL_ON_OFF)
                       {
                           zclSampleSw_DstAddr.endPoint = pInd->rsp.simpleDesc.endpoint;
                           // Notify BLE application of change
@@ -1691,13 +1733,13 @@ static void zclSampleSw_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *bd
       else
       {
         //Parent not found, attempt to rejoin again after a fixed delay
-        Timer_setTimeout( EndDeviceRejoinClkHandle, SAMPLEAPP_END_DEVICE_REJOIN_DELAY );
-        Timer_start(&EndDeviceRejoinClkStruct);
+        UtilTimer_setTimeout( EndDeviceRejoinClkHandle, SAMPLEAPP_END_DEVICE_REJOIN_DELAY );
+        UtilTimer_start(&EndDeviceRejoinClkStruct);
       }
     break;
 #endif
   }
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
   UI_UpdateBdbStatusLine(bdbCommissioningModeMsg);
 #endif
 }
@@ -1771,6 +1813,7 @@ static uint8_t zclSampleSw_ProcessIncomingMsg( zclIncoming_t *pInMsg )
 
     case ZCL_CMD_REPORT:
       zclSampleSw_ProcessInReportCmd( pInMsg );
+      handled = TRUE;
       break;
 #endif
     case ZCL_CMD_DEFAULT_RSP:
@@ -1859,18 +1902,27 @@ static uint8_t zclSampleSw_ProcessInWriteRspCmd( zclIncoming_t *pInMsg )
 #endif // ZCL_WRITE
 
 #ifdef ZCL_REPORT_DESTINATION_DEVICE
+/*********************************************************************
+ * @fn      zclSampleSw_ProcessInReportCmd
+ *
+ * @brief   Process the "Profile" Report Command
+ *
+ * @param   pInMsg - incoming message to process
+ *
+ * @return  none
+ */
 static void zclSampleSw_ProcessInReportCmd( zclIncoming_t *pInMsg )
 {
   zclReportCmd_t *pInSwReport;
 
   pInSwReport = (zclReportCmd_t *)pInMsg->attrCmd;
 
-  if ( pInSwReport->attrList[0].attrID != ATTRID_ON_OFF )
+  if ( pInSwReport->attrList[0].attrID != ATTRID_ON_OFF_ON_OFF )
   {
     return;
   }
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
   // read the Light state and display the information
   if ( pInSwReport->attrList[0].attrData[0] == LIGHT_ON )
   {
@@ -2013,7 +2065,7 @@ void zclSampleSw_UiActionSwDiscoverable(const int32_t _itemEntry)
     zclGeneral_SendIdentify(SAMPLESW_ENDPOINT, &dstAddr,60, TRUE, zclCounterRsp.zclFrameCounter);
 }
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 /*********************************************************************
  * @fn      zclSampleSw_processKey
  *
@@ -2076,7 +2128,7 @@ static void zclSampleSw_UpdateStatusLine(void)
     CUI_statusLinePrintf(gCuiHandle, gSampleSwInfoLine, lineFormat, remoteLightAddr);
 }
 
-#endif // USE_ZCL_SAMPLEAPP_UI
+#endif // CUI_DISABLE
 
 #ifdef DMM_OAD
 /*********************************************************************

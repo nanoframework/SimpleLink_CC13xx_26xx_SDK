@@ -15,5 +15,6 @@ package/package_ti.uia.sysbios.c
 LoggerStreamer.c
 LoggerStreamer2.c
 LoggerIdle.c
+lib/release/ti.uia.sysbios.am4f
 lib/release/ti.uia.sysbios.am4fg
 lib/release/ti.uia.sysbios.arm4f

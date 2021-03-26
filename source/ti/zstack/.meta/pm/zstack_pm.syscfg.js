@@ -40,8 +40,22 @@ const Common = system.getScript("/ti/zstack/zstack_common.js");
 
 /* Description text for configurables */
 
+const powerModeCapabilitiesLongDescription = `Specify the power mode features included \
+in the build (compile-time features included).
+
+Note that for ZigBee Coordinators and ZigBee Routers, the power mode of \
+operation is fixed to *Always On*. This is required for coordinators and \
+routers. ZigBee End Devices can be freely configured between *Sleepy* and \
+*Always On*.
+
+For more information, refer to the [ZigBee Configuration](/zigbee/html/\
+sysconfig/zigbee.html#zigbee-configuration) section of the ZigBee User's \
+Guide.
+
+**Default:** Sleepy (Low Power Mode enabled)`;
+
 const powerModeLongDescription = `Specify whether the radio should always be \
-on or be allowed to sleep.
+on or be allowed to sleep (selected run-time configuration).
 
 Note that for ZigBee Coordinators and ZigBee Routers, the power mode of \
 operation is fixed to *Always On*. This is required for coordinators and \
@@ -111,12 +125,31 @@ const pmModule = {
             onChange: onDeviceTypeChange
         },
         {
+            name: "powerModeCapabilities",
+            displayName: "Power Mode Capabilities",
+            description: "Choose End Device build power modes features",
+            longDescription: powerModeCapabilitiesLongDescription,
+            default: "sleepy",
+            options: [
+                {
+                    name: "alwaysOn",
+                    displayName: "Always On + Sleepy Supported"
+                },
+                {
+                    name: "sleepy",
+                    displayName: "Only Sleepy Supported"
+                }
+            ],
+            onChange: onPowerModeCapabilitiesChange
+        },
+        {
             name: "powerModeOperation",
             displayName: "Power Mode of Operation",
             description: "Specify whether the radio should always be on "
                          + "or be allowed to sleep",
             longDescription: powerModeLongDescription,
             default: "sleepy",
+            readOnly: true,
             options: [
                 {
                     name: "alwaysOn",
@@ -181,19 +214,79 @@ const pmModule = {
 /* Function to handle changes in deviceType configurable */
 function onDeviceTypeChange(inst, ui)
 {
-    if(inst.deviceType === "zc" || inst.deviceType === "zr")
+    if(inst.deviceType === "zc")
     {
+        inst.powerModeCapabilities = "alwaysOn";
+        ui.powerModeCapabilities.readOnly = true;
+        ui.powerModeCapabilities.hidden = true;
         inst.powerModeOperation = "alwaysOn";
         ui.powerModeOperation.readOnly = true;
+        ui.powerModeOperation.hidden = true;
         ui.minPollPeriod.hidden = true;
         ui.pollPeriod.hidden = true;
         ui.queuedMessagePollPeriod.hidden = true;
         ui.dataResponsePollPeriod.hidden = true;
         ui.rejoinMessagePollPeriod.hidden = true;
     }
-    else /* zed or znp */
+    else if(inst.deviceType === "zr") // || inst.deviceType === "zc")
+    {
+        inst.powerModeCapabilities = "alwaysOn";
+        ui.powerModeCapabilities.readOnly = false;
+        ui.powerModeCapabilities.hidden = false;
+        inst.powerModeOperation = "alwaysOn";
+        ui.powerModeOperation.readOnly = true;
+        ui.powerModeOperation.hidden = false;
+        ui.minPollPeriod.hidden = true;
+        ui.pollPeriod.hidden = true;
+        ui.queuedMessagePollPeriod.hidden = true;
+        ui.dataResponsePollPeriod.hidden = true;
+        ui.rejoinMessagePollPeriod.hidden = true;
+    }
+    else if (inst.deviceType === "zed")
+    {
+        inst.powerModeCapabilities = "sleepy";
+        ui.powerModeCapabilities.readOnly = false;
+        ui.powerModeCapabilities.hidden = false;
+        inst.powerModeOperation = "sleepy";
+        ui.powerModeOperation.readOnly = false;
+        ui.powerModeOperation.hidden = false;
+        ui.minPollPeriod.hidden = false;
+        ui.pollPeriod.hidden = false;
+        ui.queuedMessagePollPeriod.hidden = false;
+        ui.dataResponsePollPeriod.hidden = false;
+        ui.rejoinMessagePollPeriod.hidden = false;
+    }
+    else if (inst.deviceType === "znp")
+    {
+        inst.powerModeCapabilities = "alwaysOn";
+        ui.powerModeCapabilities.readOnly = true;
+        ui.powerModeCapabilities.hidden = false;
+        inst.powerModeOperation = "sleepy";
+        ui.powerModeOperation.readOnly = false;
+        ui.powerModeOperation.hidden = false;
+        ui.minPollPeriod.hidden = false;
+        ui.pollPeriod.hidden = false;
+        ui.queuedMessagePollPeriod.hidden = false;
+        ui.dataResponsePollPeriod.hidden = false;
+        ui.rejoinMessagePollPeriod.hidden = false;
+    }
+}
+
+/* Function to handle changes in powerModeOperation configurable */
+function onPowerModeCapabilitiesChange(inst, ui)
+{
+    if(inst.powerModeCapabilities === "sleepy")
     {
         inst.powerModeOperation = "sleepy";
+        ui.powerModeOperation.readOnly = true;
+        ui.minPollPeriod.hidden = false;
+        ui.pollPeriod.hidden = false;
+        ui.queuedMessagePollPeriod.hidden = false;
+        ui.dataResponsePollPeriod.hidden = false;
+        ui.rejoinMessagePollPeriod.hidden = false;
+    }
+    else if(inst.powerModeCapabilities === "alwaysOn")
+    {
         ui.powerModeOperation.readOnly = false;
         ui.minPollPeriod.hidden = false;
         ui.pollPeriod.hidden = false;

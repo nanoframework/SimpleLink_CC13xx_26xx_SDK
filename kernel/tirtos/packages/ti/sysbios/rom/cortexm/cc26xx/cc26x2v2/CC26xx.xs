@@ -239,6 +239,14 @@ function module$use()
  */
 function module$validate()
 {
+    /* 
+     * valdiation checks can be disabled to avoid warnings in regression
+     * suite
+     */
+    if (CC26xx.validate == false) {
+        return;
+    }
+
     var Settings = xdc.module("ti.sysbios.family.Settings");
     var Clock = xdc.module('ti.sysbios.knl.Clock');
     var Swi = xdc.module('ti.sysbios.knl.Swi');

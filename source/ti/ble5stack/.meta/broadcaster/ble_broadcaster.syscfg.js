@@ -99,10 +99,22 @@ function moduleInstances(inst)
 {
     const dependencyModule = [];
 
+    // If mesh is enabled and includes peripheral add the
+    // default application adv set parameters
+    let meshAndPeri = false;
+
+    inst.mesh &&
+    (inst.meshApp == "meshAndPeri" || inst.meshApp == "meshAndPeriOadOffchip" || inst.meshApp == "meshAndPeriOadOnchip")?
+    meshAndPeri = true : meshAndPeri = false;
+
     if(!inst.hideBroadcasterGroup)
     {
         for(let i = 1; i <= inst.numOfAdvSets; i++)
         {
+            const args = {
+                numOfAdvSet: i,
+                meshAdnPeri: meshAndPeri
+            }
         
             dependencyModule.push({
                 name: "advSet" + i,
@@ -110,9 +122,7 @@ function moduleInstances(inst)
                 moduleName: "/ti/ble5stack/broadcaster/advertisement_set",
                 collapsed: true,
                 group: "broadcasterConfig",
-                args: {
-                    numOfAdvSet: i
-                }
+                args: args
             });
         }
     }

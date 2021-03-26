@@ -11,7 +11,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -202,6 +202,8 @@ extern "C"
 // Extended Advertising
 // TEMP: CONSOLIDATE BACK INTO EXISTING STATES
 #define LL_STATE_EXT_ADV                               0x11
+#define LL_STATE_PERIODIC_ADV                          0x12
+#define LL_STATE_PERIODIC_SCAN                         0x13
 
 // LL Events
 #define LL_EVT_NONE                                    0x0000
@@ -213,10 +215,10 @@ extern "C"
 #define LL_EVT_EXT_SCAN_TIMEOUT                        0x0020
 #define LL_EVT_EXT_ADV_TIMEOUT                         0x0040
 #define LL_EVT_SLAVE_CONN_CREATED_BAD_PARAM            0x0080
-#define LL_RESERVED2                                   0x0100
+#define LL_EVT_PERIODIC_SCAN_CANCELLED                 0x0100
 #define LL_EVT_RESET_SYSTEM_HARD                       0x0200
 #define LL_EVT_RESET_SYSTEM_SOFT                       0x0400
-#define LL_RESERVED3                                   0x0800
+#define LL_RESERVED                                    0x0800
 #define LL_EVT_ADDRESS_RESOLUTION_TIMEOUT              0x1000
 #define LL_EVT_INIT_DONE                               0x2000
 #define LL_EVT_OUT_OF_MEMORY                           0x4000
@@ -860,32 +862,6 @@ extern char *llCtrl_BleLogStrings[];
 #define OVERRIDE_REG_TERMINATION                       0xFFFFFFFF
 #endif // CC13X2P
 
-// CTE RF registers
-#define RFC_CTE_MCE_RAM_DATA                           (RFC_RAM_BASE + 0x8000) //0x21008000 
-#define RFC_CTE_RFE_RAM_DATA                           (RFC_RAM_BASE + 0xC000) //0x2100C000 
-#define RFC_CTE_LAST_CAPTURE                           (RFC_RAM_BASE + 0x19)
-#define RFC_CTE_MCE_RAM_STATE                          (RFC_RAM_BASE + 0x1C)
-#define RFC_CTE_MCE_RX_CTEINFO                         (RFC_RAM_BASE + 0x1D)
-#define RFC_CTE_MCE_RF_GAIN                            (RFC_RAM_BASE + 0x1E)
-#define RFC_CTE_RFE_RAM_STATE                          (RFC_RAM_BASE + 0x20)
-#define RFC_CTE_RFE_RX_CTEINFO                         (RFC_RAM_BASE + 0x21)
-#define RFC_CTE_RFE_RF_GAIN                            (RFC_RAM_BASE + 0x22)
-
-// CTE RF ram types
-#define RFC_CTE_CAPTURE_RAM_MCE                        (0x00)
-#define RFC_CTE_CAPTURE_RAM_RFE                        (0x01)
-#define RFC_CTE_NO_CAPTURE                             (0xFF)
-
-// CTE RF ram states
-#define RFC_CTE_RAM_STATE_EMPTY                        (0x00)
-#define RFC_CTE_RAM_STATE_BUSY                         (0x01)
-#define RFC_CTE_RAM_STATE_DUAL_BUSY                    (0x02)
-#define RFC_CTE_RAM_STATE_READY                        (0x03)
-#define RFC_CTE_RAM_STATE_DUAL_READY                   (0x04)
-
-// CTE RF ram buffer size (in units of samples)
-#define RFC_CTE_MAX_RAM_SIZE                           (512)
-
 // RF FW write param command type
 #define RFC_FWPAR_ADDRESS_TYPE_BYTE                    (0x03)
 #define RFC_FWPAR_ADDRESS_TYPE_DWORD                   (0x00)
@@ -921,6 +897,12 @@ extern char *llCtrl_BleLogStrings[];
 #define COEX_TYPE_1_WIRE_GRANT                         (0)
 #define COEX_TYPE_1_WIRE_REQUEST                       (1)
 #define COEX_TYPE_3_WIRE                               (2)
+
+// CTE Samples task ID
+#define CTE_TASK_ID_NONE                               (0)
+#define CTE_TASK_ID_CONNECTION                         (1)
+#define CTE_TASK_ID_CONNECTIONLESS                     (2)
+#define CTE_TASK_ID_TEST                               (3)
 
 /*******************************************************************************
  * TYPEDEFS
@@ -1224,14 +1206,20 @@ typedef struct
 // add new parameters to llConn_t because of the ROM.
 struct llConnExtraParams_t
 {
-  uint16 size;
-  uint16 pduSize;
-  uint8  state;
-  uint8 *pEntry;
-  uint8  extFeatureMask; //external features can highjack this bitmap which is connection oriented
-                         //|   7..1   |              0               |
-                         //| reserved |  RPA not resolved disconnect |
-                         //|          |  with reason 0x05            |
+  uint16  size;
+  uint16  pduSize;
+  uint8   state;
+  uint8 * pEntry;
+  uint8   extFeatureMask;                 //external features can highjack this bitmap which is connection oriented
+                                          //|   7..1   |              0               |
+                                          //| reserved |  RPA not resolved disconnect |
+                                          //|          |  with reason 0x05            |
+  uint8   connPriority;                   // connection priority
+  uint16  connMissCount;                  // connection miss count
+  uint8   connMinTimeExternalUpdateInd:1; // connection external update indication for the minimum connection time.
+  uint8   connMaxTimeExternalUpdateInd:1; // connection external update indication for the maximum connection time.
+  uint32  connMinTimeLength:31;           // connection minimum time length
+  uint32  connMaxTimeLength:31;           // connection maximum time length
 }; 
 
 // Connection Data
@@ -1496,15 +1484,20 @@ typedef struct
   uint8       type;                         // CTE type received from peer                 
 }llCteRecvInfo_t;
 
-//CTE request info struct
+// CTE sample configuration struct
 typedef struct
 {
-  uint8       samplingEnable;               // CTE sampling enable received from Host
   uint8       sampleRate1M;                 // CTE sample rate for 1Mbps phy
   uint8       sampleRate2M;                 // CTE sample rate for 2Mbps phy
   uint8       sampleSize1M;                 // CTE sample size for 1Mbps phy
   uint8       sampleSize2M;                 // CTE sample size for 2Mbps phy
   uint8       sampleCtrl;                   // CTE sample control flags (bit0-RAW_RF(no filtering), ...)
+}llCteSampleConfig_t;
+
+//CTE request info struct
+typedef struct
+{
+  uint8       samplingEnable;               // CTE sampling enable received from Host
   uint8       requestEnable;                // CTE request enable received from Host
   uint8       requestLen;                   // CTE request length received from Host
   uint8       requestType;                  // CTE request type received from Host                 
@@ -1512,6 +1505,7 @@ typedef struct
   uint8       recvCte;                      // flag indicates received CTE from peer
   uint16      requestInterval;              // CTE periodic received from Host
   uint32      periodicEvent;                // connection event to send CTE request
+  llCteSampleConfig_t sampleConfig;         // CTE sample Host configuration
   llCteRecvInfo_t recvInfo;                 // CTE response info received
   llCteAntSwitch_t *pAntenna;               // antenna switch pattern for AoA
 } llCteInitiator_t;
@@ -1548,9 +1542,10 @@ typedef struct
 // CTE IQ Samples struct
 typedef struct
 {
-  dataQ_t             queue;
-  rfc_iqAutoCopyDef_t autoCopy;
-  uint8               autoCopyCompleted;
+  dataQ_t             queue;               // Auto Copy buffer queue
+  rfc_iqAutoCopyDef_t autoCopy;            // Auto Copy RF struct
+  dataEntry_t         *pAutoCopyBuffers;   // pointer to the allocated auto copy buffers
+  uint8               autoCopyCompleted;   // Counter indicates that RF finished copy the samples
 } llCteSamples_t;
 
 // CTE Test struct
@@ -1559,8 +1554,8 @@ typedef struct
   uint8       testMode;                     // flag indicates that CTE Test Mode was set by Host
   uint8       inProgress;                   // flag indicates about processing received CTE
   uint8       recvCte;                      // flag indicates received CTE form peer
-  uint8       type;			    // CTE type received in RX test HCI command
-  uint8       length;			    // CTE length received in RX test HCI command
+  uint8       type;                         // CTE type received in RX test HCI command
+  uint8       length;                       // CTE length received in RX test HCI command
   llCteAntSwitch_t *pAntenna;               // antenna switch pattern for AoA
 } llCteTest_t;
 
@@ -1680,6 +1675,7 @@ typedef struct
 #define LL_TEST_MODE_TP_CON_SLA_BV69                 67
 #define LL_TEST_MODE_TP_CON_MAS_BV65                 68
 #define LL_TEST_MODE_TP_CON_INI_BV03                 69
+#define LL_TEST_MODE_TP_DDI_SCN_BV36                 70
 // Tickets
 #define LL_TEST_MODE_JIRA_220                        200
 #define LL_TEST_MODE_MISSED_SLV_EVT                  201
@@ -1824,6 +1820,11 @@ extern uint8 *llCurrentMappedChan;
 // Coex feature
 extern llCoex_t llCoex;
 
+// QOS PARAMETERS
+//***************
+// Qos default parameters
+extern uint8  qosDefaultParameterPriority;
+
 /*******************************************************************************
  * FUNCTIONS
  */
@@ -1899,7 +1900,9 @@ extern void                 llConvertCtrlProcTimeoutToEvent( llConnState_t * );
 extern uint8                llVerifyConnParamReqParams( uint16, uint16, uint16, uint8, uint16, uint16 *);
 extern uint8                llValidateConnParams( llConnState_t *, uint16, uint16, uint16, uint16, uint16, uint8, uint16, uint16 *);
 extern void                 llUpdateCteState( llConnState_t *);
-extern uint8                llGetCteInfo( llConnState_t * );
+extern uint8                llGetCteInfo( uint8, void * );
+extern uint8                llSetCteAntennaArray(llCteAntSwitch_t *, uint8 *, uint8 , uint8);
+extern void                 llApplyParamUpdate( llConnState_t * );
 
 // Data Channel Management
 extern void                 llProcessChanMap( llConnState_t *, uint8 * );

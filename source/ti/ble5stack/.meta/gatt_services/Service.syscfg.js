@@ -1,5 +1,7 @@
 "use strict";
 const Common = system.getScript("/ti/ble5stack/ble_common.js");
+let gServiceIndex = 0;
+
 // Function to check if a string contains only letters, numbers and underscore.
 function alphanumeric(inputtxt)
 {
@@ -59,6 +61,7 @@ function validate(inst, vo)
 		}
 	}
 
+	//check for dupicate UUID
 	let serviceMod  = system.modules['/ti/ble5stack/gatt_services/Service'];
 	let counter = 0;
 	for (let i = 0; i < serviceMod.$instances.length; i++) {
@@ -80,35 +83,101 @@ function validate(inst, vo)
 		}
 	}
 
-	counter = 0;
-	for (let i = 0; i < serviceMod.$instances.length; i++) {
-		if(serviceMod.$instances[i].name.toLowerCase() == inst.name.toLowerCase()){
-			counter ++;
-			if(counter > 1){
-				vo["name"].errors.push("This name is taken by another service/characteristic.");
-				break;
-			}
-		}
+    //check for duplicate CB name- in the same service
+    let counterWriteCB = 0;
+    let counterReadCB = 0;
 
-		for (let cidx = 0; cidx < serviceMod.$instances[i].characteristics.length; ++ cidx) {
-			if(serviceMod.$instances[i].characteristics[cidx].name.toLowerCase() == inst.name.toLowerCase()) {
-				counter ++;
-				if(counter > 1) {
-					vo["name"].errors.push("This name is taken by another service/characteristic.");
-					break;
-				}
-			}
-		}
-	}
+    if(inst.userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() && inst.userReadCBfunc != "")
+    {
+        counterReadCB++;
+        counterWriteCB++;
+    }
+    if(counterReadCB > 0){ vo["userReadCBfunc"].errors.push("This function is already in use in another callback."); }
+    if(counterWriteCB > 0){ vo["userWriteCBfunc"].errors.push("This function is already in use in another callback."); }
+
+    //check duplicate CB function between other service
+    for (let i = 0; i < serviceMod.$instances.length; i++)
+    {
+        if(!(inst === serviceMod.$instances[i]) && inst.userReadCBfunc != "" &&
+          (serviceMod.$instances[i].userWriteCBfunc.toLowerCase() == inst.userReadCBfunc.toLowerCase() ))
+        {
+            vo["userReadCBfunc"].errors.push("This function is already in use by another service.");
+            break;
+        }
+    }
+
+    for (let i = 0; i < serviceMod.$instances.length; i++)
+    {
+        if(!(inst === serviceMod.$instances[i]) && inst.userWriteCBfunc != "" &&
+          (serviceMod.$instances[i].userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() ))
+        {
+            vo["userWriteCBfunc"].errors.push("This function is already in use by another service.");
+            break;
+        }
+    }
+
+	//check for duplicate service name
+	counter = 0;
+    for (let i = 0; i < serviceMod.$instances.length; i++) {
+        if(serviceMod.$instances[i].name.toLowerCase() == inst.name.toLowerCase()){
+            counter ++;
+            if(counter > 1)
+            {
+                vo["name"].errors.push("This name is taken by another service/characteristic.");
+                break;
+            }
+        }
+
+        for (let cidx = 0; cidx < serviceMod.$instances[i].characteristics.length; ++ cidx) {
+            if(serviceMod.$instances[i].characteristics[cidx].name.toLowerCase() == inst.name.toLowerCase()) {
+                counter ++;
+                if(counter > 1)
+                {
+                    vo["name"].errors.push("This name is taken by another service/characteristic.");
+                    break;
+                }
+            }
+        }
+    }
 }
 
+/*
+ *  ======== updateName ========
+ *  @param inst  - Module instance containing the config that changed
+ */
+function updateName(inst)
+{
+  inst.name = inst.$name;
+}
 
 let config = [
-	{
+    {
         name         : 'name',
         displayName  : 'Service Name',
         default      : ""
-	},
+    },
+    {
+        name       : 'hiddenServName',
+        displayName: 'Hidden Service Name',
+        hidden	   : true,
+        default    : '',
+        onChange   : updateName
+    },
+    {
+        name       : 'numOfServices',
+        default	   : 0,
+        hidden	   : true,
+        onChange   : updateNumOfServices
+    },
+    {
+        name		: 'serviceType',
+        displayName	: 'Service Type',
+        default		: 'Primary Service',
+        options		: [
+            {name: 'Primary Service'},
+            {name: 'Secondary Service'},
+        ]
+    },
     {
         name       : 'uuidSize',
         displayName: 'Service UUID Size',
@@ -123,28 +192,42 @@ let config = [
         displayName  : 'Service UUID',
         default      : 0,
         displayFormat: 'hex'
-	},
+    },
     {
         name         : 'userWriteCBfunc',
-        displayName  : 'Write attribute CB function',
-        default      : ''
-	},
+        displayName  : 'Write Attribute CB Function',
+        default      : '',
+        placeholder : "Optional- Enter a function name to enable",
+    },
     {
         name         : 'userReadCBfunc',
-        displayName  : 'Read attribute CB function',
-        default      : ''
-	}
+        displayName  : 'Read Attribute CB Function',
+        default      : '',
+        placeholder : "Optional- Enter a function name to enable",
+    }
 ];
 
+function updateNumOfServices(inst,ui)
+{
+	inst.uuid = parseInt((256 +gServiceIndex*256).toString(16), 16);
+	gServiceIndex++;
+	if(inst.serviceExamples == "Custom Service"){
+		inst.name = inst.$name;
+	}
+
+}
 function moduleInstances(inst) {
     return [
         {
             name            : 'characteristics',
-            displayName     : inst.$name + ' - Characteristics',
+            displayName     : inst.$name + ' - Characteristic',
             useArray        : true,
             moduleName      : '/ti/ble5stack/gatt_services/Characteristic',
             collapsed       : false,
-
+            args            : {
+                hiddenUuid	: (gServiceIndex).toString(),
+                hiddenName  : "1",
+            }
         }
     ];
 }
@@ -158,11 +241,12 @@ exports = {
     validate             : validate,
     maxInstances         : 100,
     moduleInstances      : moduleInstances,
+    gServiceIndex		 : gServiceIndex,
     templates            : {
-        "/ti/ble5stack/templates/services.h.xdt":
-        "/ti/ble5stack/templates/services.h.xdt",
+        "/ti/ble5stack/templates/ble_gatt_service.h.xdt":
+        "/ti/ble5stack/templates/ble_gatt_service.h.xdt",
 
-        "/ti/ble5stack/templates/services.c.xdt":
-        "/ti/ble5stack/templates/services.c.xdt"
+        "/ti/ble5stack/templates/ble_gatt_service.c.xdt":
+        "/ti/ble5stack/templates/ble_gatt_service.c.xdt"
     }
 };

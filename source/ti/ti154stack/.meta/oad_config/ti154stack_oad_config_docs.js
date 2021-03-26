@@ -73,12 +73,16 @@ __Default__:
 The following table holds the formula or optimized value used to set the \
 default \`OAD_BLOCK_REQ_RATE\` value upon a \`BEACON_INTERVAL\` change.
 \n\
-Beacon Order| Block Request Poll Delay
+Beacon Order| Block Request Rate
 --- | ---
 15 | 200
-Other | BEACON_INTERVAL - 100 \`(1)\`
+Other (explicit polling) | 200
+Other (implicit polling) | BEACON_INTERVAL - 100 \`(1)\`
 \n\
 \`(1) BEACON_INTERVAL = 2 ^ CONFIG_BEACON_ORDER * 960 * SYMBOL_DURATION_IN_MS\`
+\n\
+For frequency hopping mode when using a 5kbps PHY, the default block request \
+rate is 400.
 \n\
 For beacon mode, the speed of OAD transfer is affected by the \
 \`CONFIG_BEACON_ORDER\` and \`PHY_ID\` set. Additionally, the constant value \
@@ -112,9 +116,13 @@ default \`OAD_BLOCK_REQ_POLL_DELAY\` value upon a \`BEACON_INTERVAL change\`.
 Beacon Order| Block Request Poll Delay
 --- | ---
 15 | 50
-Other | BEACON_INTERVAL - 400 \`(1)\`
+Other (explicit polling) | 50
+Other (implicit polling) | BEACON_INTERVAL - 400 \`(1)\`
 \n\
 \`(1) BEACON_INTERVAL = 2^(CONFIG_BEACON_ORDER) * 960 * SYMBOL_DURATION_IN_MS\`
+\n\
+For frequency hopping mode when using a 5kbps PHY, the default block request \
+poll delay is 100.
 \n\
 For beacon mode, the speed of OAD transfer is affected by the \
 \`CONFIG_BEACON_ORDER\` and \`PHY_ID\` set. Additionally, the constant value \

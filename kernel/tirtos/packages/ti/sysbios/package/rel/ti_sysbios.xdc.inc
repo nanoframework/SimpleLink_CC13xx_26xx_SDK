@@ -21,5 +21,6 @@ package/package.cfg.xdc.inc
 lib/debug/ti.sysbios.aem4f
 package/package_ti.sysbios.c
 BIOS.c
+lib/debug/ti.sysbios.am4f
 lib/debug/ti.sysbios.am4fg
 lib/debug/ti.sysbios.arm4f

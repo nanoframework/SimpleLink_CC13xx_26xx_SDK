@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -79,7 +79,7 @@
 // OAD Reset GATT Profile Service UUID
 static const uint8_t resetServUUID[ATT_UUID_SIZE] =
 {
-  TI_BASE_UUID_128(OAD_RESET_SERVICE_UUID)
+    TI_BASE_UUID_128(OAD_RESET_SERVICE_UUID)
 };
 
 static const uint8_t resetCharUUID[ATT_UUID_SIZE] =

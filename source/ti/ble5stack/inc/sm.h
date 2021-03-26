@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -340,6 +340,38 @@ extern bStatus_t SM_GetScConfirmOob( uint8 *publicKey, uint8 *oob, uint8 *pOut )
 * @return      none
 */
 extern void SM_GenerateRandBuf( uint8 *random, uint8 len );
+
+/**
+* @fn          SM_SetAuthenPairingOnlyMode
+*
+* @brief       Set the device into Authenticated Pairing Only Mode.
+*              If enabled and the key generation method does not result
+*              in a key that provides Authenticated MITM protection then
+*              the device will send the Pairing Failed command with the
+*              error code Authentication Requirements.
+*
+* @param       state - set TRUE to enable Authenticated Pairing Only Mode
+*                      set FALSE to disable
+*
+* @return      none
+*/
+extern void SM_SetAuthenPairingOnlyMode( uint8 state );
+
+/**
+* @fn          SM_GetAuthenPairingOnlyMode
+*
+* @brief       Get the device into Authenticated Pairing Only Mode.
+*              If enabled and the key generation method does not result
+*              in a key that provides Authenticated MITM protection then
+*              the device will send the Pairing Failed command with the
+*              error code Authentication Requirements.
+*
+* @param       none
+*
+* @return      state - TRUE Authenticated Pairing Only Mode is enabled
+*                      FALSE when disabled
+*/
+extern uint8 SM_GetAuthenPairingOnlyMode( void );
 
 /*-------------------------------------------------------------------
  * FUNCTIONS - MASTER API - Only use these in a master device

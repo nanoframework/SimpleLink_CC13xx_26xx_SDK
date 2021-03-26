@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -298,23 +298,35 @@ extern uint8 hciSmpTaskID;
 #define HCI_LE_READ_NUM_SUPPORTED_ADV_SETS                0x203B    //!< opcode of @ref HCI_LE_ReadNumSupportedAdvSetsCmd
 #define HCI_LE_REMOVE_ADV_SET                             0x203C    //!< opcode of @ref HCI_LE_RemoveAdvSetCmd
 #define HCI_LE_CLEAR_ADV_SETS                             0x203D    //!< opcode of @ref HCI_LE_ClearAdvSetsCmd
-#define HCI_LE_SET_PERIODIC_ADV_PARAMETERS                0x203E    //!< opcode of
-#define HCI_LE_SET_PERIODIC_ADV_DATA                      0x203F    //!< opcode of
-#define HCI_LE_SET_PERIODIC_ADV_ENABLE                    0x2040    //!< opcode of
+#define HCI_LE_SET_PERIODIC_ADV_PARAMETERS                0x203E    //!< opcode of @ref HCI_LE_SetPeriodicAdvParamsCmd
+#define HCI_LE_SET_PERIODIC_ADV_DATA                      0x203F    //!< opcode of @ref HCI_LE_SetPeriodicAdvDataCmd
+#define HCI_LE_SET_PERIODIC_ADV_ENABLE                    0x2040    //!< opcode of @ref HCI_LE_SetPeriodicAdvEnableCmd
 #define HCI_LE_SET_EXT_SCAN_PARAMETERS                    0x2041    //!< opcode of @ref LE_SetExtScanParams
 #define HCI_LE_SET_EXT_SCAN_ENABLE                        0x2042    //!< opcode of @ref LE_SetExtScanEnable
 #define HCI_LE_EXT_CREATE_CONN                            0x2043    //!< opcode of @ref LE_ExtCreateConn
+#define HCI_LE_PERIODIC_ADV_CREATE_SYNC                   0x2044    //!< opcode of @ref HCI_LE_PeriodicAdvCreateSyncCmd
+#define HCI_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL            0x2045    //!< opcode of @ref HCI_LE_PeriodicAdvCreateSyncCancelCmd
+#define HCI_LE_PERIODIC_ADV_TERMINATE_SYNC                0x2046    //!< opcode of @ref HCI_LE_PeriodicAdvTerminateSyncCmd
+#define HCI_LE_ADD_DEVICE_TO_PERIODIC_ADV_LIST            0x2047    //!< opcode of @ref HCI_LE_AddDeviceToPeriodicAdvListCmd
+#define HCI_LE_REMOVE_DEVICE_FROM_PERIODIC_ADV_LIST       0x2048    //!< opcode of @ref HCI_LE_RemoveDeviceFromPeriodicAdvListCmd
+#define HCI_LE_CLEAR_PERIODIC_ADV_LIST                    0x2049    //!< opcode of @ref HCI_LE_ClearPeriodicAdvListCmd
+#define HCI_LE_READ_PERIODIC_ADV_LIST_SIZE                0x204A    //!< opcode of @ref HCI_LE_ReadPeriodicAdvListSizeCmd
+
 // @endcond // NODOC
 
 // V5.1
 // @cond NODOC
 #define HCI_LE_ENHANCED_CTE_RECEIVER_TEST                 0x204F    //!< opcode of @ref HCI_LE_EnhancedCteRxTestCmd
 #define HCI_LE_ENHANCED_CTE_TRANSMITTER_TEST              0x2050    //!< opcode of @ref HCI_LE_EnhancedCteTxTestCmd
+#define HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_PARAMS     0x2051    //!< opcode of @ref HCI_LE_SetConnectionlessCteTransmitParamsCmd
+#define HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_ENABLE     0x2052    //!< opcode of @ref HCI_LE_SetConnectionlessCteTransmitEnableCmd
+#define HCI_LE_SET_CONNECTIONLESS_IQ_SAMPLING_ENABLE      0x2053    //!< opcode of @ref HCI_LE_SetConnectionlessIqSamplingEnableCmd
 #define HCI_LE_SET_CONNECTION_CTE_RECEIVE_PARAMS          0x2054    //!< opcode of @ref HCI_LE_SetConnectionCteReceiveParams
 #define HCI_LE_SET_CONNECTION_CTE_TRANSMIT_PARAMS         0x2055    //!< opcode of @ref HCI_LE_SetConnectionCteTransmitParams
 #define HCI_LE_SET_CONNECTION_CTE_REQUEST_ENABLE          0x2056    //!< opcode of @ref HCI_LE_SetConnectionCteRequestEnable
 #define HCI_LE_SET_CONNECTION_CTE_RESPONSE_ENABLE         0x2057    //!< opcode of @ref HCI_LE_SetConnectionCteResponseEnable
 #define HCI_LE_READ_ANTENNA_INFORMATION                   0x2058    //!< opcode of @ref HCI_LE_ReadAntennaInformation
+#define HCI_LE_SET_PERIODIC_ADV_RECEIVE_ENABLE            0x2059    //!< opcode of @ref HCI_LE_SetPeriodicAdvReceiveEnableCmd
 // @endcond // NODOC
 
 /// @endcond //NODOC
@@ -386,6 +398,8 @@ extern uint8 hciSmpTaskID;
 #define HCI_EXT_LE_SET_EXT_SCAN_RESPONSE_DATA             0xFC72    //!< opcode of @ref HCI_EXT_LE_SetExtScanRspDataCmd
 #define HCI_EXT_LE_SET_EXT_VIRTUAL_ADV_ADDRESS            0xFC73    //!< opcode of @ref HCI_EXT_SetVirtualAdvAddrCmd
 #define HCI_EXT_SET_SCAN_CHAN                             0xFC74    //!< opcode of @ref HCI_EXT_SetExtScanChannels
+#define HCI_EXT_SET_QOS_PARAMETERS                        0xFC75    //!< opcode of @ref HCI_EXT_SetQOSParameters
+#define HCI_EXT_SET_QOS_DEFAULT_PARAMETERS                0xFC76    //!< opcode of @ref HCI_EXT_SetQOSDefaultParameters
 // @endcond //NODOC
 
 /*
@@ -442,9 +456,11 @@ extern char *BLEEventCode_BleLogStrings[];
 // VS Meta Event Codes - Texas Instruments Inc specific!
 #define HCI_BLE_SCAN_REQ_REPORT_EVENT                     0x80      //!< event of type @ref hciEvt_BLEScanReqReport_t
 #define HCI_BLE_EXT_CONNECTION_IQ_REPORT_EVENT            0x81      //!< event of type @ref hciEvt_BLEExtCteConnectionIqReport_t
-#define HCI_BLE_CHANNEL_MAP_UPDATE_EVENT                  0x82    //!< event of type @ref hciEvt_BLEChanMapUpdate_t
+#define HCI_BLE_CHANNEL_MAP_UPDATE_EVENT                  0x82      //!< event of type @ref hciEvt_BLEChanMapUpdate_t
 #define HCI_BLE_CONN_UPDATE_REJECT_EVENT                  0x83      //!< event of type @ref hciEvt_BLEConnUpdateComplete_t
+#define HCI_BLE_EXT_CONNECTIONLESS_IQ_REPORT_EVENT        0x84      //!< event of type @ref hciEvt_BLEExtCteConnectionlessIqReport_t
 
+#define HCI_TEST_EVENT_CODE                               0xFE      //!< test event code use for cte test
 #define HCI_VE_EVENT_CODE                                 0xFF      //!< event of type @ref hciEvt_VSCmdComplete_t
 
 // LE Vendor Specific LL Extension Events

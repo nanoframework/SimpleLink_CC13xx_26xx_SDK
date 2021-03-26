@@ -88,6 +88,10 @@
 
 #define MT_ZDO_STATUS_LEN   1
 
+#define MT_ZDO_EXT_RX_IDLE_SET 1
+#define MT_ZDO_EXT_RX_IDLE_RX_ON_CONFIG 2
+#define MT_ZDO_EXT_RX_IDLE_SLEEPY_CONFIG 3
+
 #if defined ( MT_ZDO_EXTENSIONS )
 typedef struct
 {
@@ -153,7 +157,6 @@ static void MT_ZdoNwkAddrOfInterestReq( uint8_t *pBuf );
 static void MT_ZdoStartupFromApp(uint8_t *pBuf);
 static void MT_ZdoRegisterForZDOMsg(uint8_t *pBuf);
 static void MT_ZdoRemoveRegisteredCB(uint8_t *pBuf);
-static void MT_ZdoSetRejoinParameters(uint8_t *pBuf);
 #endif /* MT_ZDO_FUNC */
 
 #if defined (MT_ZDO_CB_FUNC)
@@ -415,10 +418,6 @@ uint8_t MT_ZdoCommandProcessing(uint8_t* pBuf)
 
     case MT_ZDO_MSG_CB_REMOVE:
       MT_ZdoRemoveRegisteredCB(pBuf);
-      break;
-
-    case MT_ZDO_SET_REJOIN_PARAMS:
-      MT_ZdoSetRejoinParameters(pBuf);
       break;
 
 #if defined ( MT_ZDO_EXTENSIONS )
@@ -2138,41 +2137,6 @@ void MT_ZdoRemoveRegisteredCB(uint8_t *pBuf)
   }
 }
 
-/*************************************************************************************************
- * @fn      MT_ZdoSetRejoinParameters(pBuf);
- *
- * @brief   Set Rejoin backoff and scan duration from MT
- *
- * @param   pBuf  - MT message data
- *
- * @return  void
- *************************************************************************************************/
-static void MT_ZdoSetRejoinParameters(uint8_t *pBuf)
-{
-  uint8_t cmdId;
-  uint8_t retValue;
-  uint32_t rejoinBackoffDuration, rejoinScanDuration;
-
-  // parse header
-  cmdId = pBuf[MT_RPC_POS_CMD1];
-  pBuf += MT_RPC_FRAME_HDR_SZ;
-
-  //Rejoin Backoff Duration
-  rejoinBackoffDuration = OsalPort_buildUint32(pBuf, 4);
-  pBuf += 4;
-
-  //Rejoin Scan Duration
-  rejoinScanDuration = OsalPort_buildUint32(pBuf, 4);
-
-  ZDApp_SetRejoinScanDuration(rejoinScanDuration);
-  ZDApp_SetRejoinBackoffDuration(rejoinBackoffDuration);
-
-  retValue = ZSuccess;
-
-  MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_ZDO), cmdId, 1, &retValue);
-
-}
-
 #endif /* MT_ZDO_FUNC */
 
 
@@ -2972,9 +2936,21 @@ static void MT_ZdoExtRxIdle( uint8_t *pBuf )
   setFlag = *pBuf++;
   setValue = *pBuf++;
 
-  if ( setFlag )
+  if ( setFlag == MT_ZDO_EXT_RX_IDLE_SET )
   {
     ZMacSetReq( ZMacRxOnIdle, &setValue );
+  }
+  else if ( setFlag == MT_ZDO_EXT_RX_IDLE_RX_ON_CONFIG )
+  {
+    ZMacSetReq( ZMacRxOnIdle, &setValue );
+#if ( RFD_RX_ALWAYS_ON_CAPABLE == TRUE )
+    zgRxAlwaysOn = TRUE;
+#endif
+  }
+  else if ( setFlag == MT_ZDO_EXT_RX_IDLE_SLEEPY_CONFIG )
+  {
+    ZMacSetReq( ZMacRxOnIdle, &setValue );
+    zgRxAlwaysOn = FALSE;
   }
   else
   {

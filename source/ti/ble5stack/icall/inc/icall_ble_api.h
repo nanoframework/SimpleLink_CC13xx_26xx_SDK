@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -220,6 +220,21 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define HCI_LE_SetConnectionCteRequestEnableCmd(...)      (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionCteRequestEnableCmd , ##__VA_ARGS__))
 #define HCI_LE_SetConnectionCteResponseEnableCmd(...)     (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionCteResponseEnableCmd , ##__VA_ARGS__))
 #define HCI_LE_ReadAntennaInformationCmd(...)             (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_ReadAntennaInformationCmd , ##__VA_ARGS__))
+/* Periodic Adv */
+#define HCI_LE_SetPeriodicAdvParamsCmd(...)               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetPeriodicAdvParamsCmd , ##__VA_ARGS__))
+#define HCI_LE_SetPeriodicAdvDataCmd(...)                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetPeriodicAdvDataCmd , ##__VA_ARGS__))
+#define HCI_LE_SetPeriodicAdvEnableCmd(...)               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetPeriodicAdvEnableCmd , ##__VA_ARGS__))
+#define HCI_LE_PeriodicAdvCreateSyncCmd(...)              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_PeriodicAdvCreateSyncCmd , ##__VA_ARGS__))
+#define HCI_LE_PeriodicAdvCreateSyncCancelCmd(...)        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_PeriodicAdvCreateSyncCancelCmd , ##__VA_ARGS__))
+#define HCI_LE_PeriodicAdvTerminateSyncCmd(...)           (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_PeriodicAdvTerminateSyncCmd , ##__VA_ARGS__))
+#define HCI_LE_AddDeviceToPeriodicAdvListCmd(...)         (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_AddDeviceToPeriodicAdvListCmd , ##__VA_ARGS__))
+#define HCI_LE_RemoveDeviceFromPeriodicAdvListCmd(...)    (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_RemoveDeviceFromPeriodicAdvListCmd , ##__VA_ARGS__))
+#define HCI_LE_ClearPeriodicAdvListCmd(...)               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_ClearPeriodicAdvListCmd , ##__VA_ARGS__))
+#define HCI_LE_ReadPeriodicAdvListSizeCmd(...)            (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_ReadPeriodicAdvListSizeCmd , ##__VA_ARGS__))
+#define HCI_LE_SetPeriodicAdvReceiveEnableCmd(...)        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetPeriodicAdvReceiveEnableCmd , ##__VA_ARGS__))
+#define HCI_LE_SetConnectionlessCteTransmitParamsCmd(...) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessCteTransmitParamsCmd , ##__VA_ARGS__))
+#define HCI_LE_SetConnectionlessCteTransmitEnableCmd(...) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessCteTransmitEnableCmd , ##__VA_ARGS__))
+#define HCI_LE_SetConnectionlessIqSamplingEnableCmd(...)  (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd , ##__VA_ARGS__))
 
 /* HCI Extented API */
 /********************/
@@ -266,6 +281,8 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define HCI_EXT_SetVirtualAdvAddrCmd(...)                          (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetVirtualAdvAddrCmd , ##__VA_ARGS__))
 #define HCI_EXT_CoexEnableCmd(...)                                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_CoexEnableCmd , ##__VA_ARGS__))
 #define HCI_EXT_SetExtScanChannels(...)                            (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetExtScanChannels , ##__VA_ARGS__))
+#define HCI_EXT_SetQOSParameters(...)                              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetQOSParameters , ##__VA_ARGS__))
+#define HCI_EXT_SetQOSDefaultParameters(...)                       (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetQOSDefaultParameters , ##__VA_ARGS__))
 
 /* HCI API Cont'd */
 /******************/
@@ -379,6 +396,9 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define GapAdv_abortLoad(...)                                                           (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_abortLoad , ##__VA_ARGS__))
 #define GapAdv_setEventMask(...)                                                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_setEventMask , ##__VA_ARGS__))
 #define GapAdv_setVirtualAdvAddr(...)                                                   (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_setVirtualAdvAddr , ##__VA_ARGS__))
+#define GapAdv_SetPeriodicAdvParams(...)                                                (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_SetPeriodicAdvParams , ##__VA_ARGS__))
+#define GapAdv_SetPeriodicAdvData(...)                                                  (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_SetPeriodicAdvData , ##__VA_ARGS__))
+#define GapAdv_SetPeriodicAdvEnable(...)                                                (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapAdv_SetPeriodicAdvEnable , ##__VA_ARGS__))
 
 // GAP Scanner module
 #define GapScan_registerCb(...)                                                         (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_registerCb , ##__VA_ARGS__))
@@ -391,6 +411,14 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define GapScan_disable(...)                                                            (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_disable , ##__VA_ARGS__))
 #define GapScan_getAdvReport(...)                                                       (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_getAdvReport , ##__VA_ARGS__))
 #define GapScan_discardAdvReportList(...)                                               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_discardAdvReportList , ##__VA_ARGS__))
+#define GapScan_PeriodicAdvCreateSync(...)                                              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_PeriodicAdvCreateSync , ##__VA_ARGS__))
+#define GapScan_PeriodicAdvCreateSyncCancel(...)                                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_PeriodicAdvCreateSyncCancel , ##__VA_ARGS__))
+#define GapScan_PeriodicAdvTerminateSync(...)                                           (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_PeriodicAdvTerminateSync , ##__VA_ARGS__))
+#define GapScan_SetPeriodicAdvReceiveEnable(...)                                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_SetPeriodicAdvReceiveEnable , ##__VA_ARGS__))
+#define GapScan_AddDeviceToPeriodicAdvList(...)                                         (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_AddDeviceToPeriodicAdvList , ##__VA_ARGS__))
+#define GapScan_RemoveDeviceFromPeriodicAdvList(...)                                    (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_RemoveDeviceFromPeriodicAdvList , ##__VA_ARGS__))
+#define GapScan_ReadPeriodicAdvListSize(...)                                            (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_ReadPeriodicAdvListSize , ##__VA_ARGS__))
+#define GapScan_ClearPeriodicAdvList(...)                                               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapScan_ClearPeriodicAdvList , ##__VA_ARGS__))
 
 // GAP Initiator Module
 #define GapInit_setPhyParam(...)                                                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GapInit_setPhyParam , ##__VA_ARGS__))
@@ -409,7 +437,9 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define RTLSSrv_readAntennaInformationCmd(...)                                          (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_readAntennaInformationCmd , ##__VA_ARGS__))
 #define RTLSSrv_setCteSampleAccuracy(...)                                               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_setCteSampleAccuracy , ##__VA_ARGS__))
 #define RTLSSrv_setPinOutput(...)                                                       (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_setPinOutput , ##__VA_ARGS__))
-
+#define RTLSSrv_SetCLCteTransmitParams(...)                                             (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_SetCLCteTransmitParams, ##__VA_ARGS__))
+#define RTLSSrv_CLCteTransmitEnable(...)                                                (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_CLCteTransmitEnable, ##__VA_ARGS__))
+#define RTLSSrv_setCLCteSamplingEnableCmd(...)                                          (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_RTLSSrv_setCLCteSamplingEnableCmd, ##__VA_ARGS__))
 
 /* L2CAP API */
 /*************/
@@ -624,6 +654,7 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define SM_GetDHKey(...)                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_SM_GetDHKey , ##__VA_ARGS__))
 #define SM_RegisterTask(taskID)                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_SM_RegisterTask, ICall_getLocalMsgEntityId(ICALL_SERVICE_CLASS_BLE_MSG, taskID)))
 #define SM_GenerateRandBuf(...)                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_SM_GenerateRandBuf, ##__VA_ARGS__))
+#define SM_AuthenticatedPairingOnlyMode(...)    (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_SM_AuthenticatedPairingOnlyMode, ##__VA_ARGS__))
 
 #endif /* ICALL_LITE */
 #ifdef __cplusplus

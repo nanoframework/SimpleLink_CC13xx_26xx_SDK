@@ -10,6 +10,8 @@ GCArmv7A.xs
 GCArmv7AF.xdc
 IM.xdc
 IM.xs
+M0.xdc
+M0.xs
 M3.xdc
 M3.xs
 M4.xdc
@@ -29,7 +31,7 @@ package/gnu.targets.arm.sch
 package/.vers_g200
 package/.vers_r200
 package/.vers_b200
-package/.xdc-I11
+package/.xdc-K04
 package/gnu_targets_arm.java
 package/gnu_targets_arm.class
 package/package_gnu.targets.arm.c
@@ -40,6 +42,7 @@ GCArmv6.h
 GCArmv7A.h
 GCArmv7AF.h
 IM.h
+M0.h
 M3.h
 M4.h
 M4F.h

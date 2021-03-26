@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -223,6 +223,53 @@ extern "C"
  */
 #define GAP_LINK_PARAM_UPDATE_REJECT_EVENT    0x18
 
+/**
+ * Periodic Advertising Advertiser command complete events.
+ */
+/// Set periodic advertising parameters command complete event
+#define GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT 0x19
+/// Set periodic advertising data command complete event
+#define GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT   0x1A
+/// Set periodic advertising enable command complete event
+#define GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT 0x1B
+
+/**
+ * Periodic Advertising Scanner command status event.
+ */
+#define GAP_SCAN_CREATE_SYNC_EVENT        	    0x1C
+
+/**
+ * Periodic Advertising Scanner command complete events.
+ */
+/// Periodic advertising create sync command complete event
+#define GAP_SCAN_SYNC_CANCEL_EVENT              0x1D
+/// Periodic advertising terminate sync command complete event
+#define GAP_SCAN_TERMINATE_SYNC_EVENT           0x1E
+/// Periodic advertising receive enable command complete event
+#define GAP_SCAN_PERIODIC_RECEIVE_EVENT         0x1F
+/// Add device to period advertisers list command complete event
+#define GAP_SCAN_ADD_DEVICE_ADV_LIST_EVENT      0x20
+/// Remove device from period advertisers list create sync command complete event
+#define GAP_SCAN_REMOVE_DEVICE_ADV_LIST_EVENT   0x21
+/// Read period advertisers list size command complete event
+#define GAP_SCAN_READ_ADV_LIST_SIZE_EVENT       0x22
+/// Clear period advertisers list command complete event
+#define GAP_SCAN_CLEAR_ADV_LIST_EVENT           0x23
+
+/**
+ * Periodic Advertising Scanner establish event.
+ */
+#define GAP_SCAN_PERIODIC_ADV_SYNC_EST_EVENT    0x24
+
+/**
+ * Periodic Advertising Scanner sync lost event.
+ */
+#define GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT    0x25
+
+/**
+ * Periodic Advertising Scanner report event.
+ */
+#define GAP_SCAN_PERIODIC_ADV_REPORT_EVENT       0x26
 /** @} End GAP_Event_IDs */
 
 /**

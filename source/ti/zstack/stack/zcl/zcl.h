@@ -72,6 +72,7 @@ extern "C"
 
 #include "af.h"
 #include "aps_groups.h"
+#include "ti_zstack_config.h"
 
 /*********************************************************************
  * CONSTANTS
@@ -91,90 +92,90 @@ extern "C"
 /// Basic Cluster. Attributes for determining basic information about a device,
 /// setting user device information such as description of location, and
 /// enabling a device.
-#define ZCL_CLUSTER_ID_GEN_BASIC                             0x0000
+#define ZCL_CLUSTER_ID_GENERAL_BASIC                             0x0000
 /// Power Configuration Cluster. Attributes for determining more detailed
 /// information about a device's power source(s), and for configuring
 /// under/over voltage alarms.
-#define ZCL_CLUSTER_ID_GEN_POWER_CFG                         0x0001
+#define ZCL_CLUSTER_ID_GENERAL_POWER_CFG                         0x0001
 /// Device Temperature Configuration Cluster. Attributes for determining
 /// information about a device's internal temperature, and for configuring
 /// under/over temperature alarms.
-#define ZCL_CLUSTER_ID_GEN_DEVICE_TEMP_CONFIG                0x0002
+#define ZCL_CLUSTER_ID_GENERAL_DEVICE_TEMP_CONFIG                0x0002
 /// Identify Cluster. Attributes and commands for putting a device into
 /// Identification mode (e.g., flashing a light).
-#define ZCL_CLUSTER_ID_GEN_IDENTIFY                          0x0003
+#define ZCL_CLUSTER_ID_GENERAL_IDENTIFY                          0x0003
 /// Groups Cluster. Attributes and commands for allocating a device to one or
 /// more of a number of groups of devices, where each group is addressable by a group address
-#define ZCL_CLUSTER_ID_GEN_GROUPS                            0x0004
+#define ZCL_CLUSTER_ID_GENERAL_GROUPS                            0x0004
 /// Scenes Cluster. Attributes and commands for setting up and recalling a number
 /// of scenes for a device. Each scene corresponds to a set of stored values of
 /// specified device attributes.
-#define ZCL_CLUSTER_ID_GEN_SCENES                            0x0005
+#define ZCL_CLUSTER_ID_GENERAL_SCENES                            0x0005
 /// On/Off Cluster. Attributes and commands for switching devices between 'On'
 /// and 'Off' states.
-#define ZCL_CLUSTER_ID_GEN_ON_OFF                            0x0006
+#define ZCL_CLUSTER_ID_GENERAL_ON_OFF                            0x0006
 /// On/Off Switch Configuration Cluster. Attributes and commands for configuring
 /// on/off switching devices.
-#define ZCL_CLUSTER_ID_GEN_ON_OFF_SWITCH_CONFIG              0x0007
+#define ZCL_CLUSTER_ID_GENERAL_ON_OFF_SWITCH_CONFIGURATION       0x0007
 /// Level Control Cluster. Attributes and commands for controlling a characteristic
 /// of devices that can be set to a level between fully 'On' and fully 'Off'.
-#define ZCL_CLUSTER_ID_GEN_LEVEL_CONTROL                     0x0008
+#define ZCL_CLUSTER_ID_GENERAL_LEVEL_CONTROL                     0x0008
 /// Alarms Cluster. Attributes and commands for sending alarm notifications and
 /// configuring alarm functionality.
-#define ZCL_CLUSTER_ID_GEN_ALARMS                            0x0009
+#define ZCL_CLUSTER_ID_GENERAL_ALARMS                            0x0009
 /// Time Cluster. Attributes and commands that provide an interface to a
 /// real-time clock.
-#define ZCL_CLUSTER_ID_GEN_TIME                              0x000A
+#define ZCL_CLUSTER_ID_GENERAL_TIME                              0x000A
 /// RSSI Location Cluster. Attributes and commands for exchanging location information
 /// and channel parameters among devices, and (optionally) reporting data to a
 /// centralized device that collects data from devices in the network and calculates
 /// their positions from the set of collected data.
-#define ZCL_CLUSTER_ID_GEN_LOCATION                          0x000B
+#define ZCL_CLUSTER_ID_GENERAL_LOCATION                          0x000B
 /// Diagnostics Cluster. Attributes and commands that provide an interface to
 /// diagnostics of the stack.
-#define ZCL_CLUSTER_ID_HA_DIAGNOSTIC                         0x0B05
+#define ZCL_CLUSTER_ID_HA_DIAGNOSTIC                             0x0B05
 /// Poll Control Cluster. Attributes and commands that provide an interface to
 /// control the polling of sleeping end device.
-#define ZCL_CLUSTER_ID_GEN_POLL_CONTROL                      0x0020
+#define ZCL_CLUSTER_ID_GENERAL_POLL_CONTROL                      0x0020
 /// Power Profile Cluster. Attributes and commands that provide an interface to
 /// the power profile of a device.
-#define ZCL_CLUSTER_ID_GEN_POWER_PROFILE                     0x001A
+#define ZCL_CLUSTER_ID_GENERAL_POWER_PROFILE                     0x001A
 /// Meter Identification Cluster. Attributes and commands that provide an interface
 /// to meter identification.
-#define ZCL_CLUSTER_ID_HA_METER_IDENTIFICATION               0x0B01
+#define ZCL_CLUSTER_ID_HA_METER_IDENTIFICATION                   0x0B01
 /// Analog Input (basic) Cluster. An interface for reading the value of an analog
 /// measurement and accessing various characteristics of that measurement.
-#define ZCL_CLUSTER_ID_GEN_ANALOG_INPUT_BASIC                0x000C
+#define ZCL_CLUSTER_ID_GENERAL_ANALOG_INPUT_BASIC                0x000C
 /// Analog Output (basic) Cluster. An interface for setting the value of an analog
 /// output (typically to the environment) and accessing various characteristics
 /// of that value.
-#define ZCL_CLUSTER_ID_GEN_ANALOG_OUTPUT_BASIC               0x000D
+#define ZCL_CLUSTER_ID_GENERAL_ANALOG_OUTPUT_BASIC               0x000D
 /// Analog Value (basic) Cluster. An interface for setting an analog value,
 /// typically used as a control system parameter, and accessing various
 /// characteristics of that value.
-#define ZCL_CLUSTER_ID_GEN_ANALOG_VALUE_BASIC                0x000E
+#define ZCL_CLUSTER_ID_GENERAL_ANALOG_VALUE_BASIC                0x000E
 /// Binary Input (basic) Cluster. An interface for reading the value of a binary
 /// measurement and accessing various characteristics of that measurement.
-#define ZCL_CLUSTER_ID_GEN_BINARY_INPUT_BASIC                0x000F
+#define ZCL_CLUSTER_ID_GENERAL_BINARY_INPUT_BASIC                0x000F
 /// Binary Output (basic) Cluster. An interface for setting the value of a binary
 /// output (typically to the environment) and accessing various characteristics
 /// of that value.
-#define ZCL_CLUSTER_ID_GEN_BINARY_OUTPUT_BASIC               0x0010
+#define ZCL_CLUSTER_ID_GENERAL_BINARY_OUTPUT_BASIC               0x0010
 /// Binary Value (basic) Cluster. An interface for setting a binary value,
 /// typically used as a control system parameter, and accessing various
 /// characteristics of that value.
-#define ZCL_CLUSTER_ID_GEN_BINARY_VALUE_BASIC                0x0011
+#define ZCL_CLUSTER_ID_GENERAL_BINARY_VALUE_BASIC                0x0011
 /// Multistate Input (basic) Cluster. An interface for reading the value of a
 /// multistate measurement and accessing various characteristics of that measurement.
-#define ZCL_CLUSTER_ID_GEN_MULTISTATE_INPUT_BASIC            0x0012
+#define ZCL_CLUSTER_ID_GENERAL_MULTISTATE_INPUT_BASIC            0x0012
 /// Multistate Output (basic) Cluster. An interface for setting the value of a
 /// multistate output (typically to the environment) and accessing various
 /// characteristics of that value.
-#define ZCL_CLUSTER_ID_GEN_MULTISTATE_OUTPUT_BASIC           0x0013
+#define ZCL_CLUSTER_ID_GENERAL_MULTISTATE_OUTPUT_BASIC           0x0013
 /// Multistate Value (basic) Cluster. An interface for setting a multistate value,
 /// typically used as a control system parameter, and accessing various characteristics
 /// of that value.
-#define ZCL_CLUSTER_ID_GEN_MULTISTATE_VALUE_BASIC            0x0014
+#define ZCL_CLUSTER_ID_GENERAL_MULTISTATE_VALUE_BASIC            0x0014
 /** @} End ZCL_GENERAL_CLUSTER_IDS */
 
 /**
@@ -285,7 +286,7 @@ extern "C"
  */
 /// Partition Cluster. The commands and attributes for enabling partitioning of
 /// a large frame between devices.
-#define ZCL_CLUSTER_ID_GEN_PARTITION                         0x0016
+#define ZCL_CLUSTER_ID_GENERAL_PARTITION                         0x0016
 /// Generic tunnel Cluster. The minimum common commands and attributes required
 /// to tunnel any protocol.
 #define ZCL_CLUSTER_ID_PI_GENERIC_TUNNEL                     0x0600
@@ -429,7 +430,7 @@ extern "C"
  */
 /// Commissioning Cluster. The commands and attributes for commissioning a
 /// device onto the network.
-#define ZCL_CLUSTER_ID_GEN_COMMISSIONING                     0x0015
+#define ZCL_CLUSTER_ID_GENERAL_COMMISSIONING                     0x0015
 /// Touchlink Cluster. The commands and attributes for Touchlink commissioning
 /// a device.
 #define ZCL_CLUSTER_ID_TOUCHLINK                             0x1000
@@ -462,7 +463,7 @@ extern "C"
  */
 /// EN50523 Appliance Control Cluster. Commands and attributes for controlling
 /// household appliances.
-#define ZCL_CLUSTER_ID_GEN_APPLIANCE_CONTROL                 0x001B
+#define ZCL_CLUSTER_ID_GENERAL_APPLIANCE_CONTROL                 0x001B
 /// EN50523 Appliance Identification Cluster. Commands and attributes for
 /// appliance information and device settings.
 #define ZCL_CLUSTER_ID_HA_APPLIANCE_IDENTIFICATION           0x0B00
@@ -563,11 +564,11 @@ extern "C"
 #define ZCL_CMD_DISCOVER_CMDS_RECEIVED_RSP              0x12
 /// This command may be used to discover all commands which may be generated
 /// (sent) by the cluster, including optional or manufacturer-specific commands.
-#define ZCL_CMD_DISCOVER_CMDS_GEN                       0x13
+#define ZCL_CMD_DISCOVER_CMDS_GEN                 0x13
 /// The Discover Commands Generated Response command is sent in response to a
 /// Discover Commands Generated command, and is used to discover which commands
 /// a cluster supports.
-#define ZCL_CMD_DISCOVER_CMDS_GEN_RSP                   0x14
+#define ZCL_CMD_DISCOVER_CMDS_GEN_RSP             0x14
 /// This command is similar to the discover attributes command, but also includes
 /// a field to indicate whether the attribute is readable, writeable or reportable.
 #define ZCL_CMD_DISCOVER_ATTRS_EXT                      0x15
@@ -698,6 +699,7 @@ extern "C"
  * @{
 *  @brief Access control (bitmask values)
  */
+#define ACCESS_CONTROL_NONE								              0x00
 #define ACCESS_CONTROL_READ                             0x01  // attribute can be read
 #define ACCESS_CONTROL_WRITE                            0x02  // attribute can be written
 #define ACCESS_REPORTABLE                               0x04  // indicate attribute is reportable
@@ -728,6 +730,7 @@ extern "C"
 #define ZCL_OPER_WRITE                                  0x02 // Write new attribute value
 
 #define ATTRID_CLUSTER_REVISION                         0xFFFD // The ClusterRevision global attribute is mandatory for all cluster instances, client and server, conforming to ZCL revision 6 (ZCL6) and later ZCL revisions.
+#define ATTRID_ATTRIBUTE_REPORTING_STATUS               0xFFFE // The ClusterRevision global attribute is mandatory for all cluster instances, client and server, conforming to ZCL revision 6 (ZCL6) and later ZCL revisions.
 
 /** @} End ZCL_CONSTANTS */
 
@@ -742,12 +745,9 @@ extern "C"
 
 #define UNICAST_MSG( msg )          ( (msg)->wasBroadcast == false && (msg)->groupId == 0 )
 
-// Padding needed if buffer has odd number of octects in length
-#define PADDING_NEEDED( bufLen )    ( (bufLen) % 2 )
-
 // Check for Cluster IDs
-#define ZCL_CLUSTER_ID_GEN( id )      ( /* (id) >= ZCL_CLUSTER_ID_GEN_BASIC &&*/ \
-                                        (id) <= ZCL_CLUSTER_ID_GEN_COMMISSIONING )
+#define ZCL_CLUSTER_ID_GEN( id )      ( /* (id) >= ZCL_CLUSTER_ID_GENERAL_BASIC &&*/ \
+                                        (id) <= ZCL_CLUSTER_ID_GENERAL_COMMISSIONING )
 #define ZCL_CLUSTER_ID_CLOSURES( id ) ( (id) >= ZCL_CLUSTER_ID_CLOSURES_SHADE_CONFIG && \
                                         (id) <= ZCL_CLUSTER_ID_CLOSURES_WINDOW_COVERING )
 #define ZCL_CLUSTER_ID_HVAC( id )     ( (id) >= ZCL_CLUSTER_ID_HVAC_PUMP_CONFIG_CONTROL && \
@@ -758,7 +758,7 @@ extern "C"
                                         (id) <= ZCL_CLUSTER_ID_MS_OCCUPANCY_SENSING )
 #define ZCL_CLUSTER_ID_SS( id )       ( (id) >= ZCL_CLUSTER_ID_SS_IAS_ZONE && \
                                         (id) <= ZCL_CLUSTER_ID_SS_IAS_WD )
-#define ZCL_CLUSTER_ID_KEY( id )      ( (id) == ZCL_CLUSTER_ID_GEN_KEY_ESTABLISHMENT )
+#define ZCL_CLUSTER_ID_KEY( id )      ( (id) == ZCL_CLUSTER_ID_GENERAL_KEY_ESTABLISHMENT )
 #define ZCL_CLUSTER_ID_SE( id )       ( (id) >= ZCL_CLUSTER_ID_SE_PRICE && \
                                         (id) <= ZCL_CLUSTER_ID_SE_MDU_PAIRING )
 #define ZCL_CLUSTER_ID_PI( id )       ( (id) >= ZCL_CLUSTER_ID_PI_GENERIC_TUNNEL && \
@@ -767,9 +767,9 @@ extern "C"
 #define ZCL_CLUSTER_ID_PI_RETAIL( id )       ( (id) >= ZCL_CLUSTER_ID_MOBILE_DEVICE_CONFIGURATION && \
                                         (id) <= ZCL_CLUSTER_ID_NEIGHBOR_CLEANING )
 #define ZCL_CLUSTER_ID_LL( id )       ( (id) == ZCL_CLUSTER_ID_TOUCHLINK )
-#define ZCL_CLUSTER_ID_PART( id )     ( (id) == ZCL_CLUSTER_ID_GEN_PARTITION )
+#define ZCL_CLUSTER_ID_PART( id )     ( (id) == ZCL_CLUSTER_ID_GENERAL_PARTITION )
 
-#define ZCL_CLUSTER_ID_PC( id )       ( (id) == ZCL_CLUSTER_ID_GEN_POLL_CONTROL )
+#define ZCL_CLUSTER_ID_PC( id )       ( (id) == ZCL_CLUSTER_ID_GENERAL_POLL_CONTROL )
 
 #define ZCL_CLUSTER_ID_EM( id )	      ( (id) == ZCL_CLUSTER_ID_MS_ELECTRICAL_MEASUREMENT )
 
@@ -777,7 +777,7 @@ extern "C"
 
 #define ZCL_CLUSTER_ID_MI( id )       ( (id) == ZCL_CLUSTER_ID_HA_METER_IDENTIFICATION )
 
-#define ZCL_CLUSTER_ID_APPL_C( id )   ( (id) == ZCL_CLUSTER_ID_GEN_APPLIANCE_CONTROL )
+#define ZCL_CLUSTER_ID_APPL_C( id )   ( (id) == ZCL_CLUSTER_ID_GENERAL_APPLIANCE_CONTROL )
 
 #define ZCL_CLUSTER_ID_APPL_I( id )   ( (id) == ZCL_CLUSTER_ID_HA_APPLIANCE_IDENTIFICATION )
 
@@ -787,7 +787,7 @@ extern "C"
 
 #define ZCL_CLUSTER_ID_APPL_S( id )   ( (id) == ZCL_CLUSTER_ID_HA_APPLIANCE_STATISTICS )
 
-#define ZCL_CLUSTER_ID_PP( id )       ( (id) == ZCL_CLUSTER_ID_GEN_POWER_PROFILE )
+#define ZCL_CLUSTER_ID_PP( id )       ( (id) == ZCL_CLUSTER_ID_GENERAL_POWER_PROFILE )
 
 #define ZCL_CLUSTER_ID_DL( id )       ( (id) == ZCL_CLUSTER_ID_CLOSURES_DOOR_LOCK )
 
@@ -843,25 +843,25 @@ typedef struct
 
 #ifdef ZCL_READ
 /// Read Attribute Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  numAttr;            //!< number of attributes in the list
   uint16_t attrID[];           //!< supported attributes list - this structure should
-                             //!< be allocated with the appropriate number of attributes.
+                               //!< be allocated with the appropriate number of attributes.
 } zclReadCmd_t;
 
 /// Read Attribute Response Status record
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t attrID;            //!< attribute ID
   uint8_t  status;            //!< should be ZCL_STATUS_SUCCESS or error
   uint8_t  dataType;          //!< attribute data type
   uint8_t  *data;             //!< this structure is allocated, so the data is HERE
-                            //!< - the size depends on the attribute data type
+                              //!< - the size depends on the attribute data type
 } zclReadRspStatus_t;
 
 /// Read Attribute Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t              numAttr;     //!< number of attributes in the list
   zclReadRspStatus_t attrList[];  //!< attribute status list
@@ -869,7 +869,7 @@ typedef struct
 #endif // ZCL_READ
 
 /// Write Attribute record
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t attrID;             //!< attribute ID
   uint8_t  dataType;           //!< attribute data type
@@ -878,28 +878,28 @@ typedef struct
 } zclWriteRec_t;
 
 /// Write Attribute Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t         numAttr;     //!< number of attribute records in the list
   zclWriteRec_t attrList[];  //!< attribute records
 } zclWriteCmd_t;
 
 /// Write Attribute Status record
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  status;             //!< should be ZCL_STATUS_SUCCESS or error
   uint16_t attrID;             //!< attribute ID
 } zclWriteRspStatus_t;
 
 /// Write Attribute Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t               numAttr;     //!< number of attribute status in the list
   zclWriteRspStatus_t attrList[];  //!< attribute status records
 } zclWriteRspCmd_t;
 
 /// Configure Reporting Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  direction;          //!< to send or receive reports of the attribute
   uint16_t attrID;             //!< attribute ID
@@ -912,14 +912,14 @@ typedef struct
 } zclCfgReportRec_t;
 
 /// Configure report attribute list
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t             numAttr;    //!< number of attribute IDs in the list
   zclCfgReportRec_t attrList[]; //!< attribute ID list
 } zclCfgReportCmd_t;
 
 /// Attribute Status record
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  status;             //!< should be ZCL_STATUS_SUCCESS or error
   uint8_t  direction;          //!< whether attributes are reported or reports of attributes are received
@@ -927,28 +927,28 @@ typedef struct
 } zclCfgReportStatus_t;
 
 /// Configure Reporting Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t                numAttr;    //!< number of attribute status in the list
   zclCfgReportStatus_t attrList[]; //!< attribute status records
 } zclCfgReportRspCmd_t;
 
 /// Read Reporting Configuration Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  direction; //!< to send or receive reports of the attribute
   uint16_t attrID;    //!< attribute ID
 } zclReadReportCfgRec_t;
 
 /// Read Report Configuration Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t                 numAttr;    //!< number of attributes in the list
   zclReadReportCfgRec_t attrList[]; //!< attribute ID list
 } zclReadReportCfgCmd_t;
 
 /// Attribute Reporting Configuration record
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  status;             //!< status field
   uint8_t  direction;          //!< to send or receive reports of the attribute
@@ -962,14 +962,14 @@ typedef struct
 } zclReportCfgRspRec_t;
 
 /// Read Reporting Configuration Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t                numAttr;    //!< number of records in the list
   zclReportCfgRspRec_t attrList[]; //!< attribute reporting configuration list
 } zclReadReportCfgRspCmd_t;
 
 /// Attribute Report
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t attrID;             //!< atrribute ID
   uint8_t  dataType;           //!< attribute data type
@@ -978,21 +978,21 @@ typedef struct
 } zclReport_t;
 
 /// Report Attributes Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t       numAttr;       //!< number of reports in the list
   zclReport_t attrList[];    //!< attribute report list
 } zclReportCmd_t;
 
 /// Default Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t  commandID;
   uint8_t  statusCode;
 } zclDefaultRspCmd_t;
 
 /// Discover Attributes and Attributes Extended Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t startAttr;          //!< specifies the minimum value of the identifier
                              //!< to begin attribute discovery.
@@ -1001,14 +1001,14 @@ typedef struct
 } zclDiscoverAttrsCmd_t;
 
 /// Attribute Report info
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t attrID;             //!< attribute ID
   uint8_t  dataType;           //!< attribute data type (see Table 17 in Spec)
 } zclDiscoverAttrInfo_t;
 
 /// Discover Attributes Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t             discComplete; //!< whether or not there're more attributes to be discovered
   uint8_t             numAttr;      //!< number of attributes in the list
@@ -1016,21 +1016,21 @@ typedef struct
 } zclDiscoverAttrsRspCmd_t;
 
 /// String Data Type
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t strLen; //!< String length
   uint8_t *pStr; //!< Pointer to string buffer
 } UTF8String_t;
 
 /// Discover Commands Received, Discover Commands Generated
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t startCmdID; //!< Start command ID to discover
   uint8_t maxCmdID; //!< Maximum command ID to discover
 } zclDiscoverCmdsCmd_t;
 
 /// Discover Commands Received Response Command, Discover Commands Generated Response
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t discComplete;
   uint8_t cmdType;    //!< either ZCL_CMD_DISCOVER_CMDS_GEN or ZCL_CMD_DISCOVER_CMDS_RECEIVED
@@ -1039,7 +1039,7 @@ typedef struct
 } zclDiscoverCmdsCmdRsp_t;
 
 /// Attribute info
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint16_t attrID; //!< Attribute ID
   uint8_t attrDataType; //!< Data Type
@@ -1047,7 +1047,7 @@ typedef struct
 } zclExtAttrInfo_t;
 
 /// Discover Attributes Extended Response Command format
-typedef struct
+PACKED_TYPEDEF_STRUCT
 {
   uint8_t discComplete;
   uint8_t numAttr;                  //!< number of attributes provided

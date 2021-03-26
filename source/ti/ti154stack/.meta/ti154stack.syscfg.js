@@ -62,6 +62,9 @@ const securityScript = system.getScript("/ti/ti154stack/security_config/"
 // Get top level setting descriptions
 const docs = system.getScript("/ti/ti154stack/ti154stack_docs.js");
 
+// Get common utility functions
+const Common = system.getScript("/ti/ti154stack/ti154stack_common.js");
+
 // Static implementation of 15.4 module
 const moduleStatic = {
     // Configurables for the static 15.4 module
@@ -74,6 +77,14 @@ const moduleStatic = {
             description: docs.lockProject.description,
             longDescription: docs.lockProject.longDescription,
             onChange: onLockProjectChange
+        },
+        {
+            name: "genLibs",
+            displayName: "Generate 15.4 Libraries",
+            default: true,
+            hidden: true,
+            description: docs.genLibs.description,
+            longDescription: docs.genLibs.longDescription
         },
         {
             name: "project",
@@ -99,6 +110,10 @@ const moduleStatic = {
                 {
                     name: "sensorOAD",
                     displayName: "Sensor OAD"
+                },
+                {
+                    name: "coprocessor",
+                    displayName: "CoProcessor"
                 }
             ],
             description: docs.project.description,
@@ -178,37 +193,15 @@ function onLockProjectChange(inst, ui)
  */
 function onProjectChange(inst, ui)
 {
-    // Set visibility of network group dependents
-    networkScript.setNetworkConfigHiddenState(inst, ui, "maxDevices");
-    networkScript.setNetworkConfigHiddenState(inst, ui, "trackingDelayTime");
-    networkScript.setNetworkConfigHiddenState(inst, ui, "fhBroadcastDwellTime");
-    networkScript.setNetworkConfigHiddenState(inst, ui, "fhBroadcastInterval");
-    networkScript.setNetworkConfigHiddenState(inst, ui, "scanBackoffInterval");
-    networkScript.setNetworkConfigHiddenState(inst, ui,
-        "orphanBackoffInterval");
+    // Set visibility of all configs
+    networkScript.setAllNetworkConfigsHiddenState(inst, ui);
+    powerScript.setAllPowerConfigsHiddenState(inst, ui);
+    securityScript.setAllSecurityConfigsHiddenState(inst, ui);
+    oadScript.setAllOADConfigsHiddenState(inst, ui);
+    testModeScript.setAllTestConfigsHiddenState(inst, ui);
+    radioScript.setAllRFConfigsHiddenState(inst, ui);
 
-    // Set visibility of power group dependents
-    powerScript.setPowerConfigHiddenState(inst, ui, "rxOnIdle");
-
-    // Set visibility of security group dependents
-    securityScript.setSecurityConfigHiddenState(inst, ui, "smDefaultAuthCode");
-    securityScript.setSecurityConfigHiddenState(inst, ui,
-        "smSensorAuthMethods");
-    securityScript.setSecurityConfigHiddenState(inst, ui,
-        "smCollectorAuthMethods");
-    securityScript.setSecurityConfigHiddenState(inst, ui,
-        "smKeyrefreshTimeout");
-
-    // Set visibility of OAD group dependents
-    oadScript.setOADConfigHiddenState(inst, ui, "oadBlockSize");
-    oadScript.setOADConfigHiddenState(inst, ui, "oadBlockReqRate");
-    oadScript.setOADConfigHiddenState(inst, ui, "oadBlockReqPollDelay");
-
-    // Set visibility of test group dependents
-    testModeScript.setTestConfigHiddenState(inst, ui,
-        "collectorTestRampDataSize");
-    testModeScript.setTestConfigHiddenState(inst, ui,
-        "sensorTestRampDataSize");
+    setTopLevelConfigHiddenState(inst, ui, "mode");
 }
 
 /*
@@ -222,8 +215,10 @@ function onProjectChange(inst, ui)
  */
 function onModeChange(inst, ui)
 {
-    // Update network group configs based on mode selected
+    // Update group configs based on mode selected
     networkScript.setBeaconSuperFrameOrders(inst, ui);
+    oadScript.setDefaultOadBlockReqRate(inst);
+    oadScript.setDefaultOadBlockReqPollDelay(inst);
 
     // Set visibility of network group dependents
     networkScript.setNetworkConfigHiddenState(inst, ui, "channels");
@@ -232,7 +227,6 @@ function onModeChange(inst, ui)
     networkScript.setNetworkConfigHiddenState(inst, ui, "fhNetname");
     networkScript.setNetworkConfigHiddenState(inst, ui, "fhBroadcastDwellTime");
     networkScript.setNetworkConfigHiddenState(inst, ui, "fhBroadcastInterval");
-
 
     // Polling interval not used in beacon mode
     networkScript.setNetworkConfigHiddenState(inst, ui, "pollingInterval");
@@ -250,6 +244,57 @@ function setProjectReadOnlyState(ui, readOnly)
 {
     // Set read only state of config
     ui.project.readOnly = (readOnly) ? docs.project.readOnly : false;
+}
+
+/*
+ * ======== getTopLevelConfigHiddenState ========
+ * Get the expected visibility of the selected config
+ *
+ * @param inst    - module instance containing the config that changed
+ * @param cfgName - name of config
+ * @returns bool  - true if hidden, false if visible
+ */
+function getTopLevelConfigHiddenState(inst, cfgName)
+{
+    let isVisible = true;
+
+    switch(cfgName)
+    {
+        case "lockProject":
+        case "genLibs":
+        {
+            isVisible = false;
+            break;
+        }
+        case "mode":
+        {
+            isVisible = inst.project !== "coprocessor";
+            break;
+        }
+        case "project":
+        default:
+        {
+            isVisible = true;
+            break;
+        }
+    }
+
+    // Return whether config is hidden
+    return(!isVisible);
+}
+
+/*
+ * ======== setTopLevelConfigHiddenState ========
+ * Sets the visibility of the selected config
+ *
+ * @param inst    - module instance containing the config that changed
+ * @param ui      - user interface object
+ * @param cfgName - name of config
+ */
+function setTopLevelConfigHiddenState(inst, ui, cfgName)
+{
+    Common.setConfigHiddenState(inst, ui, cfgName, moduleStatic.config,
+        getTopLevelConfigHiddenState);
 }
 
 /*
@@ -303,15 +348,19 @@ function validateModeOptions(inst, vo)
  */
 function validate(inst, vo)
 {
-    // Validation for the custom configurables
-    validateModeOptions(inst, vo);
+    // No validation needed for CoP as all configs are hidden and unused
+    if(inst.project !== "coprocessor")
+    {
+        // Validation for the custom configurables
+        validateModeOptions(inst, vo);
 
-    // Call validation methods of all groups
-    radioScript.validate(inst, vo);
-    networkScript.validate(inst, vo);
-    powerScript.validate(inst, vo);
-    oadScript.validate(inst, vo);
-    securityScript.validate(inst, vo);
+        // Call validation methods of all groups
+        radioScript.validate(inst, vo);
+        networkScript.validate(inst, vo);
+        powerScript.validate(inst, vo);
+        oadScript.validate(inst, vo);
+        securityScript.validate(inst, vo);
+    }
 }
 
 /*
@@ -319,6 +368,59 @@ function validate(inst, vo)
  Module Dependencies and Exports
  *******************************************************************************
  */
+
+/*
+ * ======== getLibs ========
+ * Contribute libraries to linker command file
+ *
+ * @param inst  - 15.4 module instance
+ * @returns     - Object containing the name of component, array of dependent
+ *                components, and array of library names
+ */
+function getLibs(inst)
+{
+    const libs = [];
+
+    if(inst.$static.genLibs && inst.$static.project !== "coprocessor")
+    {
+        // Get device ID and toolchain to select appropriate libs
+        const GenLibs = system.getScript("/ti/utils/build/GenLibs.syscfg.js");
+        const toolchain = GenLibs.getToolchainDir();
+
+        // Generate correct maclib library to link based on device, security
+        // level, and frequency band selected
+        const basePath = "ti/ti154stack/library/tirtos/" + toolchain + "/bin/";
+
+        let security;
+        switch(inst.$static.secureLevel)
+        {
+            case "macSecureAndCommissioning": security = "sm_"; break;
+            case "macSecureDisabled": security = "nosecure_"; break;
+            default: security = "secure_"; break;
+        }
+
+        const devType = Common.isSub1GHzDevice() ? "cc13x2" : "cc26x2";
+        const freq = (inst.$static.freqBand === "freqBand24") ? "_2_4g" : "";
+
+        const maclib = basePath + "maclib_" + security + devType + freq + ".a";
+        libs.push(maclib);
+
+        if(system.modules["/ti/dmm/dmm"] === undefined)
+        {
+            const macosallib = basePath + "maclib_osal_tirtos_cc13x2_26x2.a";
+            libs.push(macosallib);
+        }
+    }
+
+    // Create a GenLibs input argument
+    const linkOpts = {
+        name: "/ti/ti154stack",
+        deps: [],
+        libs: libs
+    };
+
+    return(linkOpts);
+}
 
 /*
  *  ======== moduleInstances ========
@@ -340,6 +442,15 @@ function moduleInstances(inst)
     dependencyModule = dependencyModule.concat(securityScriptModuleInst);
     dependencyModule = dependencyModule.concat(oadScriptModuleInst);
 
+    // Pull module for ti_154stack_config.h generation
+    if(inst.project !== "coprocessor")
+    {
+        dependencyModule.push({
+            name: "ti154stackModule",
+            moduleName: "/ti/ti154stack/ti154stack_config_mod.js"
+        });
+    }
+
     return(dependencyModule);
 }
 
@@ -358,7 +469,7 @@ function modules(inst)
     dependencyModule.push({
         name: "multiStack",
         displayName: "Multi-Stack Validation",
-        moduleName: "/ti/easylink/multi_stack_validate",
+        moduleName: "/ti/common/multi_stack_validate",
         hidden: true
     });
 
@@ -398,8 +509,11 @@ const ti154StackModule = {
     longDescription: docs.ti154stackModule.longDescription,
     moduleStatic: moduleStatic,
     templates: {
-        "/ti/ti154stack/templates/ti_154stack_config.h.xdt": true,
-        "/ti/ti154stack/templates/ti_154stack_features.h.xdt": true
+        "/ti/utils/build/GenLibs.cmd.xdt":
+        {
+            modName: "/ti/ti154stack/ti154stack",
+            getLibs: getLibs
+        }
     }
 };
 

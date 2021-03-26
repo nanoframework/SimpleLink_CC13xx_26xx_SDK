@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios_family_arm_msp432e4_init
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -233,11 +233,13 @@ public class ti_sysbios_family_arm_msp432e4_init
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
             sb.append("'lib/Boot.aem4f',\n");
+            sb.append("'lib/Boot.am4f',\n");
             sb.append("'lib/Boot.am4fg',\n");
             sb.append("'lib/Boot.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/Boot.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/Boot.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/Boot.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/Boot.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");

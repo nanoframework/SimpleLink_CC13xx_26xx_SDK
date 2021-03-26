@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_sysbios
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -147,7 +147,7 @@ public class ti_sysbios
         om.bind("ti.sysbios.BIOS.LibType_Debug", xdc.services.intern.xsr.Enum.make((Proto.Enm)om.findStrict("ti.sysbios.BIOS.LibType", "ti.sysbios"), "ti.sysbios.BIOS.LibType_Debug", 3));
         om.bind("ti.sysbios.BIOS.WAIT_FOREVER", Global.eval("~(0)"));
         om.bind("ti.sysbios.BIOS.NO_WAIT", 0L);
-        om.bind("ti.sysbios.BIOS.version", 0x68101L);
+        om.bind("ti.sysbios.BIOS.version", 0x68103L);
         om.bind("ti.sysbios.BIOS.linkedWithIncorrectBootLibrary", new Extern("ti_sysbios_BIOS_linkedWithIncorrectBootLibrary__E", "xdc_Void(*)(xdc_Void)", true, false));
         om.bind("ti.sysbios.BIOS.start", new Extern("ti_sysbios_BIOS_start__E", "xdc_Void(*)(xdc_Void)", true, false));
         om.bind("ti.sysbios.BIOS.exit", new Extern("ti_sysbios_BIOS_exit__E", "xdc_Void(*)(xdc_Int)", true, false));
@@ -352,13 +352,14 @@ public class ti_sysbios
                 po.addFld("$hostonly", $$T_Num, 0, "r");
                 po.addFld("WAIT_FOREVER", Proto.Elm.newCNum("(xdc_UInt)"), Global.eval("~(0)"), "rh");
                 po.addFld("NO_WAIT", Proto.Elm.newCNum("(xdc_UInt)"), 0L, "rh");
-                po.addFld("version", Proto.Elm.newCNum("(xdc_UInt32)"), 0x68101L, "rh");
+                po.addFld("version", Proto.Elm.newCNum("(xdc_UInt32)"), 0x68103L, "rh");
         if (isCFG) {
             po.addFld("rovViewInfo", (Proto)om.findStrict("xdc.rov.ViewInfo.Instance", "ti.sysbios"), $$UNDEF, "wh");
             po.addFld("libType", (Proto)om.findStrict("ti.sysbios.BIOS.LibType", "ti.sysbios"), om.find("ti.sysbios.BIOS.LibType_Instrumented"), "wh");
             po.addFld("customCCOpts", $$T_Str, $$UNDEF, "wh");
             po.addFld("includeXdcRuntime", $$T_Bool, false, "wh");
             po.addFld("smpEnabled", $$T_Bool, false, "w");
+            po.addFld("psaEnabled", $$T_Bool, false, "wh");
             po.addFld("cpuFreq", (Proto)om.findStrict("xdc.runtime.Types.FreqHz", "ti.sysbios"), $$DEFAULT, "w");
             po.addFld("runtimeCreatesEnabled", $$T_Bool, true, "w");
             po.addFld("taskEnabled", $$T_Bool, true, "w");
@@ -602,11 +603,13 @@ public class ti_sysbios
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
             sb.append("'lib/debug/ti.sysbios.aem4f',\n");
+            sb.append("'lib/debug/ti.sysbios.am4f',\n");
             sb.append("'lib/debug/ti.sysbios.am4fg',\n");
             sb.append("'lib/debug/ti.sysbios.arm4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/debug/ti.sysbios.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/debug/ti.sysbios.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/debug/ti.sysbios.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
         sb.append("];\n");

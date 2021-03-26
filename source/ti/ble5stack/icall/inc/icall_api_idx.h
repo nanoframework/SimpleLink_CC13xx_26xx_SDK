@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -96,13 +96,16 @@
 #define IDX_GapAdv_getParam                           GapAdv_getParam
 #define IDX_GapAdv_getBuffer                          GapAdv_getBuffer
 #define IDX_GapAdv_loadByHandle                       GapAdv_loadByHandle
-#define IDX_GapAdv_loadByBuffer                       GapAdv_loadByBuffer
+#define IDX_GapAdv_loadByBuffer                       GapAdv_loadByBuffer_hook
 #define IDX_GapAdv_prepareLoadByHandle                GapAdv_prepareLoadByHandle
 #define IDX_GapAdv_prepareLoadByBuffer                GapAdv_prepareLoadByBuffer
 #define IDX_GapAdv_abortLoad                          GapAdv_abortLoad
 #define IDX_GapAdv_setEventMask                       GapAdv_setEventMask
 #define IDX_GapAdv_setVirtualAdvAddr                  GapAdv_setVirtualAdvAddr
 #define IDX_GapScan_registerCb                        GapScan_registerCb
+#define IDX_GapAdv_SetPeriodicAdvParams               GapAdv_SetPeriodicAdvParams
+#define IDX_GapAdv_SetPeriodicAdvData                 GapAdv_SetPeriodicAdvData
+#define IDX_GapAdv_SetPeriodicAdvEnable               GapAdv_SetPeriodicAdvEnable
 #define IDX_GapScan_setPhyParams                      GapScan_setPhyParams
 #define IDX_GapScan_getPhyParams                      GapScan_getPhyParams
 #define IDX_GapScan_setParam                          GapScan_setParam
@@ -112,6 +115,14 @@
 #define IDX_GapScan_disable                           GapScan_disable
 #define IDX_GapScan_getAdvReport                      GapScan_getAdvReport
 #define IDX_GapScan_discardAdvReportList              GapScan_discardAdvReportList
+#define IDX_GapScan_PeriodicAdvCreateSync             GapScan_PeriodicAdvCreateSync
+#define IDX_GapScan_PeriodicAdvCreateSyncCancel       GapScan_PeriodicAdvCreateSyncCancel
+#define IDX_GapScan_PeriodicAdvTerminateSync          GapScan_PeriodicAdvTerminateSync
+#define IDX_GapScan_SetPeriodicAdvReceiveEnable       GapScan_SetPeriodicAdvReceiveEnable
+#define IDX_GapScan_AddDeviceToPeriodicAdvList        GapScan_AddDeviceToPeriodicAdvList
+#define IDX_GapScan_RemoveDeviceFromPeriodicAdvList   GapScan_RemoveDeviceFromPeriodicAdvList
+#define IDX_GapScan_ReadPeriodicAdvListSize           GapScan_ReadPeriodicAdvListSize
+#define IDX_GapScan_ClearPeriodicAdvList              GapScan_ClearPeriodicAdvList
 #define IDX_GapInit_setPhyParam                       GapInit_setPhyParam
 #define IDX_GapInit_getPhyParam                       GapInit_getPhyParam
 #define IDX_GapInit_connect                           GapInit_connect
@@ -131,15 +142,18 @@
 
 /* RTLS Services API */
 /*********************/
-#define IDX_RTLSSrv_init                              RTLSSrv_init
-#define IDX_RTLSSrv_register                          RTLSSrv_register
-#define IDX_RTLSSrv_setConnCteReceiveParams           RTLSSrv_setConnCteReceiveParams
-#define IDX_RTLSSrv_setConnCteTransmitParams          RTLSSrv_setConnCteTransmitParams
-#define IDX_RTLSSrv_setConnCteRequestEnableCmd        RTLSSrv_setConnCteRequestEnableCmd
-#define IDX_RTLSSrv_setConnCteResponseEnableCmd       RTLSSrv_setConnCteResponseEnableCmd
-#define IDX_RTLSSrv_readAntennaInformationCmd         RTLSSrv_readAntennaInformationCmd
-#define IDX_RTLSSrv_setCteSampleAccuracy              RTLSSrv_setCteSampleAccuracy
-#define IDX_RTLSSrv_setPinOutput                      RTLSSrv_setPinOutput
+#define IDX_RTLSSrv_init                               RTLSSrv_init
+#define IDX_RTLSSrv_register                           RTLSSrv_register
+#define IDX_RTLSSrv_setConnCteReceiveParams            RTLSSrv_setConnCteReceiveParams
+#define IDX_RTLSSrv_setConnCteTransmitParams           RTLSSrv_setConnCteTransmitParams
+#define IDX_RTLSSrv_setConnCteRequestEnableCmd         RTLSSrv_setConnCteRequestEnableCmd
+#define IDX_RTLSSrv_setConnCteResponseEnableCmd        RTLSSrv_setConnCteResponseEnableCmd
+#define IDX_RTLSSrv_readAntennaInformationCmd          RTLSSrv_readAntennaInformationCmd
+#define IDX_RTLSSrv_setCteSampleAccuracy               RTLSSrv_setCteSampleAccuracy
+#define IDX_RTLSSrv_setPinOutput                       RTLSSrv_setPinOutput
+#define IDX_RTLSSrv_SetCLCteTransmitParams             RTLSSrv_SetCLCteTransmitParams
+#define IDX_RTLSSrv_CLCteTransmitEnable                RTLSSrv_CLCteTransmitEnable
+#define IDX_RTLSSrv_setCLCteSamplingEnableCmd          RTLSSrv_setCLCteSamplingEnableCmd
 
 /* HCI API */
 /***********/
@@ -181,6 +195,20 @@
 #define IDX_HCI_LE_SetConnectionCteRequestEnableCmd   HCI_LE_SetConnectionCteRequestEnableCmd
 #define IDX_HCI_LE_SetConnectionCteResponseEnableCmd  HCI_LE_SetConnectionCteResponseEnableCmd
 #define IDX_HCI_LE_ReadAntennaInformationCmd          HCI_LE_ReadAntennaInformationCmd
+#define IDX_HCI_LE_SetPeriodicAdvParamsCmd            HCI_LE_SetPeriodicAdvParamsCmd
+#define IDX_HCI_LE_SetPeriodicAdvDataCmd              HCI_LE_SetPeriodicAdvDataCmd
+#define IDX_HCI_LE_SetPeriodicAdvEnableCmd            HCI_LE_SetPeriodicAdvEnableCmd
+#define IDX_HCI_LE_PeriodicAdvCreateSyncCmd           HCI_LE_PeriodicAdvCreateSyncCmd
+#define IDX_HCI_LE_PeriodicAdvCreateSyncCancelCmd     HCI_LE_PeriodicAdvCreateSyncCancelCmd
+#define IDX_HCI_LE_PeriodicAdvTerminateSyncCmd        HCI_LE_PeriodicAdvTerminateSyncCmd
+#define IDX_HCI_LE_AddDeviceToPeriodicAdvListCmd      HCI_LE_AddDeviceToPeriodicAdvListCmd
+#define IDX_HCI_LE_RemoveDeviceFromPeriodicAdvListCmd HCI_LE_RemoveDeviceFromPeriodicAdvListCmd
+#define IDX_HCI_LE_ClearPeriodicAdvListCmd            HCI_LE_ClearPeriodicAdvListCmd
+#define IDX_HCI_LE_ReadPeriodicAdvListSizeCmd         HCI_LE_ReadPeriodicAdvListSizeCmd
+#define IDX_HCI_LE_SetPeriodicAdvReceiveEnableCmd     HCI_LE_SetPeriodicAdvReceiveEnableCmd
+#define IDX_HCI_LE_SetConnectionlessCteTransmitParamsCmd HCI_LE_SetConnectionlessCteTransmitParamsCmd
+#define IDX_HCI_LE_SetConnectionlessCteTransmitEnableCmd HCI_LE_SetConnectionlessCteTransmitEnableCmd
+#define IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd HCI_LE_SetConnectionlessIqSamplingEnableCmd
 
 /* HCI Extended API */
 /********************/
@@ -286,6 +314,8 @@
 #define IDX_HCI_EXT_SetVirtualAdvAddrCmd                 HCI_EXT_SetVirtualAdvAddrCmd
 #define IDX_HCI_EXT_CoexEnableCmd                        HCI_EXT_CoexEnableCmd
 #define IDX_HCI_EXT_SetExtScanChannels                   HCI_EXT_SetExtScanChannels
+#define IDX_HCI_EXT_SetQOSParameters                     HCI_EXT_SetQOSParameters
+#define IDX_HCI_EXT_SetQOSDefaultParameters              HCI_EXT_SetQOSDefaultParameters
 
 /* L2CAP API */
 /*************/
@@ -400,6 +430,7 @@
 #define IDX_SM_GetDHKey                               SM_GetDHKey
 #define IDX_SM_RegisterTask                           SM_RegisterTask
 #define IDX_SM_GenerateRandBuf                        SM_GenerateRandBuf
+#define IDX_SM_AuthenticatedPairingOnlyMode           SM_AuthenticatedPairingOnlyMode
 
 /* SNV API */
 /***********/

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -139,6 +139,44 @@ typedef struct {
  * GAP Scanner Functions
  */
 extern bStatus_t gapScan_init(void);
+
+/**
+ * gapScan_periodicAdvCmdCompleteCBs
+ *
+ * Process an incoming OSAL HCI Command Complete Event for
+ * periodic advertising.
+ *
+ * @param   pMsg - message to process
+ *
+ * @return  TRUE if processed and safe to deallocate, FALSE if passed
+ *          off to another task.
+ */
+ uint8_t gapScan_periodicAdvCmdCompleteCBs( hciEvt_CmdComplete_t *pMsg );
+
+/*********************************************************************
+ * gapScan_processBLEPeriodicAdvCBs
+ *
+ * Process an incoming OSAL HCI BLE specific events for
+ * periodic advertising.
+ *
+ * @param   pMsg - message to process
+ *
+ * @return  TRUE if processed and safe to deallocate, FALSE if not processed.
+ */
+uint8_t gapScan_processBLEPeriodicAdvCBs( osal_event_hdr_t *pMsg );
+
+/**
+ * gapScan_periodicAdvCmdStatusCBs
+ *
+ * Process an incoming OSAL HCI Command Status Event for
+ * periodic advertising.
+ *
+ * @param   pMsg - message to process
+ *
+ * @return  TRUE if processed and safe to deallocate, FALSE if passed
+ *          off to another task.
+ */
+uint8_t gapScan_periodicAdvCmdStatusCBs( hciEvt_CommandStatus_t *pMsg );
 
 /*********************************************************************
 *********************************************************************/

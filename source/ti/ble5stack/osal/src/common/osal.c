@@ -12,7 +12,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2004-2020, Texas Instruments Incorporated
+ Copyright (c) 2004-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -134,7 +134,7 @@ static uint8 activeTaskID = TASK_NO_TASK;
 #ifdef USE_ICALL
 // Maximum number of proxy tasks
 #ifndef OSAL_MAX_NUM_PROXY_TASKS
-#define OSAL_MAX_NUM_PROXY_TASKS 2
+#define OSAL_MAX_NUM_PROXY_TASKS 4
 #endif // OSAL_MAX_NUM_PROXY_TASKS
 
 // ICall entity ID value used to indicate invalid value
@@ -420,7 +420,7 @@ unsigned char * _ltoa(unsigned long l, unsigned char *buf, unsigned char radix)
         return ( (unsigned char*)ltoa( l, (char *)buf, radix ) );
     #endif
 #elif defined( __GNUC__ )
-  return ( (char*)ltoa( l, buf, radix ) );
+  return ( (unsigned char *)ltoa( l, (char *)buf, radix ) );
 #else
   unsigned char tmp1[10] = "", tmp2[10] = "", tmp3[10] = "";
   unsigned short num1, num2, num3;

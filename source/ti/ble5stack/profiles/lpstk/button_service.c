@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -61,19 +61,17 @@
 // Button_Service Service UUID
 CONST uint8_t ButtonServiceUUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(BUTTON_SERVICE_SERV_UUID)
+  TI_BASE_UUID_128(BUTTON_SERVICE_SERV_UUID)
 };
-
 // BUTTON0 UUID
 CONST uint8_t bs_BUTTON0UUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(BS_BUTTON0_UUID)
+  TI_BASE_UUID_128(BS_BUTTON0_UUID)
 };
-
 // BUTTON1 UUID
 CONST uint8_t bs_BUTTON1UUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(BS_BUTTON1_UUID)
+  TI_BASE_UUID_128(BS_BUTTON1_UUID)
 };
 
 /*********************************************************************

@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -116,8 +116,8 @@ extern "C"
 #define ATT_PREPARE_WRITE_REQ            0x16 //!< ATT Prepare Write Request. This method is passed as a GATT message defined as @ref attPrepareWriteReq_t
 #define ATT_PREPARE_WRITE_RSP            0x17 //!< ATT Prepare Write Response. This method is passed as a GATT message defined as @ref attPrepareWriteRsp_t
 #define ATT_EXECUTE_WRITE_REQ            0x18 //!< ATT Execute Write Request. This method is passed as a GATT message defined as @ref attExecuteWriteReq_t
-#define ATT_EXECUTE_WRITE_RSP            0x19 //!< ATT Execute Write Response. This method is passed as a GATT message defines as @ref attHandleValueNoti_t
-#define ATT_HANDLE_VALUE_NOTI            0x1b //!< ATT Handle Value Notification. This method is passed as a GATT message defined as @ref attErrorRsp_t
+#define ATT_EXECUTE_WRITE_RSP            0x19 //!< ATT Execute Write Response. This method is passed as a GATT message defines as @ref attErrorRsp_t
+#define ATT_HANDLE_VALUE_NOTI            0x1b //!< ATT Handle Value Notification. This method is passed as a GATT message defined as @ref attHandleValueNoti_t
 #define ATT_HANDLE_VALUE_IND             0x1d //!< ATT Handle Value Indication. This method is passed as a GATT message defined as @ref attHandleValueInd_t
 #define ATT_HANDLE_VALUE_CFM             0x1e //!< ATT Handle Value Confirmation. This method is passed as a GATT message
 #define ATT_UNSUPPORTED_METHOD           0x20//!< Garbage ATT opcode used for negative testing

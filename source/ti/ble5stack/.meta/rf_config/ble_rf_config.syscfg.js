@@ -200,7 +200,7 @@ function getPaTableValues(rfDesign, tableOptions)
                                                     config.displayName.valueOf() >= 14);
     }
     // If using CC1352P-4 device
-    else if(rfDesign == "LAUNCHXL-CC1352P-4")
+    else if(rfDesign == "LAUNCHXL-CC1352P-4" || rfDesign == "LP_CC2652PSIP")
     {
         currentOptions = tableOptions.filter(config => config.displayName.valueOf() <= 10);
     }
@@ -239,16 +239,24 @@ function getRfDesignOptions(deviceId)
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC26X2R1"}];
     }
-    else if(deviceId === "CC2652RB")
+    else if(deviceId === "CC2652RB1FRGZ")
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC2652RB"}];
+    }
+    else if(deviceId === "CC2652P1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652PSIP"}];
+    }
+    else if(deviceId === "CC2652R1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652RSIP"}];
     }
 
     return(newRfDesignOptions);
 }
 
 /*
- * ======== getPaTableValues ========
+ * ======== validateDefaultTxPower ========
  * Check if a selected defaultTxPower value is valid
  * This check is added since the user can enter an invalid
  * value in the example .syscfg file.
@@ -316,7 +324,7 @@ function moduleInstances(inst)
         permission: "ReadOnly"
     }
 
-    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4")
+    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC2652PSIP")
     {
         args.highPA = true;
         if(inst.rfDesign == "LAUNCHXL-CC1352P-4")

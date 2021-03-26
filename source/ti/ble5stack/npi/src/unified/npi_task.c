@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -247,7 +247,8 @@ const NPI_Params NPI_defaultParams = {
     .portBoardID        = 0,                     /* CC2650_SPI0, conflicts with SRF06 display so both can't be enabled */
 #elif (defined(CC2650DK_7ID) || defined(CC2650_LAUNCHXL) || \
     defined(CC2640R2_LAUNCHXL) || defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || \
-    defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL)))
+    defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || \
+    defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP)))
     .portBoardID        = 1,                     /* CC2650_SPI1 */
 #elif (defined(CC2650DK_5XD) || defined(CC2650DK_4XS)) && defined(TI_DRIVERS_DISPLAY_INCLUDED)
 #error "WARNING! CC2650_SPI0, is used to drive the SmartRF06 display. Cannot use SPI0 if display is enabled."
@@ -365,37 +366,37 @@ void NPITask_Fxn(UArg a0, UArg a1)
             // TX Frame has been successfully sent
             if (NPITask_events & NPITASK_TX_DONE_EVENT)
             {
-                //Deallocate most recent message being transmitted.
-                NPIUtil_free(lastQueuedTxMsg);
-                lastQueuedTxMsg = NULL;
+              //Deallocate most recent message being transmitted.
+              NPIUtil_free(lastQueuedTxMsg);
+              lastQueuedTxMsg = NULL;
 #ifndef ICALL_EVENTS
-                NPITask_events &= ~NPITASK_TX_DONE_EVENT;
+              NPITask_events &= ~NPITASK_TX_DONE_EVENT;
 #endif //ICALL_EVENTS
             }
             // Frame is ready to send to the Host
             if (NPITask_events & NPITASK_TX_READY_EVENT)
             {
-                // Cannot send if NPI Tl is already busy.
-                if (!NPITL_checkNpiBusy())
+              // Cannot send if NPI Tl is already busy.
+              if (!NPITL_checkNpiBusy())
+              {
+                // Check for outstanding SYNC REQ/RSP transactions.  If so,
+                // this ASYNC message must remain Q'd while we wait for the
+                // SYNC RSP.
+                if (!Queue_empty(npiSyncTxQueue) &&
+                        syncTransactionInProgress >= 0)
                 {
-                    // Check for outstanding SYNC REQ/RSP transactions.  If so,
-                    // this ASYNC message must remain Q'd while we wait for the
-                    // SYNC RSP.
-                    if (!Queue_empty(npiSyncTxQueue) &&
-                            syncTransactionInProgress >= 0)
-                    {
-                        // Prioritize Synchronous traffic
-                        NPITask_ProcessTXQ(npiSyncTxQueue);
-                    }
-                    else if (!(NPITask_events & NPITASK_SYNC_FRAME_RX_EVENT) &&
-                                 syncTransactionInProgress == 0 &&
-                                   !Queue_empty(npiTxQueue))
-                    {
-                        // No outstanding SYNC REQ/RSP transactions, process
-                        // ASYNC messages.
-                        NPITask_ProcessTXQ(npiTxQueue);
-                    }
+                    // Prioritize Synchronous traffic
+                    NPITask_ProcessTXQ(npiSyncTxQueue);
                 }
+                else if (!(NPITask_events & NPITASK_SYNC_FRAME_RX_EVENT) &&
+                             syncTransactionInProgress == 0 &&
+                               !Queue_empty(npiTxQueue))
+                {
+                    // No outstanding SYNC REQ/RSP transactions, process
+                    // ASYNC messages.
+                    NPITask_ProcessTXQ(npiTxQueue);
+                }
+              }
 
                 // The TX READY event flag can be cleared here regardless
                 // of the state of the TX queues. The TX done call back
@@ -968,21 +969,25 @@ static void NPITask_ProcessTXQ(Queue_Handle txQ)
     if (pMsg != NULL)
     {
         // Serialize NPI Frame to be sent over Transport Layer
+        if(lastQueuedTxMsg != NULL)
+        {
+          NPIUtil_free(lastQueuedTxMsg);
+          lastQueuedTxMsg = NULL;
+        }
         lastQueuedTxMsg = NPITask_SerializeFrame(pMsg);
 
         if (lastQueuedTxMsg != NULL)
         {
-            // Write byte array over Transport Layer
-            // We have already checked if TL is busy so we assume write succeeds
-            NPITL_writeTL(lastQueuedTxMsg, pMsg->dataLen + NPI_MSG_HDR_LENGTH);
-
-            // If the message is a synchronous response or request
-            if (NPI_GET_MSG_TYPE(pMsg) == NPI_MSG_TYPE_SYNCREQ ||
-                NPI_GET_MSG_TYPE(pMsg) == NPI_MSG_TYPE_SYNCRSP)
-            {
-                // Decrement the outstanding Sync REQ/RSP flag.
-                syncTransactionInProgress--;
-            }
+          // Write byte array over Transport Layer
+          // We have already checked if TL is busy so we assume write succeeds
+          NPITL_writeTL(lastQueuedTxMsg, pMsg->dataLen + NPI_MSG_HDR_LENGTH);
+          // If the message is a synchronous response or request
+          if (NPI_GET_MSG_TYPE(pMsg) == NPI_MSG_TYPE_SYNCREQ ||
+              NPI_GET_MSG_TYPE(pMsg) == NPI_MSG_TYPE_SYNCRSP)
+          {
+              // Decrement the outstanding Sync REQ/RSP flag.
+              syncTransactionInProgress--;
+          }
         }
 
         //Free NPI frame

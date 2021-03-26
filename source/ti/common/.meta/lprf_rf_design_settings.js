@@ -49,35 +49,13 @@
  *         rfDesign[setting] = rfDesignSettings[setting];
  *     }
  */
+
 "use strict";
 
+// Get common LPRF utility functions
+const Common = system.getScript("/ti/common/lprf_common.js");
+
 let rfDesignSettings = {};
-
-/*!
- *  ======== getLaunchPadName ========
- *  Get the name of the board being used, return name of device if no board
- *
- *  @returns String - Name of the board with prefix /ti/boards and
- *                    suffix .syscfg.json stripped off.  If no board
- *                    was specified, the device name is returned.
- */
-function getLaunchPadName()
-{
-    let name = system.deviceData.deviceId;
-
-    if(system.deviceData.board != null)
-    {
-        name = system.deviceData.board.source;
-
-        /* Strip off everything up to and including the last '/' */
-        name = name.replace(/.*\//, "");
-
-        /* Strip off everything after and including the first '.' */
-        name = name.replace(/\..*/, "");
-    }
-
-    return(name);
-}
 
 // Settings for ti/devices/CCFG module
 const boardSpecificRfDesignSettings = {
@@ -102,12 +80,30 @@ const boardSpecificRfDesignSettings = {
     CC2652RB_LAUNCHXL_RF_DESIGN_SETTINGS: {
         rfDesign: "LAUNCHXL-CC2652RB"
     },
+    LP_CC2652RSIP_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2652RSIP"
+    },
+    LP_CC2652PSIP_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2652PSIP"
+    },
+    LP_CC1312R7_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC1312R7"
+    },
+    LP_CC1352P7_1_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC1352P7-1"
+    },
+    LP_CC1352P7_4_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC1352P7-4"
+    },
+    LP_CC2652R7_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2652R7"
+    }
 };
 
 // Get the LaunchPad specific CCFG Settings
 if(system.deviceData.board)
 {
-    const boardName = getLaunchPadName();
+    const boardName = Common.getDeviceOrLaunchPadName(false);
     rfDesignSettings = Object.assign(rfDesignSettings,
         boardSpecificRfDesignSettings[boardName + "_RF_DESIGN_SETTINGS"]);
 }

@@ -18,7 +18,6 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 
 #include <bcomdef.h>
 #include <gapgattserver.h>
-#include <simple_gatt_profile.h>
 #include <gap_advertiser.h>
 #include <gapbondmgr.h>
 #include "ti_ble_config.h"
@@ -51,6 +50,7 @@ uint8_t mitm                    =    `ble.bondMITMProtection`;
 uint8_t ioCap                   =    `ble.bondIOCaps`;
 uint8_t bonding                 =    `ble.bonding`;
 uint8_t secureConnection        =    `ble.secureConn`;
+uint8_t authenPairingOnly       =    `ble.authenPairingOnly`;
 uint8_t autoSyncWL              =    `ble.syncWLWithBondDev`;
 % if(ble.secureConn != "GAPBOND_SECURE_CONNECTION_NONE" && !ble.eccDebugKeys)
 % {
@@ -79,6 +79,8 @@ void setBondManagerParameters()
     GAPBondMgr_SetParameter(GAPBOND_BONDING_ENABLED, sizeof(uint8_t), &bonding);
     // Set Secure Connection Usage during Pairing
     GAPBondMgr_SetParameter(GAPBOND_SECURE_CONNECTION, sizeof(uint8_t), &secureConnection);
+    // Set Authenticated Pairing Only mode
+    GAPBondMgr_SetParameter(GAPBOND_AUTHEN_PAIRING_ONLY, sizeof(uint8_t), &authenPairingOnly);
     // Set Auto Whitelist Sync
     GAPBondMgr_SetParameter(GAPBOND_AUTO_SYNC_WL, sizeof(uint8_t), &autoSyncWL);
     %

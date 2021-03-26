@@ -1,0 +1,9 @@
+{
+    "targets": {
+        "Default": "target_launchxl-cc1312r7.json:LP_CC1312R7",
+        "VirtualTarget": {
+            "_name": "LP_CC1312R7",
+            "Target": "target_launchxl-cc1312r7.json"
+        }
+    }
+}

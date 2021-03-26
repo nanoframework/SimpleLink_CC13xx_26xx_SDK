@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2011-2020, Texas Instruments Incorporated
+ Copyright (c) 2011-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -126,7 +126,7 @@
  *
  * The NV definitions:
  *     BLE_NVID_GAP_BOND_START - starting NV ID
- *     gapBond_maxBonds - Maximum number of bonding allowed (10 is max for
+ *     gapBond_maxBonds - Maximum number of bonding allowed (32 is max for
  *                        number of NV IDs allocated in bcomdef.h).
  *
  * A single bonding entry consists of 6 components (NV items):
@@ -177,7 +177,7 @@
 // Pairing Queue States
 typedef enum gbmPairFSM
 {
-  GBM_STATE_WAIT_PAIRING = NULL, // Waiting to begin pairing.
+  GBM_STATE_WAIT_PAIRING = 0, // Waiting to begin pairing.
   GBM_STATE_IS_PAIRING,          // Waiting for pairing to complete
   GBM_STATE_WAIT_GATT_RPAO,      // Waiting for the RPAO Characteristic Read to complete.
 #if ( HOST_CONFIG & PERIPHERAL_CFG )
@@ -267,7 +267,7 @@ static uint8_t gapBond_MITM = FALSE;
 static uint8_t gapBond_IOCap = GAPBOND_IO_CAP_DISPLAY_ONLY;
 static uint8_t gapBond_Bonding = FALSE;
 static uint8_t gapBond_sc_host_debug = FALSE;
-static uint8_t gapBond_maxBonds = 10;
+static uint8_t gapBond_maxBonds = GAP_BONDINGS_MAX;
 static uint8_t gapBond_maxCharCfg = 4;
 static uint8_t gapBond_gatt_no_client = 0;
 static uint8_t gapBond_gatt_no_service_changed = 1;
@@ -296,6 +296,8 @@ static uint8_t gapBond_KeyDistList =
 static uint8_t  gapBond_KeySize = MAX_ENC_KEYSIZE;
 
 static uint8_t gapBond_secureConnection = GAPBOND_SECURE_CONNECTION_ALLOW;
+
+static uint8_t gapBond_authenPairingOnly = FALSE;
 
 // These are the "Debug Mode" keys as defined in
 static gapBondEccKeys_t gapBond_eccKeys_sc_host_debug =
@@ -495,7 +497,24 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
     case GAPBOND_MITM_PROTECTION:
       if((len == sizeof(uint8_t)) && (*((uint8_t *)pValue) <= TRUE))
       {
+        if (*((uint8_t *)pValue) == TRUE)
+        {
+          //For Authenticated pairing IO capabilities shall be different than No Input No Output
+          if (gapBond_IOCap == GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT)
+          {
+            ret = INVALIDPARAMETER;
+            break;
+          }
+        }
+
         gapBond_MITM = *((uint8_t *)pValue);
+
+        //For Authenticated pairing MITM bit must be set to TRUE
+        if (gapBond_MITM == FALSE)
+        {
+          gapBond_authenPairingOnly = FALSE;
+          SM_SetAuthenPairingOnlyMode(gapBond_authenPairingOnly);
+        }
       }
       else
       {
@@ -509,6 +528,14 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
           (*((uint8_t *)pValue) <= GAPBOND_IO_CAP_KEYBOARD_DISPLAY))
       {
         gapBond_IOCap = *((uint8_t *)pValue);
+
+        //For Authenticated pairing IO capabilities shall be different than No Input No Output
+        if (gapBond_IOCap == GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT)
+        {
+            gapBond_MITM = FALSE;
+            gapBond_authenPairingOnly = FALSE;
+            SM_SetAuthenPairingOnlyMode(gapBond_authenPairingOnly);
+        }
       }
       else
       {
@@ -858,6 +885,29 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
 
       break;
 
+    case GAPBOND_AUTHEN_PAIRING_ONLY:
+      if((len == sizeof(uint8_t)) && (*((uint8_t *)pValue) <= TRUE))
+      {
+        if (*((uint8_t *)pValue) == TRUE)
+        {
+          //For Authenticated pairing MITM shall be set to TRUE
+          if (gapBond_MITM == FALSE)
+          {
+            ret = INVALIDPARAMETER;
+            break;
+          }
+        }
+
+        gapBond_authenPairingOnly = *((uint8_t *)pValue);
+        SM_SetAuthenPairingOnlyMode(gapBond_authenPairingOnly);
+      }
+      else
+      {
+        ret = bleInvalidRange;
+      }
+
+      break;
+
     default:
 
       // The param value isn't part of this profile, try the GAP.
@@ -959,6 +1009,10 @@ bStatus_t GAPBondMgr_GetParameter(uint16_t param, void *pValue)
 
     case GAPBOND_LRU_BOND_REPLACEMENT:
       *((uint8_t *)pValue) = gapBond_removeLRUBond;
+      break;
+
+    case GAPBOND_AUTHEN_PAIRING_ONLY:
+      *((uint8_t *)pValue) = gapBond_authenPairingOnly;
       break;
 
     default:
@@ -1183,12 +1237,6 @@ extern bStatus_t GAPBondMgr_Pair(uint16_t connHandle)
   linkDB_GetInfo(connHandle, &linkInfo);
   uint8_t role = linkInfo.connRole;
 
-  // Ensure that we're not already pairing
-  if (GAP_isPairing())
-  {
-    return bleAlreadyInRequestedMode;
-  }
-
 #if ( HOST_CONFIG & CENTRAL_CFG )
   if(role == GAP_PROFILE_CENTRAL)
   {
@@ -1202,6 +1250,11 @@ extern bStatus_t GAPBondMgr_Pair(uint16_t connHandle)
   // initiate either pairing or encryption
   if(role == GAP_PROFILE_PERIPHERAL)
   {
+    // Ensure that we're not already pairing
+    if (GAP_isPairing())
+    {
+      return bleAlreadyInRequestedMode;
+    }
     status = gapBondMgrSlaveSecurityReq(connHandle);
   }
 #endif //HOST_CONFIG & PERIPHERAL_CFG
@@ -1437,7 +1490,12 @@ uint8_t GAPBondMgr_ProcessGAPMsg(gapEventHdr_t *pMsg)
                                    saveStatus );
         }
       }
-
+      // Check if any pairing requests were queued.
+        if(gapBondFindPairReadyNode() != NULL)
+        {
+          // Set an event to start pairing.
+          MAP_osal_set_event(gapBondMgr_TaskID, GAP_BOND_POP_PAIR_QUEUE_EVT);
+        }
       safeToDealloc = TRUE;
     }
 
@@ -2997,7 +3055,7 @@ bStatus_t gapBondMgr_syncResolvingList(void)
   MAP_HCI_LE_ClearResolvingListCmd();
 
   // Add device's local IRK
-  HCI_LE_AddDeviceToResolvingListCmd(NULL, NULL, NULL, MAP_GAP_GetIRK());
+  HCI_LE_AddDeviceToResolvingListCmd(0, 0, 0, MAP_GAP_GetIRK());
 
   // Write bond addresses into the Resolving List
   for(i = 0; i < gapBond_maxBonds; i++)
@@ -3953,17 +4011,36 @@ static bStatus_t gapBondStateStartSecurity(uint16_t connHandle,
 {
   uint8_t ret = SUCCESS;
   gapBondStateNode_t *pNewNode;
-
-  // Enqueue
-  pNewNode = gapBondMgrQueuePairing(connHandle, addrType, pPairReq);
-
-  if(pNewNode == NULL)
+  uint8_t isHandleExist = FALSE;
+  // check if connHandle already in the queue
+  gapBondStateNodePtr_t qNode = gapBondStateNodeHead;
+  while(qNode)
   {
-    return(bleNoResources);
+    if(qNode->connHandle == connHandle)
+    {
+      //found handle in list
+      isHandleExist = TRUE;
+      break;
+    }
+    qNode = qNode->pNext;
   }
 
-  // Set the state.
-  gapBondStateSetState(pNewNode, GBM_STATE_IS_PAIRING);
+  if(isHandleExist == FALSE)
+  {
+    // Enqueue
+    pNewNode = gapBondMgrQueuePairing(connHandle, addrType, pPairReq);
+    if(pNewNode == NULL)
+    {
+      return(bleNoResources);
+    }
+    // Set the state.
+    gapBondStateSetState(pNewNode, GBM_STATE_IS_PAIRING);
+  }
+
+  if(GAP_isPairing())
+  {
+	return ret;
+  }
 
   // Start Pairing.
   ret = gapBondMgrAuthenticate(connHandle, addrType, pPairReq);
@@ -4118,6 +4195,11 @@ static bStatus_t gapBondStateEnd(uint16_t connHandle)
       }
 
       // Free the node.
+      if(pCurr->pPairReq)
+      {
+        MAP_osal_mem_free(pCurr->pPairReq);
+      }
+
       MAP_osal_mem_free(pCurr);
 
       // We're done.

@@ -165,9 +165,21 @@ function getRfDesignOptions()
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC26X2R1"}];
     }
-    else if(deviceId === "CC2652RB")
+    else if(deviceId === "CC2652RB1FRGZ")
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC2652RB"}];
+    }
+    else if(deviceId === "CC2652R1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652RSIP"}];
+    }
+    else if(deviceId === "CC2652P1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652PSIP"}];
+    }
+    else
+    {
+        throw new Error("Unknown deviceId " + deviceId + ".");
     }
 
     return(newRfDesignOptions);
@@ -225,6 +237,8 @@ function onFreqSub1orPhyTypeChange(inst)
 
     // Update values of frequency dependent configs
     networkScript.setDefaultChannelMasks(inst);
+    oadScript.setDefaultOadBlockReqRate(inst);
+    oadScript.setDefaultOadBlockReqPollDelay(inst);
 }
 
 /*
@@ -404,6 +418,9 @@ function getRFConfigHiddenState(inst, cfgName)
         }
     }
 
+    // Hide all configs for coprocessor project
+    isVisible = isVisible && (inst.project !== "coprocessor");
+
     // Return whether config is hidden
     return(!isVisible);
 }
@@ -418,23 +435,28 @@ function getRFConfigHiddenState(inst, cfgName)
  */
 function setRFConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getRFConfigHiddenState(inst, cfgName);
-    if(ui[cfgName].hidden)
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getRFConfigHiddenState);
+
+    // Separate case required for freqSub1 since default value depends
+    // on board which can change at runtime via rfDesign
+    if(cfgName === "freqSub1" && ui[cfgName].hidden)
     {
-        if(cfgName === "freqSub1")
-        {
-            // Separate case required for freqSub1 since default value depends
-            // on board which can change at runtime via rfDesign
-            inst.freqSub1 = getDefaultFreqSub1(inst);
-        }
-        else
-        {
-            const configToReset = Common.findConfig(config.config, cfgName);
-            // restore the default value for the hidden parameter.
-            Common.restoreDefaultValue(inst, configToReset, cfgName);
-        }
+        inst.freqSub1 = getDefaultFreqSub1(inst);
     }
+}
+
+/*
+ * ======== setAllRFConfigsHiddenState ========
+ * Sets the visibility of all RF configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllRFConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getRFConfigHiddenState, setRFConfigHiddenState);
 }
 
 /*
@@ -538,9 +560,6 @@ function addRFSettingDependency(inst)
     // Get settings from selected phy
     const radioConfigArgs = _.cloneDeep(selectedPhy.args);
 
-    // Only generate either default PA or high PA table as required
-    radioConfigArgs.codeExportConfig.paExport = "active";
-
     // Retrieve phy and phy group from rf_defaults files to get tx power
     // configuration that needs to be set in the radio config module
     const rfPhySettings = rfCommon.getPhyTypeGroupFromRFConfig(inst);
@@ -589,8 +608,15 @@ function addRFSettingDependency(inst)
  */
 function moduleInstances(inst)
 {
-    // Add radio config module associated with phy selected
-    return(addRFSettingDependency(inst));
+    const dependencyModule = [];
+
+    if(inst.project !== "coprocessor")
+    {
+        // Add radio config module associated with phy selected
+        dependencyModule.push(addRFSettingDependency(inst));
+    }
+
+    return(dependencyModule);
 }
 
 // Exports to the top level 15.4 module
@@ -602,5 +628,6 @@ exports = {
     getPhy154Settings: getPhy154Settings,
     setFreqBandReadOnlyState: setFreqBandReadOnlyState,
     setRFConfigHiddenState: setRFConfigHiddenState,
+    setAllRFConfigsHiddenState: setAllRFConfigsHiddenState,
     getRFConfigHiddenState: getRFConfigHiddenState
 };

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -202,7 +202,7 @@
 #define OADProtocol_IMAGE_HDR_LEN sizeof(OADStorage_imgIdentifyPld_t)
 
 #ifdef __unix__
-#define OADProtocol_AGAMA_IMAGE_HDR_LEN 0x50
+#define OADProtocol_CC13X2_CC26X2_IMAGE_HDR_LEN 0x50
 #endif
 
 /*!

@@ -40,12 +40,13 @@
     let rfCompensateHf = false;
 
     if (RF_CCFG !== undefined) {
-        // If SCLK_HF derived from HPOSC, set flag to add RTC compensation to Board_init()
-        if ((RF_CCFG.$static.srcClkHF === "Internal High Precision Oscillator")) {
+        // If CCFG configuration enables HF XOSC calibration, ensure RF Driver does that.
+        if (RF_CCFG.$static.enableXoscHfComp === true) {
             rfCompensateHf = true;
         }
     }
 %%}
 %   if (rfCompensateHf === true) {
+    // Enable compensation of HF clock source for RF due to CCFG setting.
     RF_enableHPOSCTemperatureCompensation();
 %   }

@@ -8,6 +8,7 @@
         <module name="C66"/>
         <module name="C71"/>
         <module name="C28_float"/>
+        <module name="C28_float64"/>
     </units>
     <sources>
         <srcFile name="linkcmd.xdt"/>

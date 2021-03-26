@@ -40,7 +40,7 @@ const displayName = "BLE";
 const categoryName = "RF Stacks";
 let topModules;
 
-if(deviceId.match(/CC26.2R1|CC2652RB|CC1352/))
+if(deviceId.match(/SIP|CC26.2R1|CC2652RB|CC1352/))
 {
     topModules = [
         {
@@ -61,6 +61,14 @@ const templates = [
         outputPath: "ti_ble_config.c"
     },
     {
+        name: "/ti/ble5stack/templates/ble_mesh_config.h.xdt",
+        outputPath: "ti_ble_mesh_config.h"
+    },
+    {
+        name: "/ti/ble5stack/templates/ble_mesh_prov_data.h.xdt",
+        outputPath: "ti_ble_mesh_prov_data.h"
+    },
+    {
         name: "/ti/ble5stack/templates/build_config.opt.xdt",
         outputPath: "ti_build_config.opt"
     },
@@ -69,12 +77,20 @@ const templates = [
         outputPath: "ti_ble_app_config.opt"
     },
     {
-        name: "/ti/ble5stack/templates/services.h.xdt",
-        outputPath: "ti_services.h"
+        name: "/ti/ble5stack/templates/ble_gatt_service.h.xdt",
+        outputPath: "ble_gatt_service.h"
     },
     {
-        name: "/ti/ble5stack/templates/services.c.xdt",
-        outputPath: "ti_services.c"
+        name: "/ti/ble5stack/templates/ble_gatt_service.c.xdt",
+        outputPath: "ble_gatt_service.c"
+    },
+    {
+        name: "/ti/ble5stack/templates/device_composition.c.xdt",
+        outputPath: "ti_device_composition.c"
+    },
+    {
+        name: "/ti/ble5stack/templates/device_composition.h.xdt",
+        outputPath: "ti_device_composition.h"
     }
 ];
 

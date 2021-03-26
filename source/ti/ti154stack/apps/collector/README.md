@@ -37,6 +37,72 @@ your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
 &lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
 
+Please refer to the following link for helpful SimpleLink Academy guides for ramping up
+on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
+
+For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
+`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+
+
+Example Application Dataflow
+---------------------------
+The collector application has three processing loops each handling a different set of
+events. These are as follows:
+
+* Collector_process: Collector application event handling
+	* Collector event handling
+		* Network start (COLLECTOR_START_EVT)
+		* Permit join toggle (COLLECTOR_OPEN_NWK_EVT/COLLECTOR_CLOSE_NWK_EVT)
+		* Generate tracking message (COLLECTOR_TRACKING_TIMEOUT_EVT)
+		* Generate config message (COLLECTOR_CONFIG_EVT)
+	* Triggers Cllc_process and Csf_processEvents
+	* Triggers MAC callback handling via ApiMac_processIncoming
+* Cllc_process: Collector logical link controller event handling
+	* Trickle timer handling (PAN Advertisement/PAN Configuration message events)
+	* State change processing
+	* Join permit timeout handling
+* Csf_processEvents: External input handling
+	* CUI input handling
+	* Button press input handling
+	* Triggers events in collector/cllc processing loops based on input
+
+All three processing loops handle specialized tasks to service collector functionality.
+Additionally, ApiMac_processIncoming will trigger collector and cllc callbacks if
+they are defined, acting as the trigger for several collector and cllc processing loop
+events.
+
+An overview of the collector cllc states and state transitions is as follows:
+
+	          Cllc_states_initWaiting
+	                     | COLLECTOR_START_EVT, initiated by CSF_KEY_EVENT,
+	                     | COLLECTOR_UI_INPUT_EVT, or by defining AUTO_START
+	                     |
+	    Existing         |          New
+	    Network          |          Network
+		   +-------------+-------------+
+		   |                           |
+		   V                           V
+	  Cllc_states_                Cllc_states_
+	  initRestoringCoordinator    startingCoordinator
+		   |                           |
+		   V                           V
+	  Cllc_states_                Cllc_states_
+	  restored                    started
+		   |                           |
+		   +-------------+-------------+
+	                     | CSF_KEY_EVENT/COLLECTOR_UI_INPUT_EVT triggers
+	                     | COLLECTOR_OPEN_NWK_EVT or COLLECTOR_CLOSE_NWK_EVT,
+	                     | triggering Cllc_setJoinPermit
+	                     |
+	    Permit join      |          Permit join
+	    Off              |          On
+		   +-------------+-------------+
+		   |                           |
+		   V                           V
+	  Cllc_states_                Cllc_states_
+	  joiningNotAllowed           joiningAllowed
+
+
 Example Usage
 -------------
 This example project implements a collector device: the PAN-Coordinator for the network. This device creates a TI 15.4-Stack network, allows sensor devices to join the network, collects sensor information sent by devices running the sensor example application, and tracks if the devices are on the network or not by periodically sending tracking request messages.
@@ -237,11 +303,21 @@ Some important settings in the TI 15.4-Stack module include:
 
 More information about the configuration and feature options can be found in the TI 15.4-Stack documentation under **Example Applications > Configuration Parameters**.
 
+### Disabling Common User Interface
+
+The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the project-specific .opts file:
+
+```
+-DCUI_DISABLE
+```
+
+> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
+
 ### Multi-Page NV Configuration
 
 By default, this project is configured to use four pages of NV. A maximum of five NV pages are supported. In order to modify the NV pages, update the following:
-* `NVOCMP_NVPAGES=4` in the project-specific .opt file
-* `NVOCMP_NVPAGES=4` in the linker command file
+* `NVOCMP_NVPAGES=4` in the project-specific .opts file
+* `NVOCMP_NVPAGES=4` in the linker options
 * SysConfig NVS module:
    * Set Region Size based on the formula `NVOCMP_NVPAGES * 0x2000`
    * Set Region Base based on the formula `0x56000 - (NVOCMP_NVPAGES * 0x2000)`

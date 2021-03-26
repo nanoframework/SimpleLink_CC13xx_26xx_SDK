@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2019-2020, Texas Instruments Incorporated
+ Copyright (c) 2019-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -476,7 +476,7 @@ static uint32_t readOADHeader(uint8_t* pWriteBuffer)
                 {
                     RingBuf_peek(&gOadBlockCacheRingBuf, (uint8_t*)&readVal);
 
-                    if ((*(TOAD_MAGIC_WORD + i)) != readVal)
+                    if (TOAD_MAGIC_WORD[i] != readVal)
                     {
                         // Failed comparison. Search for the next start char
                         isMatch = false;

@@ -82,8 +82,24 @@ const dmmCCFGSettings = {
     CC2652RB_LAUNCHXL_CCFG_SETTINGS: {}
 };
 
-const boardName = easylinkUtil.getDeviceOrLaunchPadName(true);
-const ccfgSettings = dmmCCFGSettings[boardName + "_CCFG_SETTINGS"];
+const currBoardName = easylinkUtil.getDeviceOrLaunchPadName(true);
+const ccfgSettings = dmmCCFGSettings[currBoardName + "_CCFG_SETTINGS"];
+
+// Dictionary mapping current device/board name regex to supported target
+const supportedMigrations = {
+    // No migrations are supported at this time
+    CC1312R1: {},
+    CC1352R1: {},
+    CC1352P1_LAUNCHXL: {},
+    CC1352P_2_LAUNCHXL: {},
+    CC1352P_4_LAUNCHXL: {},
+    CC1352P1F3RGZ: {},
+    /* Represents RSIP board and device */
+    "CC26.2R.*SIP": {},
+    /* Represents 26X2R1 board and device */
+    "CC26.2R1": {},
+    CC2652RB: {}
+};
 
 /**
  *  ======== stackRoles ========
@@ -144,6 +160,78 @@ function stackRoles(isHidden)
     });
 }
 
+
+
+
+/*
+* ======== getMigrationMarkdown ========
+* Returns text in markdown format that customers can use to aid in migrating a
+* project between device/boards. It is recommended to provide no more
+* than 3 bullet points with up to 120 characters per line.
+*
+* @param currTarget - Board/device being migrated FROM
+* @returns string - Markdown formatted string
+*/
+function getMigrationMarkdown(currTarget)
+{
+    const inst = system.modules["/ti/dmm/dmm"].$static;
+
+    // May need to add guidelines when other boards are supported
+    let migrationText = "";
+
+    migrationText = "* DMM does not support ANY migrations at this time."
+
+    return(migrationText);
+}
+
+
+/*
+ * ======== isMigrationValid ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the 15.4 module.
+ *
+ * @param currentTarget - Current board/device
+ * @param migrationTarget - Target board/device for migration
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValid(currentTarget, migrationTarget)
+{
+    let migRegex = null;
+
+    let migSupported;
+    migSupported = {disable: "This migration is not currently supported"};
+
+    return(migSupported);
+}
+
+/*
+ * ======== migrate ========
+ * Perform stack specific changes to the SysConfig env POST migration
+ *
+ * @param currTarget - Board/device being migrated FROM
+ * @param migrationTarget - Board/device being migrated TO
+ * @param env - SysConfig environment providing access to all configurables
+ * @param projectName - Optional name of the project being migrated
+ *
+ * @returns boolean - true when migration is supported and successful, false when
+ *                    migration is not supported and/or unsuccessful
+ */
+function migrate(currTarget, migrationTarget, env, projectName = null)
+{
+    const migrationInfo = isMigrationValid(currTarget, migrationTarget);
+    let migrationValid = false;
+
+
+    return(migrationValid);
+}
+
+
 /*
  *  ======== exports ========
  *  Export common components
@@ -155,5 +243,8 @@ exports = {
     ccfgSettings: ccfgSettings,
     maxAppStatesSupported: maxAppStatesSupported,
     maxStackRoles: maxStackRoles,
-    maxDMMPoliciesSupported: maxDMMPoliciesSupported
+    maxDMMPoliciesSupported: maxDMMPoliciesSupported,
+    getMigrationMarkdown: getMigrationMarkdown,
+    isMigrationValid: isMigrationValid,
+    migrate: migrate,
 };

@@ -51,80 +51,17 @@
 
 "use strict";
 
+// Get common LPRF utility functions
+const Common = system.getScript("/ti/common/lprf_common.js");
+
 let ccfgSettings = {};
-
-// Used to find if stack module is currently added to the configuration
-const stacks = [
-    "/ti/easylink/easylink",
-    "/ti/ble5stack/ble",
-    "/ti/dmm/dmm",
-    "/ti/thread/thread",
-    "/ti/ti154stack/ti154stack",
-    "/ti/zstack/zstack",
-    "/ti/devices/radioconfig/custom"
-];
-
-// Dictionary mapping a device name to default LaunchPad; used to discover the
-// appropriate RF settings when a device is being used without a LaunchPad
-const deviceToBoard = {
-    CC1352R: "CC1352R1_LAUNCHXL",
-    CC1352P: "CC1352P1_LAUNCHXL",
-    CC1312: "CC1312R1_LAUNCHXL",
-    CC2642: "CC26X2R1_LAUNCHXL",
-    CC2652R1: "CC26X2R1_LAUNCHXL",
-    CC2652RB: "CC2652RB_LAUNCHXL"
-};
-
-/*!
- *  ======== getDeviceOrLaunchPadName ========
- *  Get the name of the board (or device)
- *
- *  @param convertToBoard - Boolean. When true, return the associated LaunchPad
- *                          name if a device is being used without a LaunchPad
- *
- *  @returns String - Name of the board with prefix /ti/boards and
- *                    suffix .syscfg.json stripped off.  If no board
- *                    was specified, the device name is returned.
- */
-function getDeviceOrLaunchPadName(convertToBoard)
-{
-    let name = system.deviceData.deviceId;
-
-    if(system.deviceData.board != null)
-    {
-        name = system.deviceData.board.source;
-
-        /* Strip off everything up to and including the last '/' */
-        name = name.replace(/.*\//, "");
-
-        /* Strip off everything after and including the first '.' */
-        name = name.replace(/\..*/, "");
-    }
-
-    // Check if this is a standalone device without a LaunchPad
-    if(convertToBoard && !name.includes("LAUNCHXL"))
-    {
-        // Find the LaunchPad name in deviceToBoard dictionary
-        let key = null;
-        for(key in deviceToBoard)
-        {
-            if(name.includes(key))
-            {
-                name = deviceToBoard[key];
-                break;
-            }
-        }
-    }
-
-    return(name);
-}
 
 // Settings for ti/devices/CCFG module
 const boardSpecificCCFGSettings = {
     CC1312R1_LAUNCHXL_CCFG_SETTINGS: {
         enableBootloader: true,
         enableBootloaderBackdoor: true,
-        dioBootloaderBackdoor: 15,
+        dioBootloaderBackdoor: 13,
         levelBootloaderBackdoor: "Active low"
     },
     CC1352R1_LAUNCHXL_CCFG_SETTINGS: {
@@ -169,30 +106,71 @@ const boardSpecificCCFGSettings = {
         dioBootloaderBackdoor: 13,
         levelBootloaderBackdoor: "Active low",
         srcClkLF: "LF RCOSC"
+    },
+    LP_CC2652RSIP_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC2652PSIP_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC1312R7_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC1352P7_1_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC1352P7_4_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC2652R7_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
     }
 };
 
 // Get the LaunchPad specific CCFG Settings
 if(system.deviceData.board)
 {
-    const boardName = getDeviceOrLaunchPadName(false);
+    const boardName = Common.getDeviceOrLaunchPadName(false);
     ccfgSettings = Object.assign(ccfgSettings,
         boardSpecificCCFGSettings[boardName + "_CCFG_SETTINGS"]);
 }
 
 // Get the stack specific CCFG settings
 let stack = "";
-for(stack of stacks)
+for(stack of Common.stacks)
 {
-    if(system.modules[stack])
+    let stackPath = stack.path;
+    if(system.modules[stackPath])
     {
         // Workaround for rf driver examples provided by EasyLink
-        if(stack === "/ti/devices/radioconfig/custom")
+        if(stackPath === "/ti/devices/radioconfig/custom")
         {
-            stack = "/ti/easylink/easylink";
+            stackPath = "/ti/easylink/easylink";
         }
 
-        const stackCommon = system.getScript(stack + "_common.js");
+        const stackCommon = system.getScript(stackPath + "_common.js");
 
         // Verify that the stack has ccfgSettings to provide before setting them
         if(stackCommon.ccfgSettings)

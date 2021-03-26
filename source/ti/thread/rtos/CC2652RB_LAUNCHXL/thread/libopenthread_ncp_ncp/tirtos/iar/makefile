@@ -11,11 +11,7 @@ NAME = libopenthread_ncp_ncp
 
 CFLAGS = -I../.. \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1 \
-    -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h" \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include \
@@ -28,6 +24,8 @@ CFLAGS = -I../.. \
     --aeabi \
     --thumb \
     --diag_suppress=Pa050 \
+    -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h" \
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_SPINEL_CONFIG_OPENTHREAD_MESSAGE_ENABLE=1 \
     --c++ \
@@ -39,11 +37,7 @@ CFLAGS = -I../.. \
 
 CPPFLAGS = -I../.. \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1 \
-    -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h" \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include \
@@ -56,6 +50,8 @@ CPPFLAGS = -I../.. \
     --aeabi \
     --thumb \
     --diag_suppress=Pa050 \
+    -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h" \
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_SPINEL_CONFIG_OPENTHREAD_MESSAGE_ENABLE=1 \
     --c++ \

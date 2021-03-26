@@ -79,12 +79,14 @@ const config = {
             name: "bondMITMProtection",
             displayName: "MITM Protection",
             longDescription: Docs.bondMITMProtectionLongDescription,
-            default: true
+            default: true,
+            onChange: onbondMITMProtectionChange
         },
         {
             name: "bondIOCaps",
             displayName: "IO Capabilities",
             default: "GAPBOND_IO_CAP_DISPLAY_ONLY",
+            onChange: onbondIOCapsChange,
             longDescription: Docs.bondIOCapsLongDescription,
             options: [
                 { displayName: "Display Only Device",               name: "GAPBOND_IO_CAP_DISPLAY_ONLY"       },
@@ -110,6 +112,12 @@ const config = {
                 { displayName: "Supported",     name: "GAPBOND_SECURE_CONNECTION_ALLOW" },
                 { displayName: "Only",          name: "GAPBOND_SECURE_CONNECTION_ONLY"  }
             ]
+        },
+        {
+            name: "authenPairingOnly",
+            displayName: "Authenticated Pairing Only",
+            longDescription: Docs.authenPairingOnlyLongDescription,
+            default: false
         },
         {
             name: "syncWLWithBondDev",
@@ -236,10 +244,16 @@ const config = {
 function validate(inst, validation)
 {
     //check what is the max value
-    if(inst.maxBonds < 0 || inst.maxBonds > 10)
+    if(inst.maxBonds < 0 || inst.maxBonds > 32)
     {
-        validation.logError("The Max number of Bonds that can be saved in NV is 10"
+        validation.logError("The Max number of bonds that can be saved in NV is 32"
                             , inst, "maxBonds");
+    }
+
+    if(inst.maxBonds > 21)
+    {
+        validation.logWarning("If scanning or connection initiation on the 2M PHY is used, "
+        + "the max number of bonds that can be saved in NV is 21.", inst, "maxBonds");
     }
 
     if(inst.maxCharCfg < 0 || inst.maxCharCfg > 4)
@@ -263,6 +277,56 @@ function validate(inst, validation)
         validation.logWarning("The specification recommends that this value be set to no higher "
                               + "than 10 to avoid an attacker from learning too much about a "
                               + "private key before it is regenerated", inst, "ECCKeyRegenPolicy");
+    }
+}
+
+/*
+ * ======== onbondIOCapsChange ========
+ * When the GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT option is selected
+ * the MITM and authenPairingOnly values are changed to false and to readOnly mode
+ *
+ * When other option is selected the readOnly mode is disabled
+ *
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onbondIOCapsChange(inst, ui)
+{
+    if(inst.bondIOCaps == "GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT")
+    {
+        inst.bondMITMProtection = false;
+        ui.bondMITMProtection.readOnly = true;
+
+		inst.authenPairingOnly = false;
+        ui.authenPairingOnly.readOnly = true;
+    }
+    else
+    {
+        ui.bondMITMProtection.readOnly = false;
+		ui.authenPairingOnly.readOnly = false;
+    }
+}
+
+/*
+ * ======== onbondMITMProtectionChange ========
+ * When MITM is set to flase
+ * the authenPairingOnly value is changed to false and to readOnly mode
+ *
+ * When other option is selected the readOnly mode is disabled
+ *
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onbondMITMProtectionChange(inst, ui)
+{
+    if(inst.bondMITMProtection == false)
+    {
+        inst.authenPairingOnly = false;
+        ui.authenPairingOnly.readOnly = true;
+    }
+    else
+    {
+        ui.authenPairingOnly.readOnly = false;
     }
 }
 

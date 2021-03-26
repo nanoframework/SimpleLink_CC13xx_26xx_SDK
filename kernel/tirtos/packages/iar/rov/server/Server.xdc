@@ -1,9 +1,11 @@
 /* --COPYRIGHT--,EPL
- *  Copyright (c) 2012-2015 Texas Instruments Incorporated
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+ *  Copyright (c) 2012-2020 Texas Instruments Incorporated
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
  *
  *  Contributors:
  *      Texas Instruments - initial implementation
@@ -16,7 +18,7 @@ package iar.rov.server;
  */
 metaonly module Server {
 
-    config Int modelVers = 4;
+    config Int modelVers = 5;
 
     /*!
      *  ======== clientVers ========
@@ -24,9 +26,11 @@ metaonly module Server {
      *
      *  Currently, it's used to determine if Task.CallStacks view is supported.
      *  If `clientVers` is 2 or higher, that view is reported in the list of
-     *  views.
+     *  views. The versions of iar.rov.server in SYS/BIOS 6.83 and later work
+     *  only with DLLs that support Task.CallStacks, so this parameter is not
+     *  relevant anymore.
      */
-    config UInt clientVers = 1;
+    config UInt clientVers = 3;
 
     /*
      *  ======== startModel ========

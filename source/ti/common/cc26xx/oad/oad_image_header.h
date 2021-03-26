@@ -132,9 +132,6 @@ extern "C"
  ******************************************************************************/
 #include <stddef.h>
 #include <stdint.h>
-#if defined(SECURITY)
-  #include "hal_types.h"
-#endif
 
 /*******************************************************************************
  * CONSTANTS
@@ -300,11 +297,18 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
  */
 #define OAD_WIRELESS_TECH_MIOTY           0xFF7F
 
+/*!
+ * Image built for WBMS
+ */
+#define OAD_WIRELESS_TECH_WBMS            0xFEFF
+
 /** @} End OAD_WIRELESS_TECH */
 
-#if defined(DeviceFamily_CC26X2) || defined (DeviceFamily_CC26X2_V2)
+#if defined(DeviceFamily_CC26X2) || defined (DeviceFamily_CC26X2_V2) || \
+    defined(DeviceFamily_CC26X2X7)
   #define OAD_IMG_ID_VAL                    {'C', 'C', '2', '6', 'x', '2', 'R', '1'}
 #elif defined (DeviceFamily_CC13X2) ||                                        \
+      defined (DeviceFamily_CC13X2X7) ||                                      \
       defined (DeviceFamily_CC13X2_V1) ||                                     \
       defined (DeviceFamily_CC13X2_V2)
   #define OAD_IMG_ID_VAL                    {'C', 'C', '1', '3', 'x', '2', 'R', '1'}
@@ -497,7 +501,7 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
 #define IMG_COPY_STAT_OFFSET         IMG_INFO_OFFSET                      /* Image copy status */
 
 #define SEG_LEN_OFFSET               4                                    /* Offset from seg header to seg len */
-#define SIG_OFFSET                   offsetof(imgHdr_t, secInfoSeg.eccSign.sign_r)      //!< Offset from the start of security seg to sig
+#define SIG_OFFSET                   offsetof(securityInfoSeg_t, eccSign.sign_r)      //!< Offset from the start of security seg to sig
 
 #define ECDSA_KEY_LEN                32    //!< Length of the ECDSA security key
 
@@ -600,7 +604,7 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
 /// @cond NODOC
 #if defined (__IAR_SYSTEMS_ICC__)
   #define TYPEDEF_STRUCT_PACKED        __packed typedef struct
-#elif defined __TI_COMPILER_VERSION || defined __TI_COMPILER_VERSION__
+#elif defined __TI_COMPILER_VERSION || defined __TI_COMPILER_VERSION__ || __clang__
   #define TYPEDEF_STRUCT_PACKED        typedef struct __attribute__((packed))
 #elif defined (__GNUC__)
   #define TYPEDEF_STRUCT_PACKED        typedef struct __attribute__((__packed__))
@@ -611,7 +615,7 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
     /*!
     * Structure to hold the Signer Info and the Signature
     */
-    PACKED_TYPEDEF_STRUCT
+    TYPEDEF_STRUCT_PACKED
     {
         uint8_t     signerInfo[SIGNER_INFO_SIZE];
         uint8_t     signature[SIGNATURE_SIZE];

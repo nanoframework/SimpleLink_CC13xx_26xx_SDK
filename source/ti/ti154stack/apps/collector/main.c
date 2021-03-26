@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -79,11 +79,7 @@
 
 #ifdef NV_RESTORE
 #include "macconfig.h"
-#ifdef ONE_PAGE_NV
-#include "nvocop.h"
-#else
 #include "nvocmp.h"
-#endif
 #endif
 
 #include <string.h>
@@ -109,7 +105,9 @@ macUserCfg_t macUser0Cfg[] = MAC_USER_CFG;
 
 #endif /* USE_DEFAULT_USER_CFG */
 
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif
 
 #ifdef USE_ITM_DBG
 #include "itm.h"
@@ -178,24 +176,6 @@ static const uint8_t dummyExtAddr[] =
 
 extern void Board_init(void);
 
-#ifdef NV_RESTORE
-#ifdef ONE_PAGE_NV
-/* NVOCOP load API pointers */
-static void NVOCOP_loadApiPtrs(NVINTF_nvFuncts_t *pfn)
-{
-    // Load caller's structure with pointers to the NV API functions
-    pfn->initNV      = &NVOCOP_initNV;
-    pfn->compactNV   = &NVOCOP_compactNV;
-    pfn->createItem  = NULL;
-    pfn->deleteItem  = &NVOCOP_deleteItem;
-    pfn->readItem    = &NVOCOP_readItem;
-    pfn->writeItem   = &NVOCOP_writeItem;
-    pfn->writeItemEx = NULL;
-    pfn->getItemLen  = NULL;
-}
-#endif
-#endif
-
 /*!
  * @brief       Reads the IEEE extended MAC address from the CCFG
  * @param       addr - Extended address pointer
@@ -248,7 +228,10 @@ void Main_assertHandler(uint8_t assertReason)
  */
 Void appTaskFxn(UArg a0, UArg a1)
 {
-#ifdef TIMAC_AGAMA_FPGA
+    /* The following code encapsulated in TI_154STACK_FPGA flag is used for
+     * internal FPGA evaluation of the 15.4 Stack and should not be used with
+     * TI hardware platforms. */
+#ifdef TI_154STACK_FPGA
     /* FPGA build disables POWER constraints */
     Power_setConstraint(PowerCC26XX_IDLE_PD_DISALLOW);
     Power_setConstraint(PowerCC26XX_SB_DISALLOW);
@@ -258,13 +241,6 @@ Void appTaskFxn(UArg a0, UArg a1)
     // configure RF Core SMI Command Link
     IOCPortConfigureSet(IOID_22, IOC_IOCFG0_PORT_ID_RFC_SMI_CL_OUT, IOC_STD_OUTPUT);
     IOCPortConfigureSet(IOID_21, IOC_IOCFG0_PORT_ID_RFC_SMI_CL_IN, IOC_STD_INPUT);
-
-#else
-    /*
-     Disallow shutting down JTAG, VIMS, SYSBUS during idle state
-     since TIMAC requires SYSBUS during idle.
-     */
-
 #endif
 
 #ifndef OSAL_PORT2TIRTOS
@@ -285,11 +261,7 @@ Void appTaskFxn(UArg a0, UArg a1)
 
 #ifdef NV_RESTORE
     /* Setup the NV driver */
-#ifdef ONE_PAGE_NV
-    NVOCOP_loadApiPtrs(&Main_user1Cfg.nvFps);
-#else
     NVOCMP_loadApiPtrs(&Main_user1Cfg.nvFps);
-#endif
 
     if(Main_user1Cfg.nvFps.initNV)
     {
@@ -354,7 +326,7 @@ int main(void)
      */
     Board_init();
 
-#ifndef POWER_MEAS
+#if !defined(POWER_MEAS) && !defined(CUI_DISABLE)
     /* Initialize CUI UART*/
     CUI_params_t cuiParams;
     CUI_paramsInit(&cuiParams);

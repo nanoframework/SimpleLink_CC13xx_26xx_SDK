@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2005-2020, Texas Instruments Incorporated
+ Copyright (c) 2005-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -139,6 +139,7 @@
 #define MAC_FRAME_TYPE_DATA             1
 #define MAC_FRAME_TYPE_ACK              2
 #define MAC_FRAME_TYPE_COMMAND          3
+#define MAC_FRAME_TYPE_RESERVED         4
 #define MAC_FRAME_TYPE_MP               5
 #define MAC_FRAME_TYPE_FRAGMENT         6
 #define MAC_FRAME_TYPE_EXTENDED         7

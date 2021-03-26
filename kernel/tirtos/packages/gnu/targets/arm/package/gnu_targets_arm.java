@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class gnu_targets_arm
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -211,6 +211,30 @@ public class gnu_targets_arm
         om.bind("gnu.targets.arm.IM.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "gnu.targets.arm"));
         om.bind("gnu.targets.arm.IM.Command", om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"));
         om.bind("gnu.targets.arm.IM.Options", om.findStrict("xdc.bld.ITarget2.Options", "gnu.targets.arm"));
+    }
+
+    void M0$$OBJECTS()
+    {
+        Proto.Obj po, spo;
+        Value.Obj vo;
+
+        po = (Proto.Obj)om.bind("gnu.targets.arm.M0.Module", new Proto.Obj());
+        vo = (Value.Obj)om.bind("gnu.targets.arm.M0", new Value.Obj("gnu.targets.arm.M0", po));
+        pkgV.bind("M0", vo);
+        // decls 
+        om.bind("gnu.targets.arm.M0.Model", om.findStrict("xdc.bld.ITarget.Model", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.Extension", om.findStrict("xdc.bld.ITarget.Extension", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.Command", om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"));
+        om.bind("gnu.targets.arm.M0.Options", om.findStrict("xdc.bld.ITarget2.Options", "gnu.targets.arm"));
     }
 
     void M3$$OBJECTS()
@@ -459,6 +483,11 @@ public class gnu_targets_arm
         // interface IM
     }
 
+    void M0$$CONSTS()
+    {
+        // module M0
+    }
+
     void M3$$CONSTS()
     {
         // module M3
@@ -540,6 +569,13 @@ public class gnu_targets_arm
     }
 
     void IM$$CREATES()
+    {
+        Proto.Fxn fxn;
+        StringBuilder sb;
+
+    }
+
+    void M0$$CREATES()
     {
         Proto.Fxn fxn;
         StringBuilder sb;
@@ -650,6 +686,12 @@ public class gnu_targets_arm
 
     }
 
+    void M0$$FUNCTIONS()
+    {
+        Proto.Fxn fxn;
+
+    }
+
     void M3$$FUNCTIONS()
     {
         Proto.Fxn fxn;
@@ -725,6 +767,10 @@ public class gnu_targets_arm
     }
 
     void IM$$SIZES()
+    {
+    }
+
+    void M0$$SIZES()
     {
     }
 
@@ -1085,6 +1131,70 @@ public class gnu_targets_arm
         if (fxn != null) po.addFxn("module$meta$init", $$T_Met, fxn);
         fxn = Global.get(cap, "module$validate");
         if (fxn != null) om.bind("gnu.targets.arm.IM$$module$validate", true);
+        if (fxn != null) po.addFxn("module$validate", $$T_Met, fxn);
+                fxn = Global.get(cap, "archive");
+                if (fxn != null) po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "compile");
+                if (fxn != null) po.addFxn("compile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$compile", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "scompile");
+                if (fxn != null) po.addFxn("scompile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$scompile", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "link");
+                if (fxn != null) po.addFxn("link", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$link", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "getVersion");
+                if (fxn != null) po.addFxn("getVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getVersion", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "getISAChain");
+                if (fxn != null) po.addFxn("getISAChain", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getISAChain", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "findSuffix");
+                if (fxn != null) po.addFxn("findSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$findSuffix", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "selectSuffix");
+                if (fxn != null) po.addFxn("selectSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$selectSuffix", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "genConstCustom");
+                if (fxn != null) po.addFxn("genConstCustom", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genConstCustom", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "genVisibleData");
+                if (fxn != null) po.addFxn("genVisibleData", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleData", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "genVisibleFxns");
+                if (fxn != null) po.addFxn("genVisibleFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleFxns", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "genVisibleLibFxns");
+                if (fxn != null) po.addFxn("genVisibleLibFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleLibFxns", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "getRawVersion");
+                if (fxn != null) po.addFxn("getRawVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget3$$getRawVersion", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "initVers");
+                if (fxn != null) po.addFxn("initVers", (Proto.Fxn)om.findStrict("gnu.targets.arm.ITarget$$initVers", "gnu.targets.arm"), fxn);
+                fxn = Global.get(cap, "asmName");
+                if (fxn != null) po.addFxn("asmName", (Proto.Fxn)om.findStrict("gnu.targets.arm.ITarget$$asmName", "gnu.targets.arm"), fxn);
+    }
+
+    void M0$$TYPES()
+    {
+        Scriptable cap;
+        Proto.Obj po;
+        Proto.Str ps;
+        Proto.Typedef pt;
+        Object fxn;
+
+        cap = (Scriptable)Global.callFxn("loadCapsule", xdcO, "gnu/targets/arm/M0.xs");
+        om.bind("gnu.targets.arm.M0$$capsule", cap);
+        po = (Proto.Obj)om.findStrict("gnu.targets.arm.M0.Module", "gnu.targets.arm");
+        po.init("gnu.targets.arm.M0.Module", om.findStrict("gnu.targets.arm.IM.Module", "gnu.targets.arm"));
+                po.addFld("$hostonly", $$T_Num, 1, "r");
+        po.addFld("name", $$T_Str, "M0", "rh");
+        po.addFld("suffix", $$T_Str, "m0g", "rh");
+        po.addFld("isa", $$T_Str, "v6M", "rh");
+        po.addFld("platform", $$T_Str, "ti.platforms.simCM3", "wh");
+        po.addFld("cc", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"), Global.newObject("cmd", "$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep", "opts", "-mcpu=cortex-m0plus -mabi=aapcs -g"), "rh");
+        po.addFld("ccBin", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"), Global.newObject("cmd", "bin/arm-none-eabi-gcc -c -MD -MF $@.dep", "opts", "-mcpu=cortex-m0plus -mabi=aapcs -g"), "rh");
+        po.addFld("asm", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"), Global.newObject("cmd", "$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler-with-cpp", "opts", "-mcpu=cortex-m0plus"), "rh");
+        po.addFld("asmBin", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"), Global.newObject("cmd", "bin/arm-none-eabi-gcc -c -x assembler-with-cpp", "opts", "-mcpu=cortex-m0plus"), "rh");
+        po.addFld("lnkOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "gnu.targets.arm"), Global.newObject("prefix", "-mcpu=cortex-m0 -mthumb -nostartfiles -Wl,-static -Wl,--gc-sections", "suffix", "-L$(packageBase)/libs/install-native/$(GCCTARG)/lib/thumb/v6-m/nofp -Wl,--start-group -lgcc -lc -lm -Wl,--end-group --specs=nano.specs -Wl,-Map=$(XDCCFGDIR)/$@.map"), "wh");
+        po.addFld("includeOpts", $$T_Str, "-I$(packageBase)/libs/install-native/$(GCCTARG)/include/newlib-nano -I$(packageBase)/libs/install-native/$(GCCTARG)/include", "wh");
+        fxn = Global.get(cap, "module$use");
+        if (fxn != null) om.bind("gnu.targets.arm.M0$$module$use", true);
+        if (fxn != null) po.addFxn("module$use", $$T_Met, fxn);
+        fxn = Global.get(cap, "module$meta$init");
+        if (fxn != null) om.bind("gnu.targets.arm.M0$$module$meta$init", true);
+        if (fxn != null) po.addFxn("module$meta$init", $$T_Met, fxn);
+        fxn = Global.get(cap, "module$validate");
+        if (fxn != null) om.bind("gnu.targets.arm.M0$$module$validate", true);
         if (fxn != null) po.addFxn("module$validate", $$T_Met, fxn);
                 fxn = Global.get(cap, "archive");
                 if (fxn != null) po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "gnu.targets.arm"), fxn);
@@ -1704,6 +1814,10 @@ public class gnu_targets_arm
     {
     }
 
+    void M0$$ROV()
+    {
+    }
+
     void M3$$ROV()
     {
     }
@@ -2202,6 +2316,83 @@ public class gnu_targets_arm
         if (vo.getProto().lookupFld("$used") != null) {
             vo.unseal("$used");
         }
+    }
+
+    void M0$$SINGLETONS()
+    {
+        Proto.Obj po;
+        Value.Obj vo;
+
+        vo = (Value.Obj)om.findStrict("gnu.targets.arm.M0", "gnu.targets.arm");
+        po = (Proto.Obj)om.findStrict("gnu.targets.arm.M0.Module", "gnu.targets.arm");
+        vo.init2(po, "gnu.targets.arm.M0", $$DEFAULT, false);
+        vo.bind("Module", po);
+        vo.bind("$category", "Module");
+        vo.bind("$capsule", om.findStrict("gnu.targets.arm.M0$$capsule", "gnu.targets.arm"));
+        vo.bind("$package", om.findStrict("gnu.targets.arm", "gnu.targets.arm"));
+        tdefs.clear();
+        proxies.clear();
+        mcfgs.clear();
+        icfgs.clear();
+        inherits.clear();
+        vo.bind("Model", om.findStrict("xdc.bld.ITarget.Model", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Model", "gnu.targets.arm"));
+        vo.bind("DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.DebugGen", "gnu.targets.arm"));
+        vo.bind("Extension", om.findStrict("xdc.bld.ITarget.Extension", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Extension", "gnu.targets.arm"));
+        vo.bind("CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileOptions", "gnu.targets.arm"));
+        vo.bind("OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.OptionSet", "gnu.targets.arm"));
+        vo.bind("CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileGoal", "gnu.targets.arm"));
+        vo.bind("LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.LinkGoal", "gnu.targets.arm"));
+        vo.bind("ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.ArchiveGoal", "gnu.targets.arm"));
+        vo.bind("CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CommandSet", "gnu.targets.arm"));
+        vo.bind("StringArray", om.findStrict("xdc.bld.ITarget.StringArray", "gnu.targets.arm"));
+        vo.bind("TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.TypeInfo", "gnu.targets.arm"));
+        vo.bind("StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.StdTypes", "gnu.targets.arm"));
+        vo.bind("Command", om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Command", "gnu.targets.arm"));
+        vo.bind("Options", om.findStrict("xdc.bld.ITarget2.Options", "gnu.targets.arm"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Options", "gnu.targets.arm"));
+        vo.bind("$$tdefs", Global.newArray(tdefs.toArray()));
+        vo.bind("$$proxies", Global.newArray(proxies.toArray()));
+        vo.bind("$$mcfgs", Global.newArray(mcfgs.toArray()));
+        vo.bind("$$icfgs", Global.newArray(icfgs.toArray()));
+        inherits.add("gnu.targets.arm");
+        inherits.add("gnu.targets.arm");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        vo.bind("$$inherits", Global.newArray(inherits.toArray()));
+        ((Value.Arr)pkgV.getv("$modules")).add(vo);
+        ((Value.Arr)om.findStrict("$modules", "gnu.targets.arm")).add(vo);
+        vo.bind("$$instflag", 0);
+        vo.bind("$$iobjflag", 1);
+        vo.bind("$$sizeflag", 1);
+        vo.bind("$$dlgflag", 0);
+        vo.bind("$$iflag", 1);
+        vo.bind("$$romcfgs", "|");
+        vo.bind("$$nortsflag", 0);
+        Proto.Str ps = (Proto.Str)vo.find("Module_State");
+        if (ps != null) vo.bind("$object", ps.newInstance());
+        vo.bind("$$meta_iobj", om.has("gnu.targets.arm.M0$$instance$static$init", null) ? 1 : 0);
+        vo.bind("$$fxntab", Global.newArray());
+        vo.bind("$$logEvtCfgs", Global.newArray());
+        vo.bind("$$errorDescCfgs", Global.newArray());
+        vo.bind("$$assertDescCfgs", Global.newArray());
+        Value.Map atmap = (Value.Map)vo.getv("$attr");
+        atmap.setElem("", "xdc/bld/stddefs.xdt");
+        atmap.seal("length");
+        pkgV.bind("M0", vo);
+        ((Value.Arr)pkgV.getv("$unitNames")).add("M0");
     }
 
     void M3$$SINGLETONS()
@@ -2902,6 +3093,7 @@ public class gnu_targets_arm
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.GCArmv6", "gnu.targets.arm"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.GCArmv7A", "gnu.targets.arm"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.GCArmv7AF", "gnu.targets.arm"));
+        Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.M0", "gnu.targets.arm"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.M3", "gnu.targets.arm"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.M4", "gnu.targets.arm"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("gnu.targets.arm.M4F", "gnu.targets.arm"));
@@ -2918,6 +3110,7 @@ public class gnu_targets_arm
         ((Value.Obj)om.getv("gnu.targets.arm.GCArmv7A")).bless();
         ((Value.Obj)om.getv("gnu.targets.arm.GCArmv7AF")).bless();
         ((Value.Obj)om.getv("gnu.targets.arm.IM")).bless();
+        ((Value.Obj)om.getv("gnu.targets.arm.M0")).bless();
         ((Value.Obj)om.getv("gnu.targets.arm.M3")).bless();
         ((Value.Obj)om.getv("gnu.targets.arm.M4")).bless();
         ((Value.Obj)om.getv("gnu.targets.arm.M4F")).bless();
@@ -2949,6 +3142,7 @@ public class gnu_targets_arm
         GCArmv7A$$OBJECTS();
         GCArmv7AF$$OBJECTS();
         IM$$OBJECTS();
+        M0$$OBJECTS();
         M3$$OBJECTS();
         M4$$OBJECTS();
         M4F$$OBJECTS();
@@ -2964,6 +3158,7 @@ public class gnu_targets_arm
         GCArmv7A$$CONSTS();
         GCArmv7AF$$CONSTS();
         IM$$CONSTS();
+        M0$$CONSTS();
         M3$$CONSTS();
         M4$$CONSTS();
         M4F$$CONSTS();
@@ -2979,6 +3174,7 @@ public class gnu_targets_arm
         GCArmv7A$$CREATES();
         GCArmv7AF$$CREATES();
         IM$$CREATES();
+        M0$$CREATES();
         M3$$CREATES();
         M4$$CREATES();
         M4F$$CREATES();
@@ -2994,6 +3190,7 @@ public class gnu_targets_arm
         GCArmv7A$$FUNCTIONS();
         GCArmv7AF$$FUNCTIONS();
         IM$$FUNCTIONS();
+        M0$$FUNCTIONS();
         M3$$FUNCTIONS();
         M4$$FUNCTIONS();
         M4F$$FUNCTIONS();
@@ -3009,6 +3206,7 @@ public class gnu_targets_arm
         GCArmv7A$$SIZES();
         GCArmv7AF$$SIZES();
         IM$$SIZES();
+        M0$$SIZES();
         M3$$SIZES();
         M4$$SIZES();
         M4F$$SIZES();
@@ -3024,6 +3222,7 @@ public class gnu_targets_arm
         GCArmv7A$$TYPES();
         GCArmv7AF$$TYPES();
         IM$$TYPES();
+        M0$$TYPES();
         M3$$TYPES();
         M4$$TYPES();
         M4F$$TYPES();
@@ -3040,6 +3239,7 @@ public class gnu_targets_arm
             GCArmv7A$$ROV();
             GCArmv7AF$$ROV();
             IM$$ROV();
+            M0$$ROV();
             M3$$ROV();
             M4$$ROV();
             M4F$$ROV();
@@ -3057,6 +3257,7 @@ public class gnu_targets_arm
         GCArmv7A$$SINGLETONS();
         GCArmv7AF$$SINGLETONS();
         IM$$SINGLETONS();
+        M0$$SINGLETONS();
         M3$$SINGLETONS();
         M4$$SINGLETONS();
         M4F$$SINGLETONS();

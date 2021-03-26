@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@
  *****************************************************************************/
 #include <stdint.h>
 
-#ifndef COPROCESSOR
+#if !defined(COPROCESSOR) && !defined(LIBRARY)
 #include "ti_154stack_config.h"
 #endif
 

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -75,6 +75,7 @@
  * MACROS
  */
 
+
 /*********************************************************************
  * TYPEDEFS
  */
@@ -108,7 +109,6 @@ static const uint8_t oadCharUUID[OAD_CHAR_CNT][ATT_UUID_SIZE] =
     // OAD Extended Control UUID
     TI_BASE_UUID_128(OAD_EXT_CTRL_UUID)
 };
-
 
 // The current image's header is initialized in oad_image_header_app.c
 extern const imgHdr_t _imgHdr;
@@ -846,22 +846,32 @@ void OAD_close(void)
  */
 uint8_t OAD_setBlockSize(uint16_t mtuSize)
 {
-    mtuSize -= OAD_ATT_OVERHEAD;            // We can only use the payload part of notify/writeNoRsp
-    mtuSize &= ~(HAL_FLASH_WORD_SIZE - 1);  // Ensure 4-byte aligned if not already
-    oadBlkSize = mtuSize;                   // Set global block size
-
-    // Check for upper and lower bounds and adjust accordingly
-    if(oadBlkSize > OAD_MAX_BLOCK_SIZE)
+    //MTU size shall not be changed during an OAD process
+    if (state == OAD_IDLE)
     {
-        oadBlkSize = OAD_MAX_BLOCK_SIZE;
-    }
-    else if(oadBlkSize < OAD_DEFAULT_BLOCK_SIZE)
-    {
-        oadBlkSize = OAD_DEFAULT_BLOCK_SIZE;
-    }
+        mtuSize -= OAD_ATT_OVERHEAD;            // We can only use the payload part of notify/writeNoRsp
+        mtuSize &= ~(HAL_FLASH_WORD_SIZE - 1);  // Ensure 4-byte aligned if not already
+        oadBlkSize = mtuSize;                   // Set global block size
 
-    oadImgBytesPerBlock = oadBlkSize - OAD_BLK_NUM_HDR_SZ; // Bytes per block is less 4 due to header.
-    return(TRUE);
+        // Check for upper and lower bounds and adjust accordingly
+        if(oadBlkSize > OAD_MAX_BLOCK_SIZE)
+        {
+            oadBlkSize = OAD_MAX_BLOCK_SIZE;
+        }
+        else if(oadBlkSize < OAD_DEFAULT_BLOCK_SIZE)
+        {
+            oadBlkSize = OAD_DEFAULT_BLOCK_SIZE;
+        }
+
+        oadImgBytesPerBlock = oadBlkSize - OAD_BLK_NUM_HDR_SZ; // Bytes per block is less 4 due to header.
+        return(TRUE);
+    }
+    else
+    {
+        // An error has occured, reset and go back to idle
+        oadResetState();
+        return(FALSE);
+    }
 }
 
 /*********************************************************************
@@ -2052,7 +2062,7 @@ static uint8_t oadValidateCandidateHdr(imgHdr_t *receivedHeader)
     }
 
     // Check that the incoming image is page aligned
-    if(receivedHeader->imgPayload.startAddr & (HAL_FLASH_PAGE_SIZE - 1) != 0)
+    if((receivedHeader->imgPayload.startAddr & (HAL_FLASH_PAGE_SIZE - 1)) != 0)
     {
         status = OAD_INCOMPATIBLE_IMAGE;
     }
@@ -2800,12 +2810,12 @@ static bStatus_t oadWriteAttrCB(uint16_t connHandle, gattAttribute_t *pAttr,
                 if(stat == OAD_NO_RESOURCES)
                 {
                     // Notify the application there is no memory left
-                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, 0);
                 }
                 else
                 {
                     // Notify the application that OAD needs to service its Queue
-                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, 0);
                 }
             }
         }
@@ -2825,12 +2835,12 @@ static bStatus_t oadWriteAttrCB(uint16_t connHandle, gattAttribute_t *pAttr,
                 if(stat == OAD_NO_RESOURCES)
                 {
                     // Notify the application there is no memory left
-                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, 0);
                 }
                 else
                 {
                     // Notify the application that OAD needs to service its Queue
-                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, 0);
                 }
             }
         }
@@ -2846,12 +2856,12 @@ static bStatus_t oadWriteAttrCB(uint16_t connHandle, gattAttribute_t *pAttr,
                 if(stat == OAD_NO_RESOURCES)
                 {
                     // Notify the application there is no memory left
-                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, 0);
                 }
                 else
                 {
                     // Notify the application that OAD needs to service its Queue
-                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, NULL);
+                    (*oadTargetWriteCB)(OAD_QUEUE_EVT, 0);
                 }
             }
         }
@@ -2890,18 +2900,18 @@ static void oadInactivityTimeout(UArg param)
     if (oadTargetWriteCB != NULL)
     {
         // Add the message to the Queue for processing
-        uint8_t stat = oadEnqueueMsg(OAD_TIMEOUT, NULL, NULL, 0);
+        uint8_t stat = oadEnqueueMsg(OAD_TIMEOUT, 0, 0, 0);
 
         // Reset the state machine
         if(stat == OAD_NO_RESOURCES)
         {
             // Notify the application there is no memory left
-            (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, NULL);
+            (*oadTargetWriteCB)(OAD_OUT_OF_MEM_EVT, 0);
             return;
         }
 
         // Notify the application that OAD needs to service its Queue
-        (*oadTargetWriteCB)(OAD_QUEUE_EVT, NULL);
+        (*oadTargetWriteCB)(OAD_QUEUE_EVT, 0);
     }
 }
 

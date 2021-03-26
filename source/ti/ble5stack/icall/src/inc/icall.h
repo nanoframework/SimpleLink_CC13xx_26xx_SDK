@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -2920,6 +2920,11 @@ ICall_getLocalMsgEntityId(ICall_ServiceEnum service, ICall_EntityID entity)
 
 
 #endif /* ICALL_JT */
+
+#ifdef ICALL_NO_APP_EVENTS
+typedef uint8_t (*appCallback_t)(uint8_t event, uint8_t *msg);
+ICall_Errno ICall_registerAppCback(uint8_t *selfEntity, appCallback_t appCallback);
+#endif
 
 #ifdef __cplusplus
 }

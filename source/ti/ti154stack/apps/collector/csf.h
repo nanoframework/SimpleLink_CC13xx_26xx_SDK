@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -57,10 +57,10 @@
 #include "cllc.h"
 #include "smsgs.h"
 
-#ifndef __unix__
-#include "cui.h"
-#else
+#ifdef __unix__
 #include "csf_linux.h"
+#elif !defined(CUI_DISABLE)
+#include "cui.h"
 #endif
 
 #ifdef FEATURE_SECURE_COMMISSIONING
@@ -214,7 +214,7 @@ extern void Csf_deviceSensorDataUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
 extern void Csf_deviceDisassocUpdate(uint16_t shortAddr);
 #endif
 
-#if defined(DEVICE_TYPE_MSG) && !defined(__unix__)
+#if defined(DEVICE_TYPE_MSG) && !defined(__unix__) && !defined(CUI_DISABLE)
 /*!
  * @brief       The application calls this function to print out the reported
  *              device type
@@ -357,10 +357,13 @@ extern bool Csf_getDevice(ApiMac_sAddr_t *pDevAddr, Llc_deviceListItem_t *pItem)
  *
  * @param       devIndex - Device number (not address)
  * @param       pItem - place to put the device information
+ * @param       pSubID - pointer to location to store subID of the device found.
+ *              If no device was found, pSubID content is not modified
  *
  * @return      true if found, false if not
  */
-extern bool Csf_getDeviceItem(uint16_t devIndex, Llc_deviceListItem_t *pItem);
+extern bool Csf_getDeviceItem(uint16_t devIndex, Llc_deviceListItem_t *pItem,
+                              uint16_t *pSubID);
 
 /*!
  * @brief       Find entry in device list
@@ -438,12 +441,14 @@ extern bool Csf_isConfigTimerActive(void);
  */
 extern bool Csf_isTrackingTimerActive(void);
 
+#ifndef CUI_DISABLE
 /*!
  * @brief       Handles printing that the orphaned device joined back
  *
  * @return      none
  */
 extern void Csf_IndicateOrphanReJoin(uint16_t shortAddr);
+#endif /* CUI_DISABLE */
 
 /*!
  * @brief       The application calls this function to open the network.

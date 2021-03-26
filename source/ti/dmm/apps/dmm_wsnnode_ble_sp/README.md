@@ -78,7 +78,7 @@ Start Type, Start Time, AllowDelay, Priority, Activity, etc.
 
 The Global Priority Table (GPT) defines relative priorities of the two stacks
 based on the activity and priority of RF commands.  For details of the GPT,
-refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_154.c/h`.
+refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_wsn.c/h`.
 
 The Application Level information is the user defined information via the policy
 table and inludes: Application State Name, Weight, AppliedActivity, Pause, etc;

@@ -103,7 +103,7 @@ const config = {
         {
             name: "sensorTestRampDataSize",
             displayName: "Sensor Test Ramp Data Size",
-            default: 0,
+            default: 20,
             hidden: true,
             description: Docs.sensorTestRampDataSize.description,
             longDescription: Docs.sensorTestRampDataSize.longDescription
@@ -194,6 +194,9 @@ function getTestConfigHiddenState(inst, cfgName)
         }
     }
 
+    // Hide all configs for coprocessor project
+    isVisible = isVisible && (inst.project !== "coprocessor");
+
     // Return whether config is hidden
     return(!isVisible);
 }
@@ -208,15 +211,21 @@ function getTestConfigHiddenState(inst, cfgName)
  */
 function setTestConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getTestConfigHiddenState(inst, cfgName);
-    if(ui[cfgName].hidden)
-    {
-        // get a list of all nested and unnested configs
-        const configToReset = Common.findConfig(config.config, cfgName);
-        // restore the default value for the hidden parameter.
-        Common.restoreDefaultValue(inst, configToReset, cfgName);
-    }
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getTestConfigHiddenState);
+}
+
+/*
+ * ======== setAllTestConfigsHiddenState ========
+ * Sets the visibility of all test configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllTestConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getTestConfigHiddenState);
 }
 
 /*
@@ -229,5 +238,6 @@ function setTestConfigHiddenState(inst, ui, cfgName)
 exports = {
     config: config,
     setTestConfigHiddenState: setTestConfigHiddenState,
+    setAllTestConfigsHiddenState: setAllTestConfigsHiddenState,
     getTestConfigHiddenState: getTestConfigHiddenState
 };

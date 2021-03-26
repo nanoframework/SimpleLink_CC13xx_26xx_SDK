@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2020, Texas Instruments Incorporated
+ Copyright (c) 2014-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@
  *****************************************************************************/
 
 // Check if compiler is IAR
-#if !(defined(__IAR_SYSTEMS_ICC__) || defined(__TI_COMPILER_VERSION__))
+#if !(defined(__IAR_SYSTEMS_ICC__) || defined(__TI_COMPILER_VERSION__) || defined (__clang__))
 #error "startup.c: Unsupported compiler!"
 #endif
 

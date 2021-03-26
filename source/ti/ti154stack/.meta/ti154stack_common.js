@@ -47,13 +47,33 @@ const cTypeMax = {
 
 // Settings for ti/devices/CCFG module
 const ti154stackCCFGSettings = {
-    CC1312R1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC1352R1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC1352P1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {},
-    CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {},
-    CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {}
+    CC1312R1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC1352R1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC1352P1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2652RSIP_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2652PSIP_CCFG_SETTINGS: {
+        forceVddr: false
+    }
 };
 
 // Dictionary mapping a device name to default LaunchPad
@@ -61,12 +81,311 @@ const deviceToBoard = {
     CC1352R: "CC1352R1_LAUNCHXL",
     CC1352P: "CC1352P1_LAUNCHXL",
     CC1312R: "CC1312R1_LAUNCHXL",
+    CC2652R1FSIP: "LP_CC2652RSIP",
+    CC2652P1FSIP: "LP_CC2652PSIP",
     CC2652R1: "CC26X2R1_LAUNCHXL",
     CC2652RB: "CC2652RB_LAUNCHXL"
 };
 
-const boardName = getDeviceOrLaunchPadName(true);
-const ccfgSettings = ti154stackCCFGSettings[boardName + "_CCFG_SETTINGS"];
+const currBoardName = getDeviceOrLaunchPadName(true);
+const ccfgSettings = ti154stackCCFGSettings[currBoardName + "_CCFG_SETTINGS"];
+
+// Dictionary mapping current device/board name regex to supported target
+const supportedMigrations = {
+    CC1312R1: {
+        CC1312R1F3RGZ: {},
+        CC1312R1_LAUNCHXL: {},
+        CC1352R1F3RGZ: (target) => isMigrationValidFreqProject(target),
+        CC1352R1_LAUNCHXL: (target) => isMigrationValidFreqProject(target)
+    },
+    CC1352R1: {
+        CC1352R1F3RGZ: {},
+        CC1352R1_LAUNCHXL: {},
+        CC1312R1F3RGZ: (target) => isMigrationValidFreqProject(target),
+        CC1312R1_LAUNCHXL: (target) => isMigrationValidFreqProject(target)
+    },
+    CC1352P1_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P1_LAUNCHXL: {}
+    },
+    CC1352P_2_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P_2_LAUNCHXL: {}
+    },
+    CC1352P_4_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P_4_LAUNCHXL: {}
+    },
+    CC1352P1F3RGZ: {
+        CC1352P1F3RGZ: {},
+        CC1352P1_LAUNCHXL: {},
+        CC1352P_2_LAUNCHXL: {},
+        CC1352P_4_LAUNCHXL: {}
+    },
+    /* Represents RSIP board and device */
+    "CC26.2R.*SIP": {
+        CC2652R1FSIP: {},
+        LP_CC2652RSIP: {},
+        CC2652R1FRGZ: () => isMigrationValidProject(),
+        CC26X2R1_LAUNCHXL: () => isMigrationValidProject()
+    },
+    /* Represents 26X2R1 board and device */
+    "CC26.2R1": {
+        CC2652R1FRGZ: {},
+        CC26X2R1_LAUNCHXL: {},
+        CC2652R1FSIP: () => isMigrationValidProject(),
+        LP_CC2652RSIP: () => isMigrationValidProject()
+    },
+    CC2652RB: {
+        CC2652RB1FRGZ: {},
+        CC2652RB_LAUNCHXL: {}
+    }
+};
+
+/*
+ * ======== isMigrationValidFreq ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the 15.4 module based on the frequency bands supported
+ *
+ * @param migTarget - Target board/device for migration
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValidFreq(migTarget)
+{
+    let migSupported = {
+        warn: "This migration is not currently recommended and has not been "
+        + "fully tested"
+    };
+
+    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
+
+    if(inst.freqBand === "freqBandSub1" && !isSub1GHzDevice(migTarget))
+    {
+        migSupported = {
+            disable: "Cannot migrate from a Sub-1 GHz device or project to a "
+            + "2.4GHz device"
+        };
+    }
+    else if(inst.freqBand === "freqBand24" && !is24GHzDevice(inst, migTarget))
+    {
+        migSupported = {
+            disable: "Cannot migrate from a 2.4 GHz device or project to a "
+            + "Sub-1 GHz device"
+        };
+    }
+
+    return(migSupported);
+}
+
+/*
+ * ======== isMigrationValidProject ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the 15.4 module based on the project
+ *
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValidProject()
+{
+    let migSupported = {};
+
+    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
+
+    if(inst.project === "coprocessor")
+    {
+        migSupported = {
+            disable: "Migrations are not supported on the coprocessor project. "
+            + "Consider starting from an example in "
+            + "<SDK_INSTALL_DIR>/examples/ that is closer to the desired "
+            + "migration target"
+        };
+    }
+
+    return(migSupported);
+}
+
+/*
+ * ======== isMigrationValidFreqProject ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the 15.4 module based on the project and frequency settings
+ *
+ * @param migTarget - Target board/device for migration
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValidFreqProject(migTarget)
+{
+    const migSupported = _.merge(isMigrationValidFreq(migTarget),
+        isMigrationValidProject());
+
+    if(migSupported.disable)
+    {
+        return({disable: migSupported.disable});
+    }
+
+    if(migSupported.warn)
+    {
+        return({warn: migSupported.warn});
+    }
+
+    return({});
+}
+
+/*
+ * ======== isMigrationValid ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the 15.4 module.
+ *
+ * @param currentTarget - Current board/device
+ * @param migrationTarget - Target board/device for migration
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValid(currentTarget, migrationTarget)
+{
+    let migRegex = null;
+
+    const defaultDisableText = "Consider starting from an example in "
+    + " <SDK_INSTALL_DIR>/examples/ that is closer to the desired migration "
+    + "target";
+
+    // Migrations are not supported on CoP project
+    let migSupported = _.merge({disable: defaultDisableText},
+        isMigrationValidProject());
+
+    for(migRegex in supportedMigrations)
+    {
+        if(currentTarget.match(new RegExp(migRegex))
+            && supportedMigrations[migRegex][migrationTarget])
+        {
+            migSupported = supportedMigrations[migRegex][migrationTarget];
+
+            // If function exists then migration support is conditional
+            if(_.isFunction(migSupported))
+            {
+                migSupported = migSupported(migrationTarget);
+            }
+            break;
+        }
+    }
+
+    return(migSupported);
+}
+
+/*
+* ======== getMigrationMarkdown ========
+* Returns text in markdown format that customers can use to aid in migrating a
+* project between device/boards. It is recommended to provide no more
+* than 3 bullet points with up to 120 characters per line.
+*
+* @param currTarget - Board/device being migrated FROM
+* @returns string - Markdown formatted string
+*/
+function getMigrationMarkdown(currTarget)
+{
+    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
+
+    // May need to add guidelines when other boards are supported
+    let migrationText = "";
+
+    if(inst.project === "coprocessor")
+    {
+        migrationText = "* Migrations to different boards or devices are not "
+        + "currently supported on the CoProcessor project";
+    }
+
+    return(migrationText);
+}
+
+/*
+ * ======== migrate ========
+ * Perform stack specific changes to the SysConfig env POST migration
+ *
+ * @param currTarget - Board/device being migrated FROM
+ * @param migrationTarget - Board/device being migrated TO
+ * @param env - SysConfig environment providing access to all configurables
+ * @param projectName - Optional name of the project being migrated
+ *
+ * @returns boolean - true when migration is supported and succesful, false when
+ *                    migration is not supported and/or unsuccesful
+ */
+function migrate(currTarget, migrationTarget, env, projectName = null)
+{
+    const migrationInfo = isMigrationValid(currTarget, migrationTarget);
+    let migrationValid = true;
+    if(migrationInfo.disable || migrationInfo.warn)
+    {
+        migrationValid = false;
+    }
+
+    if(migrationValid)
+    {
+        /* ======== RF Design Settings ======== */
+        const rfDesign = env.system.modules[
+            "/ti/devices/radioconfig/rfdesign"].$static;
+        const rfDesignSettings = env.system.getScript(
+            "/ti/common/lprf_rf_design_settings.js"
+        ).rfDesignSettings;
+
+        if(rfDesignSettings.rfDesign !== undefined)
+        {
+            let setting = null;
+            for(setting in rfDesignSettings)
+            {
+                if(Object.prototype.hasOwnProperty.call(rfDesignSettings,
+                    setting))
+                {
+                    rfDesign[setting] = rfDesignSettings[setting];
+                }
+            }
+
+            if(env.system.modules["/ti/ti154stack/ti154stack"])
+            {
+                const TI154Stack = env.system.modules[
+                    "/ti/ti154stack/ti154stack"].$static;
+                TI154Stack.rfDesign = rfDesignSettings.rfDesign;
+            }
+        }
+
+        /* ======== CCFG Settings ======== */
+        const device = env.system.modules["/ti/devices/CCFG"].$static;
+        const ccfgSettingObj = env.system.getScript(
+            "/ti/common/lprf_ccfg_settings.js"
+        ).ccfgSettings;
+
+        let setting = null;
+        for(setting in ccfgSettingObj)
+        {
+            if(Object.prototype.hasOwnProperty.call(ccfgSettingObj, setting))
+            {
+                device[setting] = ccfgSettingObj[setting];
+            }
+        }
+    }
+
+    return(migrationValid);
+}
 
 /*!
  *  ======== getDeviceOrLaunchPadName ========
@@ -74,14 +393,19 @@ const ccfgSettings = ti154stackCCFGSettings[boardName + "_CCFG_SETTINGS"];
  *
  *  @param convertToBoard - Boolean. When true, return the associated LaunchPad
  *                          name if a device is being used without a LaunchPad
- *
- *  @returns String - Name of the board with prefix /ti/boards and
- *                    suffix .syscfg.json stripped off.  If no board
- *                    was specified, the device name is returned.
+ *  @param name - Optional name of board or device. If null, will use current
+ *               device set
+ *  @returns String - Name of the board with prefix /ti/boards and suffix
+ *                    .syscfg.json stripped off.  If no board was specified,
+ *                    the device name is returned.
  */
-function getDeviceOrLaunchPadName(convertToBoard)
+function getDeviceOrLaunchPadName(convertToBoard, boardName = null)
 {
-    let name = system.deviceData.deviceId;
+    let name = boardName;
+    if(_.isNil(name))
+    {
+        name = system.deviceData.deviceId;
+    }
 
     if(system.deviceData.board != null)
     {
@@ -97,7 +421,7 @@ function getDeviceOrLaunchPadName(convertToBoard)
     // Check if this is a standalone device without a LaunchPad
     if(convertToBoard && !name.includes("LAUNCHXL"))
     {
-        name = getLaunchPadFromDevice();
+        name = getLaunchPadFromDevice(name);
     }
 
     return(name);
@@ -107,11 +431,13 @@ function getDeviceOrLaunchPadName(convertToBoard)
  * ======== isSub1GHzDevice ========
  * Returns whether device supports Sub-1 GHz frequencies
  *
+ * @param name - Optional name of board or device. If null will use current
+ *               board/device
  * @returns - Boolean
  */
-function isSub1GHzDevice()
+function isSub1GHzDevice(boardName = null)
 {
-    const board = getLaunchPadFromDevice();
+    const board = getLaunchPadFromDevice(boardName);
     return(board.includes("CC13"));
 }
 
@@ -120,11 +446,13 @@ function isSub1GHzDevice()
  * Returns whether device supports 2.4 GHz frequency band
  *
  * @param inst - 15.4 instance (null during initialization - uses device)
+ * @param name - Optional name of board or device. If null will use current
+ *               board/device
  * @returns - Boolean
  */
-function is24GHzDevice(inst)
+function is24GHzDevice(inst, boardName = null)
 {
-    let board = getLaunchPadFromDevice();
+    let board = getLaunchPadFromDevice(boardName);
     if(inst !== null)
     {
         board = inst.rfDesign;
@@ -140,11 +468,13 @@ function is24GHzDevice(inst)
  * Returns whether device supports 433 MHz frequency band
  *
  * @param inst - 15.4 instance (null during initialization - uses device)
+ * @param name - Optional name of board or device. If null will use current
+ *               board/device
  * @returns - Boolean
  */
-function is433MHzDevice(inst)
+function is433MHzDevice(inst, boardName = null)
 {
-    let board = getLaunchPadFromDevice();
+    let board = getLaunchPadFromDevice(boardName);
     if(inst !== null)
     {
         board = inst.rfDesign;
@@ -157,11 +487,14 @@ function is433MHzDevice(inst)
  *  ======== isHighPADevice ========
  *  Returns whether device supports high PA
  *
+ * @param name - Optional name of board or device. If null will use current
+ *               board/device
  *  @returns - Boolean
  */
-function isHighPADevice()
+function isHighPADevice(boardName = null)
 {
-    return(getLaunchPadFromDevice().includes("CC1352P"));
+    const board = getLaunchPadFromDevice(boardName);
+    return(board.includes("CC1352P") || board.includes("CC2652PSIP"));
 }
 
 /*!
@@ -170,11 +503,17 @@ function isHighPADevice()
  * devices have a 1 to 1 mapping with a launchpad. Note that P-devices default
  * to a P1 launchpad
  *
+ * @param name - Optional name of board or device. If null will use current
+ *               board/device
  *  @returns String - board that corresponds to device
  */
-function getLaunchPadFromDevice()
+function getLaunchPadFromDevice(boardName = null)
 {
-    let name = system.deviceData.deviceId;
+    let name = boardName;
+    if(_.isNil(name))
+    {
+        name = system.deviceData.deviceId;
+    }
 
     // Find the LaunchPad name in deviceToBoard dictionary
     let key = null;
@@ -410,18 +749,18 @@ function channelMaskCHexStrArr(channelMask)
  * ======== findConfig ========
  * Finds and returns the configurable with the matching provided name
  *
- * @param config  - A module's configurable array
+ * @param configArray  - A module's configurable array
  * @param configName - The name of the configurable to search for
  *
  * @returns - undefined if the configurable is not found, otherwise the entire
  *            configurable object
  */
-function findConfig(config, configName)
+function findConfig(configArray, configName)
 {
     let enumDef;
 
     let element = null;
-    for(element of config)
+    for(element of configArray)
     {
         // If the element contains a group, need to search it's configurables
         if("config" in element)
@@ -446,6 +785,83 @@ function findConfig(config, configName)
     return(enumDef);
 }
 
+/*
+ * ======== findAllConfigs ========
+ * Finds and returns a list of all configurables within array
+ *
+ * @param configArray - A module's configurable arrays
+ * @returns - list of names of all configurable objects within array
+ */
+function findAllConfigs(configArray)
+{
+    let element = null;
+    let allConfigs = [];
+
+    for(element of configArray)
+    {
+        // If the element contains a group, need to search it's configurables
+        if("config" in element)
+        {
+            // Recursively search the sub-groups config array
+            allConfigs = allConfigs.concat(findAllConfigs(element.config));
+        }
+        else if(element.name !== undefined)
+        {
+            // Add to list if the current element is a configurable
+            allConfigs.push(element.name);
+        }
+    }
+
+    return(allConfigs);
+}
+
+/*
+ * ======== setConfigHiddenState ========
+ * Sets the visibility of the selected config
+ *
+ * @param inst    - module instance containing the config that changed
+ * @param ui      - user interface object
+ * @param cfgName - name of config
+ * @param configArrary - A module's configurable array
+ * @param getHidden - function to set configurable visibility
+ */
+function setConfigHiddenState(inst, ui, cfgName, configArray, getHidden)
+{
+    // Set visibility of config
+    ui[cfgName].hidden = getHidden(inst, cfgName);
+
+    if(ui[cfgName].hidden)
+    {
+        // Get a list of all nested and unnested configs
+        const configToReset = findConfig(configArray, cfgName);
+        // Restore the default value for the hidden parameter.
+        restoreDefaultValue(inst, configToReset, cfgName);
+    }
+}
+
+/*
+ * ======== setAllConfigsHiddenState ========
+ * Sets the visibility of all configs within the config array
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ * @param configArray - A module's configurable array
+ * @param getHidden - function to get configurable visibility
+ * @param setHidden - Optional function to set configurable visibility. Uses
+ *                    default setConfigHiddenState if none specified
+ */
+function setAllConfigsHiddenState(inst, ui, configArray, getHidden,
+    setHidden = setConfigHiddenState)
+{
+    let cfgName;
+
+    // Set visibility of all configs
+    const allConfigs = findAllConfigs(configArray);
+    for(cfgName of allConfigs)
+    {
+        setHidden(inst, ui, cfgName, configArray, getHidden);
+    }
+}
 
 /*
  * ======== restoreDefaultValue ========
@@ -472,6 +888,9 @@ function restoreDefaultValue(inst, _cfg, cfgName)
 }
 
 exports = {
+    getMigrationMarkdown: getMigrationMarkdown,
+    isMigrationValid: isMigrationValid,
+    migrate: migrate,
     isSub1GHzDevice: isSub1GHzDevice,
     is24GHzDevice: is24GHzDevice,
     is433MHzDevice: is433MHzDevice,
@@ -486,6 +905,9 @@ exports = {
     validateDynamicMultiEnum: validateDynamicMultiEnum,
     channelMaskCHexStrArr: channelMaskCHexStrArr,
     findConfig: findConfig,
+    findAllConfigs: findAllConfigs,
+    setConfigHiddenState: setConfigHiddenState,
+    setAllConfigsHiddenState: setAllConfigsHiddenState,
     restoreDefaultValue: restoreDefaultValue,
     getSafeDynamicConfig: getSafeDynamicConfig
 };

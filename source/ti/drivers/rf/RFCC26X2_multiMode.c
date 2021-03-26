@@ -412,13 +412,17 @@ static int32_t                  RF_currentHposcFreqOffset;
 /* Temperature notify object used by HPOSC device */
 static Temperature_NotifyObj    RF_hposcRfCompNotifyObj;
 
+/* Common system-level temperature based synth compensation  */
+static void (*pfnUpdateHposcOverride)(uint32_t *pRegOverride) = NULL;
+static int_fast16_t (*pfnTemperatureUnregisterNotify)(Temperature_NotifyObj *notifyObject) = NULL;
+
 /*-------------- Externs ---------------*/
 
 /* Hardware attribute structure populated in board file. */
 extern const RFCC26XX_HWAttrsV2 RFCC26XX_hwAttrs;
 
 /* Software policy set in the board file and implements the distributed scheduling algorithm. */
-__attribute__((weak)) const RFCC26XX_SchedulerPolicy RFCC26XX_schedulerPolicy = {
+__attribute__((weak)) RFCC26XX_SchedulerPolicy RFCC26XX_schedulerPolicy = {
     .submitHook   = RF_defaultSubmitPolicy,
     .executeHook  = RF_defaultExecutionPolicy
 };
@@ -1021,7 +1025,8 @@ static bool RF_ratDispatchTime(uint32_t* dispatchTimeClockTicks)
             else
             {
                 /* Decode the compareTime field. */
-                uint32_t compareTime = ((rfc_CMD_SET_RAT_CMP_t*)&ratCh->chCmd)->compareTime;
+                rfc_CMD_SET_RAT_CMP_t* cmd = (rfc_CMD_SET_RAT_CMP_t *)&ratCh->chCmd;
+                uint32_t compareTime = cmd->compareTime;
 
                 /* Calculate the remained time until this RAT event. The calculation takes
                    into account the minimum power cycle time. */
@@ -2002,7 +2007,6 @@ static void RF_initRadioSetup(RF_Handle handle)
     uint32_t* pRegOverrideTx20     = NULL;
     bool      tx20FeatureAvailable = false;
     bool      update               = handle->clientConfig.bUpdateSetup;
-    bool      hposcAvailable       = OSC_IsHPOSCEnabled();
 
     /* Decode the setup command. */
     RF_RadioSetup* radioSetup = handle->clientConfig.pRadioSetup;
@@ -2064,10 +2068,10 @@ static void RF_initRadioSetup(RF_Handle handle)
         RF_detachOverrides(pRegOverride, pRegOverrideTx20);
     }
 
-    /* Compensate HPOSC drift if HPOSC functionality is enabled. */
-    if(hposcAvailable==true)
+    /* Perform Software Temperature Controlled Crystal Oscillator compensation (SW TCXO), if enabled */
+    if(pfnUpdateHposcOverride != NULL)
     {
-        RF_updateHpOscOverride(pRegOverride);
+        pfnUpdateHposcOverride(pRegOverride);
     }
 }
 
@@ -2902,18 +2906,27 @@ static void RF_radioOpDoneCb(void)
         if (pCmd->pCb)
         {
             /* If any of the cancel events are set, mask out the other events. */
-            RF_EventMask exclusiveEvents = (RF_EventCmdCancelled
-                                            | RF_EventCmdAborted
-                                            | RF_EventCmdStopped
-                                            | RF_EventCmdPreempted);
+            RF_EventMask abortMask = (RF_EventCmdCancelled
+                                      | RF_EventCmdAborted
+                                      | RF_EventCmdStopped
+                                      | RF_EventCmdPreempted);
 
             /* Mask out the other events if any of the above is set. */
-            if (events & exclusiveEvents)
+            if (events & abortMask)
             {
-                events &= exclusiveEvents;
+                RF_EventMask nonTerminatingEvents = events & ~(abortMask | RF_EventCmdDone | RF_EventLastCmdDone |
+                                                               RF_EventLastFGCmdDone | RF_EventFGCmdDone);
+                if (nonTerminatingEvents)
+                {
+                    /* Invoke the user callback with any pending non-terminating events, since bare abort will follow */
+                    pCmd->pCb(pCmd->pClient, pCmd->ch, nonTerminatingEvents);
+                }
+
+                /* Mask out the other events if any of the above is set. */
+                events &= abortMask;
             }
 
-            /* Invoke the use callback */
+            /* Invoke the user callback */
             pCmd->pCb(pCmd->pClient, pCmd->ch, events);
         }
 
@@ -3884,7 +3897,7 @@ static RF_Stat RF_abortCmd(RF_Handle h, RF_CmdHandle ch, bool graceful, bool flu
 
     /* Return with the result:
      - RF_StatSuccess if at least one command was cancelled.
-     - RF_StatCmdEnded, when the command already finished.
+     - RF_StatCmdEnded, when the command already finished (in the Done Q, but not deallocated yet).
      - RF_StatInvalidParamsError otherwise.  */
     return(status);
 }
@@ -4590,9 +4603,11 @@ void RF_close(RF_Handle h)
             HwiP_destruct(&RF_hwiHwObj);
             ClockP_destruct(&RF_clkPowerUpObj);
             ClockP_destruct(&RF_clkInactivityObj);
-            if(OSC_IsHPOSCEnabled() == true)
+
+            /* Unregister temperature notify object if SW TCXO functionality is enabled. */
+            if(pfnTemperatureUnregisterNotify != NULL)
             {
-                Temperature_unregisterNotify(&RF_hposcRfCompNotifyObj);
+                pfnTemperatureUnregisterNotify(&RF_hposcRfCompNotifyObj);
             }
 
             /* Unregister the wakeup notify callback */
@@ -4681,7 +4696,7 @@ RF_CmdHandle RF_postCmd(RF_Handle h, RF_Op* pOp, RF_Priority ePri, RF_Callback p
     /* Try to allocate container */
     RF_Cmd* pCmd = RF_cmdAlloc();
 
-    /* If allocation failed */
+    /* If allocation succeeded */
     if (pCmd)
     {
         /* Stop inactivity clock if running */
@@ -5783,27 +5798,33 @@ RF_TxPowerTable_Value RF_TxPowerTable_findValue(RF_TxPowerTable_Entry table[], i
 
 /*
  *  ======== RF_enableHPOSCTemperatureCompensation ========
- * Initializes the temperature compensation monitoring
+ * Initializes the temperature compensation monitoring (SW TCXO)
+ * This function enables RF synthesizer temperature compensation
+ * It is intended for use on the SIP or BAW devices where compensation 
+ * coefficients are available inside the chip.
+ * 
+ * The name of the function is a misnomer, as it does not only apply to 
+ * HPOSC (BAW) configuration, but will generically enable SW TCXO.
  */
 void RF_enableHPOSCTemperatureCompensation(void)
 {
     int_fast16_t status;
 
-    if(OSC_IsHPOSCEnabled() == true)
+    Temperature_init();
+
+    int16_t currentTemperature = Temperature_getTemperature();
+    
+    status = Temperature_registerNotifyRange(&RF_hposcRfCompNotifyObj,
+                                                currentTemperature + RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
+                                                currentTemperature - RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
+                                                RF_hposcRfCompensateFxn,
+                                                (uintptr_t)NULL);
+
+    pfnUpdateHposcOverride = &RF_updateHpOscOverride;
+    pfnTemperatureUnregisterNotify = &Temperature_unregisterNotify;
+
+    if (status != Temperature_STATUS_SUCCESS)
     {
-        Temperature_init();
-
-        int16_t currentTemperature = Temperature_getTemperature();
-        
-        status = Temperature_registerNotifyRange(&RF_hposcRfCompNotifyObj,
-                                                 currentTemperature + RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
-                                                 currentTemperature - RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
-                                                 RF_hposcRfCompensateFxn,
-                                                 (uintptr_t)NULL);
-
-        if (status != Temperature_STATUS_SUCCESS)
-        {
-            while(1);
-        }
+        while(1);
     }
 }

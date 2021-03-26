@@ -33,7 +33,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2020, Texas Instruments Incorporated
+ Copyright (c) 2014-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -142,6 +142,7 @@ typedef struct
   cteAntProp_t          *cteAntProp;            // CTE antenna properties
   uint8                 privOverrideOffset;    // Privacy Override Offset
   coexUseCaseConfig_t   *coexUseCaseConfig;     // CoEx priority and RX request configuration
+  uint8                 maxNumCteBufs;         // num of CTE samples buffers (each ~2.5KB) used for RF auto copy
 } llUserCfg_t;
 
 /*******************************************************************************

@@ -52,6 +52,8 @@ hide llSetupNextSlaveEvent
 hide GapAdv_prepareLoadByHandle
 hide GapAdv_loadByHandle
 hide gapProcessOSALMsg
+hide gapProcessHCICmdCompleteEvt
+hide gapProcessCommandStatusEvt
 hide gapCentProcessConnEvt
 hide gapPeriProcessConnUpdateCmdStatus
 hide gapPeriProcessConnUpdateCompleteEvt
@@ -73,6 +75,7 @@ hide SM_SetECCRegenerationCount
 hide smResponderProcessLTKReq
 hide SM_p256KeyCB
 hide SM_dhKeyCB
+hide smDetermineIOCaps
 hide llConnExists
 hide llNextChanIndex
 hide llSendAdvSetEndEvent
@@ -104,6 +107,11 @@ hide llSetNextDataChan
 hide smpResponderProcessPairingPublicKey
 hide llExtScan_PostProcess
 hide linkDB_NumActive
+hide llTimeCompare
+hide llAllocConnId
+hide GapScan_disable
+hide llFindNextSecCmd
+hide llSetupExtHdr
 //
 rename ECC_keyGen                 as eccRom_genKeys
 rename ECDH_commonKey             as eccRom_genSharedSecret

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2006-2020, Texas Instruments Incorporated
+ Copyright (c) 2006-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -109,9 +109,10 @@ extern void macRadioSendImmAck(uint8 seq, uint8 panding);
 extern void macRadioSendEnhAck(uint8 pending, sAddr_t *pDstAddr, ApiMac_sec_t *sec);
 extern void macRadioCsmaTxCb(RF_Handle h, RF_CmdHandle ch, RF_EventMask e);
 extern void macRadioLbtTxCb(RF_Handle h, RF_CmdHandle ch, RF_EventMask e);
-#if defined (FEATURE_BEACON_MODE) || defined (FEATURE_NON_BEACON_MODE)
-extern uint32 macRadioTxBackoffBoundary(uint32 backoffs);
+
+#if defined (FEATURE_BEACON_MODE)
 extern uint32 macRadioTxBOBoundary(void);
+extern uint32 macRadioTxBackoffBoundary(uint32 backoffs);
 #endif
 /**************************************************************************************************
  */

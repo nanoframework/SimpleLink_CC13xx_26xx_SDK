@@ -559,7 +559,7 @@ public class iar_rov_server
         po.addFld("executable", $$T_Str, "", "wh");
         po.addFld("listMod", $$T_Bool, false, "wh");
         po.addFld("listAll", $$T_Bool, false, "wh");
-        po.addFld("clientVersion", Proto.Elm.newCNum("(xdc_UInt)"), 1L, "wh");
+        po.addFld("clientVersion", Proto.Elm.newCNum("(xdc_UInt)"), 3L, "wh");
                 fxn = Global.get(cap, "run");
                 if (fxn != null) po.addFxn("run", (Proto.Fxn)om.findStrict("xdc.tools.ICmd$$run", "iar.rov.server"), fxn);
         po = (Proto.Obj)om.findStrict("iar.rov.server.Main$$Params", "iar.rov.server");
@@ -569,7 +569,7 @@ public class iar_rov_server
         po.addFld("executable", $$T_Str, "", "wh");
         po.addFld("listMod", $$T_Bool, false, "wh");
         po.addFld("listAll", $$T_Bool, false, "wh");
-        po.addFld("clientVersion", Proto.Elm.newCNum("(xdc_UInt)"), 1L, "wh");
+        po.addFld("clientVersion", Proto.Elm.newCNum("(xdc_UInt)"), 3L, "wh");
         po = (Proto.Obj)om.findStrict("iar.rov.server.Main$$Object", "iar.rov.server");
         po.init("iar.rov.server.Main.Object", om.findStrict("iar.rov.server.Main.Instance", "iar.rov.server"));
                 fxn = Global.get(cap, "run");
@@ -589,8 +589,8 @@ public class iar_rov_server
         po = (Proto.Obj)om.findStrict("iar.rov.server.Server.Module", "iar.rov.server");
         po.init("iar.rov.server.Server.Module", $$Module);
                 po.addFld("$hostonly", $$T_Num, 1, "r");
-        po.addFld("modelVers", Proto.Elm.newCNum("(xdc_Int)"), 4L, "wh");
-        po.addFld("clientVers", Proto.Elm.newCNum("(xdc_UInt)"), 1L, "wh");
+        po.addFld("modelVers", Proto.Elm.newCNum("(xdc_Int)"), 5L, "wh");
+        po.addFld("clientVers", Proto.Elm.newCNum("(xdc_UInt)"), 3L, "wh");
         fxn = Global.get(cap, "module$use");
         if (fxn != null) om.bind("iar.rov.server.Server$$module$use", true);
         if (fxn != null) po.addFxn("module$use", $$T_Met, fxn);

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2005-2020, Texas Instruments Incorporated
+ Copyright (c) 2005-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -147,8 +147,9 @@
 /*
  * This macro is used to determine the number of elements in an array of complex type
  */
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE( _array ) (sizeof(_array) / sizeof(_array)[0])
-
+#endif /* ifndef ARRAY_SIZE */
 /**************************************************************************************************
  */
 #endif

@@ -148,7 +148,7 @@ const UInt32 ti_sysbios_family_arm_m3_Hwi_resetVectors[] = {
 %}
 };
 
-%if (Hwi.vectorTableAddress != Hwi.resetVectorAddress) {
+%if ((Hwi.vectorTableAddress != Hwi.resetVectorAddress) || (Hwi.placeVectorTables == false)) {
 % if (Program.build.target.$name.match(/gnu/)) {
 %     if (Hwi.isTiva == true) {
 Ptr _vtable_base_address;

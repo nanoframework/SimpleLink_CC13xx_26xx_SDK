@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -147,7 +147,7 @@ void NPITLUART_initializeTransport(Char *tRxBuf, Char *tTxBuf, npiCB_t npiCBack)
 
     // Configure UART parameters.
     UART_Params_init(&params);
-#ifndef TIMAC_AGAMA_FPGA
+#ifndef TI_154STACK_FPGA
     params.baudRate = NPI_UART_BR;
 #else
     params.baudRate = (NPI_UART_BR * 4);

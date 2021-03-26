@@ -9,5 +9,6 @@ package/package.cfg.xdc.inc
 lib/debug/ti.sysbios.rts.ti.aem4f
 package/package_ti.sysbios.rts.ti.c
 ReentSupport.c
+lib/debug/ti.sysbios.rts.ti.am4f
 lib/debug/ti.sysbios.rts.ti.am4fg
 lib/debug/ti.sysbios.rts.ti.arm4f

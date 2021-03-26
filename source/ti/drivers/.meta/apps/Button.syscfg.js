@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -194,6 +194,7 @@ function moduleInstances(inst)
     switch(inst.hwConfig) {
         case "Active Low No Pull":
             args = {
+                $hardware: inst.$hardware,
                 mode : "Input",
                 pull : "Pull Up",
                 interruptTrigger : "Falling Edge"
@@ -201,6 +202,7 @@ function moduleInstances(inst)
             break;
         case "Active Low Pull Up":
             args = {
+                $hardware: inst.$hardware,
                 mode : "Input",
                 pull : "None",
                 interruptTrigger : "Falling Edge"
@@ -208,6 +210,7 @@ function moduleInstances(inst)
             break;
         case "Active High No Pull":
             args = {
+                $hardware: inst.$hardware,
                 mode : "Input",
                 pull : "Pull Down",
                 interruptTrigger : "Rising Edge"
@@ -215,6 +218,7 @@ function moduleInstances(inst)
             break;
         case "Active High Pull Down":
             args = {
+                $hardware: inst.$hardware,
                 mode : "Input",
                 pull : "None",
                 interruptTrigger : "Rising Edge"
@@ -227,8 +231,7 @@ function moduleInstances(inst)
         displayName: "GPIO Pin",
         description: "This Button is driven by a GPIO",
         moduleName: "/ti/drivers/GPIO",
-        hardware : inst.$hardware,
-        args: args
+        requiredArgs: args
     }];
 
     return(gpio);
@@ -279,12 +282,12 @@ The [__Button driver__][1] provides a simple interface to control Buttons.
 * [Usage Synopsis][2]
 * [Examples][3]
 * [Configuration][4]
-[1]: /tidrivers/doxygen/html/_button_8h.html#details "C API reference"
+[1]: /drivers/doxygen/html/_button_8h.html#details "C API reference"
 [2]:
-/tidrivers/doxygen/html/_button_8h.html#ti_drivers_Button_Synopsis "Synopsis"
-[3]: /tidrivers/doxygen/html/_button_8h.html#ti_drivers_Button_Examples
+/drivers/doxygen/html/_button_8h.html#ti_drivers_Button_Synopsis "Synopsis"
+[3]: /drivers/doxygen/html/_button_8h.html#ti_drivers_Button_Examples
 "C usage examples"
-[4]: /tidrivers/syscfg/html/ConfigDoc.html#Button_Configuration_Options "Configuration options reference"
+[4]: /drivers/syscfg/html/ConfigDoc.html#Button_Configuration_Options "Configuration options reference"
 `,
     defaultInstanceName: "CONFIG_BUTTON_",
     config: Common.addNameConfig(config, "/ti/drivers/apps/Button", "CONFIG_BUTTON_"),

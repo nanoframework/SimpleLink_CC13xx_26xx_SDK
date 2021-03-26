@@ -176,10 +176,10 @@ function validate(inst, validation)
     {
         validation.logError("Max Length of Device Name Attribute is 21", inst, "deviceName");
     }
-    // Limit Maximum Number of Connections to be 8 when device role != Central
-    if(inst.deviceRole != "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 8))
+    // Limit Maximum Number of Connections to be 16 when device role != Central
+    if(inst.deviceRole != "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 16))
     {
-        validation.logError("Maximum Number of Connections range is 0 to 8", inst, "maxConnNum");
+        validation.logError("Maximum Number of Connections range is 0 to 16", inst, "maxConnNum");
     }
     // Limit Maximum Number of Connections to be 31 when device role == Central
     if(inst.deviceRole == "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 32))

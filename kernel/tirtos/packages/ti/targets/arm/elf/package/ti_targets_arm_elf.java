@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_targets_arm_elf
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -116,6 +116,54 @@ public class ti_targets_arm_elf
         om.bind("ti.targets.arm.elf.Arm9.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
         om.bind("ti.targets.arm.elf.Arm9.Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
         om.bind("ti.targets.arm.elf.Arm9.Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+    }
+
+    void IM0$$OBJECTS()
+    {
+        Proto.Obj po, spo;
+        Value.Obj vo;
+
+        po = (Proto.Obj)om.bind("ti.targets.arm.elf.IM0.Module", new Proto.Obj());
+        vo = (Value.Obj)om.bind("ti.targets.arm.elf.IM0", new Value.Obj("ti.targets.arm.elf.IM0", po));
+        pkgV.bind("IM0", vo);
+        // decls 
+        om.bind("ti.targets.arm.elf.IM0.Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.IM0.Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+    }
+
+    void M0$$OBJECTS()
+    {
+        Proto.Obj po, spo;
+        Value.Obj vo;
+
+        po = (Proto.Obj)om.bind("ti.targets.arm.elf.M0.Module", new Proto.Obj());
+        vo = (Value.Obj)om.bind("ti.targets.arm.elf.M0", new Value.Obj("ti.targets.arm.elf.M0", po));
+        pkgV.bind("M0", vo);
+        // decls 
+        om.bind("ti.targets.arm.elf.M0.Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        om.bind("ti.targets.arm.elf.M0.Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
     }
 
     void IM3$$OBJECTS()
@@ -392,6 +440,16 @@ public class ti_targets_arm_elf
         // module Arm9
     }
 
+    void IM0$$CONSTS()
+    {
+        // interface IM0
+    }
+
+    void M0$$CONSTS()
+    {
+        // module M0
+    }
+
     void IM3$$CONSTS()
     {
         // interface IM3
@@ -455,6 +513,20 @@ public class ti_targets_arm_elf
     }
 
     void Arm9$$CREATES()
+    {
+        Proto.Fxn fxn;
+        StringBuilder sb;
+
+    }
+
+    void IM0$$CREATES()
+    {
+        Proto.Fxn fxn;
+        StringBuilder sb;
+
+    }
+
+    void M0$$CREATES()
     {
         Proto.Fxn fxn;
         StringBuilder sb;
@@ -550,6 +622,18 @@ public class ti_targets_arm_elf
 
     }
 
+    void IM0$$FUNCTIONS()
+    {
+        Proto.Fxn fxn;
+
+    }
+
+    void M0$$FUNCTIONS()
+    {
+        Proto.Fxn fxn;
+
+    }
+
     void IM3$$FUNCTIONS()
     {
         Proto.Fxn fxn;
@@ -621,6 +705,14 @@ public class ti_targets_arm_elf
     }
 
     void Arm9$$SIZES()
+    {
+    }
+
+    void IM0$$SIZES()
+    {
+    }
+
+    void M0$$SIZES()
     {
     }
 
@@ -763,6 +855,55 @@ public class ti_targets_arm_elf
         po.addFld("ccConfigOpts", (Proto)om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"), Global.newObject("prefix", "$(ccOpts.prefix) -ms", "suffix", "$(ccOpts.suffix)"), "wh");
         po.addFld("includeOpts", $$T_Str, "-I$(rootDir)/include ", "wh");
         po.addFld("stdTypes", (Proto)om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"), Global.newObject("t_IArg", Global.newObject("size", 4L, "align", 4L), "t_Char", Global.newObject("size", 1L, "align", 1L), "t_Double", Global.newObject("size", 8L, "align", 4L), "t_Float", Global.newObject("size", 4L, "align", 4L), "t_Fxn", Global.newObject("size", 4L, "align", 4L), "t_Int", Global.newObject("size", 4L, "align", 4L), "t_Int8", Global.newObject("size", 1L, "align", 1L), "t_Int16", Global.newObject("size", 2L, "align", 2L), "t_Int32", Global.newObject("size", 4L, "align", 4L), "t_Int64", Global.newObject("size", 8L, "align", 4L), "t_Long", Global.newObject("size", 4L, "align", 4L), "t_LDouble", Global.newObject("size", 8L, "align", 4L), "t_LLong", Global.newObject("size", 8L, "align", 4L), "t_Ptr", Global.newObject("size", 4L, "align", 4L), "t_Short", Global.newObject("size", 2L, "align", 2L), "t_Size", Global.newObject("size", 4L, "align", 4L)), "rh");
+                po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("compile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$compile", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("scompile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$scompile", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("link", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$link", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("getVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getVersion", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("getISAChain", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$getISAChain", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("findSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$findSuffix", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("selectSuffix", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$selectSuffix", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("genConstCustom", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genConstCustom", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("genVisibleData", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleData", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("genVisibleFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleFxns", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("genVisibleLibFxns", (Proto.Fxn)om.findStrict("xdc.bld.ITarget2$$genVisibleLibFxns", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("getRawVersion", (Proto.Fxn)om.findStrict("xdc.bld.ITarget3$$getRawVersion", "ti.targets.arm.elf"), $$UNDEF);
+                po.addFxn("asmName", (Proto.Fxn)om.findStrict("ti.targets.ITarget$$asmName", "ti.targets.arm.elf"), $$UNDEF);
+    }
+
+    void IM0$$TYPES()
+    {
+        Scriptable cap;
+        Proto.Obj po;
+        Proto.Str ps;
+        Proto.Typedef pt;
+        Object fxn;
+
+        po = (Proto.Obj)om.findStrict("ti.targets.arm.elf.IM0.Module", "ti.targets.arm.elf");
+        po.init("ti.targets.arm.elf.IM0.Module", om.findStrict("ti.targets.arm.elf.IArm.Module", "ti.targets.arm.elf"));
+                po.addFld("$hostonly", $$T_Num, 1, "r");
+        po.addFld("isa", $$T_Str, "v6M", "rh");
+        po.addFld("platform", $$T_Str, "ti.platforms.simCM3", "wh");
+        po.addFld("model", (Proto)om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"), Global.newObject("endian", "little", "codeModel", "thumb2", "shortEnums", true), "rh");
+        po.addFld("lnk", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"), Global.newObject("cmd", "armcl", "opts", "--silicon_version=6M0 -z --strict_compatibility=on"), "rh");
+    }
+
+    void M0$$TYPES()
+    {
+        Scriptable cap;
+        Proto.Obj po;
+        Proto.Str ps;
+        Proto.Typedef pt;
+        Object fxn;
+
+        po = (Proto.Obj)om.findStrict("ti.targets.arm.elf.M0.Module", "ti.targets.arm.elf");
+        po.init("ti.targets.arm.elf.M0.Module", om.findStrict("ti.targets.arm.elf.IM0.Module", "ti.targets.arm.elf"));
+                po.addFld("$hostonly", $$T_Num, 1, "r");
+        po.addFld("name", $$T_Str, "M0", "rh");
+        po.addFld("suffix", $$T_Str, "em0", "rh");
+        po.addFld("rts", $$T_Str, "ti.targets.arm.rtsarm", "rh");
+        po.addFld("cc", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"), Global.newObject("cmd", "armcl -c", "opts", "--endian=little -mv6M0 --abi=eabi"), "rh");
+        po.addFld("asm", (Proto)om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"), Global.newObject("cmd", "armcl -c", "opts", "--endian=little -mv6M0 --abi=eabi"), "rh");
                 po.addFxn("archive", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$archive", "ti.targets.arm.elf"), $$UNDEF);
                 po.addFxn("compile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$compile", "ti.targets.arm.elf"), $$UNDEF);
                 po.addFxn("scompile", (Proto.Fxn)om.findStrict("xdc.bld.ITarget$$scompile", "ti.targets.arm.elf"), $$UNDEF);
@@ -1082,6 +1223,14 @@ public class ti_targets_arm_elf
     {
     }
 
+    void IM0$$ROV()
+    {
+    }
+
+    void M0$$ROV()
+    {
+    }
+
     void IM3$$ROV()
     {
     }
@@ -1305,6 +1454,143 @@ public class ti_targets_arm_elf
         atmap.seal("length");
         pkgV.bind("Arm9", vo);
         ((Value.Arr)pkgV.getv("$unitNames")).add("Arm9");
+    }
+
+    void IM0$$SINGLETONS()
+    {
+        Proto.Obj po;
+        Value.Obj vo;
+
+        vo = (Value.Obj)om.findStrict("ti.targets.arm.elf.IM0", "ti.targets.arm.elf");
+        po = (Proto.Obj)om.findStrict("ti.targets.arm.elf.IM0.Module", "ti.targets.arm.elf");
+        vo.init2(po, "ti.targets.arm.elf.IM0", $$DEFAULT, false);
+        vo.bind("Module", po);
+        vo.bind("$category", "Interface");
+        vo.bind("$capsule", $$UNDEF);
+        vo.bind("$package", om.findStrict("ti.targets.arm.elf", "ti.targets.arm.elf"));
+        tdefs.clear();
+        proxies.clear();
+        inherits.clear();
+        vo.bind("Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        vo.bind("DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        vo.bind("Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        vo.bind("CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        vo.bind("OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        vo.bind("CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        vo.bind("LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        vo.bind("ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        vo.bind("CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        vo.bind("StringArray", om.findStrict("xdc.bld.ITarget.StringArray", "ti.targets.arm.elf"));
+        vo.bind("TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        vo.bind("StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        vo.bind("Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        vo.bind("Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+        vo.bind("$$tdefs", Global.newArray(tdefs.toArray()));
+        vo.bind("$$proxies", Global.newArray(proxies.toArray()));
+        inherits.add("ti.targets.arm.elf");
+        inherits.add("ti.targets");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        vo.bind("$$inherits", Global.newArray(inherits.toArray()));
+        ((Value.Arr)pkgV.getv("$interfaces")).add(vo);
+        pkgV.bind("IM0", vo);
+        ((Value.Arr)pkgV.getv("$unitNames")).add("IM0");
+        vo.seal(null);
+        if (vo.getProto().lookupFld("$used") != null) {
+            vo.unseal("$used");
+        }
+    }
+
+    void M0$$SINGLETONS()
+    {
+        Proto.Obj po;
+        Value.Obj vo;
+
+        vo = (Value.Obj)om.findStrict("ti.targets.arm.elf.M0", "ti.targets.arm.elf");
+        po = (Proto.Obj)om.findStrict("ti.targets.arm.elf.M0.Module", "ti.targets.arm.elf");
+        vo.init2(po, "ti.targets.arm.elf.M0", $$DEFAULT, false);
+        vo.bind("Module", po);
+        vo.bind("$category", "Module");
+        vo.bind("$capsule", $$UNDEF);
+        vo.bind("$package", om.findStrict("ti.targets.arm.elf", "ti.targets.arm.elf"));
+        tdefs.clear();
+        proxies.clear();
+        mcfgs.clear();
+        icfgs.clear();
+        inherits.clear();
+        vo.bind("Model", om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Model", "ti.targets.arm.elf"));
+        vo.bind("DebugGen", om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.DebugGen", "ti.targets.arm.elf"));
+        vo.bind("Extension", om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.Extension", "ti.targets.arm.elf"));
+        vo.bind("CompileOptions", om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileOptions", "ti.targets.arm.elf"));
+        vo.bind("OptionSet", om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.OptionSet", "ti.targets.arm.elf"));
+        vo.bind("CompileGoal", om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CompileGoal", "ti.targets.arm.elf"));
+        vo.bind("LinkGoal", om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.LinkGoal", "ti.targets.arm.elf"));
+        vo.bind("ArchiveGoal", om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.ArchiveGoal", "ti.targets.arm.elf"));
+        vo.bind("CommandSet", om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.CommandSet", "ti.targets.arm.elf"));
+        vo.bind("StringArray", om.findStrict("xdc.bld.ITarget.StringArray", "ti.targets.arm.elf"));
+        vo.bind("TypeInfo", om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.TypeInfo", "ti.targets.arm.elf"));
+        vo.bind("StdTypes", om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget.StdTypes", "ti.targets.arm.elf"));
+        vo.bind("Command", om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Command", "ti.targets.arm.elf"));
+        vo.bind("Options", om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+        tdefs.add(om.findStrict("xdc.bld.ITarget2.Options", "ti.targets.arm.elf"));
+        vo.bind("$$tdefs", Global.newArray(tdefs.toArray()));
+        vo.bind("$$proxies", Global.newArray(proxies.toArray()));
+        vo.bind("$$mcfgs", Global.newArray(mcfgs.toArray()));
+        vo.bind("$$icfgs", Global.newArray(icfgs.toArray()));
+        inherits.add("ti.targets.arm.elf");
+        inherits.add("ti.targets.arm.elf");
+        inherits.add("ti.targets");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        inherits.add("xdc.bld");
+        vo.bind("$$inherits", Global.newArray(inherits.toArray()));
+        ((Value.Arr)pkgV.getv("$modules")).add(vo);
+        ((Value.Arr)om.findStrict("$modules", "ti.targets.arm.elf")).add(vo);
+        vo.bind("$$instflag", 0);
+        vo.bind("$$iobjflag", 1);
+        vo.bind("$$sizeflag", 1);
+        vo.bind("$$dlgflag", 0);
+        vo.bind("$$iflag", 1);
+        vo.bind("$$romcfgs", "|");
+        vo.bind("$$nortsflag", 0);
+        Proto.Str ps = (Proto.Str)vo.find("Module_State");
+        if (ps != null) vo.bind("$object", ps.newInstance());
+        vo.bind("$$meta_iobj", om.has("ti.targets.arm.elf.M0$$instance$static$init", null) ? 1 : 0);
+        vo.bind("$$fxntab", Global.newArray());
+        vo.bind("$$logEvtCfgs", Global.newArray());
+        vo.bind("$$errorDescCfgs", Global.newArray());
+        vo.bind("$$assertDescCfgs", Global.newArray());
+        Value.Map atmap = (Value.Map)vo.getv("$attr");
+        atmap.setElem("", "xdc/bld/stddefs.xdt");
+        atmap.seal("length");
+        pkgV.bind("M0", vo);
+        ((Value.Arr)pkgV.getv("$unitNames")).add("M0");
     }
 
     void IM3$$SINGLETONS()
@@ -2096,6 +2382,7 @@ public class ti_targets_arm_elf
         if (isCFG) {
         }//isCFG
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.arm.elf.Arm9", "ti.targets.arm.elf"));
+        Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.arm.elf.M0", "ti.targets.arm.elf"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.arm.elf.M3", "ti.targets.arm.elf"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.arm.elf.M4", "ti.targets.arm.elf"));
         Global.callFxn("module$meta$init", (Scriptable)om.findStrict("ti.targets.arm.elf.M4F", "ti.targets.arm.elf"));
@@ -2106,6 +2393,8 @@ public class ti_targets_arm_elf
         Global.callFxn("init", pkgV);
         ((Value.Obj)om.getv("ti.targets.arm.elf.IArm")).bless();
         ((Value.Obj)om.getv("ti.targets.arm.elf.Arm9")).bless();
+        ((Value.Obj)om.getv("ti.targets.arm.elf.IM0")).bless();
+        ((Value.Obj)om.getv("ti.targets.arm.elf.M0")).bless();
         ((Value.Obj)om.getv("ti.targets.arm.elf.IM3")).bless();
         ((Value.Obj)om.getv("ti.targets.arm.elf.M3")).bless();
         ((Value.Obj)om.getv("ti.targets.arm.elf.IM4")).bless();
@@ -2135,6 +2424,8 @@ public class ti_targets_arm_elf
         $$OBJECTS();
         IArm$$OBJECTS();
         Arm9$$OBJECTS();
+        IM0$$OBJECTS();
+        M0$$OBJECTS();
         IM3$$OBJECTS();
         M3$$OBJECTS();
         IM4$$OBJECTS();
@@ -2148,6 +2439,8 @@ public class ti_targets_arm_elf
         R5Ft$$OBJECTS();
         IArm$$CONSTS();
         Arm9$$CONSTS();
+        IM0$$CONSTS();
+        M0$$CONSTS();
         IM3$$CONSTS();
         M3$$CONSTS();
         IM4$$CONSTS();
@@ -2161,6 +2454,8 @@ public class ti_targets_arm_elf
         R5Ft$$CONSTS();
         IArm$$CREATES();
         Arm9$$CREATES();
+        IM0$$CREATES();
+        M0$$CREATES();
         IM3$$CREATES();
         M3$$CREATES();
         IM4$$CREATES();
@@ -2174,6 +2469,8 @@ public class ti_targets_arm_elf
         R5Ft$$CREATES();
         IArm$$FUNCTIONS();
         Arm9$$FUNCTIONS();
+        IM0$$FUNCTIONS();
+        M0$$FUNCTIONS();
         IM3$$FUNCTIONS();
         M3$$FUNCTIONS();
         IM4$$FUNCTIONS();
@@ -2187,6 +2484,8 @@ public class ti_targets_arm_elf
         R5Ft$$FUNCTIONS();
         IArm$$SIZES();
         Arm9$$SIZES();
+        IM0$$SIZES();
+        M0$$SIZES();
         IM3$$SIZES();
         M3$$SIZES();
         IM4$$SIZES();
@@ -2200,6 +2499,8 @@ public class ti_targets_arm_elf
         R5Ft$$SIZES();
         IArm$$TYPES();
         Arm9$$TYPES();
+        IM0$$TYPES();
+        M0$$TYPES();
         IM3$$TYPES();
         M3$$TYPES();
         IM4$$TYPES();
@@ -2214,6 +2515,8 @@ public class ti_targets_arm_elf
         if (isROV) {
             IArm$$ROV();
             Arm9$$ROV();
+            IM0$$ROV();
+            M0$$ROV();
             IM3$$ROV();
             M3$$ROV();
             IM4$$ROV();
@@ -2229,6 +2532,8 @@ public class ti_targets_arm_elf
         $$SINGLETONS();
         IArm$$SINGLETONS();
         Arm9$$SINGLETONS();
+        IM0$$SINGLETONS();
+        M0$$SINGLETONS();
         IM3$$SINGLETONS();
         M3$$SINGLETONS();
         IM4$$SINGLETONS();

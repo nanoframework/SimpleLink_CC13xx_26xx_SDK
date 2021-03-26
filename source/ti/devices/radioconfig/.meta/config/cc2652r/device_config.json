@@ -76,10 +76,6 @@
                 "$": ".\/..\/config\/cc2652r"
             },
             {
-                "_file": "register_definition.json",
-                "$": ".\/..\/config\/cc2652r"
-            },
-            {
                 "_file": "rf_command_definitions.json",
                 "$": ".\/..\/config\/cc2652r_ble_pg21"
             },
@@ -92,10 +88,6 @@
                 "_file": "rf_command_definitions.json",
                 "_phy": "prop",
                 "$": ".\/..\/config\/cc2652r_prop_pg21"
-            },
-            {
-                "_file": "status_definition.json",
-                "$": ".\/..\/config\/cc2652r"
             },
             {
                 "_file": "categories.json",

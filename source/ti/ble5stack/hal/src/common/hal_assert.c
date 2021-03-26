@@ -11,7 +11,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2006-2020, Texas Instruments Incorporated
+ Copyright (c) 2006-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -413,8 +413,10 @@ void halAssertHazardLights(void)
        */
       while (iByte < DEBUG_DATA_SIZE)
       {
-        /* wait for key press */
-        while(!HAL_PUSH_BUTTON1());
+        while(!HAL_PUSH_BUTTON1())
+        {
+            // wait for key press
+        };
 
         /* turn on all LEDs for first bit of byte, turn on three LEDs if
           not first bit */

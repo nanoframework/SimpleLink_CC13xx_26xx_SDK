@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -92,6 +92,7 @@ Void *HeapTrack_alloc(HeapTrack_Object *obj, SizeT size, SizeT align,
 {
     Char *buf;
     SizeT rem;
+    SizeT allocSize;
     Queue_Handle trackQueue;
     HeapTrack_Tracker *tracker;
     UInt key;
@@ -101,16 +102,25 @@ Void *HeapTrack_alloc(HeapTrack_Object *obj, SizeT size, SizeT align,
     /* Scribble must be UArg aligned, calculate remainder to add in */
     rem = size % sizeof(UArg) ? sizeof(UArg) - (size % sizeof(UArg)) : 0;
 
+    allocSize = size + rem + sizeof(HeapTrack_Tracker);
+
+    /*
+     * If size is very large and allocSize overflows, the result will be
+     * smaller than size. In this case, don't try to allocate.
+     */
+    if (allocSize < size) {
+        return (NULL);
+    }
+
     /* Add in the Tracker structure and remainder */
-    buf = Memory_alloc(obj->internalHeap,
-                       size + rem + sizeof(HeapTrack_Tracker), align, eb);
+    buf = Memory_alloc(obj->internalHeap, allocSize, align, eb);
     if (buf == NULL) {
         return (NULL);
     }
 
     /* Save new heap size and update peak sizes */
     key = Hwi_disable();
-    obj->size += (size + rem + sizeof(HeapTrack_Tracker));
+    obj->size += allocSize;
     if (obj->size > obj->peak) {
         obj->peak = obj->size;
     }

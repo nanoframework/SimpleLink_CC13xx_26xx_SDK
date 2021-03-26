@@ -1,6 +1,11 @@
 "use strict";
 
 const Common = system.getScript("/ti/ble5stack/ble_common.js");
+let gIndex = 0 ;// system.getScript("/ti/ble5stack/gatt_services/Service").gIndex;
+function resetIndex() {
+	gIndex = 0;
+}
+
 // Function to check if a string contains only letters, numbers and underscore.
 function alphanumeric(inputtxt)
 {
@@ -109,47 +114,80 @@ function validate(inst, vo)
 		}
 	}
 
-	counter = 0;
-	for (let i = 0; i < serviceMod.$instances.length; i++) {
-		if(serviceMod.$instances[i].name.toLowerCase() == inst.name.toLowerCase()){
-			counter ++;
-			if(counter > 1){
-				vo["name"].errors.push("This name is taken by another service/characteristic.");
-				break;
-			}
-		}
+    counter = 0;
+    for (let i = 0; i < serviceMod.$instances.length; i++) {
+        if(serviceMod.$instances[i].name.toLowerCase() == inst.name.toLowerCase()) {
+            counter ++;
+            if(counter > 1){
+                vo["name"].errors.push("This name is taken by another service/characteristic.");
+                break;
+            }
+        }
 
-		for (let cidx = 0; cidx < serviceMod.$instances[i].characteristics.length; ++ cidx) {
-			if(serviceMod.$instances[i].characteristics[cidx].name.toLowerCase() == inst.name.toLowerCase()) {
-			counter ++;
-				if(counter > 1) {
-					vo["name"].errors.push("This name is taken by another service/characteristic.");
-					break;
-				}
-			}
-		}
-	}
+        for (let cidx = 0; cidx < serviceMod.$instances[i].characteristics.length; ++ cidx) {
+            if(serviceMod.$instances[i].characteristics[cidx].name.toLowerCase() == inst.name.toLowerCase()) {
+                counter ++;
+                if(counter > 1 && inst.name != "") {
+                    vo["name"].errors.push("This name is taken by another service/characteristic.");
+                    break;
+                }
+            }
+        }
+    }
 }
 
+/*
+ *  ======== updateName ========
+ *  @param inst  - Module instance containing the config that changed
+ */
+function updateName(inst)
+{
+	inst.name = inst.$name;
+}
+
+function updateUuid(inst) {
+	let str = inst.$name;                     //Characteristic_8
+	str =  str.replace(/[^0-9]/g, "");        //8
+	str = (parseInt(str) + 1).toString(16);
+	str = str.length>1 ? inst.hiddenUuid + str : inst.hiddenUuid + "0" + str;       //08
+	//str = inst.hiddenUuid + inst.name;			  //108 (if we in service 1)
+	inst.uuid = system.utils.bigInt(str,16);
+}
 let config = [
     {
-        name       : 'name',
-        displayName: 'Characteristic Name',
-        default    : ''
+        name        : 'name',
+        displayName : 'Characteristic Name',
+        default     : '',
+	},
+	{
+        name        : 'hiddenName',
+        displayName : 'Hidden Characteristic Name',
+        hidden	    : true,
+        default     : '',
+        onChange    : updateName
     },
 	{
-        name       : 'description',
-        displayName: 'Characteristic description',
-        default    : ''
+        name        : 'description',
+        displayName : 'Characteristic Description',
+        default     : '',
+        placeholder : "Optional- Enter description for this characteristic",
+
     },
     {
-        name       : 'uuidSize',
-        displayName: 'Characteristic UUID Size',
-        default    : '16-bit',
-        options    : [
+        name        : 'uuidSize',
+        displayName : 'Characteristic UUID Size',
+        default     : '16-bit',
+        options     : [
             { name: '16-bit'  },
             { name: '128-bit' }
         ]
+	},
+	{
+        name       : 'hiddenUuid',
+        hidden     : true,
+        default    : "0000",
+        //displayFormat: 'hex',
+        onChange: updateUuid
     },
     {
         name         : 'uuid',
@@ -159,15 +197,16 @@ let config = [
     },
     {
         name         : 'bytes',
-        displayName  : 'Value length (bytes).',
-        default      : 1
+        displayName  : 'Value Length (bytes)',
+        default      : 0
     },
 	{
-        name         : 'value',
-        displayName  : 'Value',
-		default		 :	'',
-		longDescription:`Please enter the value byte by byte, seperated with a comma (','), in Hexadecimal characters. No spaces and other characters are allowed. for example- 00,0F,22.`
-
+        name            : 'value',
+        displayName     : 'Value',
+		default		    :	'',
+		longDescription :`Please enter the value byte by byte, seperated with a comma (','), in Hexadecimal characters. No spaces and other characters are allowed. for example- 00,0F,22.
+		NOTE- When you fill out a Value this is the default value, but the value can change at runtime.`,
+		placeholder : "Optional- Enter a value based on the value length field above",
 	},
     {
         name            : 'properties',
@@ -200,6 +239,6 @@ exports = {
     description          : 'Characteristic',
     defaultInstanceName  : 'Characteristic_',
     config               : config,
-    validate             : validate
-
+    validate             : validate,
+    resetIndex           : resetIndex
 };

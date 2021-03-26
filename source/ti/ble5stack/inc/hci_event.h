@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -350,6 +350,7 @@ extern uint8 pHciEvtMask2[];
                                LE_EVT_MASK_EXTENDED_ADV_SET_TERIMINATED       |\
                                LE_EVT_MASK_SCAN_REQUEST_RECEIVED              |\
                                LE_EVT_MASK_CHANNEL_SELECTION_ALGORITHM        |\
+                               LE_EVT_MASK_CONNECTIONLESS_IQ_REPORT           |\
                                LE_EVT_MASK_CONNECTION_IQ_REPORT               |\
                                LE_EVT_MASK_CTE_REQUEST_FAILED)
   #else // !CHAN_ALGO2_CFG
@@ -397,12 +398,16 @@ extern uint8 pHciEvtMask2[];
 #define HCI_CONNECTION_IQ_REPORT_EVENT_LEN                             14
 #define HCI_CTE_REQUEST_FAILED_EVENT_LEN                               4
 #define HCI_CONNECTIONLESS_IQ_REPORT_EVENT_LEN                         13
+#define HCI_PERIODIC_ADV_SYNCH_ESTABLISHED_EVENT_LEN                   16
+#define HCI_PERIODIC_ADV_REPORT_EVENT_LEN                              8
+#define HCI_PERIODIC_ADV_SYNCH_LOST_EVENT_LEN                          3
 // LE Synchronous Event Lengths
 #define HCI_LE_READ_ANTENNA_INFORMATION_LEN                            5
 // Vendor Specific LE Events
 #define HCI_SCAN_REQ_REPORT_EVENT_LEN                                  11
 #define HCI_EXT_CONNECTION_IQ_REPORT_EVENT_LEN                         20
 #define HCI_BLE_CHANNEL_MAP_UPDATE_EVENT_LEN                           9
+#define HCI_EXT_CONNECTIONLESS_IQ_REPORT_EVENT_LEN                     19
 
 
 /*******************************************************************************

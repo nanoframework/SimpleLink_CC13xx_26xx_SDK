@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -158,6 +158,11 @@ extern "C"
 #ifndef MAX_NUM_RL_ENTRIES              
 #define MAX_NUM_RL_ENTRIES              10  // at 60 bytes per RL entry
 #endif                                  
+
+// Number of CTE Sampling Buffers
+#ifndef MAX_NUM_CTE_BUFS
+#define MAX_NUM_CTE_BUFS                1  // one CTE samples buffer of ~2.5KB used for RF auto copy
+#endif
                                         
 #ifndef MAX_NUM_MST_PKTS                
 #define MAX_NUM_MST_PKTS                UNLIMITED_PKTS_PER_EVENT
@@ -283,7 +288,7 @@ PACKED_TYPEDEF_STRUCT
 
 extern uint8 numTxDataBufs;
 extern uint8 maxNumTxDataBufs;
-
+extern uint8 maxNumCteDataBufs;
 extern uint8 maxNumConns;
 extern uint16 maximumPduSize;
 extern uint8 rfFeModeBias;

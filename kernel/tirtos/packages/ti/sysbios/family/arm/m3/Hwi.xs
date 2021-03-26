@@ -173,6 +173,12 @@ if (xdc.om.$name == "cfg") {
             resetVectorAddress : 0x0,           /* placed low in flash */
             vectorTableAddress : 0x20000000,
         },
+        "CC26.1.*": {
+            numInterrupts : 16 + 38,            /* supports 54 interrupts */
+            numPriorities : 8,
+            resetVectorAddress : 0x0,           /* placed low in flash */
+            vectorTableAddress : 0x20000000,
+        },
         "CC26.*": {
             numInterrupts : 16 + 34,            /* supports 50 interrupts */
             numPriorities : 8,
@@ -190,6 +196,16 @@ if (xdc.om.$name == "cfg") {
             numPriorities : 8,
             resetVectorAddress : 0x01000800,
             vectorTableAddress : 0x20000000,
+        },
+        /*
+         * CC32XX vector table placement must be done in the linker.cmd file.
+         * Hwi.placeVectorTables config parameter must be 'false'!
+         */
+        "CC32XX": {
+            numInterrupts : 16 + 179,
+            numPriorities : 8,
+            resetVectorAddress : 0x0,
+            vectorTableAddress : 0x0,
         }
     }
 
@@ -209,8 +225,7 @@ if (xdc.om.$name == "cfg") {
     deviceTable["OMAP5430"]      = deviceTable["OMAP4430"];
     deviceTable["Vayu"]          = deviceTable["OMAP4430"];
     deviceTable["DRA7XX"]        = deviceTable["OMAP4430"];
-    deviceTable["CC13.1.*"]      = deviceTable["CC26.2.*"];
-    deviceTable["CC26.1.*"]      = deviceTable["CC26.2.*"];
+    deviceTable["CC13.1.*"]      = deviceTable["CC26.1.*"];
     deviceTable["CC13.2.*"]      = deviceTable["CC26.2.*"];
     deviceTable["CC13.*"]        = deviceTable["CC26.*"];
     deviceTable["CC3235S"]       = deviceTable["CC3200"];
@@ -680,7 +695,13 @@ function module$static$init(mod, params)
         Startup.firstFxns.$add(Hwi.initNVIC);
     }
 
-    mod.vectorTableBase = Hwi.vectorTableAddress;
+    if ((Hwi.vectorTableAddress != Hwi.resetVectorAddress) ||
+            (Hwi.placeVectorTables == false)) {
+        mod.vectorTableBase = $externPtr('ti_sysbios_family_arm_m3_Hwi_ramVectors[0]');
+    }
+    else {
+        mod.vectorTableBase = Hwi.vectorTableAddress;
+    }
 
     if (Hwi.vectorTableAddress > 0x3fffc000) {
         Hwi.$logError("Vector Table must be placed at or below 0x3FFFFC00",
@@ -840,6 +861,10 @@ function addHookSet(hookSet)
  */
 function module$validate()
 {
+    if (Hwi.placeVectorTables && Program.cpu.deviceName == "CC32XX") {
+        Hwi.$logError("Hwi.placeVectorTables must be 'false' for CC32XX.", Hwi, "placeVectorTables");
+    }
+
     /* validate all "created" instances */
     for (var i = 0; i < Hwi.$instances.length; i++) {
         instance_validate(Hwi.$instances[i]);

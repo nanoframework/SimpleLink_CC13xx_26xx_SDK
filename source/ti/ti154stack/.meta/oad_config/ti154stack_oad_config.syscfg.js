@@ -93,6 +93,30 @@ function getDefaultOadBlockSize(subGSelected)
 }
 
 /*
+ * ======== getDefaultOadBlockReqRate ========
+ * Returns default OAD block request rate based on the PHY type and mode
+ * selected
+ *
+ * @returns int - default block size
+ */
+function getDefaultOadBlockReqRate(mode, phyType)
+{
+    return mode === "frequencyHopping" && phyType === "phy5kbps" ? 400 : 200;
+}
+
+/*
+ * ======== getDefaultOadBlockReqPollDelay ========
+ * Returns default OAD block request poll delay based on the PHY type and mode
+ * selected
+ *
+ * @returns int - default block size
+ */
+function getDefaultOadBlockReqPollDelay(mode, phyType)
+{
+    return mode === "frequencyHopping" && phyType === "phy5kbps" ? 100 : 50;
+}
+
+/*
  * ======== setDefaultOADBlockSize ========
  * Sets default OAD block size based on frequency band selected
  *
@@ -103,6 +127,30 @@ function setDefaultOADBlockSize(inst, freqBandSelected)
 {
     const subGSelected = (freqBandSelected === "freqBandSub1");
     inst.oadBlockSize = getDefaultOadBlockSize(subGSelected);
+}
+
+/*
+ * ======== setDefaultOadBlockReqRate ========
+ * Sets default OAD block request rate based on the PHY type and mode selected
+ *
+ * @param inst   - module instance containing the config to be changed
+ */
+function setDefaultOadBlockReqRate(inst)
+{
+    inst.oadBlockReqRate = getDefaultOadBlockReqRate(inst.mode, inst.phyType);
+}
+
+/*
+ * ======== setDefaultOadBlockReqPollDelay ========
+ * Sets default OAD block request poll delay based on the PHY type and mode
+ * selected
+ *
+ * @param inst   - module instance containing the config to be changed
+ */
+function setDefaultOadBlockReqPollDelay(inst)
+{
+    inst.oadBlockReqPollDelay = getDefaultOadBlockReqPollDelay(inst.mode,
+        inst.phyType);
 }
 
 /*
@@ -146,15 +194,21 @@ function getOADConfigHiddenState(inst, cfgName)
  */
 function setOADConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getOADConfigHiddenState(inst, cfgName);
-    if(ui[cfgName].hidden)
-    {
-        // get a list of all nested and unnested configs
-        const configToReset = Common.findConfig(config.config, cfgName);
-        // restore the default value for the hidden parameter.
-        Common.restoreDefaultValue(inst, configToReset, cfgName);
-    }
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getOADConfigHiddenState);
+}
+
+/*
+ * ======== setAllOADConfigsHiddenState ========
+ * Sets the visibility of all OAD configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllOADConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getOADConfigHiddenState);
 }
 
 /*
@@ -259,5 +313,8 @@ exports = {
     moduleInstances: moduleInstances,
     setOADConfigHiddenState: setOADConfigHiddenState,
     getOADConfigHiddenState: getOADConfigHiddenState,
-    setDefaultOADBlockSize: setDefaultOADBlockSize
+    setAllOADConfigsHiddenState: setAllOADConfigsHiddenState,
+    setDefaultOADBlockSize: setDefaultOADBlockSize,
+    setDefaultOadBlockReqRate: setDefaultOadBlockReqRate,
+    setDefaultOadBlockReqPollDelay: setDefaultOadBlockReqPollDelay
 };

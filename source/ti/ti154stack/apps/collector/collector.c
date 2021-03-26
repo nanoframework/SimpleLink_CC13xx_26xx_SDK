@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,9 @@
 #include "csf.h"
 #include "smsgs.h"
 #include "collector.h"
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif /* CUI_DISABLE */
 #include <advanced_config.h>
 #ifdef FEATURE_SECURE_COMMISSIONING
 #include "sm_ti154.h"
@@ -147,7 +149,7 @@
 #define ASSOC_TRACKING_RETRY    0x4000    /* Tracking Req retried */
 #define ASSOC_TRACKING_ERROR    0x8000    /* Tracking Req error */
 #define ASSOC_TRACKING_MASK     0xF000    /* Tracking mask  */
-
+#define MAX_DATA_REQ_MSDU_MAP_TABLE_SIZE 3
 #ifdef USE_DMM
 #define NTWK_DISCOVER_TIMER         100
 #endif /* USE_DMM */
@@ -183,6 +185,9 @@ STATIC uint16_t devicePanId = 0xFFFF;
 STATIC uint8_t deviceTxMsduHandle = 0;
 
 STATIC bool fhEnabled = false;
+
+STATIC ApiMac_msduAddrMap_t dataRequestMsduMappingTable[MAX_DATA_REQ_MSDU_MAP_TABLE_SIZE];
+
 #ifdef USE_DMM
 /* Device List Discovery Flag */
 static bool listDiscovery = false;
@@ -454,15 +459,29 @@ void Collector_init(void)
         Csf_setBroadcastClock(BROADCAST_CMD_START_TIME);
 #ifdef USE_DMM
         /* Update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
 #endif /* USE_DMM */
+    }
+    Llc_netInfo_t netInfo;
+    if (Csf_getNetworkInformation(&netInfo) == true)
+    {
+        /* Update Channel Mask to show the previous network channel */
+        if (!CONFIG_FH_ENABLE)
+        {
+            uint8_t channelMask[APIMAC_154G_CHANNEL_BITMAP_SIZ] = {0};
+            uint8_t idx = netInfo.channel / 8;
+            uint8_t shift = (netInfo.channel % 8);
+            uint8_t chan = (0x01) << shift;
+            channelMask[idx] = chan;
+            Cllc_setChanMask(channelMask);
+        }
     }
 
     if(CONFIG_AUTO_START)
     {
 #ifdef USE_DMM
         /* Update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
 #endif /* USE_DMM */
         /* Start the device */
         Util_setEvent(&Collector_events, COLLECTOR_START_EVT);
@@ -475,7 +494,7 @@ void Collector_init(void)
 
 #ifdef DMM_OAD
     // register the app callbacks
-    DMMPolicy_registerAppCbs(dmmPolicyAppCBs, DMMPolicy_StackRole_154Sensor);
+    DMMPolicy_registerAppCbs(dmmPolicyAppCBs, DMMPolicy_StackRole_154Collector);
 #endif
 }
 
@@ -491,7 +510,7 @@ void Collector_process(void)
     {
 #ifdef USE_DMM
         /* update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
 #endif /* USE_DMM */
 
         if(cllcState == Cllc_states_initWaiting)
@@ -565,7 +584,7 @@ void Collector_process(void)
     if (Collector_events & COLLECTOR_PROV_EVT)
     {
         /* update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
         /* Clear the event */
         Util_clearEvent(&Collector_events, COLLECTOR_PROV_EVT);
     }
@@ -587,7 +606,7 @@ void Collector_process(void)
     if(Collector_events & COLLECTOR_RESUME_EVT)
     {
         /* update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
 
         //call start event to restore network
         processStartEvent();
@@ -844,7 +863,7 @@ static void collector_networkDeviceCb(uint16_t devAddr, union RemoteDisplay_Devi
         listDiscovery = true;
         isCollectorDev = true;
         devIdx = 0;
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_HIGH_BANDWIDTH);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_HIGH_BANDWIDTH);
     }
     else
     {
@@ -880,13 +899,13 @@ static void collector_networkDeviceCb(uint16_t devAddr, union RemoteDisplay_Devi
     if((listDiscovery) && (devIdx <= numEntries))
     {
         Llc_deviceListItem_t item;
-        Csf_getDeviceItem(devIdx++, &item);
+        Csf_getDeviceItem(devIdx++, &item, NULL);
 
         setNtwkDiscoverClock(item.devInfo.shortAddress);
     }
     else
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
         listDiscovery = false;
     }
 }
@@ -1154,15 +1173,15 @@ static void cllcStateChangedCB(Cllc_states_t state)
 #ifdef USE_DMM
     if( (cllcState == Cllc_states_initWaiting) || (cllcState == Cllc_states_joiningNotAllowed) )
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_UNINIT);
     }
     else if( (cllcState == Cllc_states_startingCoordinator) || (cllcState == Cllc_states_initRestoringCoordinator) || (cllcState == Cllc_states_joiningAllowed) )
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_PROVISIONING);
      }
      else if ((cllcState == Cllc_states_started) || (cllcState == Cllc_states_restored))
      {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_CONNECTED);
      }
 #endif /* USE_DMM */
 
@@ -1202,10 +1221,39 @@ static void dataCnfCB(ApiMac_mcpsDataCnf_t *pDataCnf)
     {
         Csf_updateFrameCounter(NULL, pDataCnf->frameCntr);
     }
+    /* Remove the sensor short address from the table if the status = ApiMac_status_fhNotInNeighborTable */
+    else if(pDataCnf->status == ApiMac_status_fhNotInNeighborTable)
+    {
+        uint8_t searchIndex = 0;
+        ApiMac_msduAddrMap_t * last_invalid_data_req;
+        ApiMac_sAddrExt_t extendedAddr;
+        for(searchIndex = 0; searchIndex < MAX_DATA_REQ_MSDU_MAP_TABLE_SIZE; searchIndex++)
+        {
+            if(pDataCnf->msduHandle == dataRequestMsduMappingTable[searchIndex].msduHandle)
+            {
+                /* msdu handle matches, so this data callback correlates with
+                last data request information */
+                last_invalid_data_req = &dataRequestMsduMappingTable[searchIndex];
+
+                Llc_deviceListItem_t item;
+                if(Csf_getDevice((&last_invalid_data_req->dstAddr), &item))
+                {
+                    /* Switch to the long address */
+                    memcpy(extendedAddr, &item.devInfo.extAddress,
+                           (APIMAC_SADDR_EXT_LEN));
+                }
+
+                Cllc_removeDevice(&extendedAddr);
+                break;
+            }
+        }
+
+    }
     else if(pDataCnf->status != ApiMac_status_success)
     {
         Collector_statistics.otherTxFailures++;
     }
+
 
 #ifdef POWER_MEAS
     /* Back to back data messages to ensure a response for every poll message */
@@ -1618,6 +1666,7 @@ static void processDeviceTypeResponse(ApiMac_mcpsDataInd_t *pDataInd)
     /* Make sure the message is the correct size */
     if(pDataInd->msdu.len == SMSGS_DEVICE_TYPE_RESPONSE_MSG_LEN)
     {
+#ifndef CUI_DISABLE
         uint8_t *pBuf = pDataInd->msdu.p;
 
         /* Command format
@@ -1630,6 +1679,7 @@ static void processDeviceTypeResponse(ApiMac_mcpsDataInd_t *pDataInd)
 
         /* Notify the user */
         Csf_deviceSensorDeviceTypeResponseUpdate(deviceFamilyID, deviceTypeID);
+#endif
     }
 }
 #endif /* DEVICE_TYPE_MSG */
@@ -1773,9 +1823,9 @@ static void processSensorData(ApiMac_mcpsDataInd_t *pDataInd)
                                                                     pBuf[3]);
         pBuf += 4;
     }
-    
+
     if(sensorData.frameControl & Smsgs_dataFields_accelSensor)
-    {                  
+    {
         sensorData.accelerometerSensor.xAxis = (int16_t)Util_buildUint16(pBuf[0],
                                                                 pBuf[1]);
         pBuf += 2;
@@ -1786,7 +1836,7 @@ static void processSensorData(ApiMac_mcpsDataInd_t *pDataInd)
                                                                 pBuf[1]);
         pBuf += 2;
         sensorData.accelerometerSensor.xTiltDet = *pBuf++;
-        sensorData.accelerometerSensor.yTiltDet = *pBuf++;    
+        sensorData.accelerometerSensor.yTiltDet = *pBuf++;
 
 #endif /* LPSTK */
     }
@@ -1968,6 +2018,7 @@ static bool sendMsg(Smsgs_cmdIds_t type, uint16_t dstShortAddr, bool rxOnIdle,
                     uint16_t len,
                     uint8_t *pData)
 {
+    static uint8_t map_index = 0;
     ApiMac_mcpsDataReq_t dataReq;
 
     /* Fill the data request field */
@@ -2028,15 +2079,19 @@ static bool sendMsg(Smsgs_cmdIds_t type, uint16_t dstShortAddr, bool rxOnIdle,
 #endif /* FEATURE_SECURE_COMMISSIONING */
 #endif /* FEATURE_MAC_SECURITY */
 
-    /* Send the message */
-    if(ApiMac_mcpsDataReq(&dataReq) != ApiMac_status_success)
+    ApiMac_status_t status = ApiMac_mcpsDataReq(&dataReq);
+    if(status != ApiMac_status_success)
     {
         /*  Transaction overflow occurred */
         return (false);
     }
     else
     {
-        return (true);
+        /* Structure is used to track data request handles to help remove unresponsive devices from macSecurity table in FH mode */
+       dataRequestMsduMappingTable[map_index % MAX_DATA_REQ_MSDU_MAP_TABLE_SIZE].dstAddr = dataReq.dstAddr;
+       dataRequestMsduMappingTable[map_index % MAX_DATA_REQ_MSDU_MAP_TABLE_SIZE].msduHandle = dataReq.msduHandle;
+       map_index ++;
+       return (true);
     }
 }
 
@@ -2234,95 +2289,69 @@ static void generateTrackingRequests(void)
                 sendTrackingRequest(&Cllc_associatedDevList[x]);
                 return;
             }
-            else if((status & (ASSOC_TRACKING_SENT | ASSOC_TRACKING_RSP
+            else if((status & (ASSOC_TRACKING_SENT
                                | ASSOC_TRACKING_ERROR)))
             {
-                Cllc_associated_devices_t *pDev = NULL;
-                int y;
+                ApiMac_deviceDescriptor_t devInfo;
+                Llc_deviceListItem_t item;
+                ApiMac_sAddr_t devAddr;
 
-                if(status & (ASSOC_TRACKING_SENT | ASSOC_TRACKING_ERROR))
+                /*
+                 Timeout occurred, notify the user that the tracking
+                 failed.
+                 */
+                memset(&devInfo, 0, sizeof(ApiMac_deviceDescriptor_t));
+
+                devAddr.addrMode = ApiMac_addrType_short;
+                devAddr.addr.shortAddr =
+                    Cllc_associatedDevList[x].shortAddr;
+
+                if(Csf_getDevice(&devAddr, &item))
                 {
-                    ApiMac_deviceDescriptor_t devInfo;
-                    Llc_deviceListItem_t item;
-                    ApiMac_sAddr_t devAddr;
-
-                    /*
-                     Timeout occurred, notify the user that the tracking
-                     failed.
-                     */
-                    memset(&devInfo, 0, sizeof(ApiMac_deviceDescriptor_t));
-
-                    devAddr.addrMode = ApiMac_addrType_short;
-                    devAddr.addr.shortAddr =
-                        Cllc_associatedDevList[x].shortAddr;
-
-                    if(Csf_getDevice(&devAddr, &item))
-                    {
-                        memcpy(&devInfo.extAddress,
-                               &item.devInfo.extAddress,
-                               sizeof(ApiMac_sAddrExt_t));
-                    }
-                    devInfo.shortAddress = Cllc_associatedDevList[x].shortAddr;
-                    devInfo.panID = devicePanId;
-                    Csf_deviceNotActiveUpdate(&devInfo,
-                        ((status & ASSOC_TRACKING_SENT) ? true : false));
-
-                    /* Not responding, so remove the alive marker */
-                    Cllc_associatedDevList[x].status
-                            &= ~(CLLC_ASSOC_STATUS_ALIVE
-                                | ASSOC_CONFIG_SENT | ASSOC_CONFIG_RSP);
+                    memcpy(&devInfo.extAddress,
+                           &item.devInfo.extAddress,
+                           sizeof(ApiMac_sAddrExt_t));
                 }
+                devInfo.shortAddress = Cllc_associatedDevList[x].shortAddr;
+                devInfo.panID = devicePanId;
+                Csf_deviceNotActiveUpdate(&devInfo,
+                    ((status & ASSOC_TRACKING_SENT) ? true : false));
+
+                /* Not responding, so remove the alive marker */
+                Cllc_associatedDevList[x].status
+                        &= ~(CLLC_ASSOC_STATUS_ALIVE
+                            | ASSOC_CONFIG_SENT | ASSOC_CONFIG_RSP);
 
                 /* Clear the tracking bits */
-                Cllc_associatedDevList[x].status  &= ~(ASSOC_TRACKING_ERROR
-                                | ASSOC_TRACKING_SENT | ASSOC_TRACKING_RSP);
+                Cllc_associatedDevList[x].status
+                        &= ~(ASSOC_TRACKING_ERROR | ASSOC_TRACKING_SENT
+                            | ASSOC_TRACKING_RSP);
+            }
 
-                /* Find the next valid device */
-                y = x;
-                while(pDev == NULL)
-                {
-                    /* Get the very first active and alive device */
-                    if((Cllc_associatedDevList[y].shortAddr != CSF_INVALID_SHORT_ADDR)
-                            && (Cllc_associatedDevList[y].status
-                                    & CLLC_ASSOC_STATUS_ALIVE))
-                    {
-                        pDev = &Cllc_associatedDevList[y];
-                    }
-                    /* Check for roll over */
-                    if(y == (CONFIG_MAX_DEVICES-1))
-                    {
-                        /* Move to the beginning */
-                        y = 0;
-                    }
-                    else
-                    {
-                        /* Move the the next device */
-                        y++;
-                    }
-
-                    if(y == x)
-                    {
-                        /* We've come back around */
-                        break;
-                    }
-                }
-
-                /* Make sure a sensor actually exists before sending */
-                if(pDev != NULL)
-                {
-                    /* Only send the tracking request if you are in the commissioned state for SM only
-                    * this is handled inside of the sendTrackingRequest function */
-                    sendTrackingRequest(pDev);
-                }
-
-
-                /* Only do one at a time */
+            else if (status & ASSOC_TRACKING_RSP)
+            {
+                /* Sensor has already been tracked */
+                continue;
+            }
+            else
+            {
+                sendTrackingRequest(&Cllc_associatedDevList[x]);
                 return;
             }
         }
     }
+    /* All sensors have been tracked. Clear all tracking bits, restart tracking */
+    for(x = 0; x < CONFIG_MAX_DEVICES; x++)
+    {
+        if((Cllc_associatedDevList[x].shortAddr != CSF_INVALID_SHORT_ADDR)
+              && (Cllc_associatedDevList[x].status & CLLC_ASSOC_STATUS_ALIVE))
+        {
+            Cllc_associatedDevList[x].status  &= ~(ASSOC_TRACKING_ERROR
+                            | ASSOC_TRACKING_SENT | ASSOC_TRACKING_RSP);
+        }
+    }
 
-    /* If no activity found, find the first active device */
+    /* If no sensor ready found, find the first active device */
     for(x = 0; x < CONFIG_MAX_DEVICES; x++)
     {
         /* Make sure the entry is valid. */
@@ -2522,7 +2551,7 @@ void smFailCMProcessCb(ApiMac_deviceDescriptor_t *devInfo, bool rxOnIdle,
         }
 
 #ifdef USE_DMM
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_UNINIT);
         RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_FAIL);
 #endif /* USE_DMM */
     }
@@ -2554,7 +2583,7 @@ void smFailCMProcessCb(ApiMac_deviceDescriptor_t *devInfo, bool rxOnIdle,
         }
 
 #ifdef USE_DMM
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_UNINIT);
         RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_FAIL);
 #endif /* USE_DMM */
     }
@@ -2624,7 +2653,7 @@ void smSuccessCMProcessCb(ApiMac_deviceDescriptor_t *devInfo, bool keyRefreshmen
         Util_setEvent(&Collector_events, COLLECTOR_CONFIG_EVT);
     }
 #ifdef USE_DMM
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Collector, DMMPOLICY_154_CONNECTED);
     RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_SUCCESS);
 #endif /* USE_DMM */
 }
@@ -2641,7 +2670,9 @@ static void orphanIndCb(ApiMac_mlmeOrphanInd_t *pData)
     /* get the short address of the device */
     if(CSF_INVALID_SHORT_ADDR != shortAddr)
     {
+#ifndef CUI_DISABLE
         Csf_IndicateOrphanReJoin(shortAddr);
+#endif /* CUI_DISABLE */
     }
 
 }
@@ -2654,7 +2685,7 @@ static void orphanIndCb(ApiMac_mlmeOrphanInd_t *pData)
 static void initializeNtwkDiscoverClock(void)
 {
     /* Initialize the timers needed for this application */
-    ntwkDiscoverClkHandle = Timer_construct(&ntwkDiscoverClkStruct,
+    ntwkDiscoverClkHandle = UtilTimer_construct(&ntwkDiscoverClkStruct,
                                         processnwtkDiscoverTimeoutCallback,
                                         NTWK_DISCOVER_TIMER,
                                         0,
@@ -2668,9 +2699,9 @@ static void initializeNtwkDiscoverClock(void)
 static void setNtwkDiscoverClock(uint16_t devAddr)
 {
 
-    Timer_setTimeout(ntwkDiscoverClkHandle, NTWK_DISCOVER_TIMER);
-    Timer_setFunc(ntwkDiscoverClkHandle, processnwtkDiscoverTimeoutCallback, devAddr);
-    Timer_start(&ntwkDiscoverClkStruct);
+    UtilTimer_setTimeout(ntwkDiscoverClkHandle, NTWK_DISCOVER_TIMER);
+    UtilTimer_setFunc(ntwkDiscoverClkHandle, processnwtkDiscoverTimeoutCallback, devAddr);
+    UtilTimer_start(&ntwkDiscoverClkStruct);
 }
 
 /*!

@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -101,7 +101,7 @@
 #define NPITASK_STACK_SIZE 1024
 
 //! \brief Task priority for NPI RTOS task
-#define NPITASK_PRIORITY 2
+#define NPITASK_PRIORITY 4
 
 
 // ****************************************************************************
@@ -737,8 +737,8 @@ static uint8_t NPITask_sendBufToStack( NPIMSG_msg_t *pMsg )
 
     }
 
-    OsalPort_free(pMsg);
     OsalPort_msgDeallocate(pMsg->pBuf);
+    OsalPort_free(pMsg);
 
     return (msgStatus);
 }
@@ -775,6 +775,11 @@ static void NPITask_processStackMsg(uint8_t *pMsg)
             {
                 // Pass the message along to the application
                 incomingTXEventAppCBFunc(pMsg);
+                break;
+            }
+            case NONE:
+            default:
+            {
                 break;
             }
         }
@@ -818,9 +823,9 @@ static void NPITask_processStackMsg(uint8_t *pMsg)
                 default:
                 {
                     /* Fail - unsupported message type */
-                	OsalPort_free(recPtr);
-                	OsalPort_free(pNPIMsg);
-                	OsalPort_msgDeallocate(pNPIMsg->pBuf);
+                    OsalPort_free(recPtr);
+                    OsalPort_msgDeallocate(pNPIMsg->pBuf);
+                    OsalPort_free(pNPIMsg);
                     break;
                 }
             }
@@ -830,8 +835,8 @@ static void NPITask_processStackMsg(uint8_t *pMsg)
         else
         {
             /* Fail - couldn't get queue record */
-        	OsalPort_free(pNPIMsg);
-        	OsalPort_msgDeallocate(pNPIMsg->pBuf);
+          OsalPort_msgDeallocate(pNPIMsg->pBuf);
+          OsalPort_free(pNPIMsg);
         }
     }
 }
@@ -1102,9 +1107,9 @@ static void NPITask_incomingFrameCB(uint8_t frameSize, uint8_t *pFrame,
             default:
             {
                 // undefined msgType
+                OsalPort_msgDeallocate(pFrame);
                 OsalPort_free(npiMsgPtr);
                 OsalPort_free(recPtr);
-                OsalPort_msgDeallocate(pFrame);
 
                 break;
             }

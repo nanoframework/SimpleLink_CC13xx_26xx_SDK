@@ -128,6 +128,7 @@ metaonly interface ITarget inherits xdc.bld.ITarget3 {
         [".C",    {suf: ".C",   typ: "cpp"}],
         [".cc",   {suf: ".cc",  typ: "cpp"}],
         [".s",    {suf: ".s",   typ: "asm"}],
+        [".sv6M", {suf: ".sv6M",typ: "asm"}],
         [".sv7M", {suf: ".sv7M",typ: "asm"}],
         [".sv8M", {suf: ".sv8M",typ: "asm"}],
     ];
@@ -213,7 +214,7 @@ metaonly interface ITarget inherits xdc.bld.ITarget3 {
     override config String binaryParser = "xdc.targets.omf.Elf";
 }
 /*
- *  @(#) iar.targets.arm; 1, 0, 0,; 5-11-2020 15:30:18; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
+ *  @(#) iar.targets.arm; 1, 0, 0,; 9-3-2020 14:51:03; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
 
  */
 

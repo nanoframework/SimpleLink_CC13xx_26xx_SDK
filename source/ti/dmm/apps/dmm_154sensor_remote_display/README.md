@@ -14,6 +14,7 @@
   * [Provisioned 15.4 Sensor](#Provisioned15.4Sensor)
   * [DMM 15.4 Security Manager (SM) Commissioning](#DMM15.4SecurityManager)
   * [Block Mode Test](#BlockModeTest)
+  * [Disabling Common User Interface](#DisableCUI)
 * [DMM Sensor Reboot and Reset](#15.4SensorRebootAndReset)
 * [DMM Limitations](#DmmLimitations)
 
@@ -107,7 +108,7 @@ Start Type, Start Time, AllowDelay, Priority, Activity, etc.
 
 The Global Priority Table (GPT) defines relative priorities of the two stacks
 based on the activity and priority of RF commands.  For details of the GPT,
-refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_154.c/h`.
+refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_154sensor.c/h`.
 
 The Application Level information is the user defined information via the policy
 table and inludes: Application State Name, Weight, AppliedActivity, Pause, etc;
@@ -595,6 +596,16 @@ The diagram below represents the stack activity when you enabled and disable the
 ![Block Mode Test Activity](./resource/block_mode_test_activity.png)
 
 On the Block Mode Clock event, the DMM Block Mode Status will be toggled and the Block Mode Test Period will be updated. If the current DMM Block Mode Status is "True", the DMM Block Mode status will be set "Off" (DMM Block Mode Status will be set to "False") and the Block Mode Test Clock will be updated to a timeout value of RD_BLOCK_MODE_OFF_PERIOD.  If the current DMM Block Mode Status is "False", the DMM Block Mode status will be set "On" (DMM Block Mode Status will be set to "True") and the Block Mode Test Clock will be updated to a timeout value of RD_BLOCK_MODE_ON_PERIOD.
+
+## <a name="DisableCUI"></a>Disabling Common User Interface
+
+The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the `dmm_154sensor_remote_display_app.opts`:
+
+```
+-DCUI_DISABLE
+```
+
+> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
 
 ## <a name="15.4SensorRebootAndReset"></a>DMM Sensor Reboot and Reset
 

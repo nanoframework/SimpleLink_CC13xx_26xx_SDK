@@ -19,7 +19,7 @@ Peripherals Exercised
 ---------------------
 
 > To trigger various events, buttons can be used as well as the configurable user interface.
-> The Example Usage section of this document explains how to use the user interface, although both the button presses and the CUI perform the 
+> The Example Usage section of this document explains how to use the user interface, although both the button presses and the CUI perform the
 > same actions.
 
 * `CONFIG_UART_TX` `CONFIG_UART_RX` - UART transmit and receive lines available through the backchannel CC13x2 Launchpad USB connection. This is used as the serial connection to the host processor.
@@ -33,6 +33,13 @@ The following hardware is required to run TI 15.4-Stack Out of Box (OOB) example
 your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
 &lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
+
+Please refer to the following link for helpful SimpleLink Academy guides for ramping up
+on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
+
+For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
+`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+
 
 Example Usage
 -------------

@@ -60,7 +60,7 @@
  *  stdint.h are not available to C++ clients (unless the special macro
  *  __STDC_LIMIT_MACROS is defined).
  */
-#define  xdc_target__sizeof_IArg 4U
+#define  xdc_target__sizeof_IArg 8U
 #define  xdc_target__sizeof_Char 1U
 #define  xdc_target__sizeof_Double 8U
 #define  xdc_target__sizeof_Float 4U
@@ -84,7 +84,7 @@
  *  within #ifdef blocks; even if provided by the compiler, alignof() can't
  *  be used in pre-processor statements.
  */
-#define  xdc_target__alignof_IArg 4U
+#define  xdc_target__alignof_IArg 8U
 #define  xdc_target__alignof_Char 1U
 #define  xdc_target__alignof_Double 8U
 #define  xdc_target__alignof_Float 4U

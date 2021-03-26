@@ -52,6 +52,8 @@ hide llSetupNextSlaveEvent
 hide GapAdv_prepareLoadByHandle
 hide GapAdv_loadByHandle
 hide gapProcessOSALMsg
+hide gapProcessHCICmdCompleteEvt
+hide gapProcessCommandStatusEvt
 hide gapCentProcessConnEvt
 hide gapPeriProcessConnUpdateCmdStatus
 hide gapPeriProcessConnUpdateCompleteEvt
@@ -73,6 +75,7 @@ hide SM_SetECCRegenerationCount
 hide smResponderProcessLTKReq
 hide SM_p256KeyCB
 hide SM_dhKeyCB
+hide smDetermineIOCaps
 hide llConnExists
 hide llNextChanIndex
 hide llSendAdvSetEndEvent
@@ -104,9 +107,13 @@ hide llSetNextDataChan
 hide smpResponderProcessPairingPublicKey
 hide llExtScan_PostProcess
 hide linkDB_NumActive
+hide llTimeCompare
+hide llAllocConnId
+hide GapScan_disable
+hide llFindNextSecCmd
+hide llSetupExtHdr
 hide rfSetup
 hide llAllocRfMem
-hide llSetupExtHdr
 hide llInit_TaskEnd
 hide LL_ReadTxPowerLevel
 hide LE_ReadTxPowerCmd
@@ -117,7 +124,6 @@ hide LL_EXT_SetMaxDtmTxPower
 hide llAdv_TaskEnd
 hide extScanCmd
 hide llSetupExtScan
-hide llFindNextSecCmd
 hide extInitCmd
 hide llExtInit_PostProcess
 hide llSetupExtInit

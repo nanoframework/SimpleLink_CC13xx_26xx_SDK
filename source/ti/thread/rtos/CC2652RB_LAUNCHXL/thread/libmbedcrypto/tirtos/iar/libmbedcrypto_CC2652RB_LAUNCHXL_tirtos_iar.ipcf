@@ -13,19 +13,17 @@
         <path>$PROJ_DIR$</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms</path>
         <path>$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source</path>
-        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include</path>
+        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
     </includePath>
 
     <defines>
-        <define>SIMPLELINK_OPENTHREAD_SDK_BUILD=1</define>
-        <define>SIMPLELINK_OPENTHREAD_CONFIG_CC2652=1</define>
-        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h"</define>
         <define>HAVE_CONFIG_H</define>
         <define>_BSD_SOURCE=1</define>
         <define>_DEFAULT_SOURCE=1</define>
+        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h"</define>
     </defines>
 
     <extraOptions>
@@ -70,8 +68,8 @@
         <group name="config" build="true">
             <path copyTo="$PROJ_DIR$/config/aes_alt.h">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/config/aes_alt.h</path>
             <path copyTo="$PROJ_DIR$/config/ecjpake_alt.h">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/config/ecjpake_alt.h</path>
-            <path copyTo="$PROJ_DIR$/config/mbedtls-config-cc2652-iar.h">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/config/mbedtls-config-cc2652-iar.h</path>
             <path copyTo="$PROJ_DIR$/config/sha256_alt.h">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/config/sha256_alt.h</path>
+            <path copyTo="$PROJ_DIR$/config/mbedtls-config-cc2652-iar.h">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC2652RB_LAUNCHXL/thread/libmbedcrypto/config/mbedtls-config-cc2652-iar.h</path>
         </group>
         <group name="third_party/mbedtls/repo/library" build="true">
             <path reference="$PROJ_DIR$/third_party/mbedtls/repo/library/aes.c">$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/library/aes.c</path>

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2011-2020, Texas Instruments Incorporated
+ Copyright (c) 2011-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -463,7 +463,7 @@ void GAP_UpdateResolvingList(uint8_t *pIRK)
   gapBondMgr_syncResolvingList();
 #else
   // Pass local IRK to the controller
-  HCI_LE_AddDeviceToResolvingListCmd( NULL, NULL, NULL, pIRK );
+  HCI_LE_AddDeviceToResolvingListCmd( 0, 0, 0, pIRK );
 #endif // GAP_BOND_MGR
 }
 
@@ -544,7 +544,7 @@ bStatus_t GAP_DeviceInit_noGAPBondMgr(uint8_t profileRole, uint8_t taskID,
 void GAP_UpdateResolvingList_noGAPBondMgr(uint8_t *pIRK)
 {
   // Pass local IRK to the controller
-  HCI_LE_AddDeviceToResolvingListCmd( NULL, NULL, NULL, pIRK );
+  HCI_LE_AddDeviceToResolvingListCmd( 0, 0, 0, pIRK );
 }
 
 /*********************************************************************

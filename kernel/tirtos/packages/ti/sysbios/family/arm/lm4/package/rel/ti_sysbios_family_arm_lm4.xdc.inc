@@ -10,5 +10,6 @@ package/package_ti.sysbios.family.arm.lm4.c
 Seconds.c
 Timer.c
 TimestampProvider.c
+lib/debug/ti.sysbios.family.arm.lm4.am4f
 lib/debug/ti.sysbios.family.arm.lm4.am4fg
 lib/debug/ti.sysbios.family.arm.lm4.arm4f

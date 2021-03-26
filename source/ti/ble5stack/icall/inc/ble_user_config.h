@@ -72,7 +72,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2020, Texas Instruments Incorporated
+ Copyright (c) 2014-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -235,8 +235,22 @@ extern "C"
 #define MAX_NUM_WL_ENTRIES             16  // at 8 bytes per WL entry
 #endif
 
-#ifndef MAX_NUM_RL_ENTRIES
-#define MAX_NUM_RL_ENTRIES             10  // at 8 bytes per WL entry
+#ifndef CFG_MAX_NUM_RL_ENTRIES
+#ifdef GAP_BOND_MGR
+#define CFG_MAX_NUM_RL_ENTRIES             GAP_BONDINGS_MAX // at 8 bytes per WL entry
+#else
+#define CFG_MAX_NUM_RL_ENTRIES             10  // at 8 bytes per WL entry
+#endif
+#endif
+
+// Number of CTE Sampling Buffers
+#ifndef MAX_NUM_CTE_BUFS
+#define MAX_NUM_CTE_BUFS               1  // one CTE samples buffer of ~2.5KB used for RF auto copy
+#endif
+
+// Number of CTE Sampling Buffers
+#ifndef MAX_NUM_CTE_BUFS
+#define MAX_NUM_CTE_BUFS               1  // one CTE samples buffer of ~2.5KB used for RF auto copy
 #endif
 
 // Inactivity timeout in us
@@ -419,6 +433,13 @@ extern "C"
   #endif
 #endif
 
+// Check that the number of CTE buffers have not exceeded 16
+// which is the maximum CTE count allowed by the Spec
+// This means the controller will allocate a maximum of 40KB (16 * ~2.5KB)
+#if (MAX_NUM_CTE_BUFS > 16)
+  #warning Invalid MAX_NUM_CTE_BUFS - Should be less than or equal to 16.
+#endif
+
 #endif // !(CTRL_CONFIG | HOST_CONFIG)
 
 // CTE Config parameters
@@ -433,6 +454,7 @@ extern "C"
 // Enable Connection CTE and using which Rams for sampling with flow control and auto copy
 #define  CTE_CONFIG (BV(CTE_CONNECTION_ENABLE) | \
                      BV(CTE_GENERIC_RX_ENABLE) | \
+                     BV(CTE_SCANNER_ENABLE)    | \
                      BV(CTE_USE_MCE_RAM)       | \
                      BV(CTE_USE_RFE_RAM)       | \
                      BV(CTE_USE_DUAL_RAM)      | \
@@ -486,6 +508,7 @@ typedef struct
   uint32_t                    bleStackType;
   uint32_t                    extStackSettings; // | reserved | use CC2652RB | MasterGuard |
                                                 // |   31..2  |       1      |      0      |
+  uint8                       maxNumCteBuffers;
 } stackSpecific_t;
 
 #else /* !(ICALL_JT) */

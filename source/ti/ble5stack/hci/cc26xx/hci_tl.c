@@ -11,7 +11,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -238,6 +238,21 @@ hciStatus_t hciLESetConnectionCteRequestEnable     ( uint8 *pBuf );
 hciStatus_t hciLESetConnectionCteResponseEnable    ( uint8 *pBuf );
 hciStatus_t hciLEReadAntennaInformation            ( uint8 *pBuf );
 
+hciStatus_t hciLESetPeriodicAdvParams              ( uint8 *pBuf );
+hciStatus_t hciLESetPeriodicAdvData                ( uint8 *pBuf );
+hciStatus_t hciLESetPeriodicAdvEnable              ( uint8 *pBuf );
+hciStatus_t hciLESetConnectionlessCteTransmitParams( uint8 *pBuf );
+hciStatus_t hciLESetConnectionlessCteTransmitEnable( uint8 *pBuf );
+hciStatus_t hciLEPeriodicAdvCreateSync             ( uint8 *pBuf );
+hciStatus_t hciLEPeriodicAdvCreateSyncCancel       ( uint8 *pBuf );
+hciStatus_t hciLEPeriodicAdvTerminateSync          ( uint8 *pBuf );
+hciStatus_t hciLEAddDeviceToPeriodicAdvList        ( uint8 *pBuf );
+hciStatus_t hciLERemoveDeviceFromPeriodicAdvList   ( uint8 *pBuf );
+hciStatus_t hciLEClearPeriodicAdvList              ( uint8 *pBuf );
+hciStatus_t hciLEReadPeriodicAdvListSize           ( uint8 *pBuf );
+hciStatus_t hciLESetPeriodicAdvReceiveEnable       ( uint8 *pBuf );
+hciStatus_t hciLESetConnectionlessIqSamplingEnable ( uint8 *pBuf );
+
 // Vendor Specific Commands
 hciStatus_t hciExtSetRxGain                        ( uint8 *pBuf );
 hciStatus_t hciExtSetTxPower                       ( uint8 *pBuf );
@@ -437,6 +452,25 @@ cmdPktTable_t hciCmdTable[] =
   (HCI_LE_SET_CONNECTION_CTE_RESPONSE_ENABLE, hciLESetConnectionCteResponseEnable},
   (HCI_LE_READ_ANTENNA_INFORMATION,           hciLEReadAntennaInformation},
 
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG))
+  (HCI_LE_SET_PERIODIC_ADV_PARAMETERS        ,hciLESetPeriodicAdvParams},
+  (HCI_LE_SET_PERIODIC_ADV_DATA              ,hciLESetPeriodicAdvData},
+  (HCI_LE_SET_PERIODIC_ADV_ENABLE            ,hciLESetPeriodicAdvEnable},
+  (HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_PARAMS,hciLESetConnectionlessCteTransmitParams},
+  (HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_ENABLE,hciLESetConnectionlessCteTransmitEnable},
+#endif // ADV_NCONN_CFG | ADV_CONN_CFG
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
+  (HCI_LE_PERIODIC_ADV_CREATE_SYNC            ,hciLEPeriodicAdvCreateSync          },
+  (HCI_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL     ,hciLEPeriodicAdvCreateSyncCancel    },
+  (HCI_LE_PERIODIC_ADV_TERMINATE_SYNC         ,hciLEPeriodicAdvTerminateSync       },
+  (HCI_LE_ADD_DEVICE_TO_PERIODIC_ADV_LIST     ,hciLEAddDeviceToPeriodicAdvList     },
+  (HCI_LE_REMOVE_DEVICE_FROM_PERIODIC_ADV_LIST,hciLERemoveDeviceFromPeriodicAdvList},
+  (HCI_LE_CLEAR_PERIODIC_ADV_LIST             ,hciLEClearPeriodicAdvList           },
+  (HCI_LE_READ_PERIODIC_ADV_LIST_SIZE         ,hciLEReadPeriodicAdvListSize        },
+  (HCI_LE_SET_PERIODIC_ADV_RECEIVE_ENABLE     ,hciLESetPeriodicAdvReceiveEnable    },
+  (HCI_LE_SET_CONNECTIONLESS_IQ_SAMPLING_ENABLE,hciLESetConnectionlessIqSamplingEnable},
+#endif
+
   // Vendor Specific Commands
   {HCI_EXT_SET_RX_GAIN                      , hciExtSetRxGain                  },
   {HCI_EXT_SET_TX_POWER                     , hciExtSetTxPower                 },
@@ -576,7 +610,7 @@ uint16 HCI_ProcessEvent( uint8 task_id, uint16 events )
   // check for system messages
   if ( events & SYS_EVENT_MSG )
   {
-    if ( pMsg = (osal_event_hdr_t *)osal_msg_receive(hciTaskID) )
+    if (( pMsg = (osal_event_hdr_t *)osal_msg_receive(hciTaskID) ))
     {
 #if !defined(HCI_TL_NONE) && !defined(ICALL_LITE)
       switch( pMsg->event )
@@ -2698,6 +2732,318 @@ hciStatus_t hciLEReadAntennaInformation( uint8 *pBuf )
   return HCI_LE_ReadAntennaInformationCmd(void);
 }
 
+#if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_NCONN_CFG) || (CTRL_CONFIG & ADV_CONN_CFG))
+/*******************************************************************************
+ * @fn          hciLESetPeriodicAdvParams
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetPeriodicAdvParams( uint8 *pBuf )
+{
+  return HCI_LE_SetPeriodicAdvParamsCmd( pBuf[0],
+                                         BUILD_UINT16(pBuf[1], pBuf[2]),
+                                         BUILD_UINT16(pBuf[3], pBuf[4]),
+                                         BUILD_UINT16(pBuf[5], pBuf[6]));
+}
+
+/*******************************************************************************
+ * @fn          hciLESetPeriodicAdvData
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetPeriodicAdvData( uint8 *pBuf )
+{
+  return HCI_LE_SetPeriodicAdvDataCmd( pBuf[0],
+                                       pBuf[1],
+                                       pBuf[2]),
+                                       &pBuf[3]);
+}
+
+/*******************************************************************************
+ * @fn          hciLESetPeriodicAdvEnable
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetPeriodicAdvEnable( uint8 *pBuf )
+{
+  return HCI_LE_SetPeriodicAdvEnableCmd( pBuf[0],
+                                         pBuf[1]);
+}
+
+/*******************************************************************************
+ * @fn          hciLESetConnectionlessCteTransmitParams
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetConnectionlessCteTransmitParams( uint8 *pBuf )
+{
+  return HCI_LE_SetConnectionlessCteTransmitParamsCmd( pBuf[0],
+                                                       pBuf[1],
+                                                       pBuf[2],
+                                                       pBuf[3],
+                                                       pBuf[4],
+                                                       &pBuf[5]);
+}
+
+/*******************************************************************************
+ * @fn          hciLESetConnectionlessCteTransmitEnable
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetConnectionlessCteTransmitEnable( uint8 *pBuf )
+{
+  return HCI_LE_SetConnectionlessCteTransmitEnableCmd( pBuf[0],
+                                                       pBuf[1]);
+}
+#endif // CTRL_CONFIG=(ADV_NCONN_CFG | ADV_CONN_CFG)
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
+/*******************************************************************************
+ * @fn          hciLEPeriodicAdvCreateSync
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEPeriodicAdvCreateSync( uint8 *pBuf )
+{
+  return HCI_LE_PeriodicAdvCreateSyncCmd( pBuf[0],
+                                          pBuf[1],
+                                          pBuf[2],
+                                          &pBuf[3],
+                                          BUILD_UINT16(pBuf[9], pBuf[10]),
+                                          BUILD_UINT16(pBuf[11], pBuf[12]),
+                                          pBuf[13]);
+}
+
+/*******************************************************************************
+ * @fn          hciLEPeriodicAdvCreateSyncCancel
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEPeriodicAdvCreateSyncCancel( uint8 *pBuf )
+{
+  return HCI_LE_PeriodicAdvCreateSyncCancelCmd();
+}
+
+/*******************************************************************************
+ * @fn          hciLEPeriodicAdvTerminateSync
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEPeriodicAdvTerminateSync( uint8 *pBuf )
+{
+  return HCI_LE_PeriodicAdvTerminateSyncCmd(BUILD_UINT16(pBuf[0], pBuf[1]));
+}
+
+/*******************************************************************************
+ * @fn          hciLEAddDeviceToPeriodicAdvList
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEAddDeviceToPeriodicAdvList( uint8 *pBuf )
+{
+  return HCI_LE_AddDeviceToPeriodicAdvListCmd(pBuf[0],
+                                              &pBuf[1],
+                                              pBuf[7]);
+}
+
+/*******************************************************************************
+ * @fn          hciLERemoveDeviceFromPeriodicAdvList
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLERemoveDeviceFromPeriodicAdvList( uint8 *pBuf )
+{
+  return HCI_LE_RemoveDeviceFromPeriodicAdvListCmd(pBuf[0],
+                                                   &pBuf[1],
+                                                   pBuf[7]);
+}
+
+/*******************************************************************************
+ * @fn          hciLEClearPeriodicAdvList
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEClearPeriodicAdvList( uint8 *pBuf )
+{
+  return HCI_LE_ClearPeriodicAdvListCmd();
+}
+
+/*******************************************************************************
+ * @fn          hciLEReadPeriodicAdvListSize
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLEReadPeriodicAdvListSize( uint8 *pBuf )
+{
+  return HCI_LE_ReadPeriodicAdvListSizeCmd();
+}
+
+/*******************************************************************************
+ * @fn          hciLESetPeriodicAdvReceiveEnable
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetPeriodicAdvReceiveEnable( uint8 *pBuf )
+{
+  return HCI_LE_SetPeriodicAdvReceiveEnableCmd(BUILD_UINT16(pBuf[0], pBuf[1]),
+                                               pBuf[2]);
+}
+
+/*******************************************************************************
+ * @fn          hciLESetConnectionlessIqSamplingEnable
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciLESetConnectionlessIqSamplingEnable( uint8 *pBuf )
+{
+  return HCI_LE_SetConnectionlessIqSamplingEnableCmd( BUILD_UINT16(pBuf[0], pBuf[1]),
+                                                      pBuf[2],
+                                                      pBuf[3],
+                                                      pBuf[4],
+                                                      pBuf[5],
+                                                      &pBuf[6]);
+#endif
+
 /*
 ** Vendor Specific Commands
 */
@@ -3620,6 +3966,51 @@ hciStatus_t hciExtSetExtScanChannels( uint8 *pBuf )
   return HCI_EXT_SetExtScanChannels( pBuf[0] );
 }
 #endif // CTRL_CONFIG & SCAN_CFG
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
+/*******************************************************************************
+ * @fn          hciExtSetQOSParameters
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciExtSetQOSParameters( uint8 *pBuf )
+{
+  return HCI_EXT_SetExtSetQOSParameters( pBuf[0],
+                                         pBuf[1],
+                                         BUILD_UINT32(pBuf[2], pBuf[3], pBuf[4],pBuf[5]),
+                                         BUILD_UINT16(pBuf[6], pBuf[7]));
+}
+
+/*******************************************************************************
+ * @fn          hciExtSetQOSDefaultParameters
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciExtSetQOSDefaultParameters( uint8 *pBuf )
+{
+    return HCI_EXT_SetQOSDefaultParameters( pBuf[0]);
+}
+#endif // ADV_CONN_CFG & INIT_CFG
 
 /*******************************************************************************
  * @fn          hciExtCoexEnable

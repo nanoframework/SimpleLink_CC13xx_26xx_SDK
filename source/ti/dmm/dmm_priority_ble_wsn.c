@@ -62,7 +62,7 @@ typedef enum
 {
     DMM_WSN_RETRANSMIT =0x022B,       
     DMM_WSN_TRANSMIT =0x0309,		
-    DMM_WSN_RECEIVE =0x03E7,		
+    DMM_WSN_RECEIVE =0x0307,
 } DMMStackActivityWSN;
 
 /* Global Priority Table: BLE connection lower than WSN data */
@@ -106,13 +106,15 @@ StackActivity activityWSN_bleLwsnH[ACTIVITY_NUM_WSN*PRIORITY_NUM] =
 /* the order of stacks in policy table and global table must be the same */
 GlobalTable globalPriorityTable_bleLwsnH[DMMPOLICY_NUM_STACKS] =
 {
-     {  .globalTableArray =  activityBLE_bleLwsnH,
+    {
+        .globalTableArray =  activityBLE_bleLwsnH,
         .tableSize = (uint8_t)(ACTIVITY_NUM_BLE*PRIORITY_NUM),
         .stackRole = DMMPolicy_StackRole_BlePeripheral,
-     },
+    },
 
-     {  .globalTableArray =  activityWSN_bleLwsnH,
+    {
+        .globalTableArray =  activityWSN_bleLwsnH,
         .tableSize = (uint8_t)(ACTIVITY_NUM_WSN*PRIORITY_NUM),
         .stackRole = DMMPolicy_StackRole_WsnNode,
-     },
+    },
 };

@@ -168,6 +168,7 @@ void I2S_close(I2S_Handle handle)
 
     I2SInPointerSet(I2S0_BASE, 0U);
     I2SOutPointerSet(I2S0_BASE, 0U);
+
     I2SSampleStampInConfigure(I2S0_BASE, 0xFFFFU);
     I2SSampleStampOutConfigure(I2S0_BASE, 0xFFFFU);
 
@@ -226,10 +227,6 @@ void I2S_startClocks(I2S_Handle handle) {
 
     initHw(handle);
     enableClocks(handle);
-
-    /* Configuring sample stamp generator will trigger the audio stream to start */
-    I2SSampleStampInConfigure(I2S0_BASE, 0);
-    I2SSampleStampOutConfigure(I2S0_BASE, 0);
 }
 
 /*
@@ -257,7 +254,6 @@ void I2S_stopClocks(I2S_Handle handle) {
  *  ======== I2S_startRead ========
  */
 void I2S_startRead(I2S_Handle handle) {
-
     I2SCC26XX_Object *object = handle->object;
 
     /* If a read interface is activated */
@@ -275,11 +271,7 @@ void I2S_startRead(I2S_Handle handle) {
         object->ptrUpdateFxn(handle, &object->read);
 
         /* Configuring sample stamp generator will trigger the audio stream to start */
-        if(object->read.delay != 0U) {
-
-            I2SSampleStampInConfigure(I2S0_BASE, object->read.delay);
-            I2SWclkCounterReset(I2S0_BASE);
-        }
+        I2SSampleStampInConfigure(I2S0_BASE, (HWREGH(I2S0_BASE + I2S_O_STMPWCNT) + object->startUpDelay));
     }
 }
 
@@ -305,11 +297,8 @@ void I2S_startWrite(I2S_Handle handle) {
         object->ptrUpdateFxn(handle, &object->write);
 
         /* Configuring sample stamp generator will trigger the audio stream to start */
-        if(object->write.delay != 0U) {
+        I2SSampleStampOutConfigure(I2S0_BASE, (HWREGH(I2S0_BASE + I2S_O_STMPWCNT) + object->startUpDelay));
 
-            I2SSampleStampOutConfigure(I2S0_BASE, object->write.delay);
-            I2SWclkCounterReset(I2S0_BASE);
-        }
     }
 }
 
@@ -499,8 +488,32 @@ static void updatePointer(I2S_Handle handle, I2SCC26XX_Interface *interface) {
                     interface->activeTransfer = (I2S_Transaction*)List_next(&transactionFinished->queueElement);
                 }
                 else {
-                    /* Application did nothing, we need to stop the interface to avoid errors */
-                    interface->stopInterface(handle);
+                   /* Application did nothing, we need to stop the interface to avoid errors
+                    * However, we cannot spin here while the hardware stops, this is an ISR context!
+                    */
+                   if (interface->stopInterface == I2S_stopRead)
+                   {
+                       I2SIntDisable(I2S0_BASE, I2S_INT_DMA_IN);
+
+                       I2SIntClear(I2S0_BASE, I2S_INT_DMA_IN);
+                       I2SIntClear(I2S0_BASE, I2S_INT_PTR_ERR);
+
+                       I2SSampleStampInConfigure(I2S0_BASE, 0xFFFFU);
+
+                       I2SInPointerSet(I2S0_BASE, 0U);
+                   }
+
+                   if(interface->stopInterface == I2S_stopWrite)
+                   {
+                       I2SIntDisable(I2S0_BASE, I2S_INT_DMA_OUT);
+
+                       I2SIntClear(I2S0_BASE, I2S_INT_DMA_OUT);
+                       I2SIntClear(I2S0_BASE, I2S_INT_PTR_ERR);
+
+                       I2SSampleStampOutConfigure(I2S0_BASE, 0xFFFFU);
+
+                       I2SOutPointerSet(I2S0_BASE, 0U);
+                   }
                 }
             }
         }
@@ -545,10 +558,8 @@ static bool initObject(I2S_Handle handle, I2S_Params *params) {
         object->phaseType            = params->phaseType;
         object->bitsPerWord          = params->bitsPerWord;
         object->startUpDelay         = params->startUpDelay;
-        object->read.delay           = 1;
-        object->write.delay          = 1;
 
-        object->dataShift            = (params->trueI2sFormat)? (object->bitsPerWord - params->memorySlotLength + 1): 0;
+        object->dataShift            = (params->trueI2sFormat)? 1: 0;
 
              if(params->memorySlotLength == I2S_MEMORY_LENGTH_16BITS)    {object->memorySlotLength = I2S_MEMORY_LENGTH_16BITS_CC26XX;}
         else if(params->memorySlotLength == I2S_MEMORY_LENGTH_24BITS)    {object->memorySlotLength = I2S_MEMORY_LENGTH_24BITS_CC26XX;}
@@ -751,17 +762,25 @@ static bool computeWSDivider(I2S_Handle handle, const I2S_Params *params, uint16
         numbOfChannels = (numbOfChannels > SD1->numberOfChannelsUsed)? numbOfChannels : SD1->numberOfChannelsUsed;
     }
 
-
     uint16_t sampleLength  = 0U;
-             sampleLength += object->beforeWordPadding;
-             sampleLength += object->bitsPerWord;
-             sampleLength += object->afterWordPadding;
-    /* No overflow risk as sampleLength<255+255+255 and numbOfChannels<=8 */
-    uint16_t numOfSCKCyles = (sampleLength * numbOfChannels);
 
     switch(object->phaseType) {
 
         case(I2S_PHASE_TYPE_DUAL) :
+
+            /* In dual-phase format, each phase represents a channel and is divided into the three intervals:
+             *
+             * Data delay (optional): BCLK periods between the first WCLK edge and MSB of the audio channel
+             * data transfered during the phase.
+             *
+             * Word: BCLK periods during which one sample word (a single channel) is transfered.
+             *
+             * Idle (optional): BCLK periods between the word interval and the next phase.
+             */
+            sampleLength += object->beforeWordPadding;
+            sampleLength += object->bitsPerWord;
+            sampleLength += object->afterWordPadding;
+
             /* WS is high for WDIV[9:0] (1 to 1023) SCK periods and low for WDIV[9:0] (1 to 1023) SCK periods.
              * WS frequency = SCK frequency / (2 x WDIV[9:0])
              * Dual phase protocols don't accept more than two channels
@@ -775,10 +794,31 @@ static bool computeWSDivider(I2S_Handle handle, const I2S_Params *params, uint16
         break;
 
         case(I2S_PHASE_TYPE_SINGLE) :
+
+            /* In single phase format, from 1 to 8 sample words (channels) are transfered back-to-back using
+             * a single phase. The phase is divided into the three intervals:
+             *
+             * Data delay (optional) : BCLK periods between the first WCLK edge and MSB of the FIRST audio channel
+             * data transfered.
+             *
+             * Word: BCLK periods during which from 1 to 8 channels are transfered back-to-back.
+             *
+             * Idle (optional): BCLK periods between the word interval and the next phase.
+             */
+            sampleLength += object->beforeWordPadding;
+            sampleLength += (object->bitsPerWord * numbOfChannels);
+            sampleLength += object->afterWordPadding;
+
             /* WS is high for 1 SCK period and low for WDIV[9:0] (1 to 1023) SCK periods.
              * WS frequency = SCK frequency / (1 + PRCM:I2SWCLKDIV.WDIV[9:0])
+             * Single phase protocols don't accept more than 8 channels
              */
-            *result = (numOfSCKCyles - 1U);
+            if (numbOfChannels <= 8U) {
+                *result = sampleLength;
+            }
+            else {
+                retVal = (bool)false;
+            }
         break;
 
         default :
@@ -833,18 +873,30 @@ static void configSerialFormat(I2S_Handle handle) {
     /* Get the pointer to the object*/
     object = handle->object;
 
-    DebugP_assert((uint16_t)(object->beforeWordPadding + object->dataShift) < 256);
+    /*
+     * Word length depends on the phase type:
+     * For dual-phase format (I2S, LJF, RJF) this is the maximum number of bits per
+     * word (object->bitsPerWord + object->afterWordPadding).
+     * For single-phase format (DSP) this is the exact number of bits per word (object->bitsPerWord).
+     */
 
-    I2SFormatConfigure(I2S0_BASE, (object->beforeWordPadding + object->dataShift),
-                         (uint8_t)object->memorySlotLength,
-                         (uint8_t)object->samplingEdge,
-                         (bool)  (object->phaseType == I2S_PHASE_TYPE_DUAL),
-                                 (object->bitsPerWord +  object->afterWordPadding),
-                                  object->startUpDelay);
+    I2SFormatConfigure(I2S0_BASE,
+                      (object->beforeWordPadding + object->dataShift),
+                      (uint8_t)object->memorySlotLength,
+                      (uint8_t)object->samplingEdge,
+                      (bool)(object->phaseType == I2S_PHASE_TYPE_DUAL),
+                      ((object->phaseType == I2S_PHASE_TYPE_DUAL) ? (object->bitsPerWord + object->afterWordPadding) : object->bitsPerWord),
+                      (object->dmaBuffSizeConfig + 1));
 
-    /* Prevent DMA start by setting an unreachable trigger */
-    I2SSampleStampInConfigure(I2S0_BASE,  (uint16_t)((uint16_t)object->bitsPerWord + (uint16_t)object->afterWordPadding));
-    I2SSampleStampOutConfigure(I2S0_BASE, (uint16_t)((uint16_t)object->bitsPerWord + (uint16_t)object->afterWordPadding));
+    /* To avoid false start-up triggers, I2S:STMPINTRIG and I2S:STMPOUTTRIG must
+     * initially be equal to or higher than I2S:STMPWPER, which is set as
+     * (object->dmaBuffSizeConfig + 1) above. Since, 0xFFFFU > UINT8_MAX + 1
+     * this should prevent false triggers. UINT8_MAX is used above because it
+     * matches the type of dmaBuffSizeConfig, and is the width of the
+     * corresponding register in hardware.
+     */
+    I2SSampleStampInConfigure(I2S0_BASE, 0xFFFFU);
+    I2SSampleStampOutConfigure(I2S0_BASE, 0xFFFFU);
 }
 
 /*
@@ -905,13 +957,16 @@ static void enableClocks(I2S_Handle handle) {
     /* Get the pointer to the object*/
     object = handle->object;
 
-    /* Enable internal clocks */
-    PRCMAudioClockEnable();
+    I2SStart(I2S0_BASE, object->dmaBuffSizeConfig);
 
     /* Enable sample stamps */
     I2SSampleStampEnable(I2S0_BASE);
 
-    I2SStart(I2S0_BASE, object->dmaBuffSizeConfig);
+    /* Reset WCLK counter */
+    I2SWclkCounterReset(I2S0_BASE);
+
+    /* Enable internal clocks */
+    PRCMAudioClockEnable();
 
     /* Activate clocks (no clock is running before this call)
      * (clocks must be correctly set before)

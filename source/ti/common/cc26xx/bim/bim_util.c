@@ -74,10 +74,6 @@ const uint8_t OAD_EXTFL_ID[OAD_IMG_ID_LEN] = OAD_EXTFL_ID_VAL;
  * LOCAL FUNCTIONS
  */
 
-#ifdef BIM_ONCHIP
-static bool evenBitCount(uint32_t value);
-#endif //#ifdef BIM_ONCHIP
-
 /*******************************************************************************
  * @fn          jumpToPrgEntry
  *
@@ -213,7 +209,7 @@ bool metadataIDCheck(imgFixedHdr_t *imgHdr)
  * @return True when the value field has even number of 1's, otherwise returns 
  *         False.
  */
-static bool evenBitCount(uint32_t value)
+bool evenBitCount(uint32_t value)
 {
   uint8_t count; 
   
@@ -230,37 +226,6 @@ static bool evenBitCount(uint32_t value)
   {
     return true;
   }
-}
-
-/*******************************************************************************
- * @fn     setSearchValidImg
- *
- * @brief       This function sets the value of local variable based on the
- *              content of the image valid field in the image header.
- *
- * @param       flashPageNum - starting flash page number of the image.
- * @param       FN - pointer to local variable flash page number
- * @param       IT - pointer to local variable image type
- *
- *
- * @return Zero when successful. Non-zero, otherwise.
- */
-void setSearchValidImg(uint8_t flashPageNum, uint8_t *imgType)
-{
-     uint8_t status;
-     imgHdr_t imgHdr = {0};
-     
-     status = readFlash(flashPageNum, (uint8_t *)&imgHdr, OAD_IMG_HDR_LEN);
-     if ((status == FLASH_SUCCESS) && imgIDCheck(&(imgHdr.fixedHdr)) &&
-         (imgHdr.fixedHdr.imgVld != 0) && (evenBitCount(imgHdr.fixedHdr.imgVld))
-        )
-     {
-       *imgType = OAD_IMG_TYPE_APPSTACKLIB; //APP_STACK
-     }  
-     else
-     {
-       *imgType = OAD_IMG_TYPE_PERSISTENT_APP; //PERSISTENT_IMG
-     }
 }
 
 #endif //#ifdef BIM_ONCHIP

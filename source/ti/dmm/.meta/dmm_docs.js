@@ -121,7 +121,7 @@ ___Additional Setup Required___:
 
 Application states must be managed within the application code. \
 Whenever the application changes states, the DMM should be immediatly \
-notified using the \`DMMPolicy_updateStackState()\` API. Any additional \
+notified using the \`DMMPolicy_updateApplicationState()\` API. Any additional \
 application states added here must also handled by the developer within the \
 application code.
 `
@@ -275,6 +275,10 @@ const buildDefine = {
     description: "Define to enable this policy entry"
 };
 
+const genLibs = {
+    description: "Set this option to false in order to disable genLibs usage"
+};
+
 /*
  *  ======== exports ========
  *  Export documentation
@@ -299,5 +303,6 @@ exports = {
     states: states,
     appliedActivity: appliedActivity,
     isDefineSpecific: isDefineSpecific,
-    buildDefine: buildDefine
+    buildDefine: buildDefine,
+    genLibs: genLibs,
 };

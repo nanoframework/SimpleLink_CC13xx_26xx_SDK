@@ -49,12 +49,14 @@ const RfDesign = Common.getScript("rfdesign");
 let OverridePath = "/";
 let Overrides = [];
 let TxPowerOverrideFile = "none.json";
+let ccfg;
 
 // Exported functions
 exports = {
     init: init,
     updateTxPowerOverride: updateTxPowerOverride,
     getStructNames: getStructNames,
+    getRepetitionFactor: getRepetitionFactor,
     generateCode: generateCode
 };
 
@@ -173,6 +175,7 @@ function generateCode(symName, data, custom) {
         stackOffset: 0
     };
     const ovrTmp = {};
+    ccfg = system.modules["/ti/devices/CCFG"];
 
     _.each(Overrides, (ovr) => {
         ovrTmp[ovr.ptrName] = ovr;
@@ -191,6 +194,40 @@ function generateCode(symName, data, custom) {
     ret.code = ret.code.replace(/pRegOverride/g, symName);
 
     return ret;
+}
+
+/*!
+ *  ======== getRepetitionFactor ========
+ *  Get the repetition factor for the symbol rate.
+ *
+ */
+function getRepetitionFactor() {
+    let rep = 1;
+
+    _.each(Overrides, (ovr) => {
+        if (ovr.cmdName.includes("CMD_PROP_RADIO_DIV_SETUP")) {
+            for (const key in ovr) {
+                if (key === "cmdName" || key === "ptrName") {
+                    // eslint-disable-next-line no-continue
+                    continue;
+                }
+                const obuf = ovr[key].overridebuffer;
+                const items = Common.forceArray(obuf.Element32b);
+                // eslint-disable-next-line no-loop-func
+                _.each(items, (el) => {
+                    if (el._type === "HW_REG_OVERRIDE") {
+                        const val = el.$;
+                        if (val.includes("0x5324")) {
+                            // Extract repetition factor
+                            rep = parseInt(val.replace("0x5324,", ""));
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    return rep;
 }
 
 /*!
@@ -248,6 +285,7 @@ function generateStruct(override, data, custom) {
     };
     ret.code += "uint32_t " + override.ptrName + "[] =\n{\n";
     let nEntries = 0;
+    const coExEnabled = Common.getCoexConfig() !== null;
 
     // Generate the code
     for (const key in override) {
@@ -265,9 +303,24 @@ function generateStruct(override, data, custom) {
             // eslint-disable-next-line no-continue
             continue;
         }
+        // Skip HPOSC unless enabled in CCFG
+        if (key.includes("override_hposc")) {
+            if (!ccfg.$static.enableXoscHfComp) {
+                // eslint-disable-next-line no-continue
+                continue;
+            }
+        }
         // Skip Co-Ex unless available and enabled
         if (key.includes("coex")) {
-            if (Common.getCoexConfig() === null) {
+            const isCoExOvr = !key.includes("non_coex");
+            let bGenerateCode;
+            if (coExEnabled) {
+                bGenerateCode = isCoExOvr;
+            }
+            else {
+                bGenerateCode = !isCoExOvr;
+            }
+            if (!bGenerateCode) {
                 // eslint-disable-next-line no-continue
                 continue;
             }
@@ -276,15 +329,10 @@ function generateStruct(override, data, custom) {
         ret.code += "    // " + key + "\n";
 
         const tmp = obuf.Element32b;
-        let items = [];
 
         // If there is more than one element, use array
-        if (Array.isArray(tmp)) {
-            items = tmp;
-        }
-        else {
-            items[0] = tmp;
-        }
+        const items = Common.forceArray(tmp);
+
         // Process override array
         ret.code = processOverrideArray(items, ret.code, data);
         nEntries += items.length;

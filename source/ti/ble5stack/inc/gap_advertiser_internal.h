@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -148,6 +148,19 @@ extern void      gapAdv_controllerCb(uint8 cBackID, void *pParams);
 extern bStatus_t gapAdv_searchForBufferUse(uint8 *pBuf, advSet_t *pAdvSet);
 extern void      gapAdv_processRemoveSetEvt(uint8_t handle, 
                                             aeSetParamCmd_t* pAdvParam);
+
+/**
+ * gapAdv_periodicAdvCmdCompleteCBs
+ *
+ * Process an incoming OSAL HCI Command Complete Event for
+ * periodic advertising.
+ *
+ * @param   pMsg - message to process
+ *
+ * @return  TRUE if processed and safe to deallocate, FALSE if passed
+ *          off to another task.
+ */
+uint8_t gapAdv_periodicAdvCmdCompleteCBs( hciEvt_CmdComplete_t *pMsg );
 
 /*********************************************************************
 *********************************************************************/

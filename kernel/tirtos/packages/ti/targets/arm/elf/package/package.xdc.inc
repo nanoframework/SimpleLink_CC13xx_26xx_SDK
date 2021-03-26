@@ -3,6 +3,8 @@ package.xs
 IArm.xdc
 IArm.xs
 Arm9.xdc
+IM0.xdc
+M0.xdc
 IM3.xdc
 M3.xdc
 IM4.xdc
@@ -18,13 +20,15 @@ package/ti.targets.arm.elf.sch
 package/.vers_g200
 package/.vers_r200
 package/.vers_b200
-package/.xdc-I11
+package/.xdc-K04
 package/ti_targets_arm_elf.java
 package/ti_targets_arm_elf.class
 package/package_ti.targets.arm.elf.c
 package/package.defs.h
 IArm.h
 Arm9.h
+IM0.h
+M0.h
 IM3.h
 M3.h
 IM4.h

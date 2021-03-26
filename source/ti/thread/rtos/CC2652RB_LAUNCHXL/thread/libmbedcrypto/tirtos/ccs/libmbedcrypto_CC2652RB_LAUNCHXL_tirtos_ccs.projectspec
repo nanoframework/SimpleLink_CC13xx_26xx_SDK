@@ -42,17 +42,15 @@
             --plain_char=unsigned
             --diag_suppress=23000
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms
-            -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1
-            -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1
-            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc2652-ccs.h&quot;&apos;
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source
-            -I${WorkspaceDirPath}/libmbedcrypto_CC2652RB_LAUNCHXL_tirtos_ccs/config
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include
             -DHAVE_CONFIG_H
             -D_BSD_SOURCE=1
             -D_DEFAULT_SOURCE=1
+            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc2652-ccs.h&quot;&apos;
+            -I${WorkspaceDirPath}/libmbedcrypto_CC2652RB_LAUNCHXL_tirtos_ccs/config
             --silicon_version=7M4
             --code_state=16
             --little_endian
@@ -66,12 +64,9 @@
         description="this is the mbeddtls library">
 
         <property name="isHybrid" value="true"/>
-        <group id="libmbedcrypto_CC2652RB_LAUNCHXL_tirtos_ccs.SIMPLELINK_CC13X2_26X2_SDK.thread.TI"/>
         <file path="../../config/aes_alt.h" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="config">
         </file>
         <file path="../../config/ecjpake_alt.h" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="config">
-        </file>
-        <file path="../../config/mbedtls-config-cc2652-ccs.h" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="config">
         </file>
         <file path="../../config/sha256_alt.h" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="config">
         </file>
@@ -232,6 +227,8 @@
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/library/x509write_csr.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="third_party/mbedtls/repo/library">
         </file>
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/library/xtea.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="third_party/mbedtls/repo/library">
+        </file>
+        <file path="../../config/mbedtls-config-cc2652-ccs.h" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="config">
         </file>
     </project>
 </projectSpec>

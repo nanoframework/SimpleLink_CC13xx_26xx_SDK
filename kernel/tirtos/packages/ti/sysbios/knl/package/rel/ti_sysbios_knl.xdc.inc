@@ -32,5 +32,6 @@ Event.c
 Semaphore.c
 Mailbox.c
 Queue.c
+lib/debug/ti.sysbios.knl.am4f
 lib/debug/ti.sysbios.knl.am4fg
 lib/debug/ti.sysbios.knl.arm4f

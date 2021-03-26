@@ -52,6 +52,10 @@ var cc26x2PowerSrcList = [
    "./PowerCC26X2_tirtos.c"
 ];
 
+var cc26x2x7PowerSrcList = [
+   "./PowerCC26X2_tirtos.c"
+];
+
 var cc32xxPowerSrcList = [
     "./PowerCC32XX_tirtos.c"
 ];
@@ -74,47 +78,50 @@ var packageFiles = [
 
 /* Generate libraries for products which have been defined */
 if (deviceWareOpts.cc26xxware) {
-    var iarM4F = xdc.module('iar.targets.arm.M4F');
-    var iarM4FCopts = iarM4F.profiles["release"].compileOpts.copts; /* must restore after use */
-    iarM4F.profiles["release"].compileOpts.copts =
-        iarM4F.profiles["release"].compileOpts.copts.replace("Ohs", "Ohz");
-
-    var tiM4F = xdc.module('ti.targets.arm.elf.M4F');
-    var tiM4FCopts = tiM4F.profiles["release"].compileOpts.copts; /* must restore after use */
-    tiM4F.profiles["release"].compileOpts.copts =
-        tiM4F.profiles["release"].compileOpts.copts.replace("-O2", "-O3");
-
-    if ((tiM4F.profiles["release"].compileOpts.copts).indexOf(" --opt_for_speed=0") < 0) {
-        tiM4F.profiles["release"].compileOpts.copts += " --opt_for_speed=0";
-    }
 
     var targets;
     var sources;
 
+    /*
+    targets = libBuilder.cc26x1Targets;
+    sources = dplFiles.concat(cc26x2PowerSrcList);
+
+    libBuilder.makeLibs("dpl_cc13x1", targets, sources,
+        " -DDeviceFamily_CC13X1");
+
+    libBuilder.makeLibs("dpl_cc26x1", targets, sources,
+        " -DDeviceFamily_CC26X1");
+
+    */
+
     targets = libBuilder.cc26xxTargets;
     sources = dplFiles.concat(cc26x2PowerSrcList);
 
-    libBuilder.makeLibs("lib/dpl_cc13x2", targets, sources,
+    libBuilder.makeLibs("dpl_cc13x2", targets, sources,
         " -DDeviceFamily_CC13X2");
 
-    libBuilder.makeLibs("lib/dpl_cc26x2", targets, sources,
+    libBuilder.makeLibs("dpl_cc26x2", targets, sources,
         " -DDeviceFamily_CC26X2");
 
-    /* restore M4F profile options for subsequent users */
-    iarM4F.profiles["release"].compileOpts.copts = iarM4FCopts;
-    tiM4F.profiles["release"].compileOpts.copts = tiM4FCopts;
+    sources = dplFiles.concat(cc26x2x7PowerSrcList);
+
+    libBuilder.makeLibs("dpl_cc13x2x7", targets, sources,
+        " -DDeviceFamily_CC13X2X7");
+
+    libBuilder.makeLibs("dpl_cc26x2x7", targets, sources,
+        " -DDeviceFamily_CC26X2X7");
 }
 
 if (deviceWareOpts.cc32xxware) {
     var copts = " -DUSE_CC3220_ROM_DRV_API";
 
-    libBuilder.makeLibs("lib/dpl_cc32xx",
+    libBuilder.makeLibs("dpl_cc32xx",
         libBuilder.cc32xxTargets, dplFiles.concat(cc32xxPowerSrcList), copts);
 }
 
 if (deviceWareOpts.msp432e4DriverLib) {
     /* build one library for the super-set part */
-    libBuilder.makeLibs("lib/dpl_msp432e4", libBuilder.msp432e4Targets,
+    libBuilder.makeLibs("dpl_msp432e4", libBuilder.msp432e4Targets,
         dplFiles.concat(msp432e4PowerSrcList), " -DDeviceFamily_MSP432E411Y");
 }
 

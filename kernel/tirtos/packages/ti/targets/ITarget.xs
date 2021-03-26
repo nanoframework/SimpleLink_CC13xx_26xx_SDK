@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2019 Texas Instruments Incorporated
+ * Copyright (c) 2008-2020 Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,6 +82,7 @@ var _isaChainMap = {
     isa_71:  ["71"],
     isa_28:  ["28"],
     isa_28FP:["28", "28FP"],
+    isa_28FP64:["28", "28FP64"],
     isa_430: ["430"],
     isa_430X:["430", "430X"],
     isa_470: ["470", "v4T"],

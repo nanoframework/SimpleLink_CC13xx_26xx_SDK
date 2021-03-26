@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,6 +70,10 @@ SwiP_Handle SwiP_construct(SwiP_Struct *handle, SwiP_Fxn swiFxn,
         swi = Swi_construct2((Swi_Struct2 *)handle, swiFxn, NULL);
     }
     else {
+        if ((params->priority >= Swi_numPriorities) && (params->priority != ~(0U))) {
+            /* Swi_construct2() will not return NULL on priority error */
+            return (NULL);
+        }
         Swi_Params_init(&swiParams);
 
         swiParams.arg0 = params->arg0;
@@ -94,6 +98,10 @@ SwiP_Handle SwiP_create(SwiP_Fxn swiFxn, SwiP_Params *params)
         handle = Swi_create(swiFxn, NULL, Error_IGNORE);
     }
     else {
+        if ((params->priority >= Swi_numPriorities) && (params->priority != ~(0U))) {
+            /* Swi_create() only asserts params is within range */
+            return (NULL);
+        }
         Swi_Params_init(&swiParams);
         swiParams.arg0 = params->arg0;
         swiParams.arg1 = params->arg1;
@@ -214,7 +222,9 @@ void SwiP_restore(uintptr_t key)
  */
 void SwiP_setPriority(SwiP_Handle handle, uint32_t priority)
 {
-    Swi_setPri((Swi_Handle)handle, priority);
+    if ((priority < Swi_numPriorities) || (priority == ~(0U))) {
+        Swi_setPri((Swi_Handle)handle, priority);
+    }
 }
 
 /*

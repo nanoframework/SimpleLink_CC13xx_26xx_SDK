@@ -213,8 +213,8 @@ int main()
   DMMSch_registerClient(pWsnTaskHndl, DMMPolicy_StackRole_WsnNode);
 
   /*set the stacks in default states */
-  DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_ADV);
-  DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_SLEEPING);
+  DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_ADV);
+  DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_SLEEPING);
 
   /* enable interrupts and start SYS/BIOS */
   BIOS_start();

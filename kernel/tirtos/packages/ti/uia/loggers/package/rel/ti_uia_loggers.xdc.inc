@@ -12,5 +12,6 @@ package/package_ti.uia.loggers.c
 LoggerRunMode.c
 LoggerStopMode.c
 LoggerMin.c
+lib/release/ti.uia.loggers.am4f
 lib/release/ti.uia.loggers.am4fg
 lib/release/ti.uia.loggers.arm4f

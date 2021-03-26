@@ -11,7 +11,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -131,6 +131,11 @@
 /*! percent filter */
 #define CONFIG_PERCENTFILTER              0xFF
 
+/* Definition of maintainAssocTable modes */
+#define CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE   0
+#define CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX  1
+#define CLLC_MAINTAIN_ASSOC_TABLE_UPDATE     2
+
 /******************************************************************************
  Security constants and definitions
  *****************************************************************************/
@@ -178,7 +183,7 @@ Cllc_statistics_t Cllc_statistics;
  * Variable to start the assignment of short addresses by the coordinator
  * to each the device that associates to it
  */
-uint16_t Cllc_devShortAddr = 0x0001;
+uint16_t Cllc_devShortAddr = CLLC_ASSOC_DEVICE_STARTING_NUMBER;
 uint8_t CONST Cllc_keySource[] = CLLC_DEFAULT_KEY_SOURCE;
 
 /******************************************************************************
@@ -247,8 +252,7 @@ STATIC uint8_t fhChannelMask[] = CONFIG_FH_CHANNEL_MASK;
 STATIC uint8_t asyncChannelMask[] = FH_ASYNC_CHANNEL_MASK;
 #endif /* CONFIG_FH_ENABLE */
 #else
-STATIC uint8_t fhChannelMask[];
-STATIC uint8_t asyncChannelMask[];
+STATIC uint8_t asyncChannelMask[APIMAC_154G_CHANNEL_BITMAP_SIZ];
 #endif
 
 #ifdef FEATURE_MAC_SECURITY
@@ -347,7 +351,8 @@ static void maintainAssocTable(ApiMac_deviceDescriptor_t *pDevInfo,
                                ApiMac_capabilityInfo_t *pCapInfo,
                                int8_t rssi,
                                uint16_t status,
-                               bool mode);
+                               uint16_t index,
+                               uint8_t mode);
 static void configureStartParam(uint8_t channel);
 
 /* PAN decriptor list management functions */
@@ -430,8 +435,8 @@ void Cllc_init(ApiMac_callbacks_t *pMacCbs, Cllc_callbacks_t *pCllcCbs)
     /* setup short address */
     ApiMac_mlmeSetReqUint16(ApiMac_attribute_shortAddress,
                             coordInfoBlock.shortAddr);
-#if defined( POWER_MEAS ) || defined (TIMAC_AGAMA_FPGA)
-    /* Always set association permit to 1*/
+#if defined( POWER_MEAS )
+    /* Always set association permit to 1 */
     ApiMac_mlmeSetReqBool(ApiMac_attribute_associatePermit, true);
 #endif
 
@@ -462,6 +467,9 @@ void Cllc_init(ApiMac_callbacks_t *pMacCbs, Cllc_callbacks_t *pCllcCbs)
         ApiMac_mlmeSetFhReqUint8(ApiMac_FHAttribute_broadcastDwellInterval,
                                  FH_BROADCAST_DWELL_TIME);
 
+        /* Stack broadcast interval is set to half the application broadcast 
+         * message generation rate. This prevents the transmit queue from
+         * overflowing by transmitting faster than the queue can fill. */
         ApiMac_mlmeSetFhReqUint32(ApiMac_FHAttribute_BCInterval,
                                   (FH_BROADCAST_INTERVAL >> 1));
 
@@ -796,6 +804,7 @@ void Cllc_restoreNetwork(Llc_netInfo_t *pNetworkInfo, uint16_t numDevices,
         Llc_deviceListItem_t *pDevList)
 {
     uint16_t i = 0;
+    uint16_t subID;
 
     /* set state */
     updateState(Cllc_states_initRestoringCoordinator);
@@ -824,8 +833,14 @@ void Cllc_restoreNetwork(Llc_netInfo_t *pNetworkInfo, uint16_t numDevices,
         for(i = 0; i < numDevices; i++, pDevList++)
         {
             /* Add to association table */
-            maintainAssocTable(&pDevList->devInfo, &pDevList->capInfo, 1, 0,
-                               (false));
+            maintainAssocTable(&pDevList->devInfo, &pDevList->capInfo, 1, 0, 0,
+                               CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE);
+
+            /* Get the address for assigning to new devices */
+            if( pDevList->devInfo.shortAddress >= Cllc_devShortAddr)
+            {
+                Cllc_devShortAddr = pDevList->devInfo.shortAddress + 1;
+            }
         }
     }
     else
@@ -834,7 +849,7 @@ void Cllc_restoreNetwork(Llc_netInfo_t *pNetworkInfo, uint16_t numDevices,
         /* repopulate association table */
         for(i = 0; i < numDevices; i++)
         {
-            Csf_getDeviceItem(i, &item);
+            Csf_getDeviceItem(i, &item, &subID);
 #ifdef FEATURE_MAC_SECURITY
             /* Add device to security device table */
             Cllc_addSecDevice(item.devInfo.panID,
@@ -843,8 +858,15 @@ void Cllc_restoreNetwork(Llc_netInfo_t *pNetworkInfo, uint16_t numDevices,
                               item.rxFrameCounter);
 #endif /* FEATURE_MAC_SECURITY */
             /* Add to association table */
-            maintainAssocTable(&item.devInfo, &item.capInfo, 1, 0,
-                               (false));
+            maintainAssocTable(&item.devInfo, &item.capInfo, 1, 0, subID,
+                               CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX);
+
+            /* Get the address for assigning to new devices */
+            if( item.devInfo.shortAddress >= Cllc_devShortAddr)
+            {
+                Cllc_devShortAddr = item.devInfo.shortAddress + 1;
+            }
+
 #ifdef FEATURE_SECURE_COMMISSIONING
             {
                 /* Mark the devices that need to be re-commissioned */
@@ -898,7 +920,7 @@ ApiMac_status_t Cllc_setJoinPermit(uint32_t duration)
  */
 void Cllc_removeDevice(ApiMac_sAddrExt_t *pExtAddr)
 {
-    int8_t i = 0;
+    uint8_t i = 0;
     uint16_t shortAddr = Csf_getDeviceShort(pExtAddr);
 
     if(shortAddr != CSF_INVALID_SHORT_ADDR)
@@ -1173,17 +1195,21 @@ static void processState(Cllc_coord_states_t state)
             break;
 
         case Cllc_coordStates_scanEdCnf:
-
-            if(!CONFIG_FH_ENABLE)
+            /* Do not re-send start request for ED Scan if network has started */
+            if(coordInfoBlock.currentCllcState < Cllc_states_started)
             {
-                /* check for duplicate PAN ID */
-                configureStartParam(coordInfoBlock.channel);
+                if(!CONFIG_FH_ENABLE)
+                {
+                    /* check for duplicate PAN ID */
+                    configureStartParam(coordInfoBlock.channel);
 
-                /* setup short address */
-                ApiMac_mlmeSetReqUint16(ApiMac_attribute_shortAddress,
-                                        coordInfoBlock.shortAddr);
+                    /* setup short address */
+                    ApiMac_mlmeSetReqUint16(ApiMac_attribute_shortAddress,
+                                            coordInfoBlock.shortAddr);
+                }
+
+                sendStartReq(CONFIG_FH_ENABLE);
             }
-            sendStartReq(CONFIG_FH_ENABLE);
             break;
 
         case Cllc_coordStates_startCnf:
@@ -1297,8 +1323,13 @@ static void scanCnfCb(ApiMac_mlmeScanCnf_t *pData)
         }
         else if(pData->scanType == ApiMac_scantype_energyDetect)
         {
-            coordInfoBlock.channel
+            /* Do not update coordinator channel if network has already started */
+            if(coordInfoBlock.currentCllcState < Cllc_states_started)
+            {
+                  coordInfoBlock.channel
                   = findBestChannel(pData->result.pEnergyDetect);
+            }
+
             switchState(Cllc_coordStates_scanEdCnf);
         }
     }
@@ -1517,7 +1548,9 @@ static void assocIndCb(ApiMac_mlmeAssociateInd_t *pData)
     {
         /* New device, make a new short address */
         assocRsp.status = ApiMac_assocStatus_panAccessDenied;
-        devInfo.shortAddress = Cllc_numOfDevices + CLLC_ASSOC_DEVICE_STARTING_NUMBER;
+
+        devInfo.shortAddress = Cllc_devShortAddr;
+        Cllc_devShortAddr++;
 
         if(pCllcCallbacksCopy && pCllcCallbacksCopy->pDeviceJoiningCb)
         {
@@ -1534,8 +1567,8 @@ static void assocIndCb(ApiMac_mlmeAssociateInd_t *pData)
         if(assocRsp.status == ApiMac_assocStatus_success)
         {
             /* add to association table */
-            maintainAssocTable(&devInfo, &pData->capabilityInformation, 1, 0,
-                               (false));
+            maintainAssocTable(&devInfo, &pData->capabilityInformation, 1, 0, 0,
+                               CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE);
 #ifdef POWER_MEAS
             if(POWER_TEST_PROFILE == POLL_DATA)
             {
@@ -1626,20 +1659,42 @@ static void disassocIndCb(ApiMac_mlmeDisassociateInd_t *pData)
  * @param       rssi     - RSSI value
  * @param       status   - status to indicate if the device is still
  *                         communicating with the coordinator
- * @param       mode     - mode false is add, mode true is update
+ *              index    - Used by CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX mode to
+ *                         indicate index to add device to in association table
+ * @param       mode     - One of three modes of operation for the function:
+ *                         CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE:
+ *                             Add to next free table entry
+ *                         CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX:
+ *                             Add to table entry at value indicated by index.
+ *                             Only add when table entry is empty
+ *                         CLLC_MAINTAIN_ASSOC_TABLE_UPDATE
+ *                             Update entry in table
  */
 static void maintainAssocTable(ApiMac_deviceDescriptor_t *pDevInfo,
                                ApiMac_capabilityInfo_t *pCapInfo,
                                int8_t rssi,
                                uint16_t status,
-                               bool mode)
+                               uint16_t index,
+                               uint8_t mode)
 {
-    if(mode == false)
+    if(CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE == mode ||
+       CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX == mode)
     {
-        Cllc_associated_devices_t *pItem;
+        Cllc_associated_devices_t *pItem = NULL;
 
         /* look for an empty slot */
-        pItem = Cllc_findDevice(CSF_INVALID_SHORT_ADDR);
+        if (CLLC_MAINTAIN_ASSOC_TABLE_ADD_FREE == mode)
+        {
+            pItem = Cllc_findDevice(CSF_INVALID_SHORT_ADDR);
+        }
+        else // CLLC_MAINTAIN_ASSOC_TABLE_ADD_INDEX
+        {
+            if (index < CONFIG_MAX_DEVICES &&
+                CSF_INVALID_SHORT_ADDR == Cllc_associatedDevList[index].shortAddr)
+            {
+                pItem = &Cllc_associatedDevList[index];
+            }
+        }
 
         if(pItem != NULL)
         {
@@ -1654,7 +1709,7 @@ static void maintainAssocTable(ApiMac_deviceDescriptor_t *pDevInfo,
             pItem->status = status;
         }
     }
-    else if(mode == true)
+    else if(mode == CLLC_MAINTAIN_ASSOC_TABLE_UPDATE)
     {
         uint16_t shortAddr = Csf_getDeviceShort(&pDevInfo->extAddress);
         if(shortAddr != CSF_INVALID_SHORT_ADDR)
@@ -1788,7 +1843,7 @@ static void commStatusIndCb(ApiMac_mlmeCommStatusInd_t *pCommStatusInd)
 {
 #ifdef FEATURE_SECURE_COMMISSIONING
     /* Association response also received by sensor - start CM is not already in progress */
-    if((pCommStatusInd->reason == ApiMac_commStatusReason_assocRsp))
+    if(pCommStatusInd->reason == ApiMac_commStatusReason_assocRsp)
     {
         if((pCommStatusInd->status == ApiMac_status_success) &&(SM_Current_State != SM_CM_InProgress))
         {
@@ -1877,7 +1932,8 @@ static void orphanIndCb(ApiMac_mlmeOrphanInd_t *pData)
         ApiMac_mlmeOrphanRsp(&orphanRsp);
 
         /* Update Assoc Table */
-        maintainAssocTable(&item.devInfo, &item.capInfo, 1, 0, (true));
+        maintainAssocTable(&item.devInfo, &item.capInfo, 1, 0, 0,
+                           CLLC_MAINTAIN_ASSOC_TABLE_UPDATE);
     }
 
     /* Invoke call back from cllc into application layer/collector if not NULL */
@@ -2085,6 +2141,7 @@ static void sendScanReq(ApiMac_scantype_t type)
     scanReq.linkQuality = CONFIG_LINKQUALITY;
     scanReq.percentFilter = CONFIG_PERCENTFILTER;
     scanReq.channelPage = CONFIG_CHANNEL_PAGE;
+    /* Should be set to the curent PHY ID*/
     scanReq.phyID = CONFIG_PHY_ID;
     /* using no security for scan request command */
     memset(&scanReq.sec, 0, sizeof(ApiMac_sec_t));

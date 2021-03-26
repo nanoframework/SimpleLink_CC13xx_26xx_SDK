@@ -129,6 +129,7 @@ public class ti_sysbios_rom_cortexm_cc26xx_cc26x2v2
             po.addFld("REVISION", Proto.Elm.newCNum("(xdc_UInt32)"), 286529877L, "w");
             po.addFld("REVISION_WORD_ADDRESS", Proto.Elm.newCNum("(xdc_UInt32)"), 0x1002B400L, "wh");
             po.addFld("otherLibFuncs", new Proto.Arr($$T_Str, false), $$DEFAULT, "wh");
+            po.addFld("validate", $$T_Bool, true, "wh");
             po.addFld("genPragmas", $$T_Bool, false, "wh");
         }//isCFG
         fxn = Global.get(cap, "module$use");

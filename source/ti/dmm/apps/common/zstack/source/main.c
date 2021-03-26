@@ -97,6 +97,7 @@
 #ifdef ZSTACK_START
 #include "zstackstartup.h"
 #if defined(DMM_LNT)
+#include <ti/sysbios/knl/Semaphore.h>
 #include "testapp_lnt.h"
 #elif defined(DMM_ZEDSWITCH) || defined(DMM_ZCSWITCH)
 #include "zcl_samplesw.h"
@@ -111,11 +112,20 @@
 #include <dmm/dmm_scheduler.h>
 
 #include "ti_dmm_application_policy.h"
-#include <dmm/dmm_priority_ble_zigbee.h>
+#if ZG_BUILD_ENDDEVICE_TYPE
+#include <dmm/dmm_priority_ble_zigbee_zed.h>
+#elif ZG_BUILD_RTRONLY_TYPE
+#include <dmm/dmm_priority_ble_zigbee_zr.h>
+#elif ZG_BUILD_COORDINATOR_TYPE
+#include <dmm/dmm_priority_ble_zigbee_zc.h>
+#endif
 
 #include "remote_display.h"
 #include "ble_user_config.h"
+
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif /* CUI_DISABLE */
 
 #ifdef DMM_OAD
 #include <ti/drivers/GPIO.h>
@@ -331,10 +341,13 @@ void AssertHandler(uint8 assertCause, uint8 assertSubcause)
   switch (assertCause)
   {
     case HAL_ASSERT_CAUSE_OUT_OF_MEMORY:
+#ifndef CUI_DISABLE
       CUI_assert("***ERROR*** >> OUT OF MEMORY!", false);
+#endif /* CUI_DISABLE */
       break;
 
     case HAL_ASSERT_CAUSE_INTERNAL_ERROR:
+#ifndef CUI_DISABLE
       // check the subcause
       if (assertSubcause == HAL_ASSERT_SUBCAUSE_FW_INERNAL_ERROR)
       {
@@ -344,25 +357,34 @@ void AssertHandler(uint8 assertCause, uint8 assertSubcause)
       {
         CUI_assert("***ERROR*** >> INTERNAL ERROR!", false);
       }
+#endif /* CUI_DISABLE */
       break;
 
     case HAL_ASSERT_CAUSE_ICALL_ABORT:
+#ifndef CUI_DISABLE
       CUI_assert("***ERROR*** >> ICALL ABORT!", true);
+#endif /* CUI_DISABLE */
       HAL_ASSERT_SPINLOCK;
       break;
 
     case HAL_ASSERT_CAUSE_ICALL_TIMEOUT:
+#ifndef CUI_DISABLE
       CUI_assert("***ERROR*** >> ICALL TIMEOUT!", true);
+#endif /* CUI_DISABLE */
       HAL_ASSERT_SPINLOCK;
       break;
 
     case HAL_ASSERT_CAUSE_WRONG_API_CALL:
+#ifndef CUI_DISABLE
       CUI_assert("***ERROR*** >> WRONG API CALL!", true);
+#endif /* CUI_DISABLE */
       HAL_ASSERT_SPINLOCK;
       break;
 
   default:
+#ifndef CUI_DISABLE
       CUI_assert("***ERROR*** >> DEFAULT SPINLOCK!", true);
+#endif /* CUI_DISABLE */
       HAL_ASSERT_SPINLOCK;
   }
 
@@ -439,6 +461,7 @@ Void main()
     macUser0Cfg[0].pAssertFP = assertHandler;
 #endif
 
+#ifndef CUI_DISABLE
     /* Initialize UI for key and LED */
     CUI_params_t cuiParams;
     CUI_paramsInit(&cuiParams);
@@ -451,6 +474,7 @@ Void main()
     // One-time initialization of the CUI
     CUI_init(&cuiParams);
 #endif
+#endif /* CUI_DISABLE */
 
 #ifdef USE_ITM_DBG
     // Configure SWO Traces on pin 26
@@ -520,7 +544,16 @@ Void main()
     DMMPolicy_Params_init(&dmmPolicyParams);
     dmmPolicyParams.numPolicyTableEntries = DMMPolicy_ApplicationPolicySize;
     dmmPolicyParams.policyTable = DMMPolicy_ApplicationPolicyTable;
-	dmmPolicyParams.globalPriorityTable = globalPriorityTable_bleLzigbeeH;
+#ifdef ZSTACK_START
+#if ZG_BUILD_ENDDEVICE_TYPE
+    dmmPolicyParams.globalPriorityTable = globalPriorityTable_bleLzigbeeZedH;
+#elif ZG_BUILD_RTRONLY_TYPE
+    dmmPolicyParams.globalPriorityTable = globalPriorityTable_bleLzigbeeZrH;
+#elif ZG_BUILD_COORDINATOR_TYPE
+    dmmPolicyParams.globalPriorityTable = globalPriorityTable_bleLzigbeeZcH;
+#endif
+#endif
+
     DMMPolicy_open(&dmmPolicyParams);
 
     /* initialize and open the DMM scheduler */
@@ -537,15 +570,27 @@ Void main()
     DMMSch_registerClient(pBleTaskHndl, DMMPolicy_StackRole_BlePeripheral);
 #endif
 #ifdef ZSTACK_START
-    DMMSch_registerClient(pZstackTaskkHndl, DMMPolicy_StackRole_154Sensor);
+#if ZG_BUILD_ENDDEVICE_TYPE
+    DMMSch_registerClient(pZstackTaskkHndl, DMMPolicy_StackRole_ZigbeeEndDevice);
+#elif ZG_BUILD_RTRONLY_TYPE
+    DMMSch_registerClient(pZstackTaskkHndl, DMMPolicy_StackRole_ZigbeeRouter);
+#elif ZG_BUILD_COORDINATOR_TYPE
+    DMMSch_registerClient(pZstackTaskkHndl, DMMPolicy_StackRole_ZigbeeCoordinator);
+#endif
 #endif
 
     /* set the stacks in default states */
 #ifdef BLE_START
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_IDLE);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_IDLE);
 #endif
 #ifdef ZSTACK_START
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_ZB_UNINIT);
+#if ZG_BUILD_ENDDEVICE_TYPE
+    DMMPolicy_updateStackState(DMMPolicy_StackRole_ZigbeeEndDevice, DMMPOLICY_ZB_UNINIT);
+#elif ZG_BUILD_RTRONLY_TYPE
+    DMMPolicy_updateStackState(DMMPolicy_StackRole_ZigbeeRouter, DMMPOLICY_ZB_UNINIT);
+#elif ZG_BUILD_COORDINATOR_TYPE
+    DMMPolicy_updateStackState(DMMPolicy_StackRole_ZigbeeCoordinator, DMMPOLICY_ZB_UNINIT);
+#endif
 #endif
 
 #ifdef DEBUG_SW_TRACE

@@ -9,7 +9,7 @@
             {
                 "_type": "ADI_REG_OVERRIDE",
                 "_comment": "Set VCTRIM to 0 for 20 dBm PA",
-                "$": "1,26,0x0"
+                "$": "1,26,0x00"
             }
         ]
     }

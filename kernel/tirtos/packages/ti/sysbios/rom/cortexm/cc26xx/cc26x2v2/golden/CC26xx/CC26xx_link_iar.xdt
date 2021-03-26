@@ -15,9 +15,7 @@
 --define_symbol ti_sysbios_heaps_HeapTrack_Object__create__S=0x1002e081
 % }
 
---define_symbol memcpy=0x1002fdad
 --define_symbol strlen=0x1002fddb
---define_symbol memset=0x1002fdc5
 --define_symbol ti_sysbios_BIOS_RtsGateProxy_query__E=0x1002ec9b
 --define_symbol ti_sysbios_knl_Queue_get__E=0x1002e951
 --define_symbol ti_sysbios_knl_Swi_enabled__E=0x1002ea39
@@ -101,7 +99,7 @@
 --define_symbol ti_sysbios_hal_Hwi_startup__E=0x1002ec31
 --define_symbol xdc_runtime_Core_assignParams__I=0x1002f4c9
 --define_symbol ti_sysbios_hal_Hwi_HwiProxy_switchFromBootStack__E=0x1002e935
---define_symbol ti_sysbios_heaps_HeapMem_allocUnprotected__E=0x1002cb51
+//--define_symbol ti_sysbios_heaps_HeapMem_allocUnprotected__E=0x1002cb51
 --define_symbol xdc_runtime_Memory_HeapProxy_getStats__E=0x1002f905
 --define_symbol ti_sysbios_heaps_HeapTrack_Handle__label__S=0x1002e571
 --define_symbol ti_sysbios_knl_Swi_post__E=0x1002d891
@@ -314,7 +312,7 @@
 --define_symbol ti_sysbios_family_arm_m3_Hwi_initNVIC__E=0x1002c831
 --define_symbol ti_sysbios_knl_Clock_addI__E=0x1002e625
 --define_symbol ti_sysbios_family_arm_m3_Hwi_Instance_finalize__E=0x1002ce71
---define_symbol ti_sysbios_heaps_HeapMem_alloc__E=0x1002d259
+//--define_symbol ti_sysbios_heaps_HeapMem_alloc__E=0x1002d259
 --define_symbol ti_sysbios_knl_Task_unblockI__E=0x1002dcb9
 --define_symbol ti_sysbios_knl_Swi_Instance_finalize__E=0x1002e42b
 --define_symbol ti_sysbios_family_arm_m3_Hwi_disableInterrupt__E=0x1002d8d9

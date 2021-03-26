@@ -12,6 +12,7 @@
   * [Starting the Zigbee Coordinator's Network](#startingCoordsNetwork)
   * [Provisioned Zigbee Coordinator](#ProvisionedZcSwitch)
   * [Zigbee Network Device Discovery via BLE](#NetworkDeviceDiscoveryService)
+  * [Disabling Common User Interface](#DisableCUI)
 
 ## <a name="Introduction"></a>Introduction
 
@@ -104,7 +105,7 @@ Start Type, Start Time, AllowDelay, Priority, Activity, etc.
 
 The Global Priority Table (GPT) defines relative priorities of the two stacks
 based on the activity and priority of RF commands.  For details of the GPT,
-refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_154.c/h`.
+refer to `<SDK_DIR>\source\ti\common\dmm\dmm_priority_ble_zigbee_zc.c/h`.
 
 The Application Level information is the user defined information via the policy
 table and inludes: Application State Name, Weight, AppliedActivity, Pause, etc;
@@ -469,3 +470,13 @@ Coordinator.
 written to.
 
 >In LightBlue, make sure to select the "Listen for notifications" button.
+
+## <a name="DisableCUI"></a>Disabling Common User Interface
+
+The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in `dmm_zc_switch_remote_display_app.opts`:
+
+```
+-DCUI_DISABLE
+```
+
+> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.

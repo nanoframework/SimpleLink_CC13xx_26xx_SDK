@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2010-2020, Texas Instruments Incorporated
+ Copyright (c) 2010-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -361,6 +361,18 @@ extern "C"
  *
  */
 #define GAPBOND_ERASE_LOCAL_INFO      0x41A
+
+/**
+ * Whether to enfore authenticated pairing (Read/Write)
+ *
+ * size: uint8_t
+ *
+ * default: FALSE
+ *
+ * range: TRUE (enforce) or FALSE (do not enforce)
+ */
+#define GAPBOND_AUTHEN_PAIRING_ONLY   0x41B
+
 /** @} End GAPBondMgr_Params */
 
 /**
@@ -812,8 +824,6 @@ extern bStatus_t GAPBondMgr_PasscodeRsp(uint16_t connectionHandle,
                                         uint8_t status, uint32_t passcode);
 
 /**
- * @fn      GAPBondMgr_SCGetLocalOOBParameters
- *
  * @brief   Get local Random number and confirm value for secure connection
  *
  * @design /ref did_244389729
@@ -826,8 +836,6 @@ extern bStatus_t GAPBondMgr_PasscodeRsp(uint16_t connectionHandle,
 extern bStatus_t GAPBondMgr_SCGetLocalOOBParameters(gapBondOOBData_t *localOobData);
 
 /**
- * @fn      GAPBondMgr_SCSetRemoteOOBParameters
- *
  * @brief   Set remote's OOB parameters for secure connection
  *
  * @design /ref did_244389729
@@ -842,9 +850,7 @@ extern bStatus_t GAPBondMgr_SCGetLocalOOBParameters(gapBondOOBData_t *localOobDa
 extern bStatus_t GAPBondMgr_SCSetRemoteOOBParameters(gapBondOOBData_t *remoteOobData,
                                                      uint8 OOBDataFlag);
 
-/*********************************************************************
- * @fn		GAPBondMgr_GenerateEccKeys
- *
+/**
  * @brief	Generates ECC keys.
  *
  * @design /ref did_244389729

@@ -28,19 +28,17 @@ CFLAGS = -I../.. \
     --plain_char=unsigned \
     --diag_suppress=23000 \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC1352=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-ccs.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DHAVE_CONFIG_H \
     -D_BSD_SOURCE=1 \
     -D_DEFAULT_SOURCE=1 \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-ccs.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -DOPENTHREAD_FTD=1 \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc1352-ccs-ncp.h"' \
     -I${WorkspaceDirPath}/libopenthread_ncp_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
@@ -74,19 +72,17 @@ CPPFLAGS = -I../.. \
     --plain_char=unsigned \
     --diag_suppress=23000 \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC1352=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-ccs.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DHAVE_CONFIG_H \
     -D_BSD_SOURCE=1 \
     -D_DEFAULT_SOURCE=1 \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-ccs.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -DOPENTHREAD_FTD=1 \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc1352-ccs-ncp.h"' \
     -I${WorkspaceDirPath}/libopenthread_ncp_CC1352P_2_LAUNCHXL_tirtos_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \

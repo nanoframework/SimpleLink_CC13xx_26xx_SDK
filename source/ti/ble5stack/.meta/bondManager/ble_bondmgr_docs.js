@@ -39,12 +39,7 @@
 
 // Long description for the maxBonds configuration parameter
 const maxBondsLongDescription = `Maximum number of bonds that can be saved in NV.\n
-__Default__: 10\n
-__Note__: Due to the structure of SNV, if the maximum number of bonds is set to\
-more than 13, then there are some additional required changes to support storage\
-of the larger number of bonds.\n
-For more information, refer to the [BLE User's Guide](ble5stack/ble_user_guide/html/\
-ble-stack-5.x/gapbondmngr-cc13x2_26x2.html#increasing-number-of-bonding-entries).\n`
+__Default__: 10\n`
 
 // Long description for the maxCharCfg configuration parameter
 const maxCharCfgLongDescription = `Maximum number of characteristic configurations \
@@ -112,6 +107,11 @@ Supported |
 LE Secure Connection Only |\n
 For more information, refer to the [BLE User's Guide](ble5stack/ble_user_guide/\
 html/ble-stack-5.x/gapbondmngr-cc13x2_26x2.html#selection-of-pairing-method).\n`
+
+// Long description for the authenPairingOnly configuration parameter
+const authenPairingOnlyLongDescription = `If enabled and the key generation method does not result in a key that provides Authenticated MITM protection \
+then the device will send the Pairing Failed command with the error code Authentication Requirements\n
+__Default__: False (unchecked)\n`
 
 // Long description for the syncWLWithBondDev configuration parameter
 const syncWLWithBondDevLongDescription = `Synchronize the whitelist with bonded devices.\n
@@ -216,6 +216,7 @@ ble-stack-5.x/gapbondmngr-cc13x2_26x2.html#gapbondmgr-and-snv)\n`
     bondIOCapsLongDescription: bondIOCapsLongDescription,
     bondingLongDescription:bondingLongDescription,
     secureConnLongDescription: secureConnLongDescription,
+    authenPairingOnlyLongDescription: authenPairingOnlyLongDescription,
     syncWLWithBondDevLongDescription: syncWLWithBondDevLongDescription,
     ECCKeyRegenPolicyLongDescription: ECCKeyRegenPolicyLongDescription,
     LTKSizeLongDescription: LTKSizeLongDescription,

@@ -41,6 +41,7 @@
 /*********************************************************************
  * INCLUDES
  */
+#include "ti_zstack_config.h"
 #include "zcl.h"
 #include "zcl_general.h"
 #include "zcl_ll.h"
@@ -82,7 +83,10 @@ typedef struct zclLLCBRec
 static zclLLCBRec_t *zclLLCBs = (zclLLCBRec_t *)NULL;
 static uint8_t zclLLPluginRegisted = FALSE;
 
+
+#if defined ( INTER_PAN ) || defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
 static zclLL_InterPANCallbacks_t *pInterPANCBs = (zclLL_InterPANCallbacks_t *)NULL;
+#endif
 
 /*********************************************************************
  * LOCAL FUNCTIONS
@@ -99,7 +103,9 @@ static ZStatus_t zclLL_ProcessInCmd_EndpointInfo( zclIncoming_t *pInMsg, zclLL_A
 static ZStatus_t zclLL_ProcessInCmd_GetGrpIDsRsp( zclIncoming_t *pInMsg, zclLL_AppCallbacks_t *pCBs );
 static ZStatus_t zclLL_ProcessInCmd_GetEPListRsp( zclIncoming_t *pInMsg, zclLL_AppCallbacks_t *pCBs );
 
+#if defined ( INTER_PAN ) || defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
 static ZStatus_t zclLL_HdlInInterPANCommands( zclIncoming_t *pInMsg );
+
 static ZStatus_t zclLL_ProcessInLLInterPANCmds( zclIncoming_t *pInMsg );
 
 static void zclLL_ParseInCmd_NwkJoinReq( uint8_t *pBuf, zclLLNwkJoinReq_t *pReq );
@@ -118,7 +124,7 @@ static ZStatus_t zclLL_ProcessInCmd_DeviceInfoRsp( zclIncoming_t *pInMsg );
 static ZStatus_t zclLL_ProcessInCmd_NwkStartRsp( zclIncoming_t *pInMsg );
 static ZStatus_t zclLL_ProcessInCmd_NwkJoinRtrRsp( zclIncoming_t *pInMsg );
 static ZStatus_t zclLL_ProcessInCmd_NwkJoinEDRsp( zclIncoming_t *pInMsg );
-
+#endif
 
 /*********************************************************************
  * @fn      zclLL_RegisterCmdCallbacks
@@ -191,7 +197,9 @@ ZStatus_t zclLL_RegisterInterPANCmdCallbacks( zclLL_InterPANCallbacks_t *callbac
                         zclLL_HdlIncoming );
     zclLLPluginRegisted = TRUE;
   }
+#if defined ( INTER_PAN ) || defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
   pInterPANCBs = callbacks;
+#endif
 
   return ( ZSuccess );
 }
@@ -1211,7 +1219,13 @@ static ZStatus_t zclLL_ProcessInCmd_GetGrpIDsRsp( zclIncoming_t *pInMsg,
   {
     zclLLGetGrpIDsRsp_t *pRsp;
     uint8_t cnt = pInMsg->pData[ZLL_CMDLEN_GET_GRP_IDS_RSP-1];
-    uint8_t rspLen = sizeof( zclLLGetGrpIDsRsp_t ) + ( cnt * sizeof( grpInfoRec_t ) );
+    uint16_t rspLen = sizeof( zclLLGetGrpIDsRsp_t ) + ( cnt * sizeof( grpInfoRec_t ) );
+    uint16_t actualDataLen = pInMsg->pDataLen;
+
+    if ( rspLen > actualDataLen )
+    {
+      return status;
+    }
 
     pRsp = (zclLLGetGrpIDsRsp_t *)zcl_mem_alloc( rspLen );
     if ( pRsp )
@@ -1222,7 +1236,6 @@ static ZStatus_t zclLL_ProcessInCmd_GetGrpIDsRsp( zclIncoming_t *pInMsg,
       pRsp->total = *pBuf++;
       pRsp->startIndex = *pBuf++;
       pRsp->cnt = *pBuf++;
-      pRsp->grpInfoRec = (grpInfoRec_t *)(pRsp+1);
 
       for ( i = 0; i < cnt; i++ )
       {
@@ -1262,7 +1275,13 @@ static ZStatus_t zclLL_ProcessInCmd_GetEPListRsp( zclIncoming_t *pInMsg,
   {
     zclLLGetEPListRsp_t *pRsp;
     uint8_t cnt = pInMsg->pData[ZLL_CMDLEN_GET_EP_LIST_RSP-1];
-    uint8_t rspLen = sizeof( zclLLGetEPListRsp_t ) + ( cnt * sizeof( epInfoRec_t ) );
+    uint16_t rspLen = sizeof( zclLLGetEPListRsp_t ) + ( cnt * sizeof( epInfoRec_t ) );
+    uint16_t actualDataLen = pInMsg->pDataLen;
+
+    if ( rspLen > actualDataLen )
+    {
+      return status;
+    }
 
     pRsp = (zclLLGetEPListRsp_t *)zcl_mem_alloc( rspLen );
     if ( pRsp )
@@ -1273,7 +1292,6 @@ static ZStatus_t zclLL_ProcessInCmd_GetEPListRsp( zclIncoming_t *pInMsg,
       pRsp->total = *pBuf++;
       pRsp->startIndex = *pBuf++;
       pRsp->cnt = *pBuf++;
-      pRsp->epInfoRec = (epInfoRec_t *)(pRsp+1);
 
       for ( i = 0; i < cnt; i++ )
       {
@@ -1306,6 +1324,7 @@ static ZStatus_t zclLL_ProcessInCmd_GetEPListRsp( zclIncoming_t *pInMsg,
 * Inter-PAN functions
 **********************************************************************/
 
+#if defined ( INTER_PAN ) || defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
 /*********************************************************************
  * @fn      zclLL_HdlInInterPANCommands
  *
@@ -1838,7 +1857,13 @@ static ZStatus_t zclLL_ProcessInCmd_DeviceInfoRsp( zclIncoming_t *pInMsg )
   {
     zclLLDeviceInfoRsp_t *pRsp;
     uint8_t cnt = pInMsg->pData[ZLL_CMDLEN_DEVICE_INFO_RSP-1];
-    uint8_t rspLen = sizeof( zclLLDeviceInfoRsp_t ) + ( cnt * sizeof( devInfoRec_t ) );
+    uint16_t rspLen = sizeof( zclLLDeviceInfoRsp_t ) + ( cnt * sizeof( devInfoRec_t ) );
+    uint16_t actualDataLen = pInMsg->pDataLen;
+
+    if ( rspLen > actualDataLen )
+    {
+      return status;
+    }
 
     pRsp = (zclLLDeviceInfoRsp_t *)zcl_mem_alloc( rspLen );
     if ( pRsp )
@@ -1977,7 +2002,7 @@ static ZStatus_t zclLL_ProcessInCmd_NwkJoinEDRsp( zclIncoming_t *pInMsg )
 
   return ( ZSuccess );
 }
-
+#endif
 
 /********************************************************************************************
 *********************************************************************************************/

@@ -40,12 +40,12 @@ const Common = system.getScript("/ti/zstack/zstack_common.js");
 
 /* Description text for configurables */
 const routeExpiryTimeDescription = `Number of seconds before an entry in the \
-routing table is marked as expired. Set to 0 to turn off route expiry.`;
+routing table is marked as expired. Set to 255 to turn off route expiry.`;
 
 const routeExpiryTimeLongDescription = routeExpiryTimeDescription + `\n\n\
 **Default:** 30 seconds
 
-**Range:** 0 - 127 seconds`;
+**Range:** 0 - 255 seconds`;
 
 const nwkMsgTimeoutDescription = `Default indirect message holding timeout \
 in seconds.`;
@@ -97,13 +97,13 @@ function validate(inst, validation)
 {
     /* Validate Route Expiry Time */
     Common.validateRange(inst, validation, inst.routeExpiryTime,
-        "routeExpiryTime", "Route Expiry Time", 0, 127);
+        "routeExpiryTime", "Route Expiry Time", 0, 255);
 
-    /* Info for turning off Route Expiry Feature (0) */
-    if(inst.routeExpiryTime === 0)
+    /* Info for turning off Route Expiry Feature (255) */
+    if(inst.routeExpiryTime === 255)
     {
         validation.logInfo(
-            "Setting Route Expiry Time to 0 will disable the route expiry "
+            "Setting Route Expiry Time to 255 will disable the route expiry "
             + "feature.", inst, "routeExpiryTime"
         );
     }

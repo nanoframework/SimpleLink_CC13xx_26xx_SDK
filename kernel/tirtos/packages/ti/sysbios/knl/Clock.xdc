@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018, Texas Instruments Incorporated
+ * Copyright (c) 2013-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -103,7 +103,7 @@ import xdc.runtime.Log;
  *  The getTicks() function returns number of clock ticks since startup.
  *
  *  By default, the Timer module defined by {@link #TimerProxy} is used to
- *  statically create a timer instance that provides a periodic 1 ms 
+ *  statically create a timer instance that provides a periodic 1 ms
  *  tick interrupt.
  *
  *  If you want to use a custom configured timer for the Clock module's
@@ -321,14 +321,14 @@ module Clock
      */
     typedef Void (*FuncPtr)(UArg);
 
-    /*! 
+    /*!
      *  ======== TimerProxy ========
      *  target/device-specific Timer implementation.
      *
      *  The Timer module used by the Clock module to
      *  create a Timer instance when Clock.tickSource_TIMER is configured.
      *
-     *  By default, a target specific Timer module is internally selected 
+     *  By default, a target specific Timer module is internally selected
      *  for this purpose. If the user wishes to use a different Timer module
      *  then the following configuration script will serve as an example for
      *  achieving that:
@@ -763,15 +763,15 @@ instance:
      *
      *  By default, all Clock functions run in the context of a Swi.
      *  That is, the Clock module automatically creates a Swi for
-     *  its use and runs the Clock functions within that Swi. 
+     *  its use and runs the Clock functions within that Swi.
      *  The priority of the Swi used by Clock can be changed
      *  by configuring {@link #swiPriority Clock.swiPriority}.
-     *  
+     *
      *  If Swis are disabled in an application
      *  (ie {@link ti.sysbios.BIOS#swiEnabled BIOS.swiEnabled} = false),
      *  then all Clock functions are executed within the context of
-     *  a Timer Hwi. 
-     *  
+     *  a Timer Hwi.
+     *
      *  @a(constraint)
      *  @p(blist)
      *  As Clock functions execute in either a Swi or Hwi context, they
@@ -935,6 +935,73 @@ instance:
      *
      *  Returns the remaining time if the instance is active; if the instance
      *  is not active, returns zero.
+     *
+     *  There are certain edge cases to consider when calling this function
+     *  for a periodic Clock instance.  Let the Clock instance's current
+     *  timeout tick refer to the Clock system tick value when the Clock
+     *  instance's function should be run. For a one-shot Clock, the
+     *  current timeout tick is the number of Clock system ticks at the time
+     *  the Clock instance was started, plus the Clock instance's timeout
+     *  value. This is also the current timeout tick for a periodic Clock on
+     *  its initial timeout.  A periodic Clock's current timeout tick is
+     *  advanced by the period ticks, each time the periodic function is
+     *  run.
+     *  The remaining number of ticks for the Clock's timeout or period to
+     *  expire is computed by subtracting the current Clock system tick
+     *  value from the Clock instance's current timeout tick. Normally,
+     *  this value should be less than or equal to the Clock instance's
+     *  timeout (for a one-shot Clock or periodic clock on its initial
+     *  timeout), or less than or equal to the Clock instance's period (for
+     *  a periodic Clock that has already run its initial timeout).
+     *  However, if the Clock module Swi is held off long enough for the system
+     *  tick count to advance beyond the Clock instance's current timeout
+     *  tick, this subtraction will result in a very large number (close to
+     *  0xFFFFFFFF).  Clock_getTimeout() takes this into consideration.
+     *  If the resulting value of the subtraction is greater than the Clock
+     *  instance's period (always true for a one-shot clock) and greater than
+     *  the Clock instance's timeout, it is assumed that the Clock system
+     *  ticks has surpassed the Clock instance's current timeout tick, and
+     *  0 is returned. This calculation of the remaining timeout ticks always
+     *  works for one-shot clocks. The calculation may fail if the all of
+     *  the following conditions are met:
+     *  @p(blist)
+     *      - The Clock instance is periodic
+     *      - Clock_getTimeout() is called at a moment in time where
+     *        the system Clock ticks has surpassed the Clock instance's
+     *        current timeout (due to the Clock Swi being held off),
+     *        resulting in a very large value for
+     *  @p(code)
+     *            remaining ticks = Clock instance's current timeout tick -
+     *                              system Clock tick count
+     *  @p
+     *  @p(blist)
+     *      - Either
+     *  @p(code)
+     *            remaining ticks > Clock instance's timeout, or
+     *            remaining ticks > Clock instance's period
+     *  @p
+     *        This condition can only happen if the Clock instance's timeout
+     *        or period is close to 0xFFFFFFFF.
+     *  @p
+     *
+     *  An example of a failure case is the following:
+     *  @p(blist)
+     *      - A Clock instance has an initial timeout of 0xFFFFFFFF and
+     *        period of 100.  Clock_getTimeout() is called after the initial
+     *        timeout has expired and the Clock is now running periodically.
+     *        In additiion, when Clock_getTimeout() is called, the system
+     *        tick count has surpassed the Clock instance's current timeout
+     *        by 2.  The remaining ticks will be 0xFFFFFFFE, which is still
+     *        less than the timeout of 0xFFFFFFFF, so 0xFFFFFFFE is returned
+     *        when actually 0 should be returned. Calling Clock_setTimeout()
+     *        after the initial timeout expires, passing a small value for
+     *        the new timeout (which will not be used since the Clock instance
+     *        is now using the period value), will prevent this case from
+     *        occurring.  An analogous failure can occur if the period is
+     *        close to 0xFFFFFFFF and Clock_getTimeout() is called when the
+     *        initial timeout has just expired and the Clock system tick
+     *        count has surpassed the Clock's current timeout.
+     *  @p
      *
      *  @b(returns)             returns timeout in clock ticks
      */

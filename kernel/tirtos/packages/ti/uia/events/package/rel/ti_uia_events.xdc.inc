@@ -10,5 +10,6 @@ UIAChanCtx.c
 UIAFrameCtx.c
 UIAThreadCtx.c
 UIAUserCtx.c
+lib/release/ti.uia.events.am4f
 lib/release/ti.uia.events.am4fg
 lib/release/ti.uia.events.arm4f

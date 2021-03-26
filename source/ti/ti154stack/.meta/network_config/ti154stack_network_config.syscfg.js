@@ -442,6 +442,50 @@ function setBeaconSuperFrameOrders(inst, ui)
 }
 
 /*
+ * ======== setBeaconInterval ========
+ * Update beacon interval readonly value
+ *
+ * @param inst    - module instance containing the config that changed
+ * @returns float - beacon interval in seconds
+ */
+function getBeaconInterval(inst)
+{
+    let beaconInterval;
+
+    if(inst.mode === "beacon")
+    {
+        let symbolsPerBit = 0;
+        let dataRate = 0;
+        const beaconOrder = inst.macBeaconOrder;
+        if(inst.phyType === "phy50kbps")
+        {
+            symbolsPerBit = 1;
+            dataRate = 50;
+        }
+        else if(inst.phyType === "phy5kbps")
+        {
+            symbolsPerBit = 5;
+            dataRate = 5;
+        }
+        else if(inst.phyType === "phy200kbps")
+        {
+            symbolsPerBit = 1;
+            dataRate = 200;
+        }
+        else
+        {
+            symbolsPerBit = 0.25;
+            dataRate = 250;
+        }
+
+        beaconInterval = (960 * (2 ** beaconOrder))
+            / (dataRate * 1000 * symbolsPerBit);
+    }
+
+    return(beaconInterval);
+}
+
+/*
  * ======== getNetworkConfigHiddenState ========
  * Get the expected visibility of the selected config
  *
@@ -515,6 +559,9 @@ function getNetworkConfigHiddenState(inst, cfgName)
         }
     }
 
+    // Hide all configs for coprocessor project
+    isVisible = isVisible && (inst.project !== "coprocessor");
+
     // Return whether config is hidden
     return(!isVisible);
 }
@@ -529,16 +576,21 @@ function getNetworkConfigHiddenState(inst, cfgName)
  */
 function setNetworkConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getNetworkConfigHiddenState(inst, cfgName);
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getNetworkConfigHiddenState);
+}
 
-    if(ui[cfgName].hidden)
-    {
-        // get a list of all nested and unnested configs
-        const configToReset = Common.findConfig(config.config, cfgName);
-        // restore the default value for the hidden parameter.
-        Common.restoreDefaultValue(inst, configToReset, cfgName);
-    }
+/*
+ * ======== setAllNetworkConfigsHiddenState ========
+ * Sets the visibility of all network configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllNetworkConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getNetworkConfigHiddenState);
 }
 
 /*
@@ -572,9 +624,11 @@ function validateOrder(inst, validation, cfgName)
     if(inst.mode === "beacon")
     {
         Common.validateRangeInt(inst, validation, cfgName, 1, 14);
-        if(inst[cfgName] !== 8)
+        if(cfgName === "macBeaconOrder"
+            && (inst[cfgName] <= 14) && (inst[cfgName] >= 1))
         {
-            validation.logInfo("Optimal value is 8", inst, cfgName);
+            validation.logInfo(`MAC Beacon Interval: `
+                + `${getBeaconInterval(inst)}sec\n`, inst, cfgName);
         }
     }
 }
@@ -778,6 +832,7 @@ exports = {
     validate: validate,
     selectAllOptions: selectAllOptions,
     setNetworkConfigHiddenState: setNetworkConfigHiddenState,
+    setAllNetworkConfigsHiddenState: setAllNetworkConfigsHiddenState,
     getNetworkConfigHiddenState: getNetworkConfigHiddenState,
     setDefaultChannelMasks: setDefaultChannelMasks,
     setBeaconSuperFrameOrders: setBeaconSuperFrameOrders,

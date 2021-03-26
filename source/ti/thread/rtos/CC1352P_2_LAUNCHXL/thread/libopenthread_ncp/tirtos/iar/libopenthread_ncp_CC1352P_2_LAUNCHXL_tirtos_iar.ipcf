@@ -13,22 +13,20 @@
         <path>$PROJ_DIR$</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms</path>
         <path>$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source</path>
-        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_2_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include</path>
+        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_2_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_2_LAUNCHXL/thread/libopenthread_ncp/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src</path>
     </includePath>
 
     <defines>
-        <define>SIMPLELINK_OPENTHREAD_SDK_BUILD=1</define>
-        <define>SIMPLELINK_OPENTHREAD_CONFIG_CC1352=1</define>
-        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h"</define>
         <define>HAVE_CONFIG_H</define>
         <define>_BSD_SOURCE=1</define>
         <define>_DEFAULT_SOURCE=1</define>
+        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h"</define>
         <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h"</define>
         <define>OPENTHREAD_FTD=1</define>
         <define>OPENTHREAD_CONFIG_FILE="openthread-config-cc1352-iar-ncp.h"</define>

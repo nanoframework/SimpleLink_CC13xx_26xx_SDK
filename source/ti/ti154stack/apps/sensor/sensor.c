@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -84,11 +84,13 @@
 #include "lpstk/lpstk.h"
 #endif /* LPSTK */
 
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif /* CUI_DISABLE */
 
 #ifdef DEVICE_TYPE_MSG
 #include <ti/devices/DeviceFamily.h>
-#include <ti/boards/device_type.h>
+#include "device_type.h"
 #endif /* DEVICE_TYPE_MSG */
 
 #ifdef FEATURE_SECURE_COMMISSIONING
@@ -138,13 +140,12 @@
 
 /* Inter packet interval in certification test mode */
 #if CERTIFICATION_TEST_MODE
-#if ((CONFIG_PHY_ID >= APIMAC_MRFSK_STD_PHY_ID_BEGIN) && (CONFIG_PHY_ID <= APIMAC_MRFSK_GENERIC_PHY_ID_BEGIN))
+#if (((CONFIG_PHY_ID >= APIMAC_MRFSK_STD_PHY_ID_BEGIN) && (CONFIG_PHY_ID <= APIMAC_MRFSK_GENERIC_PHY_ID_BEGIN)) || \
+    ((CONFIG_PHY_ID >= APIMAC_200KBPS_915MHZ_PHY_132) && (CONFIG_PHY_ID <= APIMAC_200KBPS_868MHZ_PHY_133)))
 /*! Regular Mode */
-#define SENSOR_TEST_RAMP_DATA_SIZE   75
 #define CERT_MODE_INTER_PKT_INTERVAL 50
-#elif ((CONFIG_PHY_ID >= APIMAC_MRFSK_GENERIC_PHY_ID_BEGIN + 1) && (CONFIG_PHY_ID <= APIMAC_MRFSK_GENERIC_PHY_ID_END))
+#elif ((CONFIG_PHY_ID >= APIMAC_MRFSK_GENERIC_PHY_ID_BEGIN + 1) && (CONFIG_PHY_ID <= APIMAC_5KBPS_868MHZ_PHY_131))
 /*! LRM Mode */
-#define SENSOR_TEST_RAMP_DATA_SIZE   20
 #define CERT_MODE_INTER_PKT_INTERVAL 300
 #else
 #error "PHY ID is wrong."
@@ -200,7 +201,7 @@ STATIC uint8_t deviceTxMsduHandle = 0;
 
 STATIC Smsgs_configReqMsg_t configSettings;
 
-#if !defined(OAD_IMG_A)
+#if !defined(OAD_IMG_A) && !defined(POWER_MEAS)
 /*!
  Temp Sensor field - valid only if Smsgs_dataFields_tempSensor
  is set in frameControl.
@@ -247,7 +248,7 @@ STATIC Smsgs_bleSensorField_t bleSensor =
     { 0 };
 #endif
 
-#endif //OAD_IMG_A
+#endif /* !defined(OAD_IMG_A) && !defined(POWER_MEAS) */
 
 STATIC Llc_netInfo_t parentInfo = {0};
 
@@ -274,14 +275,14 @@ static void dataCnfCB(ApiMac_mcpsDataCnf_t *pDataCnf);
 static void dataIndCB(ApiMac_mcpsDataInd_t *pDataInd);
 static uint8_t getMsduHandle(Smsgs_cmdIds_t msgType);
 
-#if !defined(OAD_IMG_A)
+#if !defined(OAD_IMG_A) && !defined(POWER_MEAS)
 static void processSensorMsgEvt(void);
 static bool sendSensorMessage(ApiMac_sAddr_t *pDstAddr,
                               Smsgs_sensorMsg_t *pMsg);
 static void readSensors(void);
-#endif //OAD_IMG_A
+#endif /* !defined(OAD_IMG_A) && !defined(POWER_MEAS) */
 
-#if SENSOR_TEST_RAMP_DATA_SIZE
+#if SENSOR_TEST_RAMP_DATA_SIZE && (CERTIFICATION_TEST_MODE || defined(POWER_MEAS))
 static void processSensorRampMsgEvt(void);
 #endif
 
@@ -594,8 +595,19 @@ void Sensor_init(void)
     {
 #if USE_DMM
         /* Update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
 #endif
+
+        /* Update Channel Mask to show the previous network channel */
+        if (!CONFIG_FH_ENABLE)
+        {
+            uint8_t channelMask[APIMAC_154G_CHANNEL_BITMAP_SIZ] = {0};
+            uint8_t idx = parentInfo.channel / 8;
+            uint8_t shift = (parentInfo.channel % 8);
+            uint8_t chan = (0x01) << shift;
+            channelMask[idx] = chan;
+            Jdllc_setChanMask(channelMask);
+        }
         /* Start the device */
         Util_setEvent(&Sensor_events, SENSOR_START_EVT);
     }
@@ -603,7 +615,7 @@ void Sensor_init(void)
     {
 #if USE_DMM
         /* Update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
 #endif
         /* Start the device */
         Util_setEvent(&Sensor_events, SENSOR_START_EVT);
@@ -638,13 +650,15 @@ void Sensor_process(void)
         uint32_t frameCounter = 0;
 
         /* update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
 
         Sensor_securityInit(frameCounter);
 #endif /* USE_DMM */
 
         if(Ssf_getNetworkInfo(&devInfo, &parentInfo) == true)
         {
+            rejoining = true;
+
             Ssf_configSettings_t configInfo;
 #ifdef FEATURE_MAC_SECURITY
             ApiMac_status_t stat;
@@ -701,8 +715,6 @@ void Sensor_process(void)
             }
 #endif /* FEATURE_SECURE_COMMISSIONING */
             Jdllc_rejoin(&devInfo, &parentInfo);
-            rejoining = true;
-
         }
         else
         {
@@ -747,15 +759,18 @@ void Sensor_process(void)
 #endif /* FEATURE_SECURE_COMMISSIONING */
 
 
-#if SENSOR_TEST_RAMP_DATA_SIZE
+#if SENSOR_TEST_RAMP_DATA_SIZE && (CERTIFICATION_TEST_MODE || defined(POWER_MEAS))
         processSensorRampMsgEvt();
-#else
+#endif /* SENSOR_TEST_RAMP_DATA_SIZE */
+
+#if !defined(POWER_MEAS)
         /* Read sensors */
         readSensors();
 
         /* Process Sensor Reading Message Event */
         processSensorMsgEvt();
-#endif //SENSOR_TEST_RAMP_DATA_SIZE
+#endif /* POWER_MEAS */
+
 #ifdef FEATURE_SECURE_COMMISSIONING
         }
 #endif /* FEATURE_SECURE_COMMISSIONING */
@@ -792,7 +807,7 @@ void Sensor_process(void)
     if(Sensor_events & SENSOR_PROV_EVT)
     {
         /* update policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
 
         /* Clear the event */
         Util_clearEvent(&Sensor_events, SENSOR_PROV_EVT);
@@ -1320,7 +1335,7 @@ static void dataIndCB(ApiMac_mcpsDataInd_t *pDataInd)
                     {
 #ifdef USE_DMM
                         /* Kick off commissioning process to obtain security information */
-                        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+                        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
                         RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_STARTING);
 #endif /* USE_DMM */
                         SM_startCMProcess(&parentInfo.devInfo, &devSec, parentInfo.fh,
@@ -1410,7 +1425,7 @@ static uint8_t getMsduHandle(Smsgs_cmdIds_t msgType)
 /*!
  @brief  Build and send fixed size ramp data
  */
-#if SENSOR_TEST_RAMP_DATA_SIZE
+#if SENSOR_TEST_RAMP_DATA_SIZE && (CERTIFICATION_TEST_MODE || defined(POWER_MEAS))
 static void processSensorRampMsgEvt(void)
 {
     uint8_t *pMsgBuf;
@@ -1440,7 +1455,7 @@ static void processSensorRampMsgEvt(void)
 }
 #endif
 
-#if !defined(OAD_IMG_A)
+#if !defined(OAD_IMG_A) && !defined(POWER_MEAS)
 /*!
  @brief   Build and send sensor data message
  */
@@ -1722,7 +1737,7 @@ static bool sendSensorMessage(ApiMac_sAddr_t *pDstAddr, Smsgs_sensorMsg_t *pMsg)
     return (ret);
 }
 
-#endif // !defined(OAD_IMG_A)
+#endif /* !defined(OAD_IMG_A) && !defined(POWER_MEAS) */
 
 
 /*!
@@ -2173,19 +2188,19 @@ static void jdllcStateChangeCb(Jdllc_states_t state)
 #if USE_DMM
     if(state == Jdllc_states_initRestoring)
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
     }
     else if( (state == Jdllc_states_joined) || (state == Jdllc_states_rejoined))
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
     }
     else if(state == Jdllc_states_orphan)
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
     }
     else if( (state == Jdllc_states_initWaiting) || (state == Jdllc_states_accessDenied) )
     {
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
     }
 #endif /* USE_DMM */
 
@@ -2193,7 +2208,9 @@ static void jdllcStateChangeCb(Jdllc_states_t state)
     RemoteDisplay_updateSensorJoinState(state);
 #endif /* BLE_START && USE_DMM && !DMM_CENTRAL */
 
+#ifndef CUI_DISABLE
     Ssf_stateChangeUpdate(state);
+#endif /* CUI_DISABLE */
 
 #ifdef OAD_IMG_A
     if( (state == Jdllc_states_joined) || (state == Jdllc_states_rejoined))
@@ -2212,7 +2229,7 @@ static void jdllcStateChangeCb(Jdllc_states_t state)
 static void macSyncLossCb(ApiMac_mlmeSyncLossInd_t *pSyncLossInd)
 {
     /* Update policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_PROVISIONING);
 #if defined(BLE_START) && (USE_DMM) && !(DMM_CENTRAL)
     RemoteDisplay_updateSensorJoinState((Jdllc_states_t)RemoteDisplay_JOIN_STATE_SYNC_LOSS);
 #endif
@@ -2255,7 +2272,7 @@ void smFailCMProcessCb(ApiMac_deviceDescriptor_t *devInfo, bool rxOnIdle,
     }
 
 #ifdef USE_DMM
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_UNINIT);
     RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_FAIL);
 #endif /* USE_DMM */
 }
@@ -2269,7 +2286,7 @@ void smSuccessCMProcessCb(ApiMac_deviceDescriptor_t *devInfo, bool keyRefreshmen
     ApiMac_mlmeSetReqBool(ApiMac_attribute_autoRequest, currAutoReq);
 
 #ifdef USE_DMM
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_154Sensor, DMMPOLICY_154_CONNECTED);
     RemoteDisplay_updateSmState(SMCOMMISSIONSTATE_SUCCESS);
 #endif
 }
@@ -2348,7 +2365,7 @@ static void getRDAttrCb(RemoteDisplayAttr_t remoteDisplayAttr, void *value, uint
         }
         case RemoteDisplayAttr_SensorData:
         {
-#if defined(TEMP_SENSOR)
+#if defined(TEMP_SENSOR) && !defined(POWER_MEAS)
             memcpy(value, &tempSensor.ambienceTemp, len);
 #endif
             break;
@@ -2384,6 +2401,14 @@ static void setProvisioningCb(ProvisionAttr_t provisioningAttr,
         }
         case ProvisionAttr_SensorChannelMask:
         {
+#ifndef CUI_DISABLE
+            // Validate and correct the channel mask received over BLE
+            for (uint8_t i = 0; i < APIMAC_154G_CHANNEL_BITMAP_SIZ; i++)
+            {
+                Ssf_validateChMask(byteArr, i);
+            }
+#endif /* CUI_DISABLE */
+
             Jdllc_setChanMask(byteArr);
 #if CONFIG_FH_ENABLE
             Jdllc_setAsyncChanMask(byteArr);

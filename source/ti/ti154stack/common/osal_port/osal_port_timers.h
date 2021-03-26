@@ -8,7 +8,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2004-2020, Texas Instruments Incorporated
+ Copyright (c) 2004-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,8 +58,6 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 #include "stdbool.h"
-#include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/BIOS.h>
 
 #include "osal_port.h"
 

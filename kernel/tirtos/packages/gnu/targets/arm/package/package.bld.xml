@@ -8,6 +8,7 @@
         <module name="GCArmv6"/>
         <module name="GCArmv7A"/>
         <module name="GCArmv7AF"/>
+        <module name="M0"/>
         <module name="M3"/>
         <module name="M4"/>
         <module name="M4F"/>

@@ -39,7 +39,7 @@ let topModules;
 const categoryName = "RF Stacks";
 const deviceId = system.deviceData.deviceId;
 
-if(deviceId.match(/CC2652R1|CC13.2/))
+if(deviceId.match(/CC2652(P|R)1|CC13.2/))
 { // CC13x2
     topModules = [
         {
@@ -62,6 +62,10 @@ const templates = [
     {
         name: "/ti/easylink/templates/ti_easylink_oad_config.h.xdt",
         outputPath: "ti_easylink_oad_config.h"
+    },
+    {
+        name: "/ti/easylink/templates/device_config.opt.xdt",
+        outputPath: "device_config.opt"
     }
 ];
 

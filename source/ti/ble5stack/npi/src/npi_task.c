@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -192,6 +192,8 @@ static Task_Struct npiTaskStruct;
 //!
 #if defined __TI_COMPILER_VERSION__
 #pragma DATA_ALIGN(npiTaskStack, 8)
+#elif defined __clang__
+__attribute__ ((aligned (8)))
 #else
 #pragma data_alignment=8
 #endif
@@ -943,6 +945,10 @@ static void NPITask_processStackMsg(uint8_t *pMsg)
             {
                 // Pass the message along to the application
                 incomingTXEventAppCBFunc(pMsg);
+                break;
+            }
+            case NONE:
+            {
                 break;
             }
         }

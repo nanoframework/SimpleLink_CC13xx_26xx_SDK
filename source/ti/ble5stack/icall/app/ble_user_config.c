@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -62,11 +62,7 @@
 #include "ti_radio_config.h"
 #include "ble_overrides.h"
 
-#ifndef USE_DMM
 #include <ti/drivers/rf/RF.h>
-#else
-#include <dmm/dmm_rfmap.h>
-#endif //USE_DMM
 
 #include "ecc/ECCROMCC26XX.h"
 
@@ -301,7 +297,7 @@ const stackSpecific_t bleStackConfig =
   .maxNumPSM                            = L2CAP_NUM_PSM,
   .maxNumCoChannels                     = L2CAP_NUM_CO_CHANNELS,
   .maxWhiteListElems                    = MAX_NUM_WL_ENTRIES,
-  .maxResolvListElems                   = MAX_NUM_RL_ENTRIES,
+  .maxResolvListElems                   = CFG_MAX_NUM_RL_ENTRIES,
   .pfnBMAlloc                           = &pfnBMAlloc,
   .pfnBMFree                            = &pfnBMFree,
   .rfDriverParams.powerUpDurationMargin = RF_POWER_UP_DURATION_MARGIN,
@@ -312,10 +308,11 @@ const stackSpecific_t bleStackConfig =
   .fastStateUpdateCb                    = NULL,
   .bleStackType                         = 0,
 #ifdef CC2652RB_LAUNCHXL
-  .extStackSettings                     = EXTENDED_STACK_SETTINGS | CC2652RB_OVERRIDE_USED
+  .extStackSettings                     = EXTENDED_STACK_SETTINGS | CC2652RB_OVERRIDE_USED,
 #else
-  .extStackSettings                     = EXTENDED_STACK_SETTINGS
+  .extStackSettings                     = EXTENDED_STACK_SETTINGS,
 #endif
+  .maxNumCteBuffers                     = MAX_NUM_CTE_BUFS
 };
 
 uint16_t bleUserCfg_maxPduSize = MAX_PDU_SIZE;

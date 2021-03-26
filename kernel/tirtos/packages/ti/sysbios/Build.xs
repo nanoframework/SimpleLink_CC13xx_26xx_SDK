@@ -46,6 +46,8 @@ var customArmOpts = " -q -ms --opt_for_speed=2 ";
  * '-Wno-buildin-requires-header' is a workaround to suppress pthread.h
  * warnings. This should be removed. Removal is tracked by TIRTOS-1906.
  */
+var customArmClangM33Opts = " ";
+var customArmClangM33FOpts = " ";
 var customArmClangM3Opts = " ";
 var customArmClangM4Opts = " ";
 var customArmClangM4FOpts = " ";
@@ -78,6 +80,8 @@ var ccOptsList = {
     "ti.targets.arm.elf.R4Ft"                   : customArmOpts,
     "ti.targets.arm.elf.R5F"                    : customArmOpts,
     "ti.targets.arm.elf.R5F_big_endian"         : customArmOpts,
+    "ti.targets.arm.clang.M33"                  : customArmClangM33Opts,
+    "ti.targets.arm.clang.M33F"                 : customArmClangM33FOpts,
     "ti.targets.arm.clang.M3"                   : customArmClangM3Opts,
     "ti.targets.arm.clang.M4"                   : customArmClangM4Opts,
     "ti.targets.arm.clang.M4F"                  : customArmClangM4FOpts,
@@ -304,6 +308,7 @@ var biosPackages = [
     "ti.sysbios.family.arm.v7a",
     "ti.sysbios.family.arm.v7a.smp",
     "ti.sysbios.family.arm.v8a",
+    "ti.sysbios.family.arm.vxm",
     "ti.sysbios.family.c28",
     "ti.sysbios.family.c28.f28m35x",
     "ti.sysbios.family.c28.f2837x",

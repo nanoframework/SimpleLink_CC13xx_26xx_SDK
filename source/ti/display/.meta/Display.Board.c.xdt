@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2018 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,14 +36,13 @@
  *  ======== Display.Board.c.xdt ========
  */
 
-
     let Display      = args[0];
     let instances    = Display.$instances;
+    if (instances == 0) { return; }
+
     let baudRate     = 0;
-    let UART         = system.modules["/ti/drivers/UART"];
-    let SPI          = system.modules["/ti/drivers/SPI"];
-    let GPIO         = system.modules["/ti/drivers/GPIO"];
     let uartIndex;
+    let uart2Index;
     let spiIndex;
     let lcdPowerIndex;
     let lcdEnableIndex;
@@ -51,10 +50,12 @@
 
     let host = false;
     let uart = false;
+    let uart2 = false;
     let lcd = false;
 
     let hostInstance = 0;
     let uartInstance = 0;
+    let uart2Instance = 0;
     let lcdInstance = 0;
 
     let mutexTimeout            = 0;
@@ -75,14 +76,28 @@
             };
         }
         else if (inst.displayType == "UART") {
-            uart = true;
-            uartInstance = i;
-            instAttrs[instances[i].$name] = {
-                object: "displayUartObject",
-                hwAttrs: "displayUartHWAttrs",
-                fxnTablePtr: (inst.enableANSI == true)
-                    ? "DisplayUartAnsi_fxnTable" : "DisplayUartMin_fxnTable"
-            };
+            if (inst.useUART2) {
+                uart2 = true;
+                uart2Instance = i;
+                uart2Index = inst.uart.$name;
+                instAttrs[instances[i].$name] = {
+                    object: "displayUart2Object",
+                    hwAttrs: "displayUart2HWAttrs",
+                    fxnTablePtr: (inst.enableANSI == true) ?
+                        "DisplayUart2Ansi_fxnTable" : "DisplayUart2Min_fxnTable"
+                };
+            }
+            else {
+                uart = true;
+                uartInstance = i;
+                uartIndex = inst.uart.$name;
+                instAttrs[instances[i].$name] = {
+                    object: "displayUartObject",
+                    hwAttrs: "displayUartHWAttrs",
+                    fxnTablePtr: (inst.enableANSI == true) ?
+                        "DisplayUartAnsi_fxnTable" : "DisplayUartMin_fxnTable"
+                };
+            }
 
             baudRate          = inst.baudRate;
             mutexTimeout      = inst.mutexTimeout;
@@ -94,11 +109,14 @@
             if (mutexTimeout == "Custom") {
                 mutexTimeoutInitializer = '(unsigned int)'+ mutexTimeoutValue;
             }
-
         }
         else if (inst.displayType == "LCD") {
             lcd = true;
             lcdInstance = i;
+            spiIndex = inst.spi.$name;
+            lcdEnableIndex = inst.lcdEnable.$name;
+            lcdPowerIndex = inst.lcdPower.$name;
+            lcdChipSelectIndex = inst.lcdSS.$name;
             instAttrs[instances[i].$name] = {
                 object: "displayLcdObject",
                 hwAttrs: "displayLcdHWattrs",
@@ -107,46 +125,7 @@
         }
     }
 
-    if (uart) {
-        for (let i = 0; i < UART.$instances.length; i++) {
-            if (UART.$instances[i] === instances[uartInstance].uart) {
-                uartIndex = UART.$instances[i].$name;
-                break;
-            }
-        }
-    }
-
-    if (lcd) {
-        for (let i = 0; i < SPI.$instances.length; i++) {
-            if (SPI.$instances[i] === instances[lcdInstance].spi) {
-                spiIndex = SPI.$instances[i].$name;
-                break;
-            }
-        }
-
-        for (let i = 0; i < GPIO.$instances.length; i++) {
-            if (GPIO.$instances[i] === instances[lcdInstance].lcdEnable) {
-                lcdEnableIndex = GPIO.$instances[i].$name;
-            }
-            if (GPIO.$instances[i] === instances[lcdInstance].lcdPower) {
-                lcdPowerIndex = GPIO.$instances[i].$name;
-            }
-            if (GPIO.$instances[i] === instances[lcdInstance].lcdSS) {
-                lcdChipSelectIndex = GPIO.$instances[i].$name;
-            }
-        }
-    }
-
-    if (uartIndex === null && uart == true) {
-        throw new Error("Display: can't find my UART!");
-    }
-
-    if (lcd) {
-        if (spiIndex === null || lcdEnableIndex === null
-            || lcdPowerIndex === null || lcdChipSelectIndex === null) {
-            throw new Error("Display: Error configurating LCD SPI!");
-        }
-    }
+    let countDef = Display.defaultInstanceName + "COUNT";
 
 %%}
 /*
@@ -157,6 +136,9 @@
 % if (uart) {
 #include <ti/display/DisplayUart.h>
 % }
+% if (uart2) {
+#include <ti/display/DisplayUart2.h>
+% }
 % if (lcd) {
 #include <ti/display/DisplaySharp.h>
 % }
@@ -164,9 +146,16 @@
 #include <ti/display/DisplayHost.h>
 % }
 
+#define `countDef` `instances.length`
+
 % if (uart) {
 #define Display_UARTBUFFERSIZE `instances[uartInstance].uartBufferSize`
 static char displayUARTBuffer[Display_UARTBUFFERSIZE];
+
+% }
+% if (uart2) {
+#define Display_UART2BUFFERSIZE `instances[uart2Instance].uartBufferSize`
+static char displayUART2Buffer[Display_UART2BUFFERSIZE];
 
 % }
 % if (host) {
@@ -182,6 +171,9 @@ static uint_least8_t displayLCDBuffer[Display_LCDSIZE * Display_LCDSIZE / 8];
 % if (uart) {
 DisplayUart_Object displayUartObject;
 % }
+% if (uart2) {
+DisplayUart2_Object displayUart2Object;
+% }
 % if (host) {
 DisplayHost_Object displayHostObject;
 % }
@@ -196,6 +188,16 @@ const DisplayUart_HWAttrs displayUartHWAttrs = {
     .mutexTimeout = `mutexTimeoutInitializer`,
     .strBuf       = displayUARTBuffer,
     .strBufLen    = Display_UARTBUFFERSIZE
+};
+
+% }
+% if (uart2) {
+const DisplayUart2_HWAttrs displayUart2HWAttrs = {
+    .uartIdx      = `uart2Index`,
+    .baudRate     = `baudRate`,
+    .mutexTimeout = `mutexTimeoutInitializer`,
+    .strBuf       = displayUART2Buffer,
+    .strBufLen    = Display_UART2BUFFERSIZE
 };
 
 % }
@@ -218,7 +220,7 @@ const DisplaySharp_HWAttrsV1 displayLcdHWattrs = {
 };
 
 % }
-const Display_Config Display_config[] = {
+const Display_Config Display_config[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
 %     let inst = instances[i];
 %     let attrs = instAttrs[inst.$name];
@@ -236,4 +238,4 @@ const Display_Config Display_config[] = {
 % }
 };
 
-const uint_least8_t Display_count = `instances.length`;
+const uint_least8_t Display_count = `countDef`;

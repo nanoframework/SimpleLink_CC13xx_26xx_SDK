@@ -18,11 +18,7 @@ CFLAGS = -I../.. \
     -std=gnu++98 \
     -Wno-c++14-compat \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-gcc.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC26X2R1_LAUNCHXL_tirtos_gcc/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
@@ -39,6 +35,8 @@ CFLAGS = -I../.. \
     -Wall \
     -Wextra \
     -Wshadow \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-gcc.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC26X2R1_LAUNCHXL_tirtos_gcc/config \
     -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc2652-gcc-ftd.h"' \
@@ -59,11 +57,7 @@ CPPFLAGS = -I../.. \
     -std=gnu++98 \
     -Wno-c++14-compat \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-gcc.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC26X2R1_LAUNCHXL_tirtos_gcc/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
@@ -81,6 +75,8 @@ CPPFLAGS = -I../.. \
     -Wall \
     -Wextra \
     -Wshadow \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-gcc.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC26X2R1_LAUNCHXL_tirtos_gcc/config \
     -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc2652-gcc-ftd.h"' \

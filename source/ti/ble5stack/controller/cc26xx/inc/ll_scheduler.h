@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -82,6 +82,8 @@ extern "C"
 #define LL_TASK_ID_ADVERTISER                    0x01
 #define LL_TASK_ID_SCANNER                       0x02
 #define LL_TASK_ID_INITIATOR                     0x04
+#define LL_TASK_ID_PERIODIC_ADVERTISER           0x08
+#define LL_TASK_ID_PERIODIC_SCANNER              0x10
 #define LL_TASK_ID_SLAVE                         0x40
 #define LL_TASK_ID_MASTER                        0x80
 #define LL_TASK_ID_NONE                          0xFF
@@ -89,7 +91,9 @@ extern "C"
 // Task ID Masks
 #define LL_TASK_ID_SECONDARY_TASKS               (LL_TASK_ID_ADVERTISER      | \
                                                   LL_TASK_ID_SCANNER         | \
-                                                  LL_TASK_ID_INITIATOR)
+                                                  LL_TASK_ID_INITIATOR       | \
+                                                  LL_TASK_ID_PERIODIC_ADVERTISER | \
+                                                  LL_TASK_ID_PERIODIC_SCANNER)
 
 // Task State
 #define LL_TASK_STATE_INACTIVE                   0
@@ -118,13 +122,13 @@ extern "C"
 // reused when a Master connection is formed. Thus, the total number of needed
 // tasks is at most two plus the number of connections.
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & ADV_NCONN_CFG)
-#define NUM_TASK_BLOCKS_ADV_NCONN_CFG            1
+#define NUM_TASK_BLOCKS_ADV_NCONN_CFG            2 //Adv + Periodic Adv
 #else
 #define NUM_TASK_BLOCKS_ADV_NCONN_CFG            0
 #endif // CTRL_CONFIG=ADV_NCONN_CFG
 
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
-#define NUM_TASK_BLOCKS_SCAN_CFG                 1
+#define NUM_TASK_BLOCKS_SCAN_CFG                 2 //scanner + periodic scanner
 #else
 #define NUM_TASK_BLOCKS_SCAN_CFG                 0
 #endif // CTRL_CONFIG=SCAN_CFG
@@ -133,6 +137,11 @@ extern "C"
 // Note: The number of connections is defined in the llConfigTable.
 #define LL_NUM_TASK_BLOCKS                    (NUM_TASK_BLOCKS_ADV_NCONN_CFG + \
                                                NUM_TASK_BLOCKS_SCAN_CFG + 1)
+
+// scheduler priority
+#define SCHEDULER_PRIORITY_LOW                          0
+#define SCHEDULER_PRIORITY_MED                          1
+#define SCHEDULER_PRIORITY_HIGH                         2
 
 /*******************************************************************************
  * TYPEDEFS
@@ -213,6 +222,8 @@ extern void        llExtAdvSchedSetup( taskInfo_t *llTask );
 extern void        llExtScanSchedSetup( taskInfo_t *llTask );
 extern void        llExtInitSchedSetup( taskInfo_t *llTask );
 extern void        llLinkSchedSetup( taskInfo_t *llTask );
+extern void        llPeriodicScanSchedSetup( taskInfo_t *llTask );
+extern void        llPeriodicAdvSchedSetup( taskInfo_t *llTask );
 
 #ifdef __cplusplus
 }

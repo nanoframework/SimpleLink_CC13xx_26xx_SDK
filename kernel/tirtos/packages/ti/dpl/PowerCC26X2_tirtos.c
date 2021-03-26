@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@
  */
 
 #include <stdbool.h>
+#include <ti/drivers/ITM.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
 #include <ti/sysbios/knl/Clock.h>
@@ -77,7 +78,12 @@ void PowerCC26XX_standbyPolicy(void)
     if ((constraints &
         ((1 << PowerCC26XX_DISALLOW_STANDBY) | (1 << PowerCC26XX_DISALLOW_IDLE))) ==
         ((1 << PowerCC26XX_DISALLOW_STANDBY) | (1 << PowerCC26XX_DISALLOW_IDLE))) {
+
+        /* Flush any remaining log messages in the ITM */
+        ITM_flush();
         PRCMSleep();
+        /* Restore ITM settings */
+        ITM_restore();
     }
     /*
      *  check if any sleep modes are allowed for automatic activation
@@ -106,8 +112,15 @@ void PowerCC26XX_standbyPolicy(void)
                 Clock_setTimeout(Clock_handle((Clock_Struct *)&PowerCC26X2_module.clockObj), ticks);
                 Clock_start(Clock_handle((Clock_Struct *)&PowerCC26X2_module.clockObj));
 
+                /* Flush any remaining log messages in the ITM */
+                ITM_flush();
+
                 /* go to standby mode */
                 Power_sleep(PowerCC26XX_STANDBY);
+
+                /* Restore ITM settings */
+                ITM_restore();
+
                 Clock_stop(Clock_handle((Clock_Struct *)&PowerCC26X2_module.clockObj));
                 justIdle = FALSE;
             }
@@ -115,6 +128,9 @@ void PowerCC26XX_standbyPolicy(void)
 
         /* idle if allowed */
         if (justIdle) {
+
+            /* Flush any remaining log messages in the ITM */
+            ITM_flush();
 
             /*
              * Power off the CPU domain; VIMS will power down if SYSBUS is
@@ -151,6 +167,9 @@ void PowerCC26XX_standbyPolicy(void)
             else {
                 PRCMSleep();
             }
+
+            /* Restore ITM settings */
+            ITM_restore();
         }
     }
 

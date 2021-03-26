@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -196,9 +196,7 @@ int stack_main( void *arg )
   // but must not repeat it every time the device wakes up
   // hence the call cannot be added to HalTRNG_InitTRNG();
 
-#if !defined( USE_FPGA )
   ICall_pwrRequire(ICALL_PWR_D_PERIPH_TRNG);
-#endif
 
   HalTRNG_InitTRNG();
 

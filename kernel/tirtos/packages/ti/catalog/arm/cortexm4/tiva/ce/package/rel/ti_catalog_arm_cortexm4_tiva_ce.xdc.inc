@@ -10,5 +10,6 @@ hw_types.h
 package.bld
 package/package.cfg.xdc.inc
 lib/Boot.aem4f
+lib/Boot.am4f
 lib/Boot.am4fg
 lib/Boot.arm4f

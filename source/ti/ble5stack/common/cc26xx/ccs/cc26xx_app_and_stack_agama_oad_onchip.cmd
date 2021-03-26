@@ -29,7 +29,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -169,24 +169,26 @@
   #define  OAD_HDR_SIZE            0x50
 #endif
 
+#define IMG_A_FLASH_START          0x00038000
+
+/* Image specific addresses */
 #ifdef OAD_IMG_A
-  #define FLASH_START              0
-  #define ENTRY_SIZE               0x40
-  #define ENTRY_END                FLASH_START + FLASH_SIZE - RESERVED_FLASH_SIZE - 1
-  #define ENTRY_START              ENTRY_END - ENTRY_SIZE +1
-
-  #define FLASH_END                ENTRY_START - 1
+  #define  OAD_HDR_START           IMG_A_FLASH_START
+  #define  OAD_HDR_END             (OAD_HDR_START + OAD_HDR_SIZE - 1)
+  #define  ENTRY_SIZE              0x40
+  #define  ENTRY_START             (OAD_HDR_END + 1)
+  #define  ENTRY_END               ENTRY_START + ENTRY_SIZE - 1
+  #define  FLASH_START             (ENTRY_END + 1)
+  #define  FLASH_END               (FLASH_BASE + FLASH_SIZE - RESERVED_FLASH_SIZE - 1)
 #else
-  #define  OAD_HDR_START           0
-  #define  OAD_HDR_END             OAD_HDR_START + OAD_HDR_SIZE - 1
+  #define OAD_HDR_START            FLASH_BASE
+  #define OAD_HDR_END              (OAD_HDR_START + OAD_HDR_SIZE - 1)
 
-  #define ENTRY_START              OAD_HDR_END + 1
+  #define ENTRY_START              (OAD_HDR_END + 1)
   #define ENTRY_SIZE               0x40
   #define ENTRY_END                ENTRY_START + ENTRY_SIZE - 1
-
-  #define FLASH_START              ENTRY_END + 1
-  #define FLASH_END                (FLASH_BASE + FLASH_SIZE - RESERVED_FLASH_SIZE - 1)
-  #define FLASH_LAST_PAGE_START    FLASH_END + 1
+  #define FLASH_START              (ENTRY_END + 1)
+  #define FLASH_END                (FLASH_BASE + IMG_A_FLASH_START - 1)
 #endif
 /*******************************************************************************
  * Stack
@@ -231,9 +233,8 @@ MEMORY
 
   ENTRY (RX) : origin = ENTRY_START, length = ENTRY_SIZE
   /* CCFG Page, contains .ccfg code section and some application code. */
-#ifndef OAD_IMG_A
+
   FLASH_IMG_HDR (RX) : origin = OAD_HDR_START, length = OAD_HDR_SIZE
-#endif
 
   /* Application uses internal RAM for data */
 #if (defined(FLASH_ROM_BUILD) && (FLASH_ROM_BUILD == 2))
@@ -246,28 +247,6 @@ MEMORY
  ******************************************************************************/
 SECTIONS
 {
- #ifdef OAD_IMG_A
-  GROUP >  FLASH(HIGH)
-  {
-    .image_header align PAGE_SIZE
-    .text
-    .const
-    .constdata
-    .rodata
-    .emb_text
-    .init_array
-    .cinit
-    .pinit
-  }LOAD_END(flashEndAddr)
-
-  GROUP > ENTRY
-  {
-    .resetVecs
-    .intvecs
-    EntrySection  LOAD_START(prgEntryAddr)
-  }
-
-#else   // OAD_IMG_B || OAD_IMG_E
   GROUP > FLASH_IMG_HDR
   {
     .image_header align PAGE_SIZE
@@ -275,9 +254,9 @@ SECTIONS
 
   GROUP > ENTRY
   {
-    .resetVecs
+    .resetVecs LOAD_START(prgEntryAddr)
     .intvecs
-    EntrySection  LOAD_START(prgEntryAddr)
+    EntrySection
   }
 
   GROUP >  FLASH
@@ -294,8 +273,6 @@ SECTIONS
 
   //.cinit        : > FLASH LOAD_END(flashEndAddr)
 
-#endif // OAD_IMG_A
-
   GROUP > SRAM
   {
     .data LOAD_START(ramStartHere)
@@ -307,6 +284,7 @@ SECTIONS
     vtable_ram
     .sysmem
     .nonretenvar
+    .noinit
   } LOAD_END(heapStart)
 
   .stack            :   >  SRAM (HIGH) LOAD_START(heapEnd)

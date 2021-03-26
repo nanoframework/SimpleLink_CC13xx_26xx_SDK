@@ -8,7 +8,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2004-2020, Texas Instruments Incorporated
+ Copyright (c) 2004-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -118,7 +118,6 @@ extern uint8_t stackTask_getStackServiceId(void);
  **************************************************************************************************
  */
 extern Task_Handle* stackTaskGetTaskHndl(void);
-
 
 /*********************************************************************
 *********************************************************************/

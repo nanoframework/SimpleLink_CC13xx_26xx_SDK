@@ -106,13 +106,45 @@ const nwkMaxDeviceListLongDescription = nwkMaxDeviceListDescription
 **Range:** 0 - 65535`;
 
 const zdsecmgrTcDeviceMaxDescription = `Defines the number of unique TC Link \
-Keys that the network supports.`;
+Keys (ZDSECMGR_TC_DEVICE_MAX) that the network supports. Each device that joins \
+requires a unique key, so this limits the total number of devices in the network.`;
 
 const zdsecmgrTcDeviceMaxLongDescription = zdsecmgrTcDeviceMaxDescription
 + `\n\n **Default:** 40
 
 **Range:** 0 - 65535`;
 
+const endDeviceTimeoutDescription = `Value of End Device Timeout`;
+
+const endDeviceTimeoutLongDescription = endDeviceTimeoutDescription
++ `\n\n
+If ZED, this is the value used when sending End Device Timeout Request.
+
+If ZC/ZR, this is the default value if any End Device that does not
+ negotiate a different timeout value
+
+**Default:** 8
+
+**Range:** 0 - 14`;
+
+/* End device timeout values */
+const timeoutValues = [
+    {name: 0, displayName: "0 - 10 seconds"},
+    {name: 1, displayName: "1 - 2 minutes"},
+    {name: 2, displayName: "2 - 4 minutes"},
+    {name: 3, displayName: "3 - 8 minutes"},
+    {name: 4, displayName: "4 - 16 minutes"},
+    {name: 5, displayName: "5 - 32 minutes"},
+    {name: 6, displayName: "6 - 64 minutes"},
+    {name: 7, displayName: "7 - 128 minutes"},
+    {name: 8, displayName: "8 - 256 minutes"},
+    {name: 9, displayName: "9 - 512 minutes"},
+    {name: 10, displayName: "10 - 1024 minutes"},
+    {name: 11, displayName: "11 - 2048 minutes"},
+    {name: 12, displayName: "12 - 4096 minutes"},
+    {name: 13, displayName: "13 - 8192 minutes"},
+    {name: 14, displayName: "14 - 16384 minutes"}
+];
 
 /* Network submodule for the zstack module */
 const networkModule = {
@@ -180,11 +212,19 @@ const networkModule = {
         },
         {
             name: "zdsecmgrTcDeviceMax",
-            displayName: "ZDSECMGR_TC_DEVICE_MAX",
+            displayName: "Maximum Unique TC Link Keys",
             description: zdsecmgrTcDeviceMaxDescription,
             longDescription: zdsecmgrTcDeviceMaxLongDescription,
             default: 40,
             hidden: true
+        },
+        {
+            name: "endDeviceTimeout",
+            displayName: "End Device Timeout",
+            description: endDeviceTimeoutDescription,
+            longDescription: endDeviceTimeoutLongDescription,
+            default: 8,
+            options: timeoutValues
         }
     ],
     validate: validate
@@ -347,12 +387,21 @@ function validate(inst, validation)
         );
     }
 
-    /* Warn when TC Link Key is changed */
-    if(inst.nwkMaxDeviceList !== 20)
+    /* Warn when assoc table size is changed */
+    if(inst.nwkMaxDeviceList > 50)
     {
         validation.logWarning(
-            "Consider NV size when changing this value",
+            "Consider increasing NV size for larger device lists",
             inst, "nwkMaxDeviceList"
+        );
+    }
+
+    /* Warn when TC Link Key list size is changed */
+    if(inst.zdsecmgrTcDeviceMax > 50)
+    {
+        validation.logWarning(
+            "Consider increasing NV size for larger device lists",
+            inst, "zdsecmgrTcDeviceMax"
         );
     }
 
@@ -362,7 +411,7 @@ function validate(inst, validation)
 
     /* Validate ZDSECMGR TC Device Max */
     Common.validateRange(inst, validation, inst.zdsecmgrTcDeviceMax,
-        "zdsecmgrTcDeviceMax", "ZDSECMGR_TC_DEVICE_MAX", 1, 65535);
+        "zdsecmgrTcDeviceMax", "Maximum Unique TC Link Keys", 1, 65535);
 }
 
 exports = networkModule;

@@ -41,6 +41,7 @@
  * INCLUDES
  */
 
+#include "ti_zstack_config.h"
 #include "bdb.h"
 #include "zd_app.h"
 #include "rom_jt_154.h"
@@ -86,6 +87,7 @@
 #endif
 
 #include "zstacktask.h"
+#include "ti_zstack_config.h"
 
 
  /*********************************************************************
@@ -338,8 +340,8 @@ void bdb_ZclIdentifyCmdInd( uint16_t identifyTime, uint8_t endpoint )
 {
   zclAttrRec_t identifyAttrRec;
 
-  if ( zclFindAttrRec( endpoint, ZCL_CLUSTER_ID_GEN_IDENTIFY,
-                      ATTRID_IDENTIFY_TIME, &identifyAttrRec ) )
+  if ( zclFindAttrRec( endpoint, ZCL_CLUSTER_ID_GENERAL_IDENTIFY,
+                      ATTRID_IDENTIFY_IDENTIFY_TIME, &identifyAttrRec ) )
   {
     //If we are processing an actual change
     if(*(uint16_t*)identifyAttrRec.attr.dataPtr != identifyTime)
@@ -1805,8 +1807,18 @@ ZStatus_t bdb_rejoinNwk(void)
 
   if(rejoinStatus == ZSuccess)
   {
-    uint8_t tmp = true;
-    ZMacSetReq( ZMacRxOnIdle, &tmp ); // Set receiver always on during rejoin
+#if ( RFD_RX_ALWAYS_ON_CAPABLE == TRUE )
+    if ( ZG_DEVICE_RTR_TYPE || zgRxAlwaysOn == TRUE )
+    {
+      uint8_t tmp = true;
+      ZMacSetReq( ZMacRxOnIdle, &tmp ); // Set receiver always on during rejoin
+    }
+    else
+#endif
+    // enable rejoin poll rate
+    {
+      nwk_SetCurrentPollRateType(POLL_RATE_TYPE_JOIN_REJOIN,TRUE);
+    }
 
     // Perform Secure or Unsecure Rejoin depending on available configuration
     if ( ((zgBdbAttemptUnsecureRejoin == FALSE) ||
@@ -2109,12 +2121,7 @@ ZStatus_t bdb_joinProcess(networkDesc_t *pChosenNwk)
     // The receiver is on, turn network layer polling off.
     if ( ZDO_Config_Node_Descriptor.CapabilityFlags & CAPINFO_RCVR_ON_IDLE )
     {
-      // for an End Device with NO Child Table Management process or for a Router
-      if ( ( ZG_DEVICE_RTR_TYPE )  ||
-           ( (ZG_DEVICE_ENDDEVICE_TYPE) && ( zgChildAgingEnable == FALSE ) ) )
-      {
-        nwk_SetCurrentPollRateType(POLL_RATE_RX_ON_TRUE,TRUE);
-      }
+      nwk_SetCurrentPollRateType(POLL_RATE_RX_ON_TRUE,TRUE);
     }
     else
     {
@@ -2529,8 +2536,8 @@ void bdb_startResumeCommissioningProcess(void)
 
       if( bdb_CurrEpDescriptorList->epDesc->epType & BDB_FINDING_AND_BINDING_TARGET)  //F&B as Target
       {
-        if (zclFindAttrRec( bdb_CurrEpDescriptor->endPoint, ZCL_CLUSTER_ID_GEN_IDENTIFY,
-                  ATTRID_IDENTIFY_TIME, &attrRec ) )
+        if (zclFindAttrRec( bdb_CurrEpDescriptor->endPoint, ZCL_CLUSTER_ID_GENERAL_IDENTIFY,
+                  ATTRID_IDENTIFY_IDENTIFY_TIME, &attrRec ) )
         {
           //Set it to at less 180
           if ( *((uint16_t*)attrRec.attr.dataPtr) <= BDBC_MIN_COMMISSIONING_TIME )
@@ -2825,12 +2832,13 @@ uint32_t bdb_event_loop(byte task_id, uint32_t events)
         continue;
       }
 
-      if ( zclFindAttrRec( bdb_EpDescriptor->endPoint, ZCL_CLUSTER_ID_GEN_IDENTIFY,
-                        ATTRID_IDENTIFY_TIME, &identifyAttrRec ) )
+      if ( zclFindAttrRec( bdb_EpDescriptor->endPoint, ZCL_CLUSTER_ID_GENERAL_IDENTIFY,
+                        ATTRID_IDENTIFY_IDENTIFY_TIME, &identifyAttrRec ) )
       {
-        if(*((uint16_t*)identifyAttrRec.attr.dataPtr) > 0)
+        uint16_t *data = (uint16_t*)(identifyAttrRec.attr.dataPtr);
+        if ( (*data) > 0)
         {
-          (uint16_t)(*((uint16_t*)identifyAttrRec.attr.dataPtr))--;
+          (*data)--;
           KeepIdentifyTimerRunning = TRUE;
         }
         else

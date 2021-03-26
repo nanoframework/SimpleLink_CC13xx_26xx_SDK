@@ -41,6 +41,17 @@
         <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Semaphore.oem4f.dep" src="Semaphore.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Mailbox.oem4f.dep" src="Mailbox.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Queue.oem4f.dep" src="Queue.c"/>
+        <srcFile name="lib/debug/ti.sysbios.knl.am4f.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/package/package_ti.sysbios.knl.om4f.dep" src="package/package_ti.sysbios.knl.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Clock.om4f.dep" src="Clock.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Idle.om4f.dep" src="Idle.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Intrinsics.om4f.dep" src="Intrinsics.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Swi.om4f.dep" src="Swi.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Task.om4f.dep" src="Task.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Event.om4f.dep" src="Event.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Semaphore.om4f.dep" src="Semaphore.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Mailbox.om4f.dep" src="Mailbox.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Queue.om4f.dep" src="Queue.c"/>
         <srcFile name="lib/debug/ti.sysbios.knl.am4fg.mak" src="package.bld"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.knl/package/package_ti.sysbios.knl.om4fg.dep" src="package/package_ti.sysbios.knl.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.knl/Clock.om4fg.dep" src="Clock.c"/>
@@ -72,7 +83,23 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="em4f"
-            rootDir="/db/vendors/ti/arm/20.2.1.LTS/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/ticodegen/20.2.1.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
+            os="undefined"
+            rts="ti.targets.arm.rtsarm">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
+        <target name="ti.targets.arm.clang.M4F"
+            version="ti.targets.arm.clang.M4F{1,0,1.0,0"
+            rawVersion="TI Arm Clang Compiler 1.0.0+STSTarget: arm-ti-none-eabi
+Thread model: posix
+InstalledDir: /scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/bin
+"
+            platform="ti.platforms.cortexM:MTL1_VSOC:1"
+            isa="v7M4"
+            suffix="m4f"
+            rootDir="/scratch/xlibrary/.conan/data/tiarmllvm/1.0.0.STS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"
@@ -85,7 +112,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT"
             isa="v7M4"
             suffix="m4fg"
-            rootDir="/db/vendors/arm/gcc-arm-none-eabi-9-2019-q4-major"
+            rootDir="/scratch/xlibrary/.conan/data/arm-none-eabi-gcc/9.2019.q4.major-0/library-msp/ga/package/44fcf6b9a7fb86b2586303e3db40189d3b511830"
             os="undefined"
             rts="gnu.targets.arm.rtsv7M">
             <model endian="little"
@@ -98,7 +125,7 @@
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="rm4f"
-            rootDir="/db/vendors/iar/arm/8.50.1/Linux"
+            rootDir="/scratch/xlibrary/.conan/data/iarcodegen/8.50.1.245-0/library-msp/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9"
             os="undefined"
             rts="iar.targets.arm.rts">
             <model endian="little"
@@ -111,6 +138,10 @@
         pname="lib/debug/ti.sysbios.knl.aem4f"
         profile="debug"
         target="ti.targets.arm.elf.M4F"/>
+    <library name="lib/debug/ti.sysbios.knl"
+        pname="lib/debug/ti.sysbios.knl.am4f"
+        profile="debug"
+        target="ti.targets.arm.clang.M4F"/>
     <library name="lib/debug/ti.sysbios.knl"
         pname="lib/debug/ti.sysbios.knl.am4fg"
         profile="debug"
@@ -165,6 +196,7 @@
         <file name="Semaphore.c"/>
         <file name="Mailbox.c"/>
         <file name="Queue.c"/>
+        <file name="lib/debug/ti.sysbios.knl.am4f"/>
         <file name="lib/debug/ti.sysbios.knl.am4fg"/>
         <file name="lib/debug/ti.sysbios.knl.arm4f"/>
     </release>

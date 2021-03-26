@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -64,31 +64,26 @@ CONST uint8 accel_servUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(ACCEL_SERVICE_UUID)
 };
-
 // Accelerometer Enabler UUID
 CONST uint8 accel_enablerUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(ACCEL_ENABLER_UUID)
 };
-
 // Accelerometer Range UUID
 CONST uint8 accel_rangeUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(ACCEL_RANGE_UUID)
 };
-
 // Accelerometer X-Axis Data UUID
 CONST uint8 accel_xUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(ACCEL_X_UUID)
 };
-
 // Accelerometer Y-Axis Data UUID
 CONST uint8 accel_yUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(ACCEL_Y_UUID)
 };
-
 // Accelerometer Z-Axis Data UUID
 CONST uint8 accel_zUUID[ATT_UUID_SIZE] =
 {

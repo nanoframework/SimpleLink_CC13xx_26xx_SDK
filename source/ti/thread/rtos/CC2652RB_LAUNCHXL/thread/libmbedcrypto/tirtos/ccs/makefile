@@ -28,17 +28,15 @@ CFLAGS = -I../.. \
     --plain_char=unsigned \
     --diag_suppress=23000 \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC2652=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-ccs.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC2652RB_LAUNCHXL_tirtos_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DHAVE_CONFIG_H \
     -D_BSD_SOURCE=1 \
     -D_DEFAULT_SOURCE=1 \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-ccs.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC2652RB_LAUNCHXL_tirtos_ccs/config \
     --silicon_version=7M4 \
     --code_state=16 \
     --little_endian \

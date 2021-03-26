@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -1203,6 +1203,66 @@ typedef struct
   uint8  sampleCount;             //!< number of samples
   int8   *iqSamples;              //!< list of interleaved I/Q samples
 } hciEvt_BLECteConnectionlessIqReport_t;
+
+/// @brief LE Extended CTE Connectionless IQ Report Event
+typedef struct
+{
+  osal_event_hdr_t  hdr;          //!< osal event header
+  uint8  BLEEventCode;            //!< BLE Event Code
+  uint16 totalDataLen;            //!< samples data length includes in all next events
+  uint8  eventIndex;              //!< event number
+  uint16 syncHandle;              //!< sync handle in periodic adv
+  uint8  channelIndex;            //!< index of channel
+  uint16 rssi;                    //!< current rssi
+  uint8  rssiAntenna;             //!< antenna ID
+  uint8  cteType;                 //!< cte type
+  uint8  slotDuration;            //!< sampling slot 1us or 2us
+  uint8  status;                  //!< packet status (success or CRC error)
+  uint16 eventCounter;            //!< periodic adv event counter
+  uint8  dataLen;                 //!< samples data length
+  uint8  sampleRate;              //!< sample rate (1/2/3/4 MHz)
+  uint8  sampleSize;              //!< sample size (8 or 16 bit)
+  uint8  sampleCtrl;              //!< sample control - default filtering or RAW_RF
+  void   *iqSamples;              //!< list of interleaved I/Q samples (list size is dataLen*2)
+} hciEvt_BLEExtCteConnectionlessIqReport_t;
+
+/// @brief LE Periodic Advertising Sync Established event
+typedef struct
+{
+  osal_event_hdr_t  hdr;          //!< osal event header
+  uint8  BLEEventCode;            //!< BLE Event Code
+  uint8  status;                  //!< status of event
+  uint16 syncHandle;              //!< sync handle
+  uint8  sid;                     //!< Peer SID
+  uint8  addrType;                //!< Peer address type
+  uint8  address[B_ADDR_LEN];     //!< Peer address
+  uint8  phy;                     //!< Peer PHY
+  uint16 periodicInterval;        //!< Periodic interval
+  uint8  clockAccuracy;           //!< Peer Clock Accuracy
+} hciEvt_BLEPeriodicAdvSyncEstablished_t;
+
+/// @brief LE Periodic Advertising Report event
+typedef struct
+{
+  osal_event_hdr_t  hdr;          //!< osal event header
+  uint8  BLEEventCode;            //!< BLE Event Code
+  uint16 syncHandle;              //!< sync handle
+  int8   txPower;                 //!< Tx Power information
+  int8   rssi;                    //!< RSSI of the received packet
+  uint8  cteType;                 //!< CTE type received
+  uint8  dataStatus;              //!< Periodic data status
+  uint8  dataLen;                 //!< Periodic data length
+  uint8  *data;                   //!< Periodic data received from peer
+} hciEvt_BLEPeriodicAdvReport_t;
+
+/// @brief Periodic Advertising Sync Lost Event
+typedef struct
+{
+  osal_event_hdr_t  hdr;          //!< osal event header
+  uint8  BLEEventCode;            //!< BLE Event Code
+  uint16 syncHandle;              //!< sync handle
+} hciEvt_BLEPeriodicAdvSyncLost_t;
+
 
 /// @brief Data structure for HCI Command Complete Event Return Parameter
 typedef struct
@@ -2757,6 +2817,293 @@ extern hciStatus_t HCI_LE_SetConnectionCteResponseEnableCmd( uint16 connHandle,
  */
 extern hciStatus_t HCI_LE_ReadAntennaInformationCmd( void );
 
+/**
+ * Used by the Host to set the advertiser parameters for periodic advertising
+ *
+ * @design /ref did_286039104
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode HCI_LE_SET_PERIODIC_ADV_PARAMETERS
+ *
+ * @param advHandle – Used to identify a periodic advertising train
+ *                  Created by LE Set Extended Advertising Parameters command
+ * @param periodicAdvIntervalMin – Minimum advertising interval for periodic advertising
+ *                  Range: 0x0006 to 0xFFFF Time = N * 1.25 ms Time Range: 7.5ms to 81.91875 s
+ * @param periodicAdvIntervalMax – Maximum advertising interval for periodic advertising
+ *                  Range: 0x0006 to 0xFFFF Time = N * 1.25 ms Time Range: 7.5ms to 81.91875 s
+ * @param periodicAdvProp – Periodic advertising properties
+ *                  Set bit 6 for include TxPower in the advertising PDU
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetPeriodicAdvParamsCmd( uint8 advHandle,
+                                                   uint16 periodicAdvIntervalMin,
+                                                   uint16 periodicAdvIntervalMax,
+                                                   uint16 periodicAdvProp );
+
+
+/**
+ *
+ * @brief   Used to set the advertiser data used in periodic advertising PDUs.
+ *          This command may be issued at any time after the advertising set identified by
+ *          the Advertising_Handle parameter has been configured for periodic advertising
+ *          using the HCI_LE_Set_Periodic_Advertising_Parameters command
+ *
+ * @design /ref did_286039104
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode HCI_LE_SET_PERIODIC_ADV_DATA
+ *
+ * @param   advHandle  – Used to identify a periodic advertising train
+ * @param   operation  – 0x00 - Intermediate fragment of fragmented periodic advertising data
+ *                       0x01 - First fragment of fragmented periodic advertising data
+ *                       0x02 - Last fragment of fragmented periodic advertising data
+ *                       0x03 - Complete periodic advertising data
+ * @param   dataLength – The number of bytes in the Advertising Data parameter
+ * @param   data       – Periodic advertising data
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetPeriodicAdvDataCmd( uint8 advHandle,
+                                                 uint8 operation,
+                                                 uint8 dataLength,
+                                                 uint8 *data );
+
+/**
+ * @brief   Used to request the advertiser to enable or disable
+ *          the periodic advertising for the advertising set
+ *
+ * @design /ref did_286039104
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode HCI_LE_SET_PERIODIC_ADV_ENABLE
+ *
+ * @param   enable    – 0x00 - Periodic advertising is disabled (default)
+ *                      0x01 - Periodic advertising is enabled
+ * @param   advHandle – Used to identify a periodic advertising train
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetPeriodicAdvEnableCmd( uint8 enable,
+                                                   uint8 advHandle );
+
+/**
+ * @brief   Used by the Host to set the type, length, and antenna switching pattern
+ *          for the transmission of Constant Tone Extensions in any periodic advertising.
+ *
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_PARAMS
+ *
+ * @param   advHandle – Used to identify a periodic advertising train
+ * @param   cteLen    – CTE length (0x02 - 0x14) 16 usec - 160 usec
+ * @param   cteType   – CTE type (0 - AoA, 1 - AoD 1usec, 2 - AoD 2usec)
+ * @param   cteCount  – Number of CTE's to transmit in the same periodic event
+ * @param   length    – Number of items in Antenna array (relevant to AoD only)
+ * @param   pAntenna  – Pointer to Antenna array (relevant to AoD only)
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetConnectionlessCteTransmitParamsCmd( uint8 advHandle,
+                                                                 uint8 cteLen,
+                                                                 uint8 cteType,
+                                                                 uint8 cteCount,
+                                                                 uint8 length,
+                                                                 uint8 *pAntenna);
+
+/**
+ * @brief   Used by the Host to request that the Controller enables or disables
+ *          the use of Constant Tone Extensions in any periodic advertising.
+ *
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_ENABLE
+ *
+ * @param   advHandle – Used to identify a periodic advertising train
+ * @param   enable    – 0x00 - Advertising with CTE is disabled (default)
+ *                      0x01 - Advertising with CTE is enabled
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetConnectionlessCteTransmitEnableCmd( uint8 advHandle,
+                                                                 uint8 enable );
+
+/**
+ * HCI_LE_PeriodicAdvCreateSyncCmd
+ *
+ * Used a scanner to synchronize with a periodic advertising train from
+ * an advertiser and begin receiving periodic advertising packets.
+ *
+ * @design /ref did_286039104
+ *
+ * @param   options     – Clear Bit 0 - Use the advSID, advAddrType, and advAddress
+ *                                      parameters to determine which advertiser to listen to.
+ *                        Set Bit 0   - Use the Periodic Advertiser List to determine which
+ *                                      advertiser to listen to.
+ *                        Clear Bit 1 - Reporting initially enabled.
+ *                        Set Bit 1   - Reporting initially disabled.
+ * @param   advSID      – Advertising SID subfield in the ADI field used to identify
+ *                        the Periodic Advertising (Range: 0x00 to 0x0F)
+ * @param   advAddrType – Advertiser address type - 0x00 - public ; 0x01 - random
+ * @param   advAddress  – Advertiser address (6 bytes)
+ * @param   skip        – The maximum number of periodic advertising events that can be
+ *                        skipped after a successful receive (Range: 0x0000 to 0x01F3)
+ * @param   syncTimeout – Synchronization timeout for the periodic advertising train
+ *                           Range: 0x000A to 0x4000 Time = N*10 ms Time Range: 100 ms to 163.84 s
+ * @param   syncCteType – Set Bit 0 - Do not sync to packets with an AoA CTE
+ *                        Set Bit 1 - Do not sync to packets with an AoD CTE with 1 us slots
+ *                        Set Bit 2 - Do not sync to packets with an AoD CTE with 2 us slots
+ *                        Set Bit 4 - Do not sync to packets without a CTE
+ *
+ * @return  HCI_Success
+ */
+extern hciStatus_t HCI_LE_PeriodicAdvCreateSyncCmd( uint8  options,
+                                                    uint8  advSID,
+                                                    uint8  advAddrType,
+                                                    uint8  *advAddress,
+                                                    uint16 skip,
+                                                    uint16 syncTimeout,
+                                                    uint8  syncCteType );
+
+/**
+ * HCI_LE_PeriodicAdvCreateSyncCancelCmd
+ *
+ * Used a scanner to cancel the HCI_LE_Periodic_Advertising_Create_Sync
+ * command while it is pending.
+ *
+ * @design  /ref did_286039104
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_PeriodicAdvCreateSyncCancelCmd( void );
+
+/**
+ * HCI_LE_PeriodicAdvTerminateSyncCmd
+ *
+ * Used a scanner to stop reception of the periodic advertising
+ * train identified by the syncHandle parameter.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ *                       (Range: 0x0000 to 0x0EFF)
+ *                       The handle was assigned by the Controller while generating
+ *                       the LE Periodic Advertising Sync Established event
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_PeriodicAdvTerminateSyncCmd( uint16 syncHandle );
+
+/**
+ * HCI_LE_AddDeviceToPeriodicAdvertiserListCmd
+ *
+ * Used a scanner to add an entry, consisting of a single device address
+ * and SID, to the Periodic Advertiser list stored in the Controller.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   advAddrType – Advertiser address type - 0x00 - Public or Public Identity Address
+ *                                                  0x01 - Random or Random (static) Identity Address
+ * @param   advAddress  – Advertiser address (6 bytes)
+ * @param   advSID      – Advertising SID subfield in the ADI field used to identify
+ *                        the Periodic Advertising (Range: 0x00 to 0x0F)
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_AddDeviceToPeriodicAdvListCmd( uint8 advAddrType,
+                                                         uint8 *advAddress,
+                                                         uint8 advSID );
+
+/**
+ * HCI_LE_RemoveDeviceFromPeriodicAdvListCmd
+ *
+ * Used a scanner to remove one entry from the list of Periodic Advertisers
+ * stored in the Controller.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   advAddrType – Advertiser address type -
+ *                        0x00 - Public or Public Identity Address
+ *                        0x01 - Random or Random (static) Identity Address
+ * @param   advAddress  – Advertiser address (6 bytes)
+ * @param   advSID      – Advertising SID subfield in the ADI field used to identify
+ *                        the Periodic Advertising (Range: 0x00 to 0x0F)
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_RemoveDeviceFromPeriodicAdvListCmd( uint8 advAddrType,
+                                                              uint8 *advAddress,
+                                                              uint8 advSID );
+
+/**
+ * HCI_LE_ClearPeriodicAdvListCmd
+ *
+ * Used a scanner to remove all entries from the list of Periodic
+ * Advertisers in the Controller.
+ *
+ * @design  /ref did_286039104
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_ClearPeriodicAdvListCmd( void );
+
+/**
+ * HCI_LE_ReadPeriodicAdvListSizeCmd
+ *
+ * Used a scanner to read the total number of Periodic Advertiser
+ * list entries that can be stored in the Controller.
+ *
+ * @design  /ref did_286039104
+ *
+ * @return  HCI status
+ *          Periodic Advertiser List Size (Range: 0x01 to 0xFF)
+ */
+extern hciStatus_t HCI_LE_ReadPeriodicAdvListSizeCmd( void );
+
+/**
+ * HCI_LE_SetPeriodicAdvReceiveEnableCmd
+ *
+ * Used a scanner to enable or disable reports for the periodic
+ * advertising train identified by the syncHandle parameter.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ *                       (Range: 0x0000 to 0x0EFF)
+ *                       The handle was assigned by the Controller while generating
+ *                       the LE Periodic Advertising Sync Established event
+ * @param   enable     - 0x00 - Reporting disable
+ *                       0x01 - Reporting enable
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetPeriodicAdvReceiveEnableCmd( uint16 syncHandle,
+                                                          uint8  enable );
+
+/**
+ * HCI_LE_SetConnectionlessIqSamplingEnableCmd
+ *
+ * Used by the Host to request that the Controller enables or disables capturing
+ * IQ samples from the CTE of periodic advertising packets in the periodic
+ * advertising train identified by the syncHandle parameter.
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train (Range: 0x0000 to 0x0EFF)
+ * @param   samplingEnable - Sample CTE on a received periodic advertising and report the samples to the Host.
+ * @param   slotDurations - Switching and sampling slots in 1 us or 2 us each (1 or 2).
+ * @param   maxSampledCtes – 0 - Sample and report all available CTEs
+ *                           1 to 16 - Max number of CTEs to sample and report in each periodic event
+ * @param   length    – Number of items in Antenna array (relevant to AoA only)
+ * @param   pAntenna  – Pointer to Antenna array (relevant to AoA only)
+ *
+ * @return  HCI status
+ */
+extern hciStatus_t HCI_LE_SetConnectionlessIqSamplingEnableCmd( uint16 syncHandle,
+                                                                uint8 samplingEnable,
+                                                                uint8 slotDurations,
+                                                                uint8 maxSampledCtes,
+                                                                uint8 length,
+                                                                uint8 *pAntenna);
+
 /*
 ** HCI Vendor Specific Commands: Link Layer Extensions
 */
@@ -3752,12 +4099,12 @@ extern hciStatus_t HCI_EXT_SetPinOutputCmd( uint8 dio,
 /**
  * Set CTE accuracy for 1M and 2M PHY
  *
- * @design /ref did_202754181
+ * @design  /ref did_202754181
  *
  * @par Corresponding Events
  * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_EXT_SET_LOCATIONING_ACCURACY
  *
- * @param connHandle Connection handle.
+ * @param handle - Connection handle (0x0XXX) or periodic advertising train handle (0x1XXX).
  * @param sampleRate1M sample rate for PHY 1M
  *        range : 1 - least accuracy (as in 5.1 spec) to 4 - most accuracy
  * @param sampleSize1M sample size for PHY 1M
@@ -3771,7 +4118,7 @@ extern hciStatus_t HCI_EXT_SetPinOutputCmd( uint8 dio,
  *
  * @return @ref HCI_SUCCESS
  */
-extern hciStatus_t HCI_EXT_SetLocationingAccuracyCmd( uint16 connHandle,
+extern hciStatus_t HCI_EXT_SetLocationingAccuracyCmd( uint16 handle,
                                                       uint8  sampleRate1M,
                                                       uint8  sampleSize1M,
                                                       uint8  sampleRate2M,
@@ -3849,6 +4196,71 @@ extern hciStatus_t HCI_EXT_SetVirtualAdvAddrCmd( uint8 advHandle,  uint8 *bdAddr
  * @return      @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap );
+
+/**
+ * @brief       This API is used to set the QOS Parameters
+ *              according to the entered parameter type.
+ *
+ * @design      /ref did_361975877
+ *
+ * input parameters
+ *
+ * @param       taskType  - The type of task.
+ *                          For connections: LL_QOS_CONN_TASK_TYPE.
+ *
+ * @param       paramType  - The type of parameter.
+ *                           General: LL_QOS_TYPE_PRIORITY
+ *                           For connections: LL_QOS_TYPE_CONN_MIN_LENGTH /
+ *                                            LL_QOS_TYPE_CONN_MAX_LENGTH.
+ *
+ * @param       paramVal   - The value of the parameter.
+ *                           General:
+ *                           LL_QOS_TYPE_PRIORITY optional values: LL_QOS_LOW_PRIORITY,
+ *                                                                 LL_QOS_MEDIUM_PRIORITY,
+ *                                                                 LL_QOS_HIGH_PRIORITY.
+ *                                                                 Range [0-2].
+ *                           For connections:
+ *                           LL_QOS_TYPE_CONN_MIN_LENGTH optional values: Time in [us].
+ *                                                                        for coded connection   Range [LL_MIN_LINK_DATA_TIME_CODED (2704 us) - LL_MAX_LINK_DATA_TIME_CODED (17040 us)].
+ *                                                                        for uncoded connection Range [LL_MIN_LINK_DATA_TIME (328 us) - LL_MAX_LINK_DATA_TIME_UNCODED (2120 us)].
+ *                           LL_QOS_TYPE_CONN_MAX_LENGTH optional values: Time in [us].
+ *                                                                        for coded connection   Range [LL_MIN_LINK_DATA_TIME_CODED (2704 us) - Connection's Interval ]
+ *                                                                        for uncoded connection Range [LL_MIN_LINK_DATA_TIME (328 us) - Connection's Interval ]
+ *
+ *                          Note: For the LL_QOS_TYPE_CONN_MIN_LENGTH value a margin time is added of LL_TOTAL_MARGIN_TIME_FOR_MIN_CONN_RAT_TICKS.
+ *                          Note: LL_QOS_TYPE_CONN_MAX_LENGTH must be larger than (LL_QOS_TYPE_CONN_MIN_LENGTH + LL_TOTAL_MARGIN_TIME_FOR_MIN_CONN_RAT_TICKS) Value.
+ *
+ *
+ * @param       taskHandle  - The Task Handle of which we want to update it's parameters.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      @ref HCI_SUCCESS
+ */
+extern hciStatus_t HCI_EXT_SetQOSParameters( uint8  taskType,
+                                             uint8  paramType,
+                                             uint32 ParamVal,
+                                             uint16 taskHandle);
+
+/**
+ * @brief       This API is used to set the Default QOS Parameters Values.
+ *
+ * @design      /ref did_361975877
+ *
+ * input parameters
+ *
+ * @param       defaultParamConnPriorityValue       - The default value for connection's priority.
+ *                                                    Options: LL_QOS_LOW_PRIORITY /  LL_QOS_MEDIUM_PRIORITY / LL_QOS_HIGH_PRIORITY.
+ *                                                    Range [0-2].
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      @ref HCI_SUCCESS
+ */
+extern hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValue );
 
 /**
  * Enable or disable the Coex feature.

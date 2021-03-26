@@ -47,10 +47,17 @@ const apsAckWaitLongDescription = apsAckWaitDescription + `\n\n\
 
 **Range:** 0 - 65535 ms`;
 
-const macFrameAttemptsDescription = `Maximum number of MAC frame transmission \
-attempts allowed`;
+const macFrameRetriesDescription = `Maximum number of MAC frame transmission \
+retries.`;
 
-const macFrameAttemptsLongDescription = macFrameAttemptsDescription + `\n\n\
+const macFrameRetriesLongDescription = macFrameRetriesDescription + `\n\n\
+**Default:** 3
+
+**Range:** 0 - 7`;
+
+const apsRetriesDescription = `Maximum number of APS Retries after a missed APS ACK`;
+
+const apsRetriesLongDescription = apsRetriesDescription + `\n\n\
 **Default:** 3
 
 **Range:** 0 - 127`;
@@ -66,17 +73,10 @@ const nwkDataRetriesLongDescription = nwkDataRetriesDescription + `\n\n\
 const packetSendingModule = {
     config: [
         {
-            name: "apsAckWaitDurationPolled",
-            displayName: "APS ACK Wait Duration (ms)",
-            description: apsAckWaitDescription,
-            longDescription: apsAckWaitLongDescription,
-            default: 6000
-        },
-        {
-            name: "macFrameAttempts",
-            displayName: "MAC Frame Attempts",
-            description: macFrameAttemptsDescription,
-            longDescription: macFrameAttemptsLongDescription,
+            name: "macFrameRetries",
+            displayName: "MAC Frame Retries",
+            description: macFrameRetriesDescription,
+            longDescription: macFrameRetriesLongDescription,
             default: 3
         },
         {
@@ -85,7 +85,21 @@ const packetSendingModule = {
             description: nwkDataRetriesDescription,
             longDescription: nwkDataRetriesLongDescription,
             default: 2
-        }
+        },
+        {
+            name: "apscMaxFrameRetries",
+            displayName: "APS Retries",
+            description: apsRetriesDescription,
+            longDescription: apsRetriesLongDescription,
+            default: 3
+        },
+        {
+            name: "apsAckWaitDurationPolled",
+            displayName: "APS ACK Wait Duration (ms)",
+            description: apsAckWaitDescription,
+            longDescription: apsAckWaitLongDescription,
+            default: 6000
+        },
     ],
     validate: validate
 };
@@ -107,8 +121,12 @@ function validate(inst, validation)
     }
 
     /* Validate MAC Frame Attempts */
-    Common.validateRange(inst, validation, inst.macFrameAttempts,
-        "macFrameAttempts", "MAC Frame Attempts", 0, 127);
+    Common.validateRange(inst, validation, inst.macFrameRetries,
+        "macFrameRetries", "MAC Frame Retries", 0, 7);
+
+    /* Validate MAC Frame Attempts */
+    Common.validateRange(inst, validation, inst.apscMaxFrameRetries,
+        "macFrameRetries", "MAC Frame Retries", 0, 127);
 
     /* Validate NWK Data Retries */
     Common.validateRange(inst, validation, inst.nwkDataRetries,

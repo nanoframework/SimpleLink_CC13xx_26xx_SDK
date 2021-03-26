@@ -43,6 +43,7 @@
 <li><a href="#CUI">Using the Common User Interface</a></li>
 <li><a href="#ProvisioningZigbeeSwToNetwork">Provisioning The Zigbee Router To A Network</a></li>
 <li><a href="#ProvisionedZrLight">Provisioned Zigbee Router</a></li>
+<li><a href="#DisableCUI">Disabling Common User Interface</a></li>
 </ul></li>
 </ul>
 
@@ -154,7 +155,7 @@ Start Type, Start Time, AllowDelay, Priority, Activity, etc.</p>
 
 <p>The Global Priority Table (GPT) defines relative priorities of the two stacks
 based on the activity and priority of RF commands.  For details of the GPT,
-refer to <code>&lt;SDK_DIR&gt;\source\ti\common\dmm\dmm_priority_ble_154.c/h</code>.</p>
+refer to <code>&lt;SDK_DIR&gt;\source\ti\common\dmm\dmm_priority_ble_zigbee_zr.c/h</code>.</p>
 
 <p>The Application Level information is the user defined information via the policy
 table and inludes: Application State Name, Weight, AppliedActivity, Pause, etc;
@@ -533,6 +534,17 @@ a 1-byte-long value that is used to diaplay the battery level.</p>
 
 <blockquote>
   <p>Note: In this implementation the Launchpad is USB powerd and this value always reads 100.</p>
+</blockquote>
+
+<h2><a name="DisableCUI"></a>Disabling Common User Interface</h2>
+
+<p>The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in <code>dmm_zr_light_remote_display_app.opts</code>:</p>
+
+<pre><code>-DCUI_DISABLE
+</code></pre>
+
+<blockquote>
+  <p>Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.</p>
 </blockquote>
 
     </div>

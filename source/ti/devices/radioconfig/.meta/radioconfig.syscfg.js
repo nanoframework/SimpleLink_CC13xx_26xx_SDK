@@ -61,9 +61,11 @@ function reloadInstanceFromPhy(inst, ui, phyType, phyGroup, preserve) {
     const cmdHandler = CmdHandler.get(phyGroup, phyType);
     const rfData = cmdHandler.getRfData();
     _.each(rfData, (value, key) => {
-        if (!preserve.includes(key)) {
-            inst[key] = value;
+        // Do NOT refresh preserved configurables
+        if (preserve.includes(key)) {
+            return;
         }
+        inst[key] = value;
     });
     updateTxPowerVisibility(inst, ui);
 }
@@ -110,15 +112,16 @@ function updateTxPowerVisibility(inst, ui) {
             freqBand = inst.freqBand;
             prop24 = freqBand === "2400";
         }
-        const fb433 = freqBand === "433";
+        const fbLow = freqBand === "433" || freqBand === "169";
 
         // Visibility of power tables
-        ui.txPower.hidden = inst.highPA || fb433 || prop24;
-        ui.txPowerHi.hidden = !inst.highPA || fb433 || prop24;
+        ui.txPower.hidden = inst.highPA || fbLow || prop24;
+        ui.txPowerHi.hidden = !inst.highPA || fbLow || prop24;
 
         if ("phyType433" in inst) {
-            ui.txPower433.hidden = inst.highPA || !fb433;
-            ui.txPower433Hi.hidden = !inst.highPA || !fb433;
+            const otherFreqband = freqBand !== "433";
+            ui.txPower433.hidden = inst.highPA || otherFreqband;
+            ui.txPower433Hi.hidden = !inst.highPA || otherFreqband;
         }
     }
 }

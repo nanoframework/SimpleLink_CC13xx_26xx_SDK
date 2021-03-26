@@ -66,10 +66,10 @@
 
 #if defined(__IAR_SYSTEMS_ICC__)
 __no_init uint8_t crcBuf[CRC32_BUF_SZ];
+#elif defined(__TI_COMPILER_VERSION__) || defined(__clang__)
+uint8_t crcBuf[CRC32_BUF_SZ];
 #elif defined(__GNUC__)
 uint8_t crcBuf[CRC32_BUF_SZ] __attribute__ ((section (".noinit")));
-#elif defined(__TI_COMPILER_VERSION__)
-uint8_t crcBuf[CRC32_BUF_SZ];
 #endif
 
 /*******************************************************************************
@@ -85,7 +85,7 @@ uint8_t crcBuf[CRC32_BUF_SZ];
  */
 void *CRC32_memCpy(void *dest, const void *src, uint16_t len)
 {
-    if((dest == NULL))
+    if(dest == NULL)
     {
         return(NULL);
     }
@@ -153,7 +153,7 @@ uint32_t CRC32_calc(uint8_t page, uint32_t pageSize, uint16_t offset, uint32_t l
     /* Check for invalid length */
     if((len == 0) || (len == 0xFFFFFFFF) ||
        (useExtFl == true && len > EFL_FLASH_SIZE) ||
-       (useExtFl == true && len > (MAX_ONCHIP_FLASH_PAGES*INTFLASH_PAGE_SIZE)))
+       (useExtFl == false && len > (MAX_ONCHIP_FLASH_PAGES*INTFLASH_PAGE_SIZE)))
     {
         return crc;
     }

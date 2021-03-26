@@ -4,7 +4,7 @@
  */
 
 /*
- * Copyright (c) 2008-2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2008-2020 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,13 +45,13 @@ requires xdc.bld;
 package gnu.targets.arm [1,0,0] {
     interface ITarget, IM;
     module GCArmv5T, GCArmv6, GCArmv7A, GCArmv7AF;
-    module M3, M4, M4F;
+    module M0, M3, M4, M4F;
     module M33F;
     module A8F, A9F, A15F;
     module A53F, A72F;
 }
 /*
- *  @(#) gnu.targets.arm; 1, 0, 0,; 5-11-2020 15:30:14; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
+ *  @(#) gnu.targets.arm; 1, 0, 0,; 9-3-2020 14:50:59; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
 
  */
 

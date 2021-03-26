@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2010-2020, Texas Instruments Incorporated
+ Copyright (c) 2010-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,7 @@ extern "C"
  */
 
 #include "map_direct.h"
+#include "gap_internal.h"
 
 /*********************************************************************
  * MACROS
@@ -91,6 +92,22 @@ typedef struct
   uint16_t                     remainingDataSize;  //!< Remaining size until we have all data
   rtlsSrv_connectionIQReport_t *pTmpExtIqEvt;      //!< This will temporarily hold the event that will eventually be sent to the user
 } rtlsSrv_extIqEvtState_t;
+
+typedef struct
+{
+  uint8_t              evtStarted;         //!< I/Q event is ongoing
+  uint8_t              evtIndex;           //!< Index chunk number
+  uint16_t             remainingDataSize;  //!< Remaining size until we have all data
+  rtlsSrv_clIQReport_t *pTmpCLExtIqEvt;      //!< This will temporarily hold the event that will eventually be sent to the user
+} rtlsSrv_extCLIqEvtState_t;
+
+/// CL AoA number of antennas - linked list
+typedef struct rtlsSrv_clNumAnt_t
+{
+  uint16_t syncHandle;              //!< Handle identifying the periodic advertising train
+  uint8_t numAnt;                   //!< Number of antennas in the anternna pattern
+  struct rtlsSrv_clNumAnt_t *next;
+} rtlsSrv_clNumAnt_t;
 
 /*-------------------------------------------------------------------
  * API's
@@ -166,6 +183,77 @@ bStatus_t RTLSSrv_handleCteReqFail(uint8_t *pEvtData);
  * @return      TRUE = success, FALSE = failure
  */
 bStatus_t RTLSSrv_handleReadAntInfo(uint8_t *pEvtData);
+
+/*********************************************************************
+ * @fn          RTLSSrv_handleCLIqEvent
+ *
+ * @brief       Handle a Connectionless IQ Event sent by HCI
+ *
+ * @param       pEvtData - actual information to pass
+ *
+ * @return      TRUE if processed and safe to deallocate, FALSE if not processed.
+ */
+bStatus_t RTLSSrv_handleCLIqEvent(uint8_t *pEvtData);
+
+/*********************************************************************
+ * @fn          RTLSSrv_handleExtCLIqEvent
+ *
+ * @brief       Handle an Extended Connection IQ Event sent by HCI
+ *
+ * @param       evtData - actual information to pass
+ *
+ * @return      TRUE if processed and safe to deallocate, FALSE if not processed.
+ */
+bStatus_t RTLSSrv_handleExtCLIqEvent(uint8_t *pEvtData);
+
+/**
+ * RTLSSrv_processPeriodicAdvEvent
+ *
+ * Process incoming periodic advertising OSAL HCI BLE events:
+ * translate to RTLS Services event and dispatch to user
+ * registered callback
+ *
+ * @param       pMsg - message to process
+ *
+ * @return      TRUE if processed and safe to deallocate, FALSE if not processed.
+ */
+uint8 RTLSSrv_processPeriodicAdvEvent(osal_event_hdr_t *pMsg);
+
+/**
+ * RTLSSrv_getNumAnt
+ *
+ * Returns the number of antannas in the antenna patters
+ * matching the given syncHandle
+ *
+ * @param       handle - connection/sync handle
+ *
+ * @return      0    - the handle was not found
+ *              2-75 - number of antennas in the antenna pattern
+ */
+uint8_t RTLSSrv_getNumAnt(uint16_t handle);
+
+/**
+ * RTLSSrv_removeClNumAntNode
+ *
+ * Removes the node matching the given syncHandle
+ *
+ * @param       syncHandle - Handle identifying the periodic advertising train
+ *
+ * @return      None
+ */
+void RTLSSrv_removeClNumAntNode( uint16_t syncHandle );
+
+/*********************************************************************
+ * RTLSSrv_getClAntNode
+ *
+ * Find the CL AoA antenna node matching the given syncHandle
+ *
+ * @param       syncHandle - sync handle
+ *
+ * @return      If found - pointer to the node, else NULL
+ */
+rtlsSrv_clNumAnt_t* RTLSSrv_getClAntNode(uint16_t syncHandle);
+
 #ifdef __cplusplus
 }
 #endif

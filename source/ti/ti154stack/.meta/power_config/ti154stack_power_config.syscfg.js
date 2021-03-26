@@ -224,11 +224,12 @@ function getTxPowerRFConfig(inst, freqBand, phyType, phyGroup)
 
     if((board.includes("CC1352P1") && freqBand === "freqBandSub1")
         || (((board.includes("CC1352P-2") || board.includes("CC1352P_2"))
-        || (board.includes("CC1352P-4") || board.includes("CC1352P_4")))
+        || (board.includes("CC1352P-4") || board.includes("CC1352P_4"))
+        || (board.includes("CC2652PSIP")))
         && (freqBand === "freqBand24")))
     {
         // On 1352P1 the high PA is enabled for Sub-1 GHz
-        // On 1352P2 and P4 the high PA is enabled for 2.4 GHz
+        // On 2652PSIP, 1352P2, and P4 the high PA is enabled for 2.4 GHz
         txPowerHiOptions = RfDesign.getTxPowerOptions(freq, true);
     }
 
@@ -380,7 +381,7 @@ function validate(inst, validation)
     // Verify that ccfg forceVddr is set if required
     const ccfg = system.modules["/ti/devices/CCFG"].$static;
 
-    if(ParameterHandler.validateTXpower(rfTransmitPower, freq, rfHighPA)
+    if(ParameterHandler.validateTxPower(rfTransmitPower, freq, rfHighPA)
         && !ccfg.forceVddr)
     {
         validation.logWarning(`The selected RF TX Power requires `
@@ -428,6 +429,9 @@ function getPowerConfigHiddenState(inst, cfgName)
         }
     }
 
+    // Hide all configs for coprocessor project
+    isVisible = isVisible && (inst.project !== "coprocessor");
+
     // Return whether config is hidden
     return(!isVisible);
 }
@@ -442,15 +446,21 @@ function getPowerConfigHiddenState(inst, cfgName)
  */
 function setPowerConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getPowerConfigHiddenState(inst, cfgName);
-    if(ui[cfgName].hidden)
-    {
-        // get a list of all nested and unnested configs
-        const configToReset = Common.findConfig(config.config, cfgName);
-        // restore the default value for the hidden parameter.
-        Common.restoreDefaultValue(inst, configToReset, cfgName);
-    }
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getPowerConfigHiddenState);
+}
+
+/*
+ * ======== setAllPowerConfigsHiddenState ========
+ * Sets the visibility of all power configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllPowerConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getPowerConfigHiddenState);
 }
 
 /*
@@ -466,5 +476,6 @@ exports = {
     getRFTxPowerFrom154TxPower: getRFTxPowerFrom154TxPower,
     getTxPowerConfigOptions: getTxPowerConfigOptions,
     setPowerConfigHiddenState: setPowerConfigHiddenState,
-    getPowerConfigHiddenState: getPowerConfigHiddenState
+    getPowerConfigHiddenState: getPowerConfigHiddenState,
+    setAllPowerConfigsHiddenState: setAllPowerConfigsHiddenState
 };

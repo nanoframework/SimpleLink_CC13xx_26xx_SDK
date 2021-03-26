@@ -91,11 +91,11 @@ const propDocs = [
     },
     {
         configurable: ["syncWord", "syncWordLength"],
-        longDescription: "The syncword is used by the packet engine to detect the packet start. "
+        longDescription: "The sync word is used by the packet engine to detect the packet start. "
             + "For best performance, it must satisfy multiple criteria:\n\n"
             + "* Its auto-correlation must have one high peak and only flat side lobes.\n"
             + "* It must be long enough to be unique. 4 bytes are recommended.\n\n"
-            + "Reducing the syncword length to less than 4 bytes and choosing a bad syncword "
+            + "Reducing the sync word length to less than 4 bytes and choosing a bad sync word "
             + "will likely have a negative impact on the packet error rate. In only rare cases is it recommended "
             + "to change this value. More info can be found in the [Packet Format Documentation]"
             + "(/proprietary-rf/proprietary-rf-users-guide/proprietary-rf/packet-format.html#sync-word)"

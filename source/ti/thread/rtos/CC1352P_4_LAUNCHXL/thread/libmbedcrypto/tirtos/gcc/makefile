@@ -18,11 +18,7 @@ CFLAGS = -I../.. \
     -std=gnu++98 \
     -Wno-c++14-compat \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms \
-    -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1 \
-    -DSIMPLELINK_OPENTHREAD_CONFIG_CC1352=1 \
-    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-gcc.h"' \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source \
-    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
@@ -39,6 +35,8 @@ CFLAGS = -I../.. \
     -Wall \
     -Wextra \
     -Wshadow \
+    -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-gcc.h"' \
+    -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
     -gstrict-dwarf \
     "-I$(SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR)/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/include/newlib-nano" \
     "-I$(SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR)/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/include" \

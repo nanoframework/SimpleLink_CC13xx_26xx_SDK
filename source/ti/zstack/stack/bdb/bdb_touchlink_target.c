@@ -43,6 +43,7 @@
  */
 #include "zcomdef.h"
 #include "rom_jt_154.h"
+#include "ti_zstack_config.h"
 #include "osal_nv.h"
 #include "af.h"
 #include "zd_app.h"
@@ -449,6 +450,11 @@ uint32_t touchLinkTarget_event_loop( uint8_t task_id, uint32_t events )
 ZStatus_t touchLink_TargetSendScanRsp( uint8_t srcEP, afAddrType_t *dstAddr, uint32_t transID, uint8_t seqNum )
 {
   ZStatus_t status = ZSuccess;
+
+  if ( touchLinkTargetEnabled == FALSE )
+  {
+    return ZFailure;
+  }
 
   // Make sure we respond only once during a Device Discovery
   if ( touchLinkLastAcceptedTransID != transID )

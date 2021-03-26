@@ -42,19 +42,17 @@
             --plain_char=unsigned
             --diag_suppress=23000
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms
-            -DSIMPLELINK_OPENTHREAD_SDK_BUILD=1
-            -DSIMPLELINK_OPENTHREAD_CONFIG_CC1352=1
-            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc1352-ccs.h&quot;&apos;
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source
-            -I${WorkspaceDirPath}/libmbedcrypto_CC1352R1_LAUNCHXL_tirtos_ccs/config
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include
             -DHAVE_CONFIG_H
             -D_BSD_SOURCE=1
             -D_DEFAULT_SOURCE=1
-            -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc1352-config-ide.h&quot;&apos;
+            -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc1352-ccs.h&quot;&apos;
+            -I${WorkspaceDirPath}/libmbedcrypto_CC1352R1_LAUNCHXL_tirtos_ccs/config
             -DOPENTHREAD_FTD=1
+            -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc1352-config-ide.h&quot;&apos;
             -DOPENTHREAD_CONFIG_FILE=&apos;&quot;openthread-config-cc1352-ccs-ncp.h&quot;&apos;
             -I${WorkspaceDirPath}/libopenthread_ncp_CC1352R1_LAUNCHXL_tirtos_ccs/config
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core
@@ -72,7 +70,6 @@
         description="this is the openthread platform utils library">
 
         <property name="isHybrid" value="true"/>
-        <group id="libopenthread_platform_utils_ncp_CC1352R1_LAUNCHXL_tirtos_ccs.SIMPLELINK_CC13X2_26X2_SDK.thread.TI"/>
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms/utils/code_utils.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="examples/platforms/utils">
         </file>
         <file path="${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/examples/platforms/utils/encoding.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="examples/platforms/utils">

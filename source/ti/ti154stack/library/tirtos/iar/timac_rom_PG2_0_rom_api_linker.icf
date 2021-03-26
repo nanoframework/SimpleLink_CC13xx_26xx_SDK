@@ -219,7 +219,7 @@
 --define_symbol MAC_McpsDataReq=0x10036729
 --define_symbol MAC_McpsDataAlloc=0x10036e05
 --define_symbol macAutoPendMaintainSrcMatchTable=0x10036fc5
---define_symbol macAutoPendAddSrcMatchTableEntry=0x100371e1
+//--define_symbol macAutoPendAddSrcMatchTableEntry=0x100371e1
 --define_symbol macDeviceReset=0x100377a1
 --define_symbol macAssociateCnf=0x10037d79
 --define_symbol macPollCnf=0x10037e3d
@@ -245,7 +245,7 @@
 --define_symbol MAC_InitDevice=0x10037c45
 --define_symbol MAC_MlmeAssociateReq=0x10037ea5
 --define_symbol MAC_MlmePollReq=0x10037ebd
---define_symbol macBuildHeaderIes=0x10038005
+// --define_symbol macBuildHeaderIes=0x10038005
 --define_symbol macBuildPayloadCoexistIe=0x100380d9
 --define_symbol macBuildPayloadIes=0x10037ee9
 --define_symbol macUpdateHeaderIEPtr=0x10038349
@@ -332,7 +332,7 @@
 //--define_symbol macScanRxCoordRealign=0x1003a761
 --define_symbol macScanComplete=0x1003a839
 --define_symbol macScanFailedInProgress=0x1003a96d
---define_symbol MAC_MlmeScanReq=0x1003a689
+//--define_symbol MAC_MlmeScanReq=0x1003a689
 --define_symbol macSecurityPibReset=0x1003ac6d
 --define_symbol macSecurityPibIndex=0x1003b199
 --define_symbol MAC_MlmeGetSecurityReq=0x1003af09

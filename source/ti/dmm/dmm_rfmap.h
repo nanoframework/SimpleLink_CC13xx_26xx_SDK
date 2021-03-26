@@ -57,6 +57,10 @@
 #ifndef dmm_rfmap_H_
 #define dmm_rfmap_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <ti/drivers/rf/RF.h>
 #include <dmm/dmm_scheduler.h>
 
@@ -70,5 +74,9 @@
 #define RF_runImmediateCmd  DMMSch_rfRunImmediateCmd
 #define RF_runDirectCmd     DMMSch_rfRunDirectCmd
 #define RF_requestAccess    DMMSch_rfRequestAccess
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* dmm_rfmap_H_ */

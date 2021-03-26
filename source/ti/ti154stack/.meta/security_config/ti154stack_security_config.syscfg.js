@@ -279,6 +279,9 @@ function getSecurityConfigHiddenState(inst, cfgName)
         }
     }
 
+    // Hide all configs for coprocessor project
+    isVisible = isVisible && (inst.project !== "coprocessor");
+
     // Return whether config is hidden
     return(!isVisible);
 }
@@ -293,15 +296,21 @@ function getSecurityConfigHiddenState(inst, cfgName)
  */
 function setSecurityConfigHiddenState(inst, ui, cfgName)
 {
-    // Set visibility of config
-    ui[cfgName].hidden = getSecurityConfigHiddenState(inst, cfgName);
-    if(ui[cfgName].hidden)
-    {
-        // get a list of all nested and unnested configs
-        const configToReset = Common.findConfig(config.config, cfgName);
-        // restore the default value for the hidden parameter.
-        Common.restoreDefaultValue(inst, configToReset, cfgName);
-    }
+    Common.setConfigHiddenState(inst, ui, cfgName, config.config,
+        getSecurityConfigHiddenState);
+}
+
+/*
+ * ======== setAllSecurityConfigsHiddenState ========
+ * Sets the visibility of all security configs
+ *
+ * @param inst    - module instance
+ * @param ui      - user interface object
+ */
+function setAllSecurityConfigsHiddenState(inst, ui)
+{
+    Common.setAllConfigsHiddenState(inst, ui, config.config,
+        getSecurityConfigHiddenState);
 }
 
 /*
@@ -317,30 +326,11 @@ function validate(inst, validation)
     const isSMEnabled = inst.secureLevel === "macSecureAndCommissioning";
     const isSMProject = inst.project.includes("SM");
 
-    // Linked Library Message - add info messages regarding linked library
-    if(isSecurityDisabled)
+    // If disabled option chosen after switching project type.
+    // Should never occur in examples as project type is locked
+    if(isSMEnabled && !isSMProject)
     {
-        validation.logInfo("Ensure that the maclib_nosecure library is linked",
-            inst, "secureLevel");
-    }
-    else if(isSMEnabled)
-    {
-        if(!isSMProject)
-        {
-            // If disabled option chosen after switching project type.
-            // Should never occur in examples as project type is locked
-            validation.logError("Commissioning only available for SM projects",
-                inst, "secureLevel");
-        }
-        else
-        {
-            validation.logInfo("Ensure that the maclib_sm library is linked",
-                inst, "secureLevel");
-        }
-    }
-    else
-    {
-        validation.logInfo("Ensure that the maclib_secure library is linked",
+        validation.logError("Commissioning only available for SM projects",
             inst, "secureLevel");
     }
 
@@ -448,5 +438,6 @@ exports = {
     moduleInstances: moduleInstances,
     setSecureLevelReadOnlyState: setSecureLevelReadOnlyState,
     setSecurityConfigHiddenState: setSecurityConfigHiddenState,
+    setAllSecurityConfigsHiddenState: setAllSecurityConfigsHiddenState,
     getSecurityConfigHiddenState: getSecurityConfigHiddenState
 };

@@ -139,7 +139,7 @@
 #define LINK_STATUS_JITTER_MASK       0x007F
 #endif
 
-/* in seconds; set to 0 to turn off route expiry */
+/* in seconds; set to 255 to turn off route expiry */
 #ifndef ROUTE_EXPIRY_TIME
 #define ROUTE_EXPIRY_TIME             30
 #endif
@@ -244,16 +244,6 @@
  */
 #ifndef REJOIN_POLL_RATE
 #define REJOIN_POLL_RATE              440
-#endif
-
-/* Rejoin retry backoff silent period timer duration in milliseconds - default 15 minutes according to HA test spec */
-#ifndef REJOIN_BACKOFF
-#define REJOIN_BACKOFF                900000
-#endif
-
-/* Rejoin retry backoff scan timer duration in milliseconds - default 15 minutes according to HA test spec */
-#ifndef REJOIN_SCAN
-#define REJOIN_SCAN                   900000
 #endif
 
 #endif /* ZSTACK_CONFIG_H */

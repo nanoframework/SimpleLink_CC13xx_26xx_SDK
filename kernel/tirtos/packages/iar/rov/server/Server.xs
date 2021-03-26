@@ -1,9 +1,11 @@
 /* --COPYRIGHT--,EPL
- *  Copyright (c) 2012-2015 Texas Instruments Incorporated
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+ *  Copyright (c) 2012-2020 Texas Instruments Incorporated
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
  *
  *  Contributors:
  *      Texas Instruments - initial implementation
@@ -590,10 +592,6 @@ function retrieveModuleList()
         while (len < tabs.length) {
             var tab = tabs[len];
             len++;
-            if ((tab.name == "CallStacks" || tab.name == "Exception")
-                && this.clientVers < 3) {
-                continue;
-            }
 
             /* Ugly boolean flag, should implement this logic better */
             if (modflag) {
@@ -750,14 +748,14 @@ function retrieveView(modName, tabName)
 function startModel(executable)
 {
     try {
+        var Model = xdc.useModule('xdc.rov.Model');
+
         /* Get the Symbol Table instance */
         var ISymInst =  new Packages.iar.rov.server.SymbolTable();
-        var symInst = xdc.useModule('iar.rov.server.SymbolTable').create(ISymInst);
+        var symInst =
+            xdc.useModule('iar.rov.server.SymbolTable').create(ISymInst);
 
-        /* Load the recap */
-        var rInst = new Packages.xdc.rta.Recap();
-        var recapFile = rInst.locateRecap(executable, ".rov.xs");
-        var recap = xdc.loadCapsule(recapFile);
+        var recap = Model.getRecap(executable);
 
         /* Get the IMemoryImage instance. */
         var iMemInst = new Packages.iar.rov.server.MemoryImage();
@@ -776,8 +774,8 @@ function startModel(executable)
         var callBack = xdc.module('iar.rov.server.CallBack').create();
 
         /* Start the ROV model*/
-        var Model = xdc.useModule('xdc.rov.Model');
-        Model.start(this.modelVers, executable, recap, symInst, memInst, callBack);
+        Model.start(this.modelVers, executable, recap, symInst, memInst,
+                    callBack);
 
         var callStack = xdc.module('iar.rov.server.CallStack').create(iMemInst);
         Model.setICallStackInst(callStack);

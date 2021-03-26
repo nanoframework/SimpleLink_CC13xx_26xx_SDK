@@ -51,7 +51,8 @@ var trgFilter = {
 BiosBuild.buildLibs(objList, undefined, trgFilter, arguments);
 
 Pkg.otherFiles = ["package.bld", "linkcmd.xdt", "Hwi_link.xdt", "doc-files", 
-                  "armSettings.xs", "Settings.xml", "MPU.xml", "MPU_link.xdt"];
+                  "armSettings.xs", "Settings.xml", "MPU.xml", "MPU_link.xdt",
+                  "AsmMacros.h"];
 
 /* include source files in the release package */
 Pkg.attrs.exportSrc = true;

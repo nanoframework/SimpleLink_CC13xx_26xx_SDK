@@ -16,7 +16,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -610,6 +610,10 @@ void *HEAPMGR_REALLOC(void* ptr, hmU32_t size)
 void HEAPMGR_FREE(void *ptr)
 {
   heapmgrHdr_t *currHdr;
+
+  /* Don't free NULL pointer */
+  if (ptr == NULL)
+    return;
 
   HEAPMGR_LOCK();
 

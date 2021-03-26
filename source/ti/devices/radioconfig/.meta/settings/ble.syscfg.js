@@ -46,7 +46,6 @@ const DevInfo = Common.getScript("device_info.js");
 
 /* PHY group */
 const PHY_GROUP = Common.PHY_BLE;
-DevInfo.addPhyGroup(PHY_GROUP);
 
 /* Base module for RF Settings */
 const RFBase = Common.getScript("radioconfig");
@@ -59,20 +58,8 @@ const BleDocs = Common.getScript("settings/ble_docs.js");
 const SharedDocs = Common.getScript("settings/shared_docs.js");
 
 /* Setting specific configurable */
-const tmp = system.getScript(DevInfo.getSyscfgParams(PHY_GROUP));
-const config = _.cloneDeep(tmp);
-
-// True if wBMS support
-const wbmsSupport = DevInfo.getDeviceName() === "cc2642r";
-
-if (wbmsSupport) {
-    config[0].options.push(
-        {
-            name: "wbms2m",
-            description: "wBMS, 2 Mbps"
-        }
-    );
-}
+const tmp = DevInfo.getConfiguration(PHY_GROUP);
+const config = _.cloneDeep(tmp.configs);
 
 let hasWBMS = false;
 
@@ -106,8 +93,7 @@ function validate(inst, validation) {
     // Check if a wBMS setting is included
     const instances = inst.$module.$instances;
     for (let i = 0; i < instances.length && !hasWBMS; i++) {
-        const vinst = instances[i];
-        if (vinst.phyType.includes("wbms")) {
+        if (instances[i].phyType.includes("wbms")) {
             hasWBMS = true;
         }
     }
@@ -163,7 +149,7 @@ function onVisibilityChange(inst, ui) {
  *  Either shows or hides the PDU config if the phyType supports it
  */
 function updatePDUConfig(inst, ui) {
-    ui.packetLengthBle.hidden = inst.phyType !== "bt5le1madvnc";
+    ui.packetLengthBle.hidden = !inst.phyType.includes("bt5le1madvnc");
 }
 
 /*!

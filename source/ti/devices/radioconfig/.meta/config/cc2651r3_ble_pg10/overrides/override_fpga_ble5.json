@@ -1,0 +1,26 @@
+{
+    "overridebuffer": {
+        "Element32b": [
+            {
+                "_type": "HW_REG_OVERRIDE",
+                "_comment": "Enable demodulator wired input",
+                "$": "0x51D0,0x0001"
+            },
+            {
+                "_type": "HW_REG_OVERRIDE",
+                "_comment": "Output digital baseband signal on RFC_GPO0",
+                "$": "0x1110,0x0004"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Disable digital transmitter",
+                "$": "0x00000083"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Disable synth programming",
+                "$": "0x00800403"
+            }
+        ]
+    }
+}

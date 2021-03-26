@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -129,6 +129,8 @@ static void ICallPlatform_pwrRequireImpl(uint_fast32_t bitmap)
   {
 #ifdef __IAR_SYSTEMS_ICC__
     char pos = __CLZ(bitmap);
+#elif __GNUC__
+    int pos = __builtin_clz(bitmap);
 #else
     int pos = __clz(bitmap);
 #endif
@@ -159,6 +161,8 @@ static void ICallPlatform_pwrDispenseImpl(uint_fast32_t bitmap)
   {
 #ifdef __IAR_SYSTEMS_ICC__
     char pos = __CLZ(bitmap);
+#elif __GNUC__
+    int pos = __builtin_clz(bitmap);
 #else
     int pos = __clz(bitmap);
 #endif

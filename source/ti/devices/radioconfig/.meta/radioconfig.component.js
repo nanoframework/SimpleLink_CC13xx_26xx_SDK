@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ const hasProp = Common.HAS_PROP;
 const hasBle = Common.HAS_BLE;
 const hasIeee = Common.HAS_IEEE_15_4;
 
-if (hasProp || hasBle || hasIeee) {
+if ((hasProp || hasBle || hasIeee) && DevInfo.isDeviceSupported()) {
     // Add PHY groups
     if (hasProp) {
         DevInfo.addPhyGroup(Common.PHY_PROP);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019, Texas Instruments Incorporated
+ * Copyright (c) 2014-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ Int Clock_Module_startup(Int phase)
     else {
         if ((Clock_TickSource)CLOCK_TICK_SOURCE == Clock_TickSource_TIMER) {
             /* get the max ticks that can be skipped by the timer */
-            Clock_module->maxSkippable = 
+            Clock_module->maxSkippable =
                     Clock_TimerProxy_getMaxTicks(Clock_module->timer);
         }
 
@@ -469,8 +469,8 @@ Void Clock_workFuncDynamic(UArg arg0, UArg arg1)
     serviceTick = Clock_module->nextScheduledTick;
     ticksToService = nowTick - serviceTick;
 
-    /* 
-     * if now hasn't caught up to nextScheduledTick, 
+    /*
+     * if now hasn't caught up to nextScheduledTick,
      * a spurious interrupt has probably occurred.
      * ignore for now...
      */
@@ -640,37 +640,37 @@ Void Clock_startI(Clock_Object *obj)
              /* if Clock is NOT currently processing its Q */
              (Clock_module->inWorkFunc == FALSE)) {
 
-            /* 
+            /*
              * get virtual current tick count,
              * signal Timer to save corresponding NOW info
              */
             nowTick = Clock_TimerProxy_getCurrentTick(Clock_module->timer, TRUE);
 
             nowDelta = nowTick - Clock_module->ticks;
-            scheduledDelta = Clock_module->nextScheduledTick - 
+            scheduledDelta = Clock_module->nextScheduledTick -
                 Clock_module->ticks;
 
             if (nowDelta <= scheduledDelta) {
-                        
+
                 objectServiced = TRUE;
-                    
+
                 /* start new Clock object */
                 obj->currTimeout = nowTick + obj->timeout;
                 obj->active = TRUE;
 
                 /* get the next scheduled tick */
                 scheduledTick = Clock_module->nextScheduledTick;
-                
+
                 /* how many ticks until scheduled tick? */
                 remainingTicks = scheduledTick - nowTick;
-                
+
                 if (obj->timeout < remainingTicks) {
                     Clock_scheduleNextTick(obj->timeout,
                        obj->currTimeout);
                 }
             }
         }
-        
+
         if (objectServiced == FALSE) {
             /*
              * get virtual current tick count,
@@ -686,7 +686,7 @@ Void Clock_startI(Clock_Object *obj)
                 Clock_module->startDuringWorkFunc = TRUE;
             }
         }
-    } 
+    }
     /* CLOCK_TICK_MODE == Clock_TickMode_PERIODIC */
     else {
         obj->currTimeout = (Clock_module->ticks + obj->timeout);
@@ -769,12 +769,17 @@ UInt32 Clock_getPeriod(Clock_Object *obj)
 UInt32 Clock_getTimeout(Clock_Object *obj)
 {
     UInt32 timeout = 0;
-    UInt key;
+    UInt   key;
 
     key = Hwi_disable();
     if (obj->active == TRUE) {
         timeout = obj->currTimeout - Clock_getTicks();
-        if (timeout > obj->timeout) {
+
+        /*
+         *  Check for current Clock tick count surpassing the
+         *  Clock object's current timeout.
+         */
+        if ((timeout > obj->timeout) && (timeout > obj->period)) {
             timeout = 0;
         }
     }

@@ -1,6 +1,6 @@
 {
     "setting": {
-        "Name": "4.8 kbps, OOK, 868 MHz",
+        "Name": "4.8 kbps, OOK, 39 kHz RX Bandwidth",
         "Description": "4.8 kbps OOK for 868 MHz band.",
         "Frequency": "868",
         "Patch": {

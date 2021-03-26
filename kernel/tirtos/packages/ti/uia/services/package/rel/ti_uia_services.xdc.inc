@@ -8,5 +8,6 @@ package/package.cfg.xdc.inc
 lib/release/ti.uia.services.aem4f
 package/package_ti.uia.services.c
 Rta.c
+lib/release/ti.uia.services.am4f
 lib/release/ti.uia.services.am4fg
 lib/release/ti.uia.services.arm4f

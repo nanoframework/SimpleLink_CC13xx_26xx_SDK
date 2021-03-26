@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -140,7 +140,7 @@ void Util_itoa(uint16_t num, uint8_t *buf, uint8_t radix)
  */
 unsigned char *Util_ltoa(uint32_t l, uint8_t *buf, uint8_t radix)
 {
-#if defined (__GNUC__) && !defined(__unix__)
+#if defined (__GNUC__) && !defined(__unix__) && !defined(__clang__)
     return( (char *)ltoa(l, buf, radix) );
 #else
     unsigned char tmp1[10] = "", tmp2[10] = "", tmp3[10] = "";

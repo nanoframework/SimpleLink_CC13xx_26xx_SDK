@@ -293,7 +293,7 @@ function modules(inst)
     dependencyModule.push({
         name: "multiStack",
         displayName: "Multi-Stack Validation",
-        moduleName: "/ti/easylink/multi_stack_validate",
+        moduleName: "/ti/common/multi_stack_validate",
         hidden: true
     });
 
@@ -401,7 +401,9 @@ const easyLinkModule = {
         "/ti/easylink/templates/ti_easylink_config.h.xdt":
             `/ti/easylink/templates/ti_easylink_config.h.xdt`,
         "/ti/easylink/templates/ti_easylink_config.c.xdt":
-            `/ti/easylink/templates/ti_easylink_config.c.xdt`
+            `/ti/easylink/templates/ti_easylink_config.c.xdt`,
+        "/ti/easylink/templates/device_config.opt.xdt":
+            `/ti/easylink/templates/device_config.opt.xdt`
     }
 };
 

@@ -3,6 +3,7 @@
 <package name="iar.targets.arm" version="1, 0, 0" producerId="undefined">
     <units>
         <interface name="ITarget"/>
+        <module name="M0"/>
         <module name="M3"/>
         <module name="M4"/>
         <module name="M4F"/>

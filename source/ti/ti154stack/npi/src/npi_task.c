@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -990,6 +990,10 @@ static void NPITask_processStackMsg(uint8_t *pMsg)
             {
                 // Pass the message along to the application
                 incomingTXEventAppCBFunc(pMsg);
+                break;
+            }
+            default:
+            {
                 break;
             }
         }

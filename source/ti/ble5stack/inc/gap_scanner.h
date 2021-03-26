@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -242,6 +242,41 @@ enum GapScan_EndReason_t {
 /// Default advertising report list size
 #define SCAN_PARAM_DFLT_NUM_ADV_RPT        0
 /** @} End GAPScan_Default_Param_Value */
+
+/**
+ * @defgroup GapScan_Periodic_advertising GapScan Periodic Advertising
+ * @{
+ */
+/// Maximum skip value
+#define SCAN_PERIODIC_SKIP_MAX                 0x01F3
+/// Minimum Synchronization timeout
+#define SCAN_PERIODIC_TIMEOUT_MIN              0x000A
+/// Maximum Synchronization timeout
+#define SCAN_PERIODIC_TIMEOUT_MAX              0x4000
+/// Sync with any CTE type
+#define SCAN_PERIODIC_CTE_TYPE_ALL             0
+/// Do not sync to packets with AoA
+#define SCAN_PERIODIC_DO_NOT_SYNC_AOA_CTE      1
+/// Do not sync to packets with 1us AoD
+#define SCAN_PERIODIC_DO_NOT_SYNC_AOD_CTE_1US  2
+/// Do not sync to packets with 2us AoD
+#define SCAN_PERIODIC_DO_NOT_SYNC_AOD_CTE_2US  4
+/// Do not sync to packets without CTE
+#define SCAN_PERIODIC_SYNC_ONLY_WITH_CTE       16
+/// Maximum SID value
+#define SCAN_PERIODIC_MAX_ADV_SID              0x0F
+/// Maximum allowed in option field
+#define SCAN_PERIODIC_SYNC_OPTIONS_MAX         0x03
+/// Scanner's option - Do not use periodic advertisers list
+#define SCAN_PERIODIC_DO_NOT_USE_PERIODIC_ADV_LIST (0 << 0)
+/// Scanner's option - Use periodic advertisers list
+#define SCAN_PERIODIC_USE_PERIODIC_ADV_LIST        (1 << 0)
+/// Scanner's option - Periodic advertising reports initially enabled
+#define SCAN_PERIODIC_REPORTING_INITIALLY_ENABLED  (0 << 1)
+/// Scanner's option - Periodic advertising reports initially disabled
+#define SCAN_PERIODIC_REPORTING_INITIALLY_DISABLED (1 << 1)
+/** @} End GapScan_Periodic_advertising */
+
 
 /** @} End GapScan_Constants */
 
@@ -533,7 +568,88 @@ typedef struct {
 /// Event Mask
 typedef uint32_t GapScan_EventMask_t;
 
-/** @} End GapScam_Structs */
+/// Periodic advertising create sync parameters structure
+typedef struct
+{
+  /**
+  * Clear Bit 0 - Use the advSID, advAddrType, and advAddress
+  *               parameters to determine which advertiser to listen to\n
+  * Set Bit 0   - Use the Periodic Advertiser List to determine which
+  *               advertiser to listen to\n
+  * Clear Bit 1 - Reporting initially enabled\n
+  * Set Bit 1   - Reporting initially disabled\n
+  */
+  uint8  options;
+  uint8  advAddrType;     //!< Advertiser address type - 0x00 - public ; 0x01 - random
+  uint8  advAddress[6];   //!< Advertiser address
+  uint16 skip;            //!< The maximum number of periodic advertising events that can be skipped after a successful receive (Range: 0x0000 to 0x01F3)
+  uint16 syncTimeout;     //!< Synchronization timeout for the periodic advertising train. Range: 0x000A to 0x4000 Time = N*10 ms Time Range: 100 ms to 163.84 s
+  /**
+  * Set Bit 0 - Do not sync to packets with an AoA CTE\n
+  * Set Bit 1 - Do not sync to packets with an AoD CTE with 1 us slots\n
+  * Set Bit 2 - Do not sync to packets with an AoD CTE with 2 us slots\n
+  * Set Bit 4 - Do not sync to packets without a CTE\n
+  */
+  uint8  syncCteType;
+} GapScan_PeriodicAdvCreateSyncParams_t;
+
+/// Command status and command complete event structure
+typedef struct
+{
+  osal_event_hdr_t hdr;  //!< OSAL Event Header
+  uint8_t opcode;        //!< GAP type of command
+  uint8_t status;        //!< Event status
+} GapScan_PeriodicAdvEvt_t;
+
+/// Read Advertisers list command complete structure
+typedef struct
+{
+  osal_event_hdr_t hdr;  //!< OSAL Event Header
+  uint8_t opcode;        //!< GAP type of command
+  uint8_t status;        //!< Event status
+  uint8_t listSize;      //!< Periodic advertisers list size
+} GapScan_ReadAdvSizeListEvt_t;
+
+/// Sync Lost event struct
+typedef struct
+{
+  osal_event_hdr_t hdr;   //!< OSAL Event Header
+  uint8_t opcode;         //!< GAP type of command
+  uint16_t syncHandle;    //!< Handle identifying the periodic advertising train
+} GapScan_PeriodicAdvSyncLostEvt_t;
+
+/// Periodic advertising report event structure
+typedef struct
+{
+  osal_event_hdr_t hdr;  //!< OSAL Event Header
+  uint8  opcode;         //!< GAP type of command
+  uint8  BLEEventCode;   //!< BLE Event Code
+  uint16 syncHandle;     //!< Handle identifying the periodic advertising train
+  int8   txPower;        //!< Tx Power information (Range: -127 to +20 dBm)
+  int8   rssi;           //!< RSSI value for the received packet (Range: -127 to +20 dBm); If the packet contains CTE, this value is not available
+  uint8  cteType;        //!< 0x00 AoA CTE\n 0x01 - AoD CTE with 1us slots\n 0x02 - AoD CTE with 2us slots\n 0xFF - No CTE
+  uint8  dataStatus;     //!< 0x00 - Data complete\n 0x01 - Data incomplete, more data to come\n 0x02 - Data incomplete, data truncated, no more to come
+  uint8  dataLen;        //!< Length of the Data field (Range: 0 to 247)
+  uint8  *pData;         //!< Data received from a Periodic Advertising packet
+} GapScan_Evt_PeriodicAdvRpt_t;
+
+/// Periodic advertising sync establish event structure
+typedef struct
+{
+  osal_event_hdr_t hdr;      //!< OSAL Event Header
+  uint8  opcode;             //!< GAP type of command
+  uint8  BLEEventCode;       //!< BLE Event Code
+  uint8  status;             //!< Periodic advertising sync HCI status
+  uint16 syncHandle;         //!< Handle identifying the periodic advertising train
+  uint8  advSid;             //!< Value of the Advertising SID subfield in the ADI field of the PDU
+  uint8  advAddrType;        //!< Advertiser address type:\n 0x00 - Public\n 0x01 - Random\n 0x02 - Public Identity Address\n 0x03 - Random Identity Addres
+  uint8  advAddress[6];      //!< Advertiser address
+  uint8  advPhy;             //!< Advertiser PHY:\n 0x01 - LE 1M\n 0x02 - LE 2M\n 0x03 - LE Coded
+  uint16 periodicAdvInt;     //!< Periodic advertising interval Range: 0x0006 to 0xFFFF. Time = N * 1.25 ms (Time Range: 7.5 ms to 81.91875 s)
+  uint8  advClockAccuracy;   //!< Accuracy of the periodic advertiser's clock:\n 0x00 - 500 ppm\n 0x01 - 250 ppm\n 0x02 - 150 ppm\n 0x03 - 100 ppm\n 0x04 - 75 ppm\n 0x05 - 50 ppm\n 0x06 - 30 ppm\n 0x07 - 20 ppm
+} GapScan_Evt_PeriodicAdvSyncEst_t;
+
+/** @} End GapScan_Structs */
 
 /*-------------------------------------------------------------------
  * API's
@@ -695,6 +811,147 @@ status_t GapScan_getAdvReport(uint8_t rptIdx, GapScan_Evt_AdvRpt_t* pAdvRpt);
  * @return @ref bleIncorrectMode
  */
 status_t GapScan_discardAdvReportList(void);
+
+/**
+ * GapScan_PeriodicAdvCreateSync
+ *
+ * Used a scanner to synchronize with a periodic advertising train from
+ * an advertiser and begin receiving periodic advertising packets.
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   advSID - Advertising SID subfield in the ADI field used to identify the
+ *                   Periodic Advertising (Range: 0x00 to 0x0F)
+ * @param   createSyncParams - Pointer to the create sync parameters
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+uint8_t GapScan_PeriodicAdvCreateSync( uint8  advSID,
+                                       GapScan_PeriodicAdvCreateSyncParams_t *createSyncParams );
+
+/**
+ * GapScan_PeriodicAdvCreateSyncCancel
+ *
+ * Used a scanner to cancel the HCI_LE_Periodic_Advertising_Create_Sync
+ * command while it is pending.
+ *
+ * @design  /ref did_302932730
+ *
+ * @return @ref SUCCESS
+ */
+bStatus_t GapScan_PeriodicAdvCreateSyncCancel( void );
+
+/**
+ * GapScan_PeriodicAdvTerminateSync
+ *
+ * Used a scanner to stop reception of the periodic advertising
+ * train identified by the syncHandle parameter.
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ *                       (Range: 0x0000 to 0x0EFF)
+ *                       The handle was assigned by the Controller while generating
+ *                       the LE Periodic Advertising Sync Established event
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+bStatus_t GapScan_PeriodicAdvTerminateSync( uint16 syncHandle);
+
+/**
+ * GapScan_SetPeriodicAdvReceiveEnable
+ *
+ * Used a scanner to enable or disable reports for the periodic
+ * advertising train identified by the syncHandle parameter.
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ *                       (Range: 0x0000 to 0x0EFF)
+ *                       The handle was assigned by the Controller while generating
+ *                       the LE Periodic Advertising Sync Established event
+ * @param   enable     - 0x00 - Reporting disable
+ *                       0x01 - Reporting enable
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+bStatus_t GapScan_SetPeriodicAdvReceiveEnable( uint16 syncHandle,
+                                               uint8  enable );
+
+/**
+ * GapScan_AddDeviceToPeriodicAdvList
+ *
+ * Used a scanner to add an entry, consisting of a single device address
+ * and SID, to the Periodic Advertiser list stored in the Controller.
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   advAddrType - Advertiser address type - 0x00 - Public or Public Identity Address
+ *                                                  0x01 - Random or Random (static) Identity Address
+ * @param   advAddress  - Advertiser address
+ * @param   advSID      - Advertising SID subfield in the ADI field used to identify
+ *                        the Periodic Advertising (Range: 0x00 to 0x0F)
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+bStatus_t GapScan_AddDeviceToPeriodicAdvList( uint8 advAddrType,
+                                              uint8 advAddress[6],
+                                              uint8 advSID );
+
+/**
+ * GapScan_RemoveDeviceFromPeriodicAdvertiserList
+ *
+ * Used a scanner to remove one entry from the list of Periodic Advertisers
+ * stored in the Controller.
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   advAddrType - Advertiser address type -
+ *                        0x00 - Public or Public Identity Address
+ *                        0x01 - Random or Random (static) Identity Address
+ * @param   advAddress  - Advertiser address
+ * @param   advSID      - Advertising SID subfield in the ADI field used to identify
+ *                        the Periodic Advertising (Range: 0x00 to 0x0F)
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+ bStatus_t GapScan_RemoveDeviceFromPeriodicAdvList( uint8 advAddrType,
+                                                    uint8 advAddress[6],
+                                                    uint8 advSID );
+
+/**
+ * GapScan_ReadPeriodicAdvListSize
+ *
+ * Used a scanner to read the total number of Periodic Advertiser
+ * list entries that can be stored in the Controller.
+ *
+ * @design  /ref did_302932730
+ *
+ * @return @ref SUCCESS
+ */
+hciStatus_t GapScan_ReadPeriodicAdvListSize( void );
+
+/**
+ * GapScan_ClearPeriodicAdvList
+ *
+ * Used a scanner to remove all entries from the list of Periodic
+ * Advertisers in the Controller.
+ *
+ * @design  /ref did_302932730
+ *
+ * @return @ref SUCCESS
+ */
+bStatus_t GapScan_ClearPeriodicAdvList( void );
 
 /*-------------------------------------------------------------------
 -------------------------------------------------------------------*/

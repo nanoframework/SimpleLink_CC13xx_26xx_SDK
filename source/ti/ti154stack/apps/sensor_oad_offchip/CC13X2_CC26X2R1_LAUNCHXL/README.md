@@ -40,6 +40,71 @@ your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
 &lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
 
+
+Please refer to the following link for helpful SimpleLink Academy guides for ramping up
+on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
+
+For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
+`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+
+
+Example Application Dataflow
+---------------------------
+The sensor application has three processing loops each handling a different set of
+events. These are as follows:
+
+* Sensor_process: Sensor application event handling
+	* Sensor event handling:
+		* Start sensor scan for network (SENSOR_START_EVT)
+		* Read sensor value and report to collector (SENSOR_READING_TIMEOUT_EVT)
+		* Diassociate sensor (SENSOR_DISASSOC_EVT)
+	* Triggers Jdllc_process and Ssf_processEvents
+	* Triggers MAC callback handling via ApiMac_processIncoming
+* Jdllc_process: Sensor logical link controller event handling
+	* Trickle timer handling (PAN Advertisement/PAN Configuration message events)
+	* Poll event handling (JDLLC_POLL_EVT)
+	* Association request handling (JDLLC_ASSOCIATE_REQ_EVT)
+	* Coordinator realignment handling (JDLLC_COORD_REALIGN)
+	* Scan backoff handling (JDLLC_SCAN_BACKOFF)
+	* State change handling
+* Ssf_processEvents: External input handling
+	* CUI input handling
+	* Button press input handling
+	* Triggers events in sensor/jdllc processing loops based on input
+
+All three processing loops handle specialized tasks to service sensor functionality.
+Additionally, ApiMac_processIncoming will trigger sensor and jdllc callbacks if
+they are defined, acting as the trigger for several sensor and jdllc processing loop
+events.
+
+An overview of the sensor jdllc states and state transitions is as follows:
+
+	               Jdllc_states_initWaiting
+	                          | SENSOR_START_EVT, initiated by KEY_EVENT,
+	                          | SENSOR_UI_INPUT_EVT, or by defining AUTO_START
+	                          |
+	         Existing         |          New
+	         Network          |          Network
+	            +-------------+-------------+
+	            |                           |
+	            V                           V
+	  +--> Jdllc_states_                Jdllc_states_
+	  |    initRestoring                joining
+	  |         |                           |
+	  |         V                           V
+	  |    Jdllc_states_                Jdllc_states_
+	  |    rejoined                     joined
+	  |         |                           |
+	  |         +-------------+-------------+
+	  |                       | MAC reports sync loss (BCN mode) or
+	  |                       | CONFIG_MAX_DATA_FAILURES consecutive data frames
+	  |                       | fail to be ACK'ed by collector
+	  | Orphan scan +         |
+	  | Coord realign         V
+	  +----------------- Jdllc_states_
+	                     orphan
+
+
 Example Usage
 -------------
 
@@ -240,11 +305,21 @@ Some important settings in the TI 15.4-Stack module include:
 
 More information about the configuration and feature options can be found in the TI 15.4-Stack documentation under **Example Applications > Configuration Parameters**.
 
+### Disabling Common User Interface
+
+The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the project-specific .opts file:
+
+```
+-DCUI_DISABLE
+```
+
+> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
+
 ### Multi-Page NV Configuration
 
 By default, this project is configured to use two pages of NV. A maximum of five NV pages are supported. In order to modify the NV pages, update the following:
-* `NVOCMP_NVPAGES=2` in the project-specific .opt file
-* `NVOCMP_NVPAGES=2` in the linker command file
+* `NVOCMP_NVPAGES=2` in the project-specific .opts file
+* `NVOCMP_NVPAGES=2` in the linker options
 * SysConfig NVS module:
    * Set Region Size based on the formula `NVOCMP_NVPAGES * 0x2000`
    * Set Region Base based on the formula `0x56000 - (NVOCMP_NVPAGES * 0x2000)`
@@ -292,7 +367,11 @@ For the creation of delta updates however, a path to the binary running on the s
 
 Additional advanced configuration options are provided, which are discussed in the Turbo OAD SysConfig Module.
 
-Support for multiple OAD files
+### CCFG Configuration
+
+For OAD applications, the Customer Configuration (CCFG) area must be configured in the BIM project. In order to modify the default CCFG values, update `ccfg_app.c` in the BIM Off-Chip example and rebuild.
+
+Support for Multiple OAD Files
 ------------------------------
 
 The OAD protocol supports multiple OAD images by using an Image ID that is sent when the Collector initiates the OAD and then in each OAD block request / response. This insures that the device always receives a block from the correct FW image, especially in the case where a device loses power or orphans and it is not known when it will come back on line. When an OAD image file is selected on the collector it is assigned a new image ID and added to a table, when a block request is received the image ID in the block request is used to find the correct FW image file. This insures that a device will always get a block from the correct image, no matter how long it is off line.

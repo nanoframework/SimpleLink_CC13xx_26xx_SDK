@@ -127,25 +127,27 @@ extern void setLowPowerMode(void);
  * @return      None.
  */
 extern bool metadataIDCheck(imgFixedHdr_t *imgHdr);
+
+
+#ifdef BIM_ONCHIP
+extern bool evenBitCount(uint32_t value);
+#endif //#ifdef BIM_ONCHIP
 #endif //#ifndef BIM_ONCHIP
+
 
 #ifdef BIM_ONCHIP
 /*******************************************************************************
- * @fn     setSearchValidImg
+ * @fn     evenBitCount
  *
- * @brief       This function sets the value of local variable based on the
- *              content of the image valid field in the image header.
+ * @brief  Finds if the value field has even number of bits set to 1's.
  *
- * @param       flashPageNum - starting flash page number of the image.
- * @param       imgType - pointer to local variable image type
+ * @param  value  - input field on which to calculate the even number of 1's.
  *
- *
- * @return Zero when successful. Non-zero, otherwise.
+ * @return True when the value field has even number of 1's, otherwise returns
+ *         False.
  */
-void setSearchValidImg(uint8_t flashPageNum, uint8_t *imgType);
-
+extern bool evenBitCount(uint32_t value);
 #endif //#ifdef BIM_ONCHIP
-
 /*******************************************************************************
 *******************************************************************************/
 #ifdef __cplusplus

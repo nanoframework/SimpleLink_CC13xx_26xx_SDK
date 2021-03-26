@@ -11,5 +11,6 @@ SemThreadSupport.c
 SemProcessSupport.c
 ThreadSupport.c
 CacheSupport.c
+lib/debug/ti.sysbios.xdcruntime.am4f
 lib/debug/ti.sysbios.xdcruntime.am4fg
 lib/debug/ti.sysbios.xdcruntime.arm4f

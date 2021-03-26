@@ -36,9 +36,355 @@
  */
 "use strict";
 
+
+const sigModelMapping = {
+  //"sig_model": {
+    "health_srv": {
+      "Name":"Health Server",
+      "isSupported" : true,
+      "sig_id": "0x0002",
+      "Group": "Foundation",
+      "healthSrvCbk": "health_cb",
+      "maxFaults": 16,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 0
+      }
+    },
+    "health_cli": {
+      "Name":"Health Client",
+      "isSupported" : true,
+      "sig_id": "0x0003",
+      "Group": "Foundation",
+      "publication_size": 0,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 0
+      }
+    },
+    "gen_onoff_srv": {
+      "Name":"Generic OnOff Server",
+      "isSupported" : true,
+      "sig_id": "0x1000",
+      "Group": "Generic",
+      "modelCbStructName": "generic_OnOff_srv_cb",
+      "userDataStructType": "ctl_state_t",
+      "defaultUserData": "generic_state",
+      "publication_size": 2 + 3,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 3,
+        "msgName1": "gen_OnOff_get",
+        "min_len_msg1":0,
+        "opcode1": "0x82, 0x01",
+        "msgName2": "gen_OnOff_set",
+        "min_len_msg2":0,
+        "opcode2": "0x82, 0x02",
+        "msgName3": "gen_OnOff_set_unack",
+        "min_len_msg3":0,
+        "opcode3": "0x82, 0x03",
+      }
+    },
+    "gen_onoff_cli": {
+      "Name":"Generic OnOff Client",
+      "isSupported" : true,
+      "sig_id": "0x1001",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 4,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_OnOff_Status",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x04"
+      }
+    },
+    "gen_level_srv": {
+      "Name":"Generic Level Server",
+      "isSupported" : true,
+      "sig_id": "0x1002",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 5,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 7,
+        "msgName1": "gen_Level_get",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x05",
+        "msgName2": "gen_Level_set",
+       "min_len_msg2":0,
+        "opcode2": "0x82, 0x06",
+        "msgName3": "gen_Level_set_unack",
+       "min_len_msg3":0,
+        "opcode3": "0x82, 0x07",
+        "msgName4": "gen_Delta_set",
+       "min_len_msg4":0,
+        "opcode4": "0x82, 0x09",
+        "msgName5": "gen_Delta_set_unack",
+       "min_len_msg5":0,
+        "opcode5": "0x82, 0x0A",
+        "msgName6": "gen_Move_set",
+       "min_len_msg6":0,
+        "opcode6": "0x82, 0x0B",
+        "msgName7": "gen_Move_set_unack",
+       "min_len_msg7":0,
+        "opcode7": "0x82, 0x0C"
+      }
+    },
+    "gen_level_cli": {
+      "Name":"Generic Level Client",
+      "isSupported" : true,
+      "sig_id": "0x1003",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 7,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_Level_Status",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x08",
+      }
+    },
+    "gen_def_trans_time_srv": {
+      "Name":"Generic Default Transition Time Server",
+      "isSupported" : true,
+      "sig_id": "0x1004",
+      "Group": "Generic",
+      "modelCbStructName": "generic_defualt_transition_time_srv_cb",
+      "userDataStructType": "ctl_state_t",
+      "defaultUserData": "generic_state",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 3,
+        "msgName1": "gen_Default_Transition_Time_get",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x0D",
+        "msgName2": "gen_Default_Transition_Time_set",
+       "min_len_msg2":0,
+        "opcode2": "0x82, 0x0E",
+        "msgName3": "gen_Default_Transition_Time_set_unack",
+       "min_len_msg3":0,
+        "opcode3": "0x82, 0x0F",
+      }
+    },
+    "gen_def_trans_time_cli": {
+      "Name":"Generic Default Transition Time Client",
+      "isSupported" : true,
+      "sig_id": "0x1005",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_Default_Transition_Time_Status",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x10"
+      }
+    },
+    "gen_power_onoff_srv": {
+      "Name":"Generic Power OnOff Server",
+      "isSupported" : true,
+      "sig_id": "0x1006",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "genOnPowerUpState_t",
+      "defaultUserData": "ponoff_state",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_OnPowerUp_get",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x11"
+      }
+    },
+    "gen_power_onoff_cli": {
+      "Name":"Generic Power OnOff Client",
+      "isSupported" : true,
+      "sig_id": "0x1007",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_OnPowerUp_Status",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x12"
+      }
+    },
+    "gen_power_onoff_setup_srv": {
+      "Name":"Generic Power OnOff Setup Server",
+      "isSupported" : true,
+      "sig_id": "0x1008",
+      "Group": "Generic",
+      "modelCbStructName": "generic_power_onoff_srv_cb",
+      "userDataStructType": "genOnPowerUpState_t",
+      "defaultUserData": "ponoff_state",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 2,
+        "msgName1": "gen_OnPowerUp_set",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x13",
+        "msgName2": "gen_OnPowerUp_set_unack",
+       "min_len_msg2":0,
+        "opcode2": "0x82, 0x14"
+      }
+    },
+    "gen_battery_srv": {
+      "Name":"Generic Battery Server",
+      "isSupported" : true,
+      "sig_id": "0x100C",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "batteryStatus_t",
+      "defaultUserData": "battery_server",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_Battery_get",
+        "min_len_msg1":0,
+        "opcode1": "0x82, 0x23"
+      }
+    },
+    "gen_battery_cli": {
+      "Name":"Generic Battery Client",
+      "isSupported" : true,
+      "sig_id": "0x100D",
+      "Group": "Generic",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 1,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 1,
+        "msgName1": "gen_Battery_status",
+        "min_len_msg1":0,
+        "opcode1": "0x82, 0x24"
+      }
+    },
+    "sensor_srv": {
+      "Name":"Sensor Server",
+      "isSupported" : true,
+      "sig_id": "0x1100",
+      "Group": "Sensor",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 5,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 4,
+        "msgName1": "sensor_desc_get",
+        "min_len_msg1":0,
+        "opcode1": "0x82, 0x30",
+		"msgName2": "sensor_get",
+        "min_len_msg2":0,
+        "opcode2": "0x82, 0x31",
+		"msgName3": "sensor_Column_get",
+        "min_len_msg3":0,
+        "opcode3": "0x82, 0x32",
+		"msgName4": "sensor_Series_get",
+        "min_len_msg4":0,
+        "opcode4": "0x82, 0x33",
+      }
+    },
+    "sensor_cli": {
+      "Name":"Sensor Client",
+      "isSupported" : true,
+      "sig_id": "0x1102",
+      "Group": "Sensor",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 5,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 4,
+        "msgName1": "sensor_desc_Status",
+        "min_len_msg1":0,
+        "opcode1": "0x51",
+        "msgName2": "sensor_status",
+        "min_len_msg2":0,
+        "opcode2": "0x52",
+        "msgName3": "sensor_Column_Status",
+        "min_len_msg3":0,
+        "opcode3": "0x53",
+        "msgName4": "sensor_Series_Status",
+        "min_len_msg4":0,
+        "opcode4": "0x54"
+      }
+    },
+    "sensor_setup_srv": {
+      "Name":"Sensor Setup Server",
+      "isSupported" : true,
+      "sig_id": "0x1101",
+      "Group": "Sensor",
+      "modelCbStructName": "",
+      "userDataStructType": "",
+      "defaultUserData": "",
+      "publication_size": 2 + 5,
+      "Element": "Main",
+      "messages": {
+        "num_of_msg": 10,
+        "msgName1": "sensor_Cadence_get",
+       "min_len_msg1":0,
+        "opcode1": "0x82, 0x34",
+        "msgName2": "sensor_Cadence_set",
+       "min_len_msg2":0,
+        "opcode2": "0x55",
+		    "msgName3": "sensor_Cadence_set_unack",
+       "min_len_msg3":0,
+        "opcode3": "0x56",
+		"msgName4": "sensor_settings_get",
+       "min_len_msg4":0,
+        "opcode4": "0x82, 0x35",
+		    "msgName5": "sensor_setting_get",
+       "min_len_msg5":0,
+        "opcode5": "0x82, 0x36",
+        "msgName6": "sensor_setting_set",
+       "min_len_msg6":0,
+        "opcode6": "0x59",
+		    "msgName7": "sensor_setting_set_unack",
+       "min_len_msg7":0,
+        "opcode7": "0x5A",
+        "msgName8": "sensor_Cadence_status",
+       "min_len_msg8":0,
+        "opcode8": "0x57",
+        "msgName9": "sensor_Settings_status",
+       "min_len_msg9":0,
+        "opcode9": "0x58",
+        "msgName10": "sensor_Setting_status",
+       "min_len_msg10":0,
+        "opcode10": "0x5B",
+      }
+    }
+  }
+//}
+
+
 const advParamsRanges = {
   priAdvIntMinValue:            "20",                 // Min value of Primary Advertising Interval (ms)
-  priAdvIntMaxValue:            "10485759.375",       // Max value of Primary Advertising Interval (ms)
+  priAdvIntMaxValue:            "480000",             // Max value of Primary Advertising Interval (ms)
   priAdvIntMaxValueAdvData:     "40959.375",          // Max value of Advertising Interval (ms)
   advDataTXPowerMinValue:       "-127",               // Min value of TX Power (dBm)
   advDataTXPowerMaxValue:       "127",                // Max value of TX Power (dBm)
@@ -81,7 +427,9 @@ const deviceToBoard = {
   CC1352P1: "CC1352P1_LAUNCHXL",
   CC2642R1: "CC26X2R1_LAUNCHXL",
   CC2652R1: "CC26X2R1_LAUNCHXL",
-  CC2652RB: "CC2652RB_LAUNCHXL"
+  CC2652RB: "CC2652RB_LAUNCHXL",
+  CC2652P1FSIP: "LP_CC2652PSIP",
+  CC2652R1FSIP: "LP_CC2652RSIP"
 };
 
 // Settings for ti/devices/CCFG module
@@ -92,13 +440,107 @@ const bleCentralCCFGSettings = {
   CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {},
   CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {},
   CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {},
+  LP_CC2652RSIP_CCFG_SETTINGS: {},
+  LP_CC2652PSIP_CCFG_SETTINGS: {},
   CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
     srcClkLF: "Derived from HF XOSC"
   }
 };
 
+const supportedMigrations = {
+  // Boards
+  CC1352R1_LAUNCHXL:  [
+    {target: "CC1352R1_LAUNCHXL"},
+    {target: "CC1352R1F3RGZ"},
+  ],
+  CC1352P1_LAUNCHXL:[
+    {target: "CC1352P1_LAUNCHXL"},
+    {target: "CC1352P1F3RGZ"},
+  ],
+  CC1352P_2_LAUNCHXL: [
+    {target: "CC1352P_2_LAUNCHXL"},
+    {target: "CC1352P1F3RGZ"},
+  ],
+  CC1352P_4_LAUNCHXL: [
+    {target: "CC1352P_4_LAUNCHXL"},
+    {target: "CC1352P1F3RGZ"},
+  ],
+  CC26X2R1_LAUNCHXL: [
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2652R1FSIP"},
+  ],
+  CC2652RB_LAUNCHXL: [
+    {target: "CC2652RB_LAUNCHXL"},
+    {target: "CC2652RB"},
+  ],
+  LP_CC2652PSIP: [
+    {target: "LP_CC2652PSIP"},
+    {target: "CC2652P1FSIP"},
+  ],
+  LP_CC2652RSIP: [
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2652R1FSIP"},
+  ],
+
+  //Devices
+  CC1352R1F3RGZ: [
+    {target: "CC1352R1F3RGZ"},
+    {target: "CC1352R1_LAUNCHXL"},
+  ],
+  CC1352P1F3RGZ: [
+    {target: "CC1352P1F3RGZ"},
+    {target: "CC1352P1_LAUNCHXL"},
+    {target: "CC1352P_2_LAUNCHXL"},
+    {target: "CC1352P_4_LAUNCHXL"},
+  ],
+  CC2642R1FRGZ: [
+    {target: "CC2642R1FRGZ"},
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+    {target: "CC2652R1FSIP"},
+    {target: "CC2652R1FRGZ"},
+  ],
+  CC2652R1FRGZ: [
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2652R1FSIP"},
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+  ],
+  CC2652RB: [
+    {target: "CC2652RB"},
+    {target: "CC2652RB_LAUNCHXL"},
+  ],
+  CC2652R1FSIP: [
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2652R1FSIP"},
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+  ],
+  CC2652P1FSIP: [
+    {target: "CC2652P1FSIP"},
+    {target: "LP_CC2652PSIP"},
+  ]
+};
+
 const boardName = getBoardOrLaunchPadName(true);
 const centralRoleCcfgSettings = bleCentralCCFGSettings[boardName + "_CCFG_SETTINGS"];
+
+/*
+ * ======== alphanumeric ========
+ * Check if the string contains only letters, numbers and underscore
+ *
+ * @param inputtxt       - string number to be checked
+ * @returns True if the string contains only letters, numbers and underscore otherwise return False.
+ */
+function alphanumeric(inputtxt)
+{
+  var letterNumber = /^[a-zA-Z0-9_]+$/;
+  return (inputtxt.match(letterNumber))? true : false;
+}
 
 /*
  * ======== validateConnInterval ========
@@ -450,6 +892,36 @@ function advDataHexValues(param)
 
   return(address);
 }
+/*
+ *  ======== listOfHexValues ========
+ *  Gets Hex format number and return it
+ *  in the following format 0xaa,0xaa,....
+ *
+ *  @param param  - Hex format number
+ *
+ *  @returns the Hex format number in the following format: 0xaa,\n 0xaa,\n ....
+ */
+function listOfHexValues(param)
+{
+  let hexList = "";
+  let prefix = "0x";
+
+  hexList += prefix;
+  for (let i = 0; i < param.length; i++)
+  {
+    hexList += param[i];
+    if (i%2 != 0)
+    {
+      if(i < (param.length -1))
+        {
+          hexList += ","
+          hexList += prefix;
+        }
+    }
+  }
+
+  return(hexList);
+}
 
 /*!
  *  ======== device2DeviceFamily ========
@@ -612,12 +1084,22 @@ function getRadioScript(rfDesign, deviceId)
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
             + "CC26X2R1_LAUNCHXL_rf_defaults.js");
     }
-    else if(deviceId === "CC2652RB")
+    else if(deviceId === "CC2652RB1FRGZ")
     {
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
             + "CC2652RB_LAUNCHXL_rf_defaults.js");
     }
+    else if(deviceId === "CC2652R1FSIP")
+    {
+        radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+            + "LP_CC2652RSIP_rf_defaults.js");
+    }
 
+    else if(deviceId === "CC2652P1FSIP")
+    {
+        radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+            + "LP_CC2652PSIP_rf_defaults.js");
+    }
     return(radioSettings);
 }
 
@@ -666,7 +1148,88 @@ function decimalToHexString(number)
   return '0x' + number.toString(16).toUpperCase();
 }
 
+/*
+* ======== isMigrationValid ========
+* Determines whether a migration from one board/device to another board/device
+* is supported by the EasyLink module.
+*
+* @returns One of the following Objects:
+*    - {} <--- Empty object if migration is valid
+*    - {warn: "Warning markdown text"} <--- Object with warn property
+*                                           if migration is valid but
+*                                           might require user action
+*    - {disable: "Disable markdown text"} <--- Object with disable property
+*                                              if migration is not valid
+*/
+function isMigrationValid(currentTarget, migrationTarget)
+{
+  let migrationSupported = {disable: "Migration to this target is not supported via SysConfig. Consider starting from a more similar example to your desired migration target in <SDK_INSTALL_DIR>/examples/"};
+  let currTarget = null;
+
+  for( currTarget in supportedMigrations )
+  {
+    if( currTarget == currentTarget )
+    {
+      supportedMigrations[currTarget].forEach(target =>
+      {
+        if( target.target == migrationTarget )
+        {
+          migrationSupported = {};
+        }
+      });
+    }
+  }
+
+  return migrationSupported;
+}
+
+/*
+ * ======== migrate ========
+ * Perform stack specific changes to the SysConfig env POST migration
+ *
+ * @param currTarget - Board/device being migrated FROM
+ * @param migrationTarget - Board/device being migrated TO
+ * @param env - SysConfig environment providing access to all configurables
+ * @param projectName - Optional name of the project being migrated
+ *
+ * @returns boolean - true when migration is supported and succesful, false when
+ *                    migration is not supported and/or unsuccesful
+ */
+function migrate(currTarget, migrationTarget, env, projectName = null)
+{
+  const migrationInfo = isMigrationValid(currTarget, migrationTarget);
+  let migrationValid = true;
+
+  // This is not a valid migration
+  if(migrationInfo.disable)
+  {
+    migrationValid = false;
+  }
+
+  return migrationValid;
+}
+
+/*
+* ======== getMigrationMarkdown ========
+* Returns text in markdown format that customers can use to aid in migrating a
+* project between device/boards. It is recommended to provide no more
+* than 3 bullet points with up to 120 characters per line.
+*
+* @param currTarget - Board/device being migrated FROM
+*
+* @returns string - Markdown formatted string
+*/
+function getMigrationMarkdown(currTarget)
+{
+  // At this moment no message needed
+  const migrationText = ``
+
+  return(migrationText);
+}
+
 exports = {
+    sigModelMapping:sigModelMapping,
+    alphanumeric: alphanumeric,
     advParamsRanges: advParamsRanges,
     connParamsRanges: connParamsRanges,
     maxNumAdvSets: maxNumAdvSets,
@@ -685,10 +1248,14 @@ exports = {
     advDataTotalLength: advDataTotalLength,
     addZeroFromLeft: addZeroFromLeft,
     advDataHexValues: advDataHexValues,
+    listOfHexValues: listOfHexValues,
     getBoardOrLaunchPadName: getBoardOrLaunchPadName,
     device2DeviceFamily: device2DeviceFamily,
     getRadioScript: getRadioScript,
     hideGroup: hideGroup,
     getGroupByName: getGroupByName,
-    decimalToHexString: decimalToHexString
+    decimalToHexString: decimalToHexString,
+    isMigrationValid: isMigrationValid,
+    migrate: migrate,
+    getMigrationMarkdown: getMigrationMarkdown
 };

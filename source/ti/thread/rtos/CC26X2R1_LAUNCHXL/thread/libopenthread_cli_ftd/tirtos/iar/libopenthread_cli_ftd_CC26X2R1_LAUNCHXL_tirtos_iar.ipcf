@@ -13,24 +13,22 @@
         <path>$PROJ_DIR$</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms</path>
         <path>$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source</path>
-        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC26X2R1_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include</path>
+        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC26X2R1_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC26X2R1_LAUNCHXL/thread/libopenthread_ftd/tirtos/iar/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src</path>
     </includePath>
 
     <defines>
-        <define>SIMPLELINK_OPENTHREAD_SDK_BUILD=1</define>
-        <define>SIMPLELINK_OPENTHREAD_CONFIG_CC2652=1</define>
-        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h"</define>
         <define>HAVE_CONFIG_H</define>
         <define>_BSD_SOURCE=1</define>
         <define>_DEFAULT_SOURCE=1</define>
-        <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc2652-config-ide.h"</define>
+        <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc2652-iar.h"</define>
         <define>OPENTHREAD_FTD=1</define>
+        <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc2652-config-ide.h"</define>
         <define>OPENTHREAD_CONFIG_FILE="openthread-config-cc2652-iar-ftd.h"</define>
     </defines>
 

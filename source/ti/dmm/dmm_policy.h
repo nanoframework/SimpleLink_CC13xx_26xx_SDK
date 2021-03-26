@@ -71,7 +71,7 @@
  *      values as needed.
  *    - DMMPolicy_open():  Open an instance of the DMMPolicy module,
  *      passing the initialized parameters.
- *    - Stack A/B application - DMMPolicy_updateStackState: Update the application state.
+ *    - Stack A/B application - DMMPolicy_updateApplicationState: Update the application state.
  *                              The Policy Manager finds the matching policy that is used 
  *                              when scheduling RF commands from stack A and B.
  *
@@ -166,6 +166,10 @@
 #ifndef DMMPolicy_H_
 #define DMMPolicy_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stdint.h"
 #include <ti/drivers/rf/RF.h>
 
@@ -223,6 +227,9 @@
 //! \brief The number of priority for stack activities
 #define PRIORITY_NUM                              3         ///< The number of priority for stack activities
 
+//! \brief To maintain compatibility, define old DMMPolicy_updateStackState function as new DMMPolicy_updateApplicationState function.
+#define DMMPolicy_updateStackState DMMPolicy_updateApplicationState
+
 /**
  *  @name DMM Priority
  *  @anchor DMM_PRIORITY
@@ -243,9 +250,13 @@ typedef enum
     DMMPolicy_StackRole_invalid = 0,            ///< invalid stack role
     DMMPolicy_StackRole_BlePeripheral,          ///< stack role for a BLE Simple Peripheral
     DMMPolicy_StackRole_WsnNode,                ///< stack role for an EasyLink Wireless Sensor Network Node
-    DMMPolicy_StackRole_154Sensor,              ///< stack role for a 15.4 Sensor or Zigbee Device
-    DMMPolicy_StackRole_reserved1,              ///< stack role reserved for a customers proprietary stack 
-    DMMPolicy_StackRole_reserved2,              ///< stack role reserved for a customers proprietary stack 
+    DMMPolicy_StackRole_154Sensor,              ///< stack role for a 15.4 Sensor
+    DMMPolicy_StackRole_154Collector,           ///< stack role for a 15.4 Collector
+    DMMPolicy_StackRole_ZigbeeEndDevice,        ///< stack role for a Zigbee End Device
+    DMMPolicy_StackRole_ZigbeeRouter,           ///< stack role for a Zigbee Router
+    DMMPolicy_StackRole_ZigbeeCoordinator,      ///< stack role for a Zigbee Coordinator
+    DMMPolicy_StackRole_custom1,                ///< stack role reserved for a customers proprietary stack 
+    DMMPolicy_StackRole_custom2,                ///< stack role reserved for a customers proprietary stack
 } DMMPolicy_StackRole;
 
 //! \brief Structure used to define a DMM Policy
@@ -373,7 +384,7 @@ extern DMMPolicy_Status DMMPolicy_open(DMMPolicy_Params *params);
  *
  *  @return DMMPolicy_Stat status
  */
-extern DMMPolicy_Status DMMPolicy_updateStackState(DMMPolicy_StackRole StackRole, uint32_t newState);
+extern DMMPolicy_Status DMMPolicy_updateApplicationState(DMMPolicy_StackRole StackRole, uint32_t newState);
 
 /** @brief  Get the global activity based on stack activity
  *
@@ -445,5 +456,8 @@ bool DMMPolicy_setBlockModeOff(DMMPolicy_StackRole StackRole);
  */
 bool DMMPolicy_getBlockModeStatus(DMMPolicy_StackRole StackRole);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DMMPolicy_H_ */

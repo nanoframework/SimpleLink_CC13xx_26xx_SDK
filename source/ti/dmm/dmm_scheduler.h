@@ -96,6 +96,10 @@
 #ifndef DMMSch_H_
 #define DMMSch_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stdint.h"
 
 #include <ti/drivers/rf/RF.h>
@@ -368,5 +372,9 @@ extern bool DMMSch_getBlockModeStatus(DMMPolicy_StackRole stackRole);
  *  @brief Request access RF API that should not be used in DMM <br>
 */
 extern RF_Stat DMMSch_rfRequestAccess(RF_Handle h, RF_AccessParams *pParams);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DMMSch_H_ */

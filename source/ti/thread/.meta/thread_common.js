@@ -96,7 +96,7 @@ function getDeviceOrLaunchPadName(convertToBoard)
     }
 
     // Check if this is a standalone device without a LaunchPad
-    if(convertToBoard && !name.includes("LAUNCHXL"))
+    if(convertToBoard && !name.includes("_LAUNCHXL") && !name.includes("LP_"))
     {
         // Find the LaunchPad name in deviceToBoard dictionary
         let key = null;
@@ -113,25 +113,154 @@ function getDeviceOrLaunchPadName(convertToBoard)
     return(name);
 }
 
+/*
+ * Text for each disable case.
+ */
+const disabled_PtoR = { disable: "Migration from P to R devices requires a different rf setup command and is not currently supported" };
+const disabled_RtoP = { disable: "Migration from R to P devices requires a different rf setup command and is not currently supported" };
+const disabled_noSupport = { disable: "This target is not supported" };
+
+/*
+ * Migration between R devices is supported. This does not require changes to
+ * the code. It is a bit odd to mark that current device migrating to current
+ * device is supported.
+ */
+const migrationsR = {
+    CC1312R1_LAUNCHXL: disabled_noSupport,
+    CC1352R1_LAUNCHXL: { },
+    CC26X2R1_LAUNCHXL: { },
+    LP_CC2652RSIP:     { },
+    CC1312R1F3RGZ:     disabled_noSupport,
+    CC1352R1F3RGZ:     { },
+    CC2652R1FRGZ:      { },
+    CC2652R1FSIP:      { },
+
+    CC1352P1_LAUNCHXL:  disabled_RtoP,
+    CC1352P_2_LAUNCHXL: disabled_RtoP,
+    CC1352P_4_LAUNCHXL: disabled_RtoP,
+    LP_CC2652PSIP:      disabled_RtoP,
+    CC1352P1F3RGZ:      disabled_RtoP,
+    CC2652P1FSIP:       disabled_RtoP,
+    CC2652P1FRGZ:       disabled_RtoP,
+};
+
+/*
+ * Migration between P devices is supported. This does not require changes to
+ * the code. It is a bit odd to mark that current device migrating to current
+ * device is supported.
+ */
+const migrationsP = {
+    CC1352P1_LAUNCHXL:  { },
+    CC1352P_2_LAUNCHXL: { },
+    CC1352P_4_LAUNCHXL: { },
+    LP_CC2652PSIP:      { },
+    CC1352P1F3RGZ:      { },
+    CC2652P1FSIP:       { },
+    CC2652P1FRGZ:       { },
+
+    CC1312R1_LAUNCHXL: disabled_noSupport,
+    CC1352R1_LAUNCHXL: disabled_PtoR,
+    CC26X2R1_LAUNCHXL: disabled_PtoR,
+    LP_CC2652RSIP:     disabled_PtoR,
+    CC1312R1F3RGZ:     disabled_noSupport,
+    CC1352R1F3RGZ:     disabled_PtoR,
+    CC2652R1FRGZ:      disabled_PtoR,
+    CC2652R1FSIP:      disabled_PtoR,
+};
+
+/*
+ * `migrations` is a map of maps, with the first key being the current
+ * platform and the second key being the target platform. A non existent key
+ * will default to that migration being disabled. The object within the second
+ * map will be returned by `isMigrationValid` and can contain `warn` or
+ * `disable` members to offer more intelligent prompts. An empty object will
+ * mean the migration is supported.
+ *
+ */
+const migrations = {
+    CC1352R1_LAUNCHXL:  migrationsR,
+    CC26X2R1_LAUNCHXL:  migrationsR,
+    LP_CC2652RSIP:      migrationsR,
+    CC1352P1_LAUNCHXL:  migrationsP,
+    CC1352P_2_LAUNCHXL: migrationsP,
+    CC1352P_4_LAUNCHXL: migrationsP,
+    LP_CC2652PSIP:      migrationsP,
+
+    // Devices
+    CC1352R1F3RGZ: migrationsR,
+    CC2652R1FRGZ:  migrationsR,
+    CC2652R1FSIP:  migrationsR,
+    CC1352P1F3RGZ: migrationsP,
+    CC2652P1FSIP:  migrationsP,
+    CC2652P1FRGZ:  migrationsP,
+};
+
+
+/*
+ * ======== isMigrationValid ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the TI-OpenThread module.
+ *
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValid(currentTarget, migrationTarget)
+{
+    let migrationSupported = {disable: "Migration to this target is not supported via SysConfig. Consider starting from a more similar example to your desired migration target in <SDK_INSTALL_DIR>/examples/"};
+
+    if (migrations[currentTarget] && migrations[currentTarget][migrationTarget]) {
+        migrationSupported = migrations[currentTarget][migrationTarget];
+    }
+    return(migrationSupported);
+}
+
+
+/*
+ * ======== getMigrationMarkdown ========
+ * Returns text in markdown format that customers can use to aid in migrating a
+ * project between device/boards. It's recommended to keep the text within X
+ * characters in the following format:
+ *
+ * TBD
+ *
+ * @param currTarget - Board/device being migrated FROM
+ *
+ * @returns string - Markdown formatted string
+ */
+function getMigrationMarkdown(currTarget)
+{
+    const migrationText = `\
+* Migration of OAD examples between device types may require changes to device family predefines\n
+  * [Consult the OAD documentation for more details](thread/html/thread-oad/native-oad.html#ti-openthread-oad-examples)\n
+`
+
+    return(migrationText);
+}
+
 // Settubgs fir ti/devices/CCFG module
 const threadCCFGSettings = {
     CC1352R1_LAUNCHXL_CCFG_SETTINGS: {
         forceVddr: true
     },
     CC1352P1_LAUNCHXL_CCFG_SETTINGS: {
-
     },
     CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {
         forceVddr: true
     },
     CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {
-
     },
     CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {
-
     },
     CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
-        
+    },
+    LP_CC2652PSIP_CCFG_SETTINGS: {
+    },
+    LP_CC265RPSIP_CCFG_SETTINGS: {
     }
 };
 
@@ -149,5 +278,7 @@ exports = {
     MASTER_KEY_LEN: MASTER_KEY_LEN,
     NETWORK_NAME_MAX_LEN: NETWORK_NAME_MAX_LEN,
     getDeviceOrLaunchPadName: getDeviceOrLaunchPadName,
-    ccfgSettings: ccfgSettings
+    ccfgSettings: ccfgSettings,
+    isMigrationValid: isMigrationValid,
+    getMigrationMarkdown: getMigrationMarkdown
 };

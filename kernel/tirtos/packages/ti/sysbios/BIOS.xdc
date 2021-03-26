@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -426,6 +426,14 @@ module BIOS
     config Bool smpEnabled = false;
 
     /*!
+     *  ======== psaEnabled ========
+     *  Enables ARM's Platform Security Architecture (PSA) extensions
+     *
+     *  This functionality is available on only select devices.
+     */
+    metaonly config Bool psaEnabled = false;
+
+    /*!
      *  ======== cpuFreq ========
      *  CPU frequency in Hz
      *
@@ -707,7 +715,7 @@ module BIOS
      *  Example: A macro hex value of 0x64501 implies that the SYS/BIOS
      *  product version number is 6.45.01
      */
-    const UInt32 version = 0x68101;
+    const UInt32 version = 0x68103;
 
     /*!
      *  ======== addUserStartupFunction ========

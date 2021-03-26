@@ -66,6 +66,9 @@ function getLibs()
     else if (Program.cpu.deviceName.match(/MSP432E4.*/)) {
         libName = "_msp432e4";
     }
+    else if (Program.cpu.deviceName.match(/MTL1_CORE/)) {
+        libName = "_mtxx";
+    }
     else {
         throw ("DPL not found for this device " + Program.cpu.deviceName +
             " and target " + Program.build.target.suffix);

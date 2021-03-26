@@ -370,14 +370,6 @@ void ZDO_StartDevice( byte logicalType, devStartModes_t startMode, byte beaconOr
 
         ret = ZSuccess;
       }
-      else
-      {
-        ZDApp_ChangeState( DEV_NWK_ORPHAN );
-        //set timer for scan and rejoin
-        OsalPortTimers_startTimer( ZDAppTaskID, ZDO_REJOIN_BACKOFF, zgDefaultRejoinScan );
-        ret = NLME_OrphanJoinRequest( runtimeChannel,
-                                      zgDefaultStartingScanDuration );
-      }
     }
     else
     {
@@ -1073,7 +1065,7 @@ void ZDO_ProcessBindUnbindReq( zdoIncomingMsg_t *inMsg, ZDO_BindUnbindReq_t *pRe
       {
           //validate the if the endpoint or the cluster is restricted for the request
           if((zdoBindUnbindAuthEndpoint == 0xFF) || (pReq->srcEndpoint == zdoBindUnbindAuthEndpoint) ||
-             (zdoBindUnbindAuthClusterId == 0xFF) || (zdoBindUnbindAuthClusterId == pReq->clusterID))
+             (zdoBindUnbindAuthClusterId == 0xFFFF) || (zdoBindUnbindAuthClusterId == pReq->clusterID))
           {
             AddrMgrEntry_t entry;
 
@@ -2118,6 +2110,13 @@ void ZDO_ProcessDeviceAnnce( zdoIncomingMsg_t *inMsg )
   ZDO_DeviceAnnce_t Annce;
   AddrMgrEntry_t addrEntry;
   uint8_t parentExt[Z_EXTADDR_LEN];
+
+  if ( ZG_DEVICE_ENDDEVICE_TYPE && zgRxAlwaysOn == FALSE )
+  {
+    // if we are an rxAlwaysOn capable end device but are operating as sleepy,
+    // we should not process the message
+    return;
+  }
 
   if ( (_NIB.nwkState != NWK_ROUTER) && (_NIB.nwkState != NWK_ENDDEVICE) )
   {
@@ -3611,7 +3610,7 @@ ZDO_ParentAnnce_t *ZDO_ParseParentAnnce( zdoIncomingMsg_t *inMsg )
   msg = inMsg->asdu;
   if ( inMsg->clusterID == Parent_annce_rsp)
   {
-    *msg++;
+    msg++;
   }
   numChildren = *msg++;
 

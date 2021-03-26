@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -535,6 +535,24 @@ static hciEntry_t hciTranslationTable[] =
   HCI_TRANSLATION_ENTRY(HCI_LE_SET_CONNECTION_CTE_REQUEST_ENABLE,      IDX_CAST IDX_HCI_LE_SetConnectionCteRequestEnableCmd,      HU16,    HU8,     HU16,    HU8,     HU8,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_LE_SET_CONNECTION_CTE_RESPONSE_ENABLE,     IDX_CAST IDX_HCI_LE_SetConnectionCteResponseEnableCmd,     HU16,    HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_LE_READ_ANTENNA_INFORMATION,               IDX_CAST IDX_HCI_LE_ReadAntennaInformationCmd,             HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG))
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_PERIODIC_ADV_PARAMETERS,            IDX_CAST IDX_HCI_LE_SetPeriodicAdvParamsCmd,               HU8,     HU16,    HU16,    HU16,    HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_PERIODIC_ADV_DATA,                  IDX_CAST IDX_HCI_LE_SetPeriodicAdvDataCmd,                 HU8,     HU8,     HU8,     HU8PTR,  HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_PERIODIC_ADV_ENABLE,                IDX_CAST IDX_HCI_LE_SetPeriodicAdvEnableCmd,               HU8,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_PARAMS, IDX_CAST IDX_HCI_LE_SetConnectionlessCteTransmitParamsCmd, HU8,     HU8,     HU8,     HU8,     HU8,     HU8PTR,  HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_ENABLE, IDX_CAST IDX_HCI_LE_SetConnectionlessCteTransmitEnableCmd, HU8,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+#endif
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
+  HCI_TRANSLATION_ENTRY(HCI_LE_PERIODIC_ADV_CREATE_SYNC,               IDX_CAST IDX_HCI_LE_PeriodicAdvCreateSyncCmd,              HU8,     HU8,     HU8,     HAB,     HU16,    HU16,    HU8,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL,        IDX_CAST IDX_HCI_LE_PeriodicAdvCreateSyncCancelCmd,        HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_PERIODIC_ADV_TERMINATE_SYNC,            IDX_CAST IDX_HCI_LE_PeriodicAdvTerminateSyncCmd,           HU16,    HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_ADD_DEVICE_TO_PERIODIC_ADV_LIST,        IDX_CAST IDX_HCI_LE_AddDeviceToPeriodicAdvListCmd,         HU8,     HAB,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_REMOVE_DEVICE_FROM_PERIODIC_ADV_LIST,   IDX_CAST IDX_HCI_LE_RemoveDeviceFromPeriodicAdvListCmd,    HU8,     HAB,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_CLEAR_PERIODIC_ADV_LIST,                IDX_CAST IDX_HCI_LE_ClearPeriodicAdvListCmd,               HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_READ_PERIODIC_ADV_LIST_SIZE,            IDX_CAST IDX_HCI_LE_ReadPeriodicAdvListSizeCmd,            HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_PERIODIC_ADV_RECEIVE_ENABLE,        IDX_CAST IDX_HCI_LE_SetPeriodicAdvReceiveEnableCmd,        HU16,    HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_LE_SET_CONNECTIONLESS_IQ_SAMPLING_ENABLE,  IDX_CAST IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd,  HU16,    HU8,     HU8,     HU8,     HU8,     HU8PTR,  HNP,     HNP),
+#endif
 
   // Vendor Specific HCI Commands
   HCI_TRANSLATION_ENTRY(HCI_EXT_SET_TX_POWER,                          IDX_CAST IDX_HCI_EXT_SetTxPowerCmd,                        HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
@@ -576,6 +594,8 @@ static hciEntry_t hciTranslationTable[] =
   HCI_TRANSLATION_ENTRY(HCI_EXT_GET_CONNECTION_INFO,                   IDX_CAST IDX_HCI_EXT_GetConnInfoCmd,                       HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_GET_ACTIVE_CONNECTION_INFO,            IDX_CAST IDX_HCI_EXT_GetActiveConnInfoCmd,                 HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_OVERLAPPED_PROCESSING,                 IDX_CAST IDX_HCI_EXT_OverlappedProcessingCmd,              HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_PARAMETERS,                    IDX_CAST IDX_HCI_EXT_SetQOSParameters,                     HU8,     HU8,     HU32,    HU16,    HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_DEFAULT_PARAMETERS,            IDX_CAST IDX_HCI_EXT_SetQOSDefaultParameters,              HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
 #endif // (defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG)))
 
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & ADV_CONN_CFG)
@@ -658,6 +678,7 @@ static uint8_t rspBuf[MAX_RSP_BUF];
 
 // Outgoing event
 static uint8_t out_msg[HCI_EXT_APP_OUT_BUF];
+uint8_t *pLongMsg;
 #endif /* HCI_TL_FULL */
 
 #endif // (HCI_TL_FULL || PTM_MODE)  && HOST_CONFIG
@@ -711,7 +732,7 @@ static uint8_t checkNVLen(osalSnvId_t id, osalSnvLen_t len);
 
 static uint8_t processEvents(ICall_Hdr *pMsg);
 static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg,
-                               uint8_t *pMsgLen, uint8_t *pAllocated,
+                               uint16_t *pMsgLen, uint8_t *pAllocated,
                                uint8_t *pDeallocate);
 #if (HOST_CONFIG & (CENTRAL_CFG | PERIPHERAL_CFG))
 static uint8_t *processEventsSM(smEventHdr_t *pMsg, uint8_t *pOutMsg,
@@ -5968,6 +5989,42 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
                                      &pBuf[1]); // bdAddr
      break;
    }
+
+   case HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS:
+   {
+     GapAdv_periodicAdvParams_t pPriodicParams;
+
+     pPriodicParams.periodicAdvIntervalMin = BUILD_UINT16(pBuf[1],pBuf[2]);
+     pPriodicParams.periodicAdvIntervalMax = BUILD_UINT16(pBuf[3],pBuf[4]);
+     pPriodicParams.periodicAdvProp = BUILD_UINT16(pBuf[5],pBuf[6]);
+     stat = GapAdv_SetPeriodicAdvParams(pBuf[0], &pPriodicParams);
+     break;
+   }
+
+   case HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA:
+   {
+     GapAdv_periodicAdvData_t pPeriodicData;
+
+     pPeriodicData.operation = pBuf[1];
+     pPeriodicData.dataLength = pBuf[2];
+     pPeriodicData.pData = MAP_osal_mem_alloc(pPeriodicData.dataLength);
+
+     if(pPeriodicData.pData)
+     {
+       // Copy the data
+       MAP_osal_memcpy(pPeriodicData.pData, &pBuf[3], pPeriodicData.dataLength);
+       stat = GapAdv_SetPeriodicAdvData( pBuf[0], &pPeriodicData);
+       // Free the allocated memory
+       ICall_free(pPeriodicData.pData);
+     }
+     break;
+   }
+
+   case HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE:
+   {
+     stat = GapAdv_SetPeriodicAdvEnable(pBuf[0], pBuf[1]);
+     break;
+   }
 #endif // (PERIPHERAL_CFG | BROADCASTER_CFG )
 
 #if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
@@ -6046,6 +6103,69 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
      stat = SUCCESS;
      break;
    }
+
+   case HCI_EXT_GAP_SCAN_CREATE_SYNC:
+   {
+     GapScan_PeriodicAdvCreateSyncParams_t syncParams;
+
+     syncParams.options = pBuf[1];
+     syncParams.advAddrType = pBuf[2];
+     MAP_osal_memcpy(syncParams.advAddress, &pBuf[3], B_ADDR_LEN);
+     syncParams.skip = BUILD_UINT16(pBuf[9],pBuf[10]);
+     syncParams.syncTimeout = BUILD_UINT16(pBuf[11],pBuf[12]);
+     syncParams.syncCteType = pBuf[13];
+
+     stat = GapScan_PeriodicAdvCreateSync(pBuf[0], &syncParams);
+     break;
+    }
+
+     case HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL:
+     {
+       stat = GapScan_PeriodicAdvCreateSyncCancel();
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_TERMINATE_SYNC:
+     {
+       uint16_t syncHandle = BUILD_UINT16(pBuf[0],pBuf[1]);
+       stat = GapScan_PeriodicAdvTerminateSync(syncHandle);
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_REPORT:
+     {
+       uint16_t syncHandle = BUILD_UINT16(pBuf[0],pBuf[1]);
+       stat = GapScan_SetPeriodicAdvReceiveEnable(syncHandle, pBuf[2]);
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST:
+     {
+       uint8_t advAddr[B_ADDR_LEN];
+       MAP_osal_memcpy(advAddr, &pBuf[1], B_ADDR_LEN);
+       stat = GapScan_AddDeviceToPeriodicAdvList(pBuf[0], advAddr, pBuf[7]);
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST:
+     {
+       uint8_t advAddr[B_ADDR_LEN];
+       MAP_osal_memcpy(advAddr, &pBuf[1], B_ADDR_LEN);
+       stat = GapScan_RemoveDeviceFromPeriodicAdvList(pBuf[0], advAddr, pBuf[7]);
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_READ_ERIODIC_ADV_LIST_SIZE:
+     {
+       stat = GapScan_ReadPeriodicAdvListSize();
+       break;
+     }
+
+     case HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST:
+     {
+       stat = GapScan_ClearPeriodicAdvList();
+       break;
+     }
 #endif // ( CENTRAL_CFG | OBSERVER_CFG )
 
 #if ( HOST_CONFIG & CENTRAL_CFG )
@@ -6376,7 +6496,7 @@ static uint8_t processEvents(ICall_Hdr *pMsg)
   switch (pMsg->event)
   {
     case GAP_MSG_EVENT:
-      pBuf = processEventsGAP((gapEventHdr_t *)pMsg, out_msg, (uint8_t *)&msgLen, &allocated, &deallocateIncoming);
+      pBuf = processEventsGAP((gapEventHdr_t *)pMsg, out_msg, (uint16_t *)&msgLen, &allocated, &deallocateIncoming);
       break;
 
 #if (HOST_CONFIG & (CENTRAL_CFG | PERIPHERAL_CFG))
@@ -6421,6 +6541,12 @@ static uint8_t processEvents(ICall_Hdr *pMsg)
     }
   }
 
+  // Free the pLongMsg allocation
+  if(pLongMsg)
+  {
+    MAP_osal_mem_free(pLongMsg);
+  }
+
   return(TRUE);
 }
 
@@ -6437,10 +6563,10 @@ static uint8_t processEvents(ICall_Hdr *pMsg)
  *
  * @return  outgoing message
  */
-static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint8_t *pMsgLen,
+static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint16_t *pMsgLen,
                                 uint8_t *pAllocated, uint8_t *pDeallocate)
 {
-  uint8_t msgLen = 0;
+  uint16_t msgLen = 0;
   uint8_t *pBuf = NULL;
 
   *pDeallocate = TRUE;
@@ -6769,6 +6895,212 @@ static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint8_t 
         msgLen = 11;
       }
       break;
+
+	case GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT:
+	{
+	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+
+	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
+	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
+	  pOutMsg[2] = pPkt->status;
+	  pBuf = pOutMsg;
+	  msgLen = 3;
+
+	  break;
+	}
+
+	case GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT:
+	{
+	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+
+	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
+	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
+	  pOutMsg[2] = pPkt->status;
+	  pBuf = pOutMsg;
+	  msgLen = 3;
+	  break;
+	}
+
+	case GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT:
+	{
+	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+
+	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
+	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
+	  pOutMsg[2] = pPkt->status;
+	  pBuf = pOutMsg;
+	  msgLen = 3;
+	  break;
+	}
+
+        case GAP_SCAN_PERIODIC_ADV_SYNC_EST_EVENT:
+        {
+          GapScan_Evt_PeriodicAdvSyncEst_t *pEvt = (GapScan_Evt_PeriodicAdvSyncEst_t *)pMsg;
+
+          if( pEvt != NULL )
+          {
+            pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
+            pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
+            pOutMsg[2] = pEvt->BLEEventCode;
+            pOutMsg[3] = pEvt->status;
+            pOutMsg[4] = LO_UINT16(pEvt->syncHandle);
+            pOutMsg[5] = HI_UINT16(pEvt->syncHandle);
+            pOutMsg[6] = pEvt->advSid;
+            pOutMsg[7] = pEvt->advPhy;
+            pOutMsg[8] = LO_UINT16(pEvt->periodicAdvInt);
+            pOutMsg[9] = HI_UINT16(pEvt->periodicAdvInt);
+            pOutMsg[10] = pEvt->advClockAccuracy;
+            pOutMsg[11] = pEvt->advAddrType;
+            MAP_osal_memcpy(&(pOutMsg[12]), pEvt->advAddress, B_ADDR_LEN);
+
+            pBuf = pOutMsg;
+            msgLen = 18;
+          }
+          break;
+        }
+
+        case GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT:
+        {
+          GapScan_PeriodicAdvSyncLostEvt_t *pEvt = (GapScan_PeriodicAdvSyncLostEvt_t *)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
+          pOutMsg[2] = LO_UINT16(pEvt->syncHandle);
+          pOutMsg[3] = HI_UINT16(pEvt->syncHandle);
+
+          pBuf = pOutMsg;
+          msgLen = 4;
+          break;
+        }
+
+        case GAP_SCAN_PERIODIC_ADV_REPORT_EVENT:
+        {
+          GapScan_Evt_PeriodicAdvRpt_t *pEvt = (GapScan_Evt_PeriodicAdvRpt_t*)pMsg;
+          uint8_t dataLen = pEvt->dataLen;
+          uint16_t totalLen = sizeof(GapScan_Evt_PeriodicAdvRpt_t)-sizeof(((GapScan_Evt_PeriodicAdvRpt_t *)0)->pData) + dataLen;
+          pLongMsg = (uint8_t*)MAP_osal_mem_alloc(totalLen);
+
+          if(pLongMsg)
+          {
+            pLongMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
+            pLongMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
+            pLongMsg[2] = LO_UINT16(pEvt->syncHandle);
+            pLongMsg[3] = HI_UINT16(pEvt->syncHandle);
+            pLongMsg[4] = pEvt->txPower;
+            pLongMsg[5] = pEvt->rssi;
+            pLongMsg[6] = pEvt->cteType;
+            pLongMsg[7] = pEvt->dataStatus;
+            pLongMsg[8] = pEvt->dataLen;
+            MAP_osal_memcpy(&pLongMsg[9], pEvt->pData, pEvt->dataLen);
+
+            MAP_osal_mem_free(pEvt->pData);
+            pBuf = pLongMsg;
+            msgLen = 9 + pEvt->dataLen;
+          }
+          else
+          {
+            HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
+          }
+          break;
+        }
+
+        case GAP_SCAN_CREATE_SYNC_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_SYNC_CANCEL_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_TERMINATE_SYNC_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_PERIODIC_RECEIVE_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_ADD_DEVICE_ADV_LIST_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_REMOVE_DEVICE_ADV_LIST_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_CLEAR_ADV_LIST_EVENT:
+        {
+          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+          break;
+        }
+
+        case GAP_SCAN_READ_ADV_LIST_SIZE_EVENT:
+        {
+          GapScan_ReadAdvSizeListEvt_t *pPkt = (GapScan_ReadAdvSizeListEvt_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
+          pOutMsg[2] = pPkt->status;
+          pOutMsg[3] = pPkt->listSize;
+
+          pBuf = pOutMsg;
+          msgLen = 4;
+          break;
+        }
 
     default:
       // Unknown command

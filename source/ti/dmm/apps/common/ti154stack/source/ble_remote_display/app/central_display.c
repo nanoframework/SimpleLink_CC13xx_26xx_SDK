@@ -873,11 +873,11 @@ static void CentralDisplay_processAppMsg(cdEvt_t *pMsg)
         // Set application state based on connection status
         if(numConn > 0)
         {
-            DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
+            DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
         }
         else
         {
-            DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_IDLE);
+            DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_IDLE);
         }
 
         if(!autoConnect)
@@ -1622,7 +1622,7 @@ static void CentralDisplay_processGATTDiscEvent(gattMsgEvent_t *pMsg)
     if (discState == BLE_DISC_STATE_MTU)
     {
         // Update DMMPolicy for service discovery
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_HIGH_BANDWIDTH);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_HIGH_BANDWIDTH);
 
         // MTU size response received, discover simple service
         if (pMsg->method == ATT_EXCHANGE_MTU_RSP)
@@ -1674,7 +1674,7 @@ static void CentralDisplay_processGATTDiscEvent(gattMsgEvent_t *pMsg)
         if(pMsg->hdr.status == bleProcedureComplete)
         {
             // Update states & enable notifications
-            DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
+            DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTED);
             discState = BLE_DISC_STATE_IDLE;
             CentralDisplay_enqueueMsg(CD_EVT_TGL_NOTIF, 0, NULL);
         }
@@ -2302,7 +2302,7 @@ static void CentralDisplay_doDiscoverDevices(int32_t menuEntryIndex)
   else
   {
       numScanRes = 0;
-      DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_SCAN);
+      DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_SCAN);
       GapScan_enable(0, DEFAULT_SCAN_DURATION, 0);
   }
 }
@@ -2947,7 +2947,7 @@ void CentralDisplay_bleFastStateUpdateCb(uint32_t StackRole, uint32_t stackState
     if( !(prevStackState & LL_TASK_ID_SLAVE) && (stackState & LL_TASK_ID_SLAVE))
     {
         /* update DMM policy */
-        DMMPolicy_updateStackState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTING);
+        DMMPolicy_updateApplicationState(DMMPolicy_StackRole_BlePeripheral, DMMPOLICY_BLE_CONNECTING);
     }
 
     prevStackState = stackState;

@@ -46,7 +46,6 @@ const DevInfo = Common.getScript("device_info.js");
 
 /* PHY group */
 const PHY_GROUP = Common.PHY_IEEE_15_4;
-DevInfo.addPhyGroup(PHY_GROUP);
 
 /* Base module for RF Settings */
 const RFBase = Common.getScript("radioconfig");
@@ -59,8 +58,8 @@ const IeeeDocs = Common.getScript("settings/ieee_15_4_docs.js");
 const SharedDocs = Common.getScript("settings/shared_docs.js");
 
 /* Setting specific configurable */
-const tmp = system.getScript(DevInfo.getSyscfgParams(PHY_GROUP));
-const config = _.cloneDeep(tmp);
+const tmp = DevInfo.getConfiguration(PHY_GROUP);
+const config = _.cloneDeep(tmp.configs);
 
 const settingSpecific = {
     displayName: "RF Settings IEEE 802.15.4",

@@ -5,7 +5,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -111,6 +111,20 @@ extern "C"
   .sid = 0                                                                 \
 }
 
+/// Non-Connectable & Non-Scannable advertising set
+#define GAPADV_PARAMS_AE_NC_NS {                                           \
+  .eventProps = 0,                                                         \
+  .primIntMin = 160,                                                       \
+  .primIntMax = 160,                                                       \
+  .primChanMap = GAP_ADV_CHAN_ALL,                                         \
+  .peerAddrType = PEER_ADDRTYPE_PUBLIC_OR_PUBLIC_ID,                       \
+  .peerAddr = { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa },                      \
+  .filterPolicy = GAP_ADV_WL_POLICY_ANY_REQ,                               \
+  .txPower = GAP_ADV_TX_POWER_NO_PREFERENCE,                               \
+  .primPhy = GAP_ADV_PRIM_PHY_1_MBPS,                                      \
+  .secPhy = GAP_ADV_SEC_PHY_1_MBPS,                                        \
+  .sid = 1                                                                 \
+}
 /** @} End GapAdv_Constants */
 #endif
 
@@ -476,6 +490,30 @@ typedef enum
 /// @endcond // NODOC
 } GapAdv_eventMaskFlags_t;
 
+/**
+ * @defgroup GapAdv_Periodic_Advertising GapAdv Periodic Advertising Values
+ * @{
+ */
+/// Periodic Advertising - Minimum interval
+#define GAPADV_PERIODIC_ADV_INTERVAL_MIN                 0x0006
+/// Periodic Advertising - Maximum interval
+#define GAPADV_PERIODIC_ADV_INTERVAL_MAX                 0xFFFF
+/// Periodic Advertising - Enable TX power property
+#define GAPADV_PERIODIC_ADV_ENABLE_TX_POWER              0x0040
+/// Periodic Advertising - Disable TX power property
+#define GAPADV_PERIODIC_ADV_DISABLE_TX_POWER             0x0000
+/// Periodic Advertising operation options - Intermidiate fragment
+#define GAPADV_PERIODIC_ADV_DATA_INTERMIDIATE_FRAG       0x00
+/// Periodic Advertising operation options - First fragment
+#define GAPADV_PERIODIC_ADV_DATA_FIRST_FRAG              0x01
+/// Periodic Advertising operation options - Last fragment
+#define GAPADV_PERIODIC_ADV_DATA_LAST_FRAG               0x02
+/// Periodic Advertising operation options - Complete data
+#define GAPADV_PERIODIC_ADV_DATA_COMPLETE                0x03
+/// Periodic Advertising - Maximum fragment/complete data length
+#define GAPADV_PERIODIC_ADV_MAX_DATA_LEN                 252
+/** @} End GapAdv_Periodic_Advertising */
+
 /** @} End GapAdv_Constants */
 
 /*-------------------------------------------------------------------
@@ -539,6 +577,35 @@ typedef struct
    */
   uint16 advDataLen;
 } GapAdv_truncData_t;
+
+/// Periodic advertising parameters structure
+typedef struct
+{
+  uint16 periodicAdvIntervalMin;   //!< Minimum periodic advertising interval; Range: 0x0006 to 0xFFFF Time = N * 1.25 ms Time Range: 7.5ms to 81.91875s
+  uint16 periodicAdvIntervalMax;   //!< Maximum periodic advertising interval; Range: 0x0006 to 0xFFFF Time = N * 1.25 ms Time Range: 7.5ms to 81.91875s
+  uint16 periodicAdvProp;          //!< Periodic advertising properties - set bit 6 for include TxPower in the advertising PDU
+} GapAdv_periodicAdvParams_t;
+
+/// Periodic advertising data structure
+typedef struct
+{
+  /**
+   * operation  - 0x00 - Intermediate fragment of fragmented periodic advertising data;
+   *			  0x01 - First fragment of fragmented periodic advertising data;
+   *			  0x02 - Last fragment of fragmented periodic advertising data;
+   *			  0x03 - Complete periodic advertising data
+   */
+  uint8 operation;
+  uint8 dataLength;   //!< The number of bytes in the Advertising Data parameter
+  uint8 *pData;       //!< Periodic advertising data
+} GapAdv_periodicAdvData_t;
+
+typedef struct
+{
+  osal_event_hdr_t hdr;   //!< OSAL Event Header
+  uint8_t opcode;         //!< GAP type of command
+  uint8_t status;         //!< Event status
+} GapAdv_periodicAdvEvt_t;
 
 /** @} End GapAdv_Structs */
 
@@ -916,6 +983,9 @@ extern bStatus_t GapAdv_prepareLoadByBuffer(uint8 *pBuf, bool freeOldData);
  */
 extern bStatus_t GapAdv_loadByBuffer(uint16 len, uint8 *pBuf);
 
+
+bStatus_t GapAdv_loadByBuffer_hook(uint16 len, uint8 *pBuf);
+
 /**
  * Abort an advertising load operation.
  *
@@ -946,6 +1016,63 @@ extern bStatus_t GapAdv_abortLoad(void);
  * @return SUCCESS
  */
 extern bStatus_t GapAdv_setVirtualAdvAddr(uint8 advHandle, uint8 *bdAddr);
+
+/**
+ * GapAdv_SetPeriodicAdvParams
+ *
+ * Set the advertiser parameters for the periodic advertising
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   advHandle           - Used to identify a periodic advertising train
+ *                                Created after creating extended advertising using GapAdv_create
+ * @param   periodicAdvParams   - Pointer to periodic advertising parameters
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ * @return @ref bleGAPNotFound
+ */
+ uint8_t GapAdv_SetPeriodicAdvParams( uint8 advHandle,
+                                      GapAdv_periodicAdvParams_t *periodicAdvParams );
+
+/**
+ * GapAdv_SetPeriodicAdvData
+ *
+ * Used to set the advertiser data used in periodic advertising PDUs.
+ * This command may be issued at any time after the advertising set identified by
+ * the Advertising_Handle parameter has been configured for periodic advertising
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   advHandle           - Used to identify a periodic advertising train
+ * @param   periodicAdvData     - Pointer to periodic advertising data
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+ bStatus_t GapAdv_SetPeriodicAdvData( uint8 advHandle,
+                                      GapAdv_periodicAdvData_t *periodicAdvData );
+
+/**
+ * GapAdv_SetPeriodicAdvEnable
+ *
+ * Used to request the advertiser to enable or disable
+ * the periodic advertising for the advertising set
+ *
+ * @design  /ref did_302932730
+ *
+ * @param   enable    - 0x00 - Periodic advertising is disabled (default)
+ *                      0x01 - Periodic advertising is enabled
+ * @param   advHandle - Used to identify a periodic advertising train
+ *
+ * @return @ref SUCCESS
+ * @return @ref FAILURE
+ * @return @ref bleInvalidRange
+ */
+ bStatus_t GapAdv_SetPeriodicAdvEnable( uint8 enable,
+                                        uint8 advHandle );
 
 /*-------------------------------------------------------------------
 -------------------------------------------------------------------*/

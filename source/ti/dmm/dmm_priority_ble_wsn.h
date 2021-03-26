@@ -134,6 +134,10 @@
 #ifndef dmm_priority_ble_wsn__H_
 #define dmm_priority_ble_wsn__H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "dmm_policy.h"
 
 //! \brief The number of activities
@@ -141,5 +145,9 @@
 #define ACTIVITY_NUM_WSN                        3
 
 extern GlobalTable globalPriorityTable_bleLwsnH[DMMPOLICY_NUM_STACKS];
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //dmm_priority_ble_wsn__H_

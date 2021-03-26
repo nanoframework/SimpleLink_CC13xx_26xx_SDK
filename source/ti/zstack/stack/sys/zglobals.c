@@ -80,12 +80,6 @@ typedef struct zgItem
  * NWK GLOBAL VARIABLES
  */
 
-// Rejoin backoff (silent period ) duration
-uint32_t zgDefaultRejoinBackoff = REJOIN_BACKOFF;
-
-// Rejoin scan duration
-uint32_t zgDefaultRejoinScan = REJOIN_SCAN ;
-
 // Transmission retries numbers
 uint8_t zgMaxDataRetries = NWK_MAX_DATA_RETRIES;
 uint8_t zgMaxMissingMacAckLinkFailure = MAX_MISSING_MAC_ACK_LINK_FAILURE;
@@ -142,7 +136,7 @@ uint8_t zgConcentratorRC = CONCENTRATOR_ROUTE_CACHE;   // concentrator with rout
 uint8_t zgNwkSrcRtgExpiryTime = SRC_RTG_EXPIRY_TIME;
 
 // Cleanup Child Table according to routing traffic
-uint8_t zgRouterOffAssocCleanup = FALSE;
+uint8_t zgRouterOffAssocCleanup = TRUE;
 
 // Determines whether or not a remote NWK leave request command frame received
 // by the local device is accepted .
@@ -180,7 +174,7 @@ uint8_t zgNwkParentInformation = NWK_PARENT_INFO_UNDEFINED;
 // This is an index into table Requested Timeout Enumerated Values.
 // It is used by the parent router, it indicates the default timeout value
 // for any end device that does not negotiate a different timeout value
-uint8_t zgNwkEndDeviceTimeoutDefault = NWK_END_DEV_TIMEOUT_DEFAULT;
+uint8_t zgNwkEndDeviceTimeoutDefault = END_DEV_TIMEOUT_VALUE;
 
 // Index into table Requested Timeout Enumerated Values.
 // Used to keep the leave message into MAC queue for child devices that has expired
@@ -212,6 +206,9 @@ uint8_t zTouchLinkNwkStartRtr = FALSE;
 
 //==========    Allow radio to be turned off    ===============
 uint8_t zgAllowRadioRxOff = TRUE;
+
+//==========    For ZED, determines if rx always on is enabled  ===============
+uint8_t zgRxAlwaysOn = RFD_RX_ALWAYS_ON;
 
 /*********************************************************************
  * APS GLOBAL VARIABLES

@@ -90,6 +90,11 @@ extern "C"
 #define SAMPLEAPP_END_DEVICE_REJOIN_DELAY 1000
 #define SAMPLEAPP_CONFIG_SYNC_TIMEOUT     500
 
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+#define TL_BDB_FB_EVT                     0x0100
+#define TL_BDB_FB_DELAY                   16000
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
+
 /*********************************************************************
  * MACROS
  */

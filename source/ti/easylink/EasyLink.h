@@ -161,7 +161,7 @@ extern "C"
 #include "ti_radio_config.h"
 
 //! \brief EasyLink API Version
-#define EASYLINK_API_VERSION "EasyLink-v3.10.01"
+#define EASYLINK_API_VERSION "EasyLink-v3.30.00"
 
 //! \brief defines the Tx/Rx Max Address Size
 #define EASYLINK_MAX_ADDR_SIZE              8

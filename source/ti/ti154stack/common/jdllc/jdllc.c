@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -2348,6 +2348,7 @@ static void sendScanReq(ApiMac_scantype_t type)
     /* set scan channels from channel mask*/
     memcpy(scanReq.scanChannels, defaultChannelMask,
            APIMAC_154G_CHANNEL_BITMAP_SIZ);
+
     scanReq.scanType = type;
     if(CONFIG_MAC_BEACON_ORDER == JDLLC_BEACON_ORDER_NON_BEACON)
     {
@@ -2362,7 +2363,6 @@ static void sendScanReq(ApiMac_scantype_t type)
     scanReq.linkQuality = CONFIG_LINKQUALITY;
     scanReq.percentFilter = CONFIG_PERCENTFILTER;
     scanReq.channelPage = CONFIG_CHANNEL_PAGE;
-    scanReq.phyID = CONFIG_PHY_ID;
     /* using no security for scan request command */
     memset(&scanReq.sec, 0, sizeof(ApiMac_sec_t));
     /* send scan Req */

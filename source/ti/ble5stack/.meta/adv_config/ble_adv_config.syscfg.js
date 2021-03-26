@@ -64,7 +64,7 @@ const config = {
         },
         {
             name: "tbmActiveItemsOnly",
-            displayName: "Two Button Manu - Active Items Only",
+            displayName: "Two Button Menu - Active Items Only",
             longDescription: Docs.tbmActiveItemsOnlyLongDescription,
             default: true
         },

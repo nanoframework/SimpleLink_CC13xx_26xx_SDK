@@ -51,7 +51,10 @@ extern "C"
  */
 #include "zcl.h"
 #include "nvintf.h"
+#ifndef CUI_DISABLE
 #include "cui.h"
+#endif
+
 
 // Added to include Touchlink Target functionality
 #if defined ( BDB_TL_INITIATOR ) || defined ( BDB_TL_TARGET )
@@ -93,6 +96,11 @@ extern "C"
 
 #define SAMPLEAPP_END_DEVICE_REJOIN_DELAY 1000
 #define SAMPLEAPP_CONFIG_SYNC_TIMEOUT     500
+
+#if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
+#define TL_BDB_FB_EVT                     0x0100
+#define TL_BDB_FB_DELAY                   16000
+#endif // defined ( BDB_TL_TARGET ) || defined (BDB_TL_INITIATOR)
 
 /*********************************************************************
  * MACROS
@@ -190,7 +198,7 @@ extern void zclSampleLight_updateCurrentLevelAttribute(uint8_t CurrentLevel);
 extern uint8_t zclSampleLight_getCurrentLevelAttribute(void);
 #endif
 
-#ifdef USE_ZCL_SAMPLEAPP_UI
+#ifndef CUI_DISABLE
 #if defined (ENABLE_GREENPOWER_COMBO_BASIC)
 void zclSampleLight_setGPSinkCommissioningMode(const int32_t _itemEntry);
 #endif

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -299,7 +299,8 @@ extern void gapCentProcessConnUpdateRejectEvt( hciEvt_BLEConnUpdateComplete_t *p
 extern uint8 gapCentProcessSignalEvt( l2capSignalEvent_t *pCmd );
 extern void gapProcessCreateLLConnCmdStatus( uint8 status );
 extern void gapTerminateConnComplete( void );
-
+uint16_t gapGetTerminateSyncHandle( void );
+void gapSetTerminateSyncHandle(uint16_t syncHandle);
 /*********************************************************************
 *********************************************************************/
 

@@ -474,7 +474,7 @@ static void returnRadioOperationStatus(enum NodeRadioOperationStatus result)
 {
 #if defined(USE_DMM) && !defined(USE_DMM_BLE_SP)
     /* update DMM policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_SLEEPING);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_SLEEPING);
     /* Clear toggle in case it was set */
     if ((result == NodeRadioStatus_Success) && (dmSensorPacket.concLedToggle))
     {
@@ -523,7 +523,7 @@ static void sendDmPacket(struct DualModeSensorPacket sensorPacket, uint8_t maxNu
     EasyLink_setCtrl(EasyLink_Ctrl_AsyncRx_TimeOut, EasyLink_ms_To_RadioTime(ackTimeoutMs));
 #ifdef USE_DMM
     /* update DMM policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_TX);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_TX);
 #endif /* USE_DMM */
 
     /* Set the priority for the current transmission */
@@ -557,7 +557,7 @@ static void sendDmPacket(struct DualModeSensorPacket sensorPacket, uint8_t maxNu
 
 #ifdef USE_DMM
     /* update DMM policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_ACK);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_ACK);
 #endif /* USE_DMM */
     /* Set the priority for the current reception */
     EasyLink_setCtrl(EasyLink_Ctrl_Cmd_Priority, (uint32_t)rxCmdPriEsc.cmdPriority);
@@ -595,7 +595,7 @@ static void resendPacket(void)
 
 #ifdef USE_DMM
     /* update DMM policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_TX);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_TX);
 
 #endif /* USE_DMM */
     /* Set the priority for the current transmission */
@@ -629,7 +629,7 @@ static void resendPacket(void)
 
 #ifdef USE_DMM
     /* Update DMM policy */
-    DMMPolicy_updateStackState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_ACK);
+    DMMPolicy_updateApplicationState(DMMPolicy_StackRole_WsnNode, DMMPOLICY_WSN_ACK);
 #endif /* USE_DMM */
     /* Set the priority for the current reception */
     EasyLink_setCtrl(EasyLink_Ctrl_Cmd_Priority, (uint32_t)rxCmdPriEsc.cmdPriority);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Texas Instruments Incorporated
+ * Copyright (c) 2014-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,10 +48,12 @@ function getLibs(prog)
     var lib = "";
     Build = xdc.module("ti.sysbios.Build");
 
-    if (Boot.provideDriverlib == true) {
-	Boot.$logWarning("Support for Boot.provideDriverLib is deprecated. " +
-	    "You should add the driverlib.lib file to your linker commands.",
-	     Boot, "provideDriverLib");
+    if (Program.build.target.name != "M33F") {
+        if (Boot.provideDriverlib == true) {
+            Boot.$logWarning("Support for Boot.provideDriverLib is deprecated. " +
+                "You should add the driverlib.lib file to your linker commands.",
+                Boot, "provideDriverLib");
+        }
     }
 
     if (Build.getLibs(this) != null) {
@@ -67,7 +69,13 @@ function getLibs(prog)
  */
 function init()
 {
+    /* Only process during "cfg" phase */
+    if (xdc.om.$name != "cfg") {
+        return;
+    }
+
     BIOS = xdc.module("ti.sysbios.BIOS");
     Build = xdc.module("ti.sysbios.Build");
+    if (Program.build.target.name == "M33F") return;
     Boot = xdc.useModule("ti.sysbios.family.arm.cc26xx.Boot");
 }

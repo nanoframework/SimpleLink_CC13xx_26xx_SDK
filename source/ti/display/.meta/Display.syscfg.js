@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,12 +46,35 @@ let config = [
         name        : "displayType",
         displayName : "Display Type",
         default     : "UART",
-        onChange   : onDisplayTypeChange,
+        onChange    : onChange,
         options : [
             {name: "UART"},
             {name: "LCD"},
             {name: "Host"}
         ]
+    },
+    {
+        name: "displayImplementation",
+        displayName: "Display Implementation",
+        default: "DisplayUart",
+        options: [
+            {name: "DisplayUart"},
+            {name: "DisplayUart2"},
+            {name: "DisplayDogm1286"},
+            {name: "DisplayHost"}
+        ],
+        readOnly: true,
+        description: "Displays Display delegates available for the " +
+            system.deviceData.deviceId + " device and Display Type.",
+        longDescription: "Displays Display delegates available for the " +
+            system.deviceData.deviceId + " device and the " +
+            "__Display Type__.\n\n" + `
+Since there is only one delegate for each Display Type, it is a read-only
+value that cannot be changed. Please refer to the
+[__Display driver table__][0] for further documentation.
+
+[0]: /drivers/doxygen/html/index.html#display
+`
     },
     {
         name        : "lcdSize",
@@ -65,6 +88,13 @@ let config = [
         displayName : "UART Buffer Size",
         description : "UART display buffer size in bytes",
         default     : 1024
+    },
+    {
+        name        : "useUART2",
+        displayName : "Use UART2",
+        description : "Use UART2 for underlying UART driver",
+        default     : false,
+        onChange    : onChange
     },
     {
         name        : "enableANSI",
@@ -123,33 +153,75 @@ let config = [
 function moduleInstances(inst)
 {
     if (inst.displayType === "UART") {
+
+        let displayName = "UART";
+        let moduleName = "/ti/drivers/UART";
+        if (inst.$hardware && inst.$hardware.displayName) {
+            displayName = inst.$hardware.displayName;
+        }
+
+        if (inst.useUART2) {
+            moduleName = "/ti/drivers/UART2";
+        }
+
         return ([
             {
                 name       : "uart",
-                moduleName : "/ti/drivers/UART",
+                displayName: displayName,
+                moduleName : moduleName,
                 hardware   : inst.$hardware
             }
         ]);
     }
 
     if (inst.displayType === "LCD") {
+
+        let enableName = "LCD Enable";
+        let enableHardware = null;
+        let powerName = "LCD Power";
+        let powerHardware = null;
+        let selectName = "LCD Slave Select";
+        let selectHardware = null;
+
+        /* Speculatively get hardware and displayName */
+        if (inst.$hardware && inst.$hardware.subComponents) {
+            let components = inst.$hardware.subComponents;
+
+            enableHardware = components.ENABLE;
+            powerHardware = components.POWER;
+            selectHardware = components.SELECT;
+
+            if (enableHardware && enableHardware.displayName) {
+                enableName = enableHardware.displayName;
+            }
+            if (powerHardware && powerHardware.displayName) {
+                powerName = powerHardware.displayName;
+            }
+            if (selectHardware && selectHardware.displayName) {
+                selectName = selectHardware.displayName;
+            }
+        }
+
         return ([
             {
                 name       : "lcdEnable",
+                displayName: enableName,
                 moduleName : "/ti/drivers/GPIO",
-                hardware   : inst.$hardware ? inst.$hardware.subComponents.LCD_ENABLE : null,
+                hardware   : enableHardware,
                 args       : { mode: "Dynamic" }
             },
             {
                 name       : "lcdPower",
+                displayName: powerName,
                 moduleName : "/ti/drivers/GPIO",
-                hardware   : inst.$hardware ? inst.$hardware.subComponents.LCD_POWER : null,
+                hardware   : powerHardware,
                 args       : { mode: "Dynamic" }
             },
             {
                 name       : "lcdSS",
+                displayName: selectName,
                 moduleName : "/ti/drivers/GPIO",
-                hardware   : inst.$hardware ? inst.$hardware.subComponents.LCD_SS : null,
+                hardware   : selectHardware,
                 args       : { mode: "Dynamic" }
             }
         ]);
@@ -164,11 +236,25 @@ function moduleInstances(inst)
 function sharedModuleInstances(inst)
 {
     if (inst.displayType == "LCD") {
+
+        let spiName = "LCD SPI";
+        let spiHardware = null;
+
+        /* Speculatively get hardware and displayName */
+        if (inst.$hardware && inst.$hardware.subComponents) {
+            let components = inst.$hardware.subComponents;
+            spiHardware = components.SPI;
+            if (spiHardware && spiHardware.displayName) {
+                spiName = spiHardware.displayName;
+            }
+        }
+
         return ([
             {
                 name       : "spi",
+                displayName: spiName,
                 moduleName : "/ti/drivers/SPI",
-                hardware   : inst.$hardware ? inst.$hardware.subComponents.LCD_SPI : null
+                hardware   : spiHardware
             }
         ]);
     }
@@ -182,12 +268,12 @@ function sharedModuleInstances(inst)
 function validate(inst, validation)
 {
     if (inst.mutexTimeoutValue <= 0) {
-        logError(validation, inst, 'mutexTimeoutValue', 
+        logError(validation, inst, 'mutexTimeoutValue',
                  'Must be a positive integer.');
     }
 
     if (inst.uartBufferSize < 32) {
-        logError(validation, inst, 'uartBufferSize', 
+        logError(validation, inst, 'uartBufferSize',
                  'Must be greater than 32 bytes.');
     }
 
@@ -221,7 +307,7 @@ function validate(inst, validation)
  */
 function onChangeMutexTimeout(inst, ui)
 {
-    if (inst.mutexTimeout == "Custom") {
+    if (inst.mutexTimeout === "Custom") {
         ui.mutexTimeoutValue.hidden = false;
     }
     else {
@@ -231,37 +317,58 @@ function onChangeMutexTimeout(inst, ui)
 }
 
 /*
- *  ======== onDisplayTypeChange ========
+ *  ======== onChange ========
  *  Show/hide appropriate config options for each type of display
+ *  Update Display Implementation if useUART2 config is invoked
  */
-function onDisplayTypeChange(inst, ui)
+function onChange(inst, ui)
 {
     if (inst.displayType == "LCD") {
         ui.enableANSI.hidden = true;
         ui.maxPrintLength.hidden = true;
         ui.uartBufferSize.hidden = true;
+        ui.useUART2.hidden = true;
         ui.baudRate.hidden = true;
         ui.lcdSize.hidden = false;
         ui.mutexTimeout.hidden = true;
         ui.mutexTimeoutValue.hidden = true;
+        inst.displayImplementation = "DisplayDogm1286";
     }
     else if (inst.displayType == "Host") {
         ui.enableANSI.hidden = true;
         ui.maxPrintLength.hidden = false;
         ui.uartBufferSize.hidden = true;
+        ui.useUART2.hidden = true;
         ui.baudRate.hidden = true;
         ui.lcdSize.hidden = true;
         ui.mutexTimeout.hidden = true;
         ui.mutexTimeoutValue.hidden = true;
+        inst.displayImplementation = "DisplayHost";
     }
     else {
         ui.enableANSI.hidden = false;
         ui.maxPrintLength.hidden = true;
         ui.uartBufferSize.hidden = false;
+        ui.useUART2.hidden = false;
         ui.baudRate.hidden = false;
         ui.lcdSize.hidden = true;
         ui.mutexTimeout.hidden = false;
         onChangeMutexTimeout(inst, ui);
+
+        if (inst.useUART2 == false) {
+            inst.displayImplementation =
+                inst.$module.$configByName.displayImplementation.default;
+        }
+        else {
+            inst.displayImplementation = "DisplayUart2";
+        }
+    }
+
+    if (inst.$hardware) {
+        ui.displayType.readOnly = true;
+    }
+    else {
+        ui.displayType.readOnly = false;
     }
 }
 
@@ -272,11 +379,9 @@ function filterHardware(component)
 {
     let ret = false;
 
-    if (component.name) {
-        if (component.name.match("MSP430BOOST_SHARP96")) {
-            return (true);
-        }
-        if (component.name.match("BOOSTXL_SHARP128")) {
+    if (component.type) {
+        /* Check for known component types */
+        if (Common.typeMatches(component.type, ["SHARP_LCD", "SPI_LCD"])) {
             return (true);
         }
     }
@@ -292,43 +397,55 @@ function filterHardware(component)
 function onHardwareChanged(inst, ui)
 {
     if (inst.$hardware) {
-        if (inst.$hardware.name) {
-            if (inst.$hardware.name.match("MSP430BOOST_SHARP96")) {
-                ui.displayType.readOnly = false;
-                inst.displayType = "LCD";
-                onDisplayTypeChange(inst, ui);
-                inst.lcdSize = 96;
-                ui.displayType.readOnly = true;
 
-                return;
-            }
-            if (inst.$hardware.name.match("BOOSTXL_SHARP128")) {
-                ui.displayType.readOnly = false;
-                inst.displayType = "LCD";
-                onDisplayTypeChange(inst, ui);
-                inst.lcdSize = 128;
-                ui.displayType.readOnly = true;
-
-                return;
-            }
-        }
-
-        if (Common.typeMatches(inst.$hardware.type, ["UART"])) {
-            ui.displayType.readOnly = false;
+        if (Common.typeMatches(inst.$hardware.type, ["SHARP_LCD", "SPI_LCD"])) {
+            inst.displayType = "LCD";
+            inst.lcdSize = inst.$hardware.settings.Display.size;
+        } else if (Common.typeMatches(inst.$hardware.type, ["UART"])) {
             inst.displayType = "UART";
-            onDisplayTypeChange(inst, ui);
-            ui.displayType.readOnly = true;
-
-            return;
         }
     }
     else {
-        ui.displayType.readOnly = false;
+        /* Set defaults */
         inst.displayType = "UART";
-        onDisplayTypeChange(inst, ui);
-
-        return;
+        inst.mutexTimeout = "Never Timeout";
     }
+
+    onChange(inst, ui);
+}
+
+/*
+ *  ======== getLibs ========
+ *  Argument to the /ti/utils/build/GenLibs.cmd.xdt template
+ */
+function getLibs(mod)
+{
+    let libGroup = {
+        name: "/ti/display",
+        vers: "1.0.0.0",
+        deps: [],
+        libs: []
+    };
+
+    /* Get device information from GenLibs */
+    let GenLibs = system.getScript("/ti/utils/build/GenLibs");
+    let libPath = GenLibs.libPath;
+
+    /* add the display library to libGroup's libs */
+    libGroup.libs.push(libPath("ti/display", "display.a"));
+
+    /* add dependency on /ti/drivers (if needed) */
+    let needDrivers = false;
+    for (let i = 0; i < mod.$instances.length; i++) {
+        let inst =  mod.$instances[i];
+        if (inst.displayType != "HOST") {
+            needDrivers = true;
+            break;
+        }
+    }
+    libGroup.deps = needDrivers ? ["/ti/drivers"] : [];
+
+    return (libGroup);
 }
 
 /*
@@ -346,22 +463,27 @@ and portable APIs.
 * [Examples][3]
 * [Configuration Options][4]
 
-[1]: /tidrivers/doxygen/html/_display_8h.html#details "C API reference"
-[2]: /tidrivers/doxygen/html/_display_8h.html#ti_drivers_Display_Synopsis "Basic C usage summary"
-[3]: /tidrivers/doxygen/html/_display_8h.html#ti_drivers_Display_Examples "C usage examples"
-[4]: /tidrivers/syscfg/html/ConfigDoc.html#Display_Configuration_Options "Configuration options reference"
+[1]: /drivers/doxygen/html/_display_8h.html#details "C API reference"
+[2]: /drivers/doxygen/html/_display_8h.html#ti_drivers_Display_Synopsis "Basic C usage summary"
+[3]: /drivers/doxygen/html/_display_8h.html#ti_drivers_Display_Examples "C usage examples"
+[4]: /drivers/syscfg/html/ConfigDoc.html#Display_Configuration_Options "Configuration options reference"
 `,
-    documentation: "/tidrivers/doxygen/html/_display_8h.html",
-    defaultInstanceName   : "Board_Display",
-    config                : Common.addNameConfig(config, "ti/drivers/Display","Board_Display"),
+    defaultInstanceName   : "CONFIG_Display_",
+    config                : Common.addNameConfig(config, "/ti/display/Display","CONFIG_Display_"),
     validate              : validate,
     maxInstances          : 3,
     filterHardware        : filterHardware,
     onHardwareChanged     : onHardwareChanged,
+    modules               : Common.autoForceModules(["Board"]),
     moduleInstances       : moduleInstances,
     sharedModuleInstances : sharedModuleInstances,
     templates             : {
-        boardc: "/ti/display/Display.Board.c.xdt"
+        /* contribute to TI-DRIVERS configuration file */
+        boardc: "/ti/display/Display.Board.c.xdt",
+
+        /* contribute libraries to linker command file */
+        "/ti/utils/build/GenLibs.cmd.xdt":
+            {modName: "/ti/display/Display", getLibs: getLibs}
     }
 };
 

@@ -1,6 +1,6 @@
 /******************************************************************************
 
- @file oad_switch_agama.c
+ @file oad_switch.c
 
  @brief Over the Air Download for use with the BLE OAD example
 
@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without

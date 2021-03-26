@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ extern void ICALL_HOOK_ABORT_FUNC();
  * to point to another function of void fn(void) type.
  */
 #if defined (__IAR_SYSTEMS_ICC__)
-#pragma diag_suppress=Pe111
+#pragma diag_suppress=Pe111 // Suppressed warning "statement is unreachable"
 #endif // __IAR_SYSTEMS_ICC__
 #define ICALL_HOOK_ABORT_FUNC() abort()
 #endif /* ICALL_HOOK_ABORT */

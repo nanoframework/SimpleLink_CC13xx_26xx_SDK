@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -61,25 +61,22 @@
 // LED_Service Service UUID
 CONST uint8_t LedServiceUUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(LED_SERVICE_SERV_UUID)
+  TI_BASE_UUID_128(LED_SERVICE_SERV_UUID)
 };
-
 // LED0 UUID
 CONST uint8_t ls_LED0UUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(LS_LED0_UUID)
+  TI_BASE_UUID_128(LS_LED0_UUID)
 };
-
 // LED1 UUID
 CONST uint8_t ls_LED1UUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(LS_LED1_UUID)
+  TI_BASE_UUID_128(LS_LED1_UUID)
 };
-
 // LED2 UUID
 CONST uint8_t ls_LED2UUID[ATT_UUID_SIZE] =
 {
-    TI_BASE_UUID_128(LS_LED2_UUID)
+  TI_BASE_UUID_128(LS_LED2_UUID)
 };
 
 /*********************************************************************

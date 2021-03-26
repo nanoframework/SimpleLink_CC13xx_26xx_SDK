@@ -43,8 +43,12 @@ const DmmStackRoles = {
     blePeripheral: "DMMPolicy_StackRole_BlePeripheral",
     wsnNode: "DMMPolicy_StackRole_WsnNode",
     ti154Sensor: "DMMPolicy_StackRole_154Sensor",
-    reserved1: "DMMPolicy_StackRole_reserved1",
-    reserved2: "DMMPolicy_StackRole_reserved2"
+    ti154Collector: "DMMPolicy_StackRole_154Collector",
+    zigbeeEndDevice: "DMMPolicy_StackRole_ZigbeeEndDevice",
+    zigbeeRouter: "DMMPolicy_StackRole_ZigbeeRouter",
+    zigbeeCoordinator: "DMMPolicy_StackRole_ZigbeeCoordinator",
+    custom1: "DMMPolicy_StackRole_custom1",
+    custom2: "DMMPolicy_StackRole_custom2"
 };
 
 // Applied Activities supported by DMM
@@ -104,7 +108,7 @@ class StackRole
 // ======== Stack Role Definitions ========
 
 const ti154CollectorRole = new StackRole("ti154stack", "15.4 Collector",
-    "TI154_STACK_POLICY_IDX", DmmStackRoles.ti154Sensor);
+    "TI154_STACK_POLICY_IDX", DmmStackRoles.ti154Collector);
 ti154CollectorRole.appliedActivity = DmmAppliedActivity154;
 
 const ti154SensorRole = new StackRole("ti154stack", "15.4 Sensor",
@@ -116,27 +120,27 @@ const blePeripheralRole = new StackRole("ble", "BLE Peripheral",
 blePeripheralRole.appliedActivity = DmmAppliedActivityBLE;
 
 const custom1Role = new StackRole("custom", "Custom 1",
-    "CUSTOM1_STACK_POLICY_IDX", DmmStackRoles.reserved1);
+    "CUSTOM1_STACK_POLICY_IDX", DmmStackRoles.custom1);
 const custom2Role = new StackRole("custom", "Custom 2",
-    "CUSTOM2_STACK_POLICY_IDX", DmmStackRoles.reserved2);
+    "CUSTOM2_STACK_POLICY_IDX", DmmStackRoles.custom2);
 
 const rxAlwaysOnRole = new StackRole("rx_always_on", "RX Always On",
-    "RXALWAYSON_STACK_POLICY_IDX", DmmStackRoles.reserved1);
+    "RXALWAYSON_STACK_POLICY_IDX", DmmStackRoles.custom1);
 
 const wsnNodeRole = new StackRole("proprietary", "WSN Node",
     "WSN_STACK_POLICY_IDX", DmmStackRoles.wsnNode);
 wsnNodeRole.appliedActivity = DmmAppliedActivityWSN;
 
 const zigbeeEndDeviceRole = new StackRole("zstack", "Zigbee End Device",
-    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.ti154Sensor);
+    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.zigbeeEndDevice);
 zigbeeEndDeviceRole.appliedActivity = DmmAppliedActivity154;
 
 const zigbeeRouterRole = new StackRole("zstack", "Zigbee Router",
-    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.ti154Sensor);
+    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.zigbeeRouter);
 zigbeeRouterRole.appliedActivity = DmmAppliedActivity154;
 
 const zigbeeCoordinatorRole = new StackRole("zstack", "Zigbee Coordinator",
-    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.ti154Sensor);
+    "ZIGBEE_STACK_POLICY_IDX", DmmStackRoles.zigbeeCoordinator);
 zigbeeCoordinatorRole.appliedActivity = DmmAppliedActivity154;
 
 // ======== Functions ========

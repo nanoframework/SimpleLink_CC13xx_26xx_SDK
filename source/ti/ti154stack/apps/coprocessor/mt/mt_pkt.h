@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -335,7 +335,7 @@ typedef struct
     uint8_t scanDuration[1];
     /*! Channel page on which to perform the scan */
     uint8_t channelPage[1];
-    /*! PHY ID for the PHY descriptor to use */
+    /*! Set to current PHY ID in MAC layer */
     uint8_t phyId[1];
     /*! Maximum scan results to return */
     uint8_t maxResults[1];

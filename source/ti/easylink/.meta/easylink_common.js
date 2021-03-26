@@ -51,28 +51,381 @@ const deviceToBoard = {
     CC1352P: "CC1352P1_LAUNCHXL",
     CC1312: "CC1312R1_LAUNCHXL",
     CC2642: "CC26X2R1_LAUNCHXL",
+    CC2652P1FSIP: "LP_CC2652PSIP",
+    CC2652R1FSIP: "LP_CC2652RSIP",
     CC2652R1: "CC26X2R1_LAUNCHXL",
     CC2652RB: "CC2652RB_LAUNCHXL",
-    CC2652P: "CC1352P2_LAUNCHXL"
+    CC2652P1FRGZ: "CC1352P_4_LAUNCHXL"
 };
 
 // Settings for ti/devices/CCFG module
 const easylinkCCFGSettings = {
-    CC1312R1_LAUNCHXL_CCFG_SETTINGS: {},
+    CC1312R1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
     CC1352R1_LAUNCHXL_CCFG_SETTINGS: {
         forceVddr: true
     },
-    CC1352P1_LAUNCHXL_CCFG_SETTINGS: {},
+    CC1352P1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
     CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {
         forceVddr: true
     },
-    CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {},
-    CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {}
+    CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2652PSIP_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2652RSIP_CCFG_SETTINGS: {
+        forceVddr: false
+    }
 };
 
 const boardName = getDeviceOrLaunchPadName(true);
 const ccfgSettings = easylinkCCFGSettings[boardName + "_CCFG_SETTINGS"];
+
+const sub1To24Text = "Cannot migrate from a Sub-1GHZ device to a 2.4GHz "
+    + "device";
+const twoFourToSub1Text = "Cannot migrate from a Sub-1GHZ device to a 2.4GHz "
+    + "device";
+const supportedMigrations = {
+    CC1352R1_LAUNCHXL: {
+        CC1352R1F3RGZ: {},
+        CC1312R1F3RGZ: {},
+        CC1312R1_LAUNCHXL: {},
+        CC1352R1_LAUNCHXL: {}
+    },
+    CC1352P1_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P1_LAUNCHXL: {}
+    },
+    CC1352P_2_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P_2_LAUNCHXL: {},
+        CC2652P1FRGZ: {}
+    },
+    CC1352P_4_LAUNCHXL: {
+        CC1352P1F3RGZ: {},
+        CC1352P_4_LAUNCHXL: {},
+        CC2652P1FRGZ: {}
+    },
+    CC1312R1_LAUNCHXL: {
+        CC1312R1F3RGZ: {},
+        CC1312R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text}
+    },
+    CC26X2R1_LAUNCHXL: {
+        CC2652R1FRGZ: {},
+        CC2652R1FSIP: {},
+        CC26X2R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+    },
+    LP_CC2652RSIP: {
+        CC2652R1FRGZ: {},
+        CC2652R1FSIP: {},
+        CC26X2R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+    },
+
+    // Devices
+    CC1352R1F3RGZ: {
+        CC1352R1F3RGZ: {},
+        CC1312R1F3RGZ: {},
+        CC1312R1_LAUNCHXL: {},
+        CC1352R1_LAUNCHXL: {}
+    },
+    CC1352P1F3RGZ: {
+        CC1352P1F3RGZ: {},
+        CC1352P1_LAUNCHXL: {},
+        CC1352P_2_LAUNCHXL: {},
+        CC1352P_4_LAUNCHXL: {}
+    },
+    CC1312R1F3RGZ: {
+        CC1312R1F3RGZ: {},
+        CC1312R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text}
+    },
+    CC2652R1FRGZ: {
+        CC2652R1FRGZ: {},
+        CC2652R1FSIP: {},
+        CC26X2R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+    },
+    CC2652R1FSIP: {
+        CC2652R1FRGZ: {},
+        CC2652R1FSIP: {},
+        CC26X2R1_LAUNCHXL: {},
+        LP_CC2652RSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+    },
+    CC2652P1FRGZ: {
+        CC1352P_2_LAUNCHXL: {},
+        CC1352P_4_LAUNCHXL: {},
+        CC2652P1FRGZ: {}
+    }
+};
+
+/*!
+ *  ======== convertDeviceToBoard ========
+ *  Converts a provided device to a board
+ *
+ *  @param device - String. Possible device that should be mapped to a board
+ *
+ *  @returns String - Name of the board with prefix /ti/boards and
+ *                    suffix .syscfg.json stripped off.
+ */
+function convertDeviceToBoard(device)
+{
+    let name = device;
+
+    // Check if this is a standalone device without a LaunchPad
+    if(!name.includes("LAUNCHXL") && !name.includes("LP_"))
+    {
+        // Find the LaunchPad name in deviceToBoard dictionary
+        let key = null;
+        for(key in deviceToBoard)
+        {
+            if(name.includes(key))
+            {
+                name = deviceToBoard[key];
+                break;
+            }
+        }
+    }
+
+    return(name);
+}
+
+/*
+ * ======== isMigrationValid ========
+ * Determines whether a migration from one board/device to another board/device
+ * is supported by the EasyLink module.
+ *
+ * @returns One of the following Objects:
+ *    - {} <--- Empty object if migration is valid
+ *    - {warn: "Warning markdown text"} <--- Object with warn property
+ *                                           if migration is valid but
+ *                                           might require user action
+ *    - {disable: "Disable markdown text"} <--- Object with disable property
+ *                                              if migration is not valid
+ */
+function isMigrationValid(currentTarget, migrationTarget)
+{
+    let migSupported = {
+        warn: "This migration requires manual steps and  has not been fully "
+        + "tested. See additional documentation for more details"
+    };
+
+    if(supportedMigrations[currentTarget]
+        && supportedMigrations[currentTarget][migrationTarget])
+    {
+        migSupported = supportedMigrations[currentTarget][migrationTarget];
+    }
+
+    return(migSupported);
+}
+
+/*
+ * ======== migrate ========
+ * Perform stack specific changes to the SysConfig env POST migration
+ *
+ * @param currTarget - Board/device being migrated FROM
+ * @param migrationTarget - Board/device being migrated TO
+ * @param env - SysConfig environment providing access to all configurables
+ * @param projectName - Optional name of the project being migrated
+ *
+ * @returns boolean - true when migration is supported and succesful, false when
+ *                    migration is not supported and/or unsuccesful
+ */
+function migrate(currTarget, migrationTarget, env, projectName = null)
+{
+    const migrationInfo = isMigrationValid(currTarget, migrationTarget);
+    let migrationValid = true;
+    if(migrationInfo.disable)
+    {
+        migrationValid = false;
+    }
+
+    if(migrationValid)
+    {
+        /* ======== RF Design Settings ======== */
+        const rfDesign = env.system.modules[
+            "/ti/devices/radioconfig/rfdesign"].$static;
+        const rfDesignSettings = env.system.getScript(
+            "/ti/common/lprf_rf_design_settings.js"
+        ).rfDesignSettings;
+
+        if(rfDesignSettings.rfDesign !== undefined)
+        {
+            let setting = null;
+            for(setting in rfDesignSettings)
+            {
+                if(Object.prototype.hasOwnProperty.call(rfDesignSettings,
+                    setting))
+                {
+                    rfDesign[setting] = rfDesignSettings[setting];
+                }
+            }
+
+            if(env.system.modules["/ti/easylink/easylink"])
+            {
+                const EasyLink = env.system.modules[
+                    "/ti/easylink/easylink"].$static;
+                EasyLink.rfDesign = rfDesignSettings.rfDesign;
+            }
+        }
+
+        /* ======== CCFG Settings ======== */
+        const device = env.system.modules["/ti/devices/CCFG"].$static;
+        const ccfgSettingObj = env.system.getScript(
+            "/ti/common/lprf_ccfg_settings.js"
+        ).ccfgSettings;
+
+        let setting = null;
+        for(setting in ccfgSettingObj)
+        {
+            if(Object.prototype.hasOwnProperty.call(ccfgSettingObj, setting))
+            {
+                device[setting] = ccfgSettingObj[setting];
+            }
+        }
+
+        const phyInstances = [];
+        if(env.system.modules["/ti/easylink/easylink"])
+        {
+            const easylink = env.system.modules[
+                "/ti/easylink/easylink"].$static;
+            _.forIn(easylink, (value, key) =>
+            {
+                if(key.includes("radioConfigEasylink"))
+                {
+                    phyInstances.push(easylink[key]);
+                }
+            });
+        }
+        else
+        {
+            const customStack = env.system.modules[
+                "/ti/devices/radioconfig/custom"].$static;
+            _.forIn(customStack, (value, key) =>
+            {
+                if(key.includes("radioConfig"))
+                {
+                    phyInstances.push(customStack[key]);
+                }
+            });
+        }
+
+        /*
+        * The rfPacketErrorRate projects support both Sub-1GHz and 2.4GHz PHYs.
+        * By default, the Sub-1GHz PHYs transmit at 14dBm power requiring
+        * CCFG_FORCE_VDDR = 1. The 2.4GHz PHYs do not support boost mode. For
+        * both to operate at runtime for this project, the TX power of Sub-1GHz
+        * phys must be < 14dBm and CCFG_FORCE_VDDR = 0.
+        */
+        const boardRepresentation = convertDeviceToBoard(migrationTarget);
+        if((projectName === "rfPacketErrorRate"
+            || projectName === "rfEasyLinkNp")
+            && ((boardRepresentation === "CC1352R1_LAUNCHXL")
+            || (boardRepresentation === "CC1352P_2_LAUNCHXL")
+            || (boardRepresentation === "CC1352P_4_LAUNCHXL")))
+        {
+            for(const phy of phyInstances)
+            {
+                if((phy.txPower) && (phy.txPower === "14"))
+                {
+                    device.forceVddr = false;
+                    phy.txPower = "12.5";
+                }
+                else if((phy.txPower433) && (phy.txPower433 === "14.5"))
+                {
+                    device.forceVddr = false;
+                    phy.txPower433 = "13";
+                }
+            }
+        }
+
+        /*
+        * The rfDualMode projects support both Sub-1GHz and 2.4GHz PHYs. By
+        * default, the Sub-1GHz PHYs transmit at 14dBm power requiring
+        * CCFG_FORCE_VDDR = 1. The 2.4GHz PHYs do not support boost mode. For
+        * both to operate at runtime for this project, the TX power of Sub-1GHz
+        * phys must be < 14dBm and CCFG_FORCE_VDDR = 0.
+        */
+        if((projectName.includes("rfDualMode"))
+            && ((boardRepresentation === "CC1352R1_LAUNCHXL")
+            || (boardRepresentation === "CC1352P_2_LAUNCHXL")))
+        {
+            for(const phy of phyInstances)
+            {
+                if((phy.txPower) && (phy.txPower === "14"))
+                {
+                    device.forceVddr = false;
+                    phy.txPower = "12.5";
+                }
+            }
+        }
+
+        if(boardRepresentation === "CC1312R1_LAUNCHXL")
+        {
+            for(const phy of phyInstances)
+            {
+                if((phy.txPower) && (phy.txPower === "14"))
+                {
+                    device.forceVddr = false;
+                    phy.txPower = "12.5";
+                }
+            }
+        }
+    }
+
+    return(migrationValid);
+}
+
+/*
+ * ======== getMigrationMarkdown ========
+ * Returns text in markdown format that customers can use to aid in migrating a
+ * project between device/boards. It's recommended to use at most 3 bullets,
+ * each line should have a maximum of 120 characters, and a header will be
+ * automatically added via the consumer of this API.
+ *
+ * @param currTarget - Board/device being migrated FROM
+ *
+ * @returns string - Markdown formatted string
+ */
+function getMigrationMarkdown(currTarget)
+{
+    const migrationText = `\
+* PHY settings are not common across all devices, verify they match your \
+desired application and modify accordingly\n
+* Migration from R to P devices requires different rf commands and high pa \
+setup\n\
+* More Detailed Guidelines: [Link to Docs](/proprietary-rf/proprietary-rf-\
+users-guide/sysconfig/proprietary-rf-migration.html#sysconfig-migration-tool)`;
+
+    return(migrationText);
+}
 
 /*
  * ======== isValidAddress ========
@@ -241,18 +594,9 @@ function getDeviceOrLaunchPadName(convertToBoard)
     }
 
     // Check if this is a standalone device without a LaunchPad
-    if(convertToBoard && !name.includes("LAUNCHXL"))
+    if(convertToBoard && !name.includes("LAUNCHXL") && !name.includes("LP_"))
     {
-        // Find the LaunchPad name in deviceToBoard dictionary
-        let key = null;
-        for(key in deviceToBoard)
-        {
-            if(name.includes(key))
-            {
-                name = deviceToBoard[key];
-                break;
-            }
-        }
+        name = convertDeviceToBoard(name);
     }
 
     return(name);
@@ -495,5 +839,8 @@ exports = {
     maxUint32tRatMsTime: maxUint32tRatMsTime,
     maxInt8t: maxInt8t,
     minInt8t: minInt8t,
-    ccfgSettings: ccfgSettings
+    ccfgSettings: ccfgSettings,
+    isMigrationValid: isMigrationValid,
+    migrate: migrate,
+    getMigrationMarkdown: getMigrationMarkdown
 };

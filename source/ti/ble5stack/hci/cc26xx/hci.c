@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -98,7 +98,7 @@ extern RF_Handle rfHandle;
 
 // Major Version (8 bits) . Minor Version (4 bits) . SubMinor Version (4 bits)
 #if defined( CC26X2 ) || defined(CC13X2) || defined(CC13X2P)
-#define HCI_REVISION                                 0x0213  // HCI Version BLE5 2.1.3
+#define HCI_REVISION                                 0x0220  // HCI Version BLE5 2.2.0
 #elif defined( CC26XX )
 #define HCI_REVISION                                 0x0111  // HCI Version BLE5 1.1.1
 #else // !CC26X2 && !CC13X2 && !CC26XX && !CC13XX
@@ -3124,11 +3124,11 @@ hciStatus_t HCI_LE_SetConnectionCteReceiveParamsCmd( uint16 connHandle,
   uint8 rtnParam[3];
 
   // status
-  rtnParam[0] = LL_SetConnectionCteReceiveParams(connHandle,
-                                                 samplingEnable,
-                                                 slotDurations,
-                                                 length,
-                                                 pAntenna);
+  rtnParam[0] = MAP_LL_SetConnectionCteReceiveParams(connHandle,
+                                                     samplingEnable,
+                                                     slotDurations,
+                                                     length,
+                                                     pAntenna);
 
   // connection handle
   rtnParam[1] = LO_UINT16( connHandle );
@@ -3159,10 +3159,10 @@ hciStatus_t HCI_LE_SetConnectionCteTransmitParamsCmd( uint16 connHandle,
   uint8 rtnParam[3];
 
   // status
-  rtnParam[0] = LL_SetConnectionCteTransmitParams(connHandle,
-                                                 types,
-                                                 length,
-                                                 pAntenna);
+  rtnParam[0] = MAP_LL_SetConnectionCteTransmitParams(connHandle,
+                                                      types,
+                                                      length,
+                                                      pAntenna);
 
   // connection handle
   rtnParam[1] = LO_UINT16( connHandle );
@@ -3192,11 +3192,11 @@ hciStatus_t HCI_LE_SetConnectionCteRequestEnableCmd( uint16 connHandle,
   uint8 rtnParam[3];
 
   // status
-  rtnParam[0] = LL_SetConnectionCteRequestEnable(connHandle,
-                                                 enable,
-                                                 interval,
-                                                 length,
-                                                 type);
+  rtnParam[0] = MAP_LL_SetConnectionCteRequestEnable(connHandle,
+                                                     enable,
+                                                     interval,
+                                                     length,
+                                                     type);
 
   // connection handle
   rtnParam[1] = LO_UINT16( connHandle );
@@ -3224,8 +3224,8 @@ hciStatus_t HCI_LE_SetConnectionCteResponseEnableCmd( uint16 connHandle,
   uint8 rtnParam[3];
 
   // status
-  rtnParam[0] = LL_SetConnectionCteResponseEnable(connHandle,
-                                                  enable);
+  rtnParam[0] = MAP_LL_SetConnectionCteResponseEnable(connHandle,
+                                                      enable);
 
     // connection handle
   rtnParam[1] = LO_UINT16( connHandle );
@@ -3253,10 +3253,10 @@ hciStatus_t HCI_LE_ReadAntennaInformationCmd( void )
   uint8 rtnParam[5];
 
   // status
-  rtnParam[0] = LL_ReadAntennaInformation(&rtnParam[1],
-                                          &rtnParam[2],
-                                          &rtnParam[3],
-                                          &rtnParam[4]);
+  rtnParam[0] = MAP_LL_ReadAntennaInformation(&rtnParam[1],
+                                              &rtnParam[2],
+                                              &rtnParam[3],
+                                              &rtnParam[4]);
 
   MAP_HCI_CommandCompleteEvent( HCI_LE_READ_ANTENNA_INFORMATION,
                                 sizeof(rtnParam),
@@ -3264,6 +3264,366 @@ hciStatus_t HCI_LE_ReadAntennaInformationCmd( void )
 
   return( HCI_SUCCESS );
 }
+
+
+#if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_NCONN_CFG) || (CTRL_CONFIG & ADV_CONN_CFG))
+/*******************************************************************************
+ * Used by the Host to set the advertiser parameters for periodic advertising.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetPeriodicAdvParamsCmd( uint8 advHandle,
+                                            uint16 periodicAdvIntervalMin,
+                                            uint16 periodicAdvIntervalMax,
+                                            uint16 periodicAdvProp )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetPeriodicAdvParams(advHandle,
+                                            periodicAdvIntervalMin,
+                                            periodicAdvIntervalMax,
+                                            periodicAdvProp);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_PERIODIC_ADV_PARAMETERS,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used to set the advertiser data used in periodic advertising PDUs.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetPeriodicAdvDataCmd( uint8 advHandle,
+                                          uint8 operation,
+                                          uint8 dataLength,
+                                          uint8 *data )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetPeriodicAdvData(advHandle,
+                                          operation,
+                                          dataLength,
+                                          data);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_PERIODIC_ADV_DATA,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used to request the advertiser to enable or disable
+ * the periodic advertising for the advertising set
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetPeriodicAdvEnableCmd( uint8 enable,
+                                            uint8 advHandle )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetPeriodicAdvEnable(enable,
+                                            advHandle);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_PERIODIC_ADV_ENABLE,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used by the Host to set the type, length, and antenna switching pattern
+ * for the transmission of Constant Tone Extensions in any periodic advertising.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetConnectionlessCteTransmitParamsCmd( uint8 advHandle,
+                                                          uint8 cteLen,
+                                                          uint8 cteType,
+                                                          uint8 cteCount,
+                                                          uint8 length,
+                                                          uint8 *pAntenna)
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetConnectionlessCteTransmitParams(advHandle,
+                                                          cteLen,
+                                                          cteType,
+                                                          cteCount,
+                                                          length,
+                                                          pAntenna);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_PARAMS,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used by the Host to request that the Controller enables or disables the use
+ * of Constant Tone Extensions in any periodic advertising.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetConnectionlessCteTransmitEnableCmd( uint8 advHandle,
+                                                          uint8 enable)
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetConnectionlessCteTransmitEnable(advHandle,
+                                                          enable);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_CONNECTIONLESS_CTE_TRANSMIT_ENABLE,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+#endif
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
+/*******************************************************************************
+ * Used a scanner to synchronize with a periodic advertising train from
+ * an advertiser and begin receiving periodic advertising packets.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_PeriodicAdvCreateSyncCmd( uint8  options,
+                                             uint8  advSID,
+                                             uint8  advAddrType,
+                                             uint8  *advAddress,
+                                             uint16 skip,
+                                             uint16 syncTimeout,
+                                             uint8  syncCteType )
+{
+  hciStatus_t status;
+
+  // status
+  status = MAP_LE_PeriodicAdvCreateSync( options,
+                                     advSID,
+                                     advAddrType,
+                                     advAddress,
+                                     skip,
+                                     syncTimeout,
+                                     syncCteType );
+
+  MAP_HCI_CommandStatusEvent( status, HCI_LE_PERIODIC_ADV_CREATE_SYNC );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to cancel the HCI_LE_Periodic_Advertising_Create_Sync
+ * command while it is pending.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_PeriodicAdvCreateSyncCancelCmd( void )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_PeriodicAdvCreateSyncCancel();
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to stop reception of the periodic advertising
+ * train identified by the syncHandle parameter.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_PeriodicAdvTerminateSyncCmd( uint16 syncHandle )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_PeriodicAdvTerminateSync(syncHandle);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_PERIODIC_ADV_TERMINATE_SYNC,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to add an entry, consisting of a single device address
+ * and SID, to the Periodic Advertiser list stored in the Controller.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_AddDeviceToPeriodicAdvListCmd( uint8 advAddrType,
+                                                  uint8 *advAddress,
+                                                  uint8 advSID )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_AddDeviceToPeriodicAdvList(advAddrType,
+                                              advAddress,
+                                              advSID);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_ADD_DEVICE_TO_PERIODIC_ADV_LIST,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to remove one entry from the list of Periodic Advertisers
+ * stored in the Controller.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_RemoveDeviceFromPeriodicAdvListCmd( uint8 advAddrType,
+                                                       uint8 *advAddress,
+                                                       uint8 advSID )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_RemoveDeviceFromPeriodicAdvList(advAddrType,
+                                                   advAddress,
+                                                   advSID);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_REMOVE_DEVICE_FROM_PERIODIC_ADV_LIST,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to remove all entries from the list of Periodic
+ * Advertisers in the Controller.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_ClearPeriodicAdvListCmd( void )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_ClearPeriodicAdvList();
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_CLEAR_PERIODIC_ADV_LIST,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to read the total number of Periodic Advertiser
+ * list entries that can be stored in the Controller.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_ReadPeriodicAdvListSizeCmd( void )
+{
+  // 0: Status
+  // 1: List Size
+  uint8 rtnParam[2];
+
+  rtnParam[0] = MAP_LE_ReadPeriodicAdvListSize( &rtnParam[1] );
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_READ_PERIODIC_ADV_LIST_SIZE,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used a scanner to enable or disable reports for the periodic
+ * advertising train identified by the syncHandle parameter.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetPeriodicAdvReceiveEnableCmd( uint16 syncHandle,
+                                                   uint8  enable )
+{
+  // 0: Status
+  uint8 rtnParam[1];
+
+  // status
+  rtnParam[0] = MAP_LE_SetPeriodicAdvReceiveEnable(syncHandle,
+                                               enable);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_PERIODIC_ADV_RECEIVE_ENABLE,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * Used by the Host to request that the Controller enables or disables capturing
+ * IQ samples from the CTE of periodic advertising packets in the periodic
+ * advertising train identified by the syncHandle parameter.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetConnectionlessIqSamplingEnableCmd( uint16 syncHandle,
+                                                         uint8 samplingEnable,
+                                                         uint8 slotDurations,
+                                                         uint8 maxSampledCtes,
+                                                         uint8 length,
+                                                         uint8 *pAntenna)
+{
+  // 0: Status
+  // 1: Periodic Scan Handle LSB
+  // 2: Periodic Scan Handle MSB
+  uint8 rtnParam[3];
+
+  // status
+  rtnParam[0] = MAP_LE_SetConnectionlessIqSamplingEnable(syncHandle,
+                                                         samplingEnable,
+                                                         slotDurations,
+                                                         maxSampledCtes,
+                                                         length,
+                                                         pAntenna);
+
+  // periodic scan handle
+  rtnParam[1] = LO_UINT16( syncHandle );
+  rtnParam[2] = HI_UINT16( syncHandle );
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_CONNECTIONLESS_IQ_SAMPLING_ENABLE,
+                                sizeof(rtnParam),
+                                rtnParam );
+
+  return( HCI_SUCCESS );
+}
+#endif
 
 /*
 ** HCI Vendor Specific Comamnds: Link Layer Extensions
@@ -4540,13 +4900,14 @@ hciStatus_t HCI_EXT_SetPinOutputCmd( uint8 dio,
 }
 
 /*******************************************************************************
- * This API is used to set CTE accuracy for 1M and 2M PHY
+ * This API is used to set CTE accuracy for 1M and 2M PHY per connection handle (0x0XXX)
+ * or per periodic advertising train handle (0x1XXX)
  * sample rate range : 1 - least accuracy (as in 5.1 spec) to 4 - most accuracy
  * sample size range : 1 - 8 bits (as in 5.1 spec) or 2 - 16 bits (more accurate)
  *
  * Public function defined in hci.h.
  */
-hciStatus_t HCI_EXT_SetLocationingAccuracyCmd( uint16 connHandle,
+hciStatus_t HCI_EXT_SetLocationingAccuracyCmd( uint16 handle,
                                                uint8  sampleRate1M,
                                                uint8  sampleSize1M,
                                                uint8  sampleRate2M,
@@ -4562,12 +4923,12 @@ hciStatus_t HCI_EXT_SetLocationingAccuracyCmd( uint16 connHandle,
   rtnParam[1] = HI_UINT16( HCI_EXT_SET_LOCATIONING_ACCURACY_EVENT );
 
   // status
-  rtnParam[2] = LL_EXT_SetLocationingAccuracy( connHandle,
-                                               sampleRate1M,
-                                               sampleSize1M,
-                                               sampleRate2M,
-                                               sampleSize2M,
-                                               sampleCtrl);
+  rtnParam[2] = MAP_LL_EXT_SetLocationingAccuracy( handle,
+                                                   sampleRate1M,
+                                                   sampleSize1M,
+                                                   sampleRate2M,
+                                                   sampleSize2M,
+                                                   sampleCtrl);
 
   MAP_HCI_VendorSpecifcCommandCompleteEvent( HCI_EXT_SET_LOCATIONING_ACCURACY,
                                              sizeof(rtnParam),
@@ -4665,6 +5026,50 @@ hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap )
   return( HCI_SUCCESS );
 }
 #endif // CTRL_CONFIG & SCAN_CFG
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
+/*******************************************************************************
+ * This HCI EXTENSION API is used to set the QOS Parameters.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_EXT_SetQOSParameters( uint8  taskType,
+                                      uint8  paramType,
+                                      uint32 paramVal,
+                                      uint16 taskHandle)
+{
+  hciStatus_t status;
+
+  status = MAP_LL_EXT_SetQOSParameters( taskType,
+                                        paramType,
+                                        paramVal,
+                                        taskHandle );
+
+  MAP_HCI_CommandCompleteEvent( HCI_EXT_SET_QOS_PARAMETERS,
+                                sizeof(status),
+                                &status );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * This HCI EXTENSION API is used to set the default QOS Parameters.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValue )
+{
+  hciStatus_t status;
+
+  status = MAP_LL_EXT_SetQOSDefaultParameters( defaultParamConnPriorityValue );
+
+  MAP_HCI_CommandCompleteEvent( HCI_EXT_SET_QOS_DEFAULT_PARAMETERS,
+                                sizeof(status),
+                                &status );
+
+  return( HCI_SUCCESS );
+}
+#endif // (ADV_CONN_CFG | INIT_CFG)
 
 /*******************************************************************************
  * This API is used to enable or disable the Coex feature.

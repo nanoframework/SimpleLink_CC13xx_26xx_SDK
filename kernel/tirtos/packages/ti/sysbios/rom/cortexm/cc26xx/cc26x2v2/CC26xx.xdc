@@ -85,6 +85,17 @@ module CC26xx inherits ti.sysbios.interfaces.IRomDevice
      */
     metaonly String getOtherLibDefs();
 
+    /*!
+     *  @_nodoc
+     *  ======== validate ========
+     *  Validate that the configuration options align with the
+     *  settings that were used when buidling the ROM. This can be
+     *  set to false to bypass the ROM validation warnings that are
+     *  are raised with configuration options don't align with the 
+     *  settings that were used when building the ROM.
+     */
+    metaonly config Bool validate = true;
+
 internal:   /* not for client use */
 
     /*

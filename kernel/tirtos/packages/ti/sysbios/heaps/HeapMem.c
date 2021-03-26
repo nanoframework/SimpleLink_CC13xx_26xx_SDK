@@ -278,6 +278,14 @@ Ptr HeapMem_allocUnprotected(HeapMem_Object *obj, SizeT reqSize, SizeT reqAlign)
     }
 
     /*
+     * If size is very large and adjSize overflows, the result will be
+     * smaller than reqSize. In this case, don't try to allocate.
+     */
+    if (adjSize < (Memory_Size)reqSize) {
+        return (NULL);
+    }
+
+    /*
      *  The block will be allocated from curHeader. Maintain a pointer to
      *  prevHeader so prevHeader->next can be updated after the alloc.
      */

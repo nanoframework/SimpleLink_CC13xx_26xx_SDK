@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2020, Texas Instruments Incorporated
+ Copyright (c) 2014-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -331,8 +331,8 @@ bool tbm_buttonRight(void)
 void tbm_displayItem(uint32 itemIndex, uint8 row)
 {
   uint8* pDesc;
-  uint8* pPrefix = "";
-  uint8* pPostfix = "";
+  uint8* pPrefix = (uint8 *)"";
+  uint8* pPostfix = (uint8 *)"";
 
   if (itemIndex == ptbmMenuObj->attrib.numItem)
   {
@@ -356,7 +356,7 @@ void tbm_displayItem(uint32 itemIndex, uint8 row)
     if (!TBM_IS_ITEM_ACTIVE(ptbmMenuObj, itemIndex))
     {
       /* If this is an inactive item, should be prefixed with 'x' */
-      pPrefix = "x";
+      pPrefix = (uint8 *)"x";
     }
     else
   #endif /* TBM_ACTIVE_ITEMS_ONLY */
@@ -364,12 +364,12 @@ void tbm_displayItem(uint32 itemIndex, uint8 row)
       if (TBM_IS_SUBMENU(ptbmMenuObj, itemIndex))
       {
         /* If this is an active submenu, '+' should prefix the text. */
-        pPrefix = "+";
+        pPrefix = (uint8 *)"+";
       }
       else
       {
         /* If this is an active action, a space should prefix the text. */
-        pPrefix = " ";
+        pPrefix = (uint8 *)" ";
       }
     }
   }
@@ -377,7 +377,7 @@ void tbm_displayItem(uint32 itemIndex, uint8 row)
   if (row == TBM_ROW_ITEM_FIRST)
   {
     /* If the current item, postfix with " >" */
-    pPostfix = " >";
+    pPostfix = (uint8 *)" >";
   }
 
   /* Display the description with the prefix and the postfix */

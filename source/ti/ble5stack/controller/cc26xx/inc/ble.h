@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -200,6 +200,7 @@
 #define EXT_SCAN_CFG_AUTO_WL_IGNORE    BV(3)
 #define EXT_SCAN_CFG_AUTO_ADI_PROCESS  BV(4)
 #define EXT_SCAN_CFG_EXCLUSIVE_SID     BV(5)
+#define EXT_SCAN_CFG_ACCEPT_SYNCINFO   BV(6)
 
 // Init Configuration
 #define INIT_CFG_USE_PEER_ADDR         0
@@ -258,16 +259,19 @@
 #define RAT_TICKS_IN_280US             1120      // Radio Overhead + FS Calibration
 #define RAT_TICKS_IN_300US             1200      // T_MAFS (AE)
 #define RAT_TICKS_IN_352US             1408      // CONNECT_IND is 44 bytes
+#define RAT_TICKS_IN_500US             2000      // Periodic Adv addition process command
 #define RAT_TICKS_IN_625US             2500      // Fundamental BLE Time Slot
 #define RAT_TICKS_IN_900US             3600      // Additional Rx Synch overhead for Coded S8
 #define RAT_TICKS_IN_1MS               4000      // Multiple of Adv Random Delay
 #define RAT_TICKS_IN_1_006MS           4024      // AUX_CONNECT_REQ in Coded S2
 #define RAT_TICKS_IN_1_25MS            5000      // Fundamental BLE Time Unit
 #define RAT_TICKS_IN_1_875MS           7500      // DTM Packet Interval
+#define RAT_TICKS_IN_2MS               8000      // Max time in 1M phy for fragments periodic adv
 #define RAT_TICKS_IN_2_5MS             10000     // DTM Packet Interval
 #define RAT_TICKS_IN_2_896MS           11584     // AUX_CONNECT_REQ in Coded S8
 #define RAT_TICKS_IN_10MS              40000     // General Purpose Delay
 #define RAT_TICKS_IN_12_5MS            50000     // DTM T(l) Compare
+#define RAT_TICKS_IN_16MS              64000     // Max time in Coded phy for fragments periodic adv
 #define RAT_TICKS_IN_20MS              80000
 #define RAT_TICKS_IN_1_28S             5120000   // Directed Advertising Timeout
 #define RAT_TICKS_IN_32S               128000000 // Max LSTO
@@ -478,6 +482,12 @@
 
 #define SET_EXT_SCAN_FILTER_CFG_EXCLUSIVE_SID( c )                             \
   (c) |= EXT_SCAN_CFG_EXCLUSIVE_SID
+
+#define CLR_EXT_SCAN_FILTER_CFG_ACCEPT_SYNCINFO( c )                           \
+  (c) &= ~EXT_SCAN_CFG_ACCEPT_SYNCINFO
+
+#define SET_EXT_SCAN_FILTER_CFG_ACCEPT_SYNCINFO( c )                           \
+  (c) |= EXT_SCAN_CFG_ACCEPT_SYNCINFO
 
 //
 // Adi Status Configuration
@@ -1188,8 +1198,8 @@ extern dataEntryQ_t *llSetupAdvDataEntryQueue( void );
 extern dataEntryQ_t *llSetupDataEntryQueue( void );
 extern dataEntryQ_t *llSetupOneDataEntryQueueDyn( void );
 extern dataEntryQ_t *llSetupConnRxDataEntryQueue( uint8 connId );
-extern uint8         llSetupCteSamplesEntryQueue( void );
-extern void          llFreeCteSamplesEntryQueue( void );
+extern uint8         llSetupCteSamplesEntryQueue( uint8 numBuffers );
+extern uint8         llFreeCteSamplesEntryQueue( void );
 extern void          llAddTxDataEntry( dataEntryQ_t *, dataEntry_t * );
 extern void          llProcessSlaveControlPacket( llConnState_t *, uint8 * );
 extern void          llProcessMasterControlPacket( llConnState_t *, uint8 * );

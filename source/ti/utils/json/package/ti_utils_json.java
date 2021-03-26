@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_utils_json
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -93,6 +93,8 @@ public class ti_utils_json
         sb.append("pkg.build.libraries = [\n");
             sb.append("'lib/ccs/m4f/json_debug.a',\n");
             sb.append("'lib/ccs/m4f/json_release.a',\n");
+            sb.append("'lib/ticlang/m4f/json_debug.a',\n");
+            sb.append("'lib/ticlang/m4f/json_release.a',\n");
             sb.append("'lib/gcc/m4f/json_debug.a',\n");
             sb.append("'lib/gcc/m4f/json_release.a',\n");
             sb.append("'lib/iar/m4f/json_debug.a',\n");
@@ -101,6 +103,8 @@ public class ti_utils_json
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ccs/m4f/json_debug.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/ccs/m4f/json_release.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/ticlang/m4f/json_debug.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ticlang/m4f/json_release.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/gcc/m4f/json_debug.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/gcc/m4f/json_release.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/iar/m4f/json_debug.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -118,6 +118,21 @@ extern "C"
 #define HCI_EXT_GAP_UPDATE_LINK_PARAM_REQ       0x11
 #define HCI_EXT_GAP_UPDATE_LINK_PARAM_REQ_REPLY 0x12
 #define HCI_EXT_GAP_REGISTER_CONN_EVT           0x13
+
+// GAP Periodic Advertising
+// Advertiser
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS 0x14
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA   0x15
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE 0x16
+//Scanner
+#define HCI_EXT_GAP_SCAN_CREATE_SYNC                     0x17
+#define HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL              0x18
+#define HCI_EXT_GAP_SCAN_TERMINATE_SYNC                  0x19
+#define HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_REPORT     0x1A
+#define HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST    0x1B
+#define HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST 0x1C
+#define HCI_EXT_GAP_SCAN_READ_ERIODIC_ADV_LIST_SIZE      0x1D
+#define HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST         0x1E
 
 // GAP Parameters
 #define HCI_EXT_GAP_CONFIG_SET_PARAM            0x2F
@@ -242,6 +257,23 @@ extern "C"
 #define HCI_EXT_GAP_CONNECTING_CANCELLED_EVENT      ( HCI_EXT_GAP_EVENT | 0x15 )
 #define HCI_EXT_GAP_CONN_EVT_NOTICE                 ( HCI_EXT_GAP_EVENT | 0x16 )
 #define HCI_EXT_GAP_BOND_LOST_EVENT                 ( HCI_EXT_GAP_EVENT | 0x17 )
+// GAP - Periodic Advertising Events
+// Advertiser
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT ( HCI_EXT_GAP_EVENT | 0x19 )
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT   ( HCI_EXT_GAP_EVENT | 0x1A )
+#define HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT ( HCI_EXT_GAP_EVENT | 0x1B )
+// Scanner
+#define HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT               ( HCI_EXT_GAP_EVENT | 0x1C )
+#define HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT             ( HCI_EXT_GAP_EVENT | 0x1D )
+#define HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT          ( HCI_EXT_GAP_EVENT | 0x1E )
+#define HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT                     ( HCI_EXT_GAP_EVENT | 0x1F )
+#define HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT              ( HCI_EXT_GAP_EVENT | 0x20 )
+#define HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT                  ( HCI_EXT_GAP_EVENT | 0x21 )
+#define HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT            ( HCI_EXT_GAP_EVENT | 0x22 )
+#define HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT    ( HCI_EXT_GAP_EVENT | 0x23 )
+#define HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT ( HCI_EXT_GAP_EVENT | 0x24 )
+#define HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT     ( HCI_EXT_GAP_EVENT | 0x25 )
+#define HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT         ( HCI_EXT_GAP_EVENT | 0x26 )
 // UTIL Events (continued)
 #define HCI_EXT_UTIL_MEM_STATS_EVENT                ( HCI_EXT_UTIL_EVENT | 0x01 )
 #define HCI_EXT_UTIL_SYSTEM_ERROR                   ( HCI_EXT_UTIL_EVENT | 0x02 )

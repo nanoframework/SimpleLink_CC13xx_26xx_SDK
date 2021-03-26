@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -526,7 +526,7 @@ NwkDiscovery_Status_t NwkDiscovery_processEvents(void)
                 {
                     /* Send Match Desc Req to obtain proper lightEndPoint data */
                     zstack_zdoMatchDescReq_t zdoMatchDescReq;
-                    uint16_t cluster = ZCL_CLUSTER_ID_GEN_ON_OFF;
+                    uint16_t cluster = ZCL_CLUSTER_ID_GENERAL_ON_OFF;
                     zdoMatchDescReq.dstAddr = pDeviceToDiscover->discoveredDevice.nwkAddr;
                     zdoMatchDescReq.nwkAddrOfInterest = pDeviceToDiscover->discoveredDevice.nwkAddr;
                     zdoMatchDescReq.n_outputClusters = 0;

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -56,8 +56,8 @@ extern "C"
  * INCLUDES
  */
 
-#include <driverLib/gpio.h>
-#include <driverLib/ioc.h>
+#include <driverlib/gpio.h>
+#include <driverlib/ioc.h>
 
 /*******************************************************************************
  * MACROS

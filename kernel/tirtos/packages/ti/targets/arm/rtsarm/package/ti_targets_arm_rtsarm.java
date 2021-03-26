@@ -2,7 +2,7 @@
  *  Do not modify this file; it is automatically 
  *  generated and any modifications will be overwritten.
  *
- * @(#) xdc-I11
+ * @(#) xdc-K04
  */
 import java.util.*;
 import org.mozilla.javascript.*;
@@ -11,7 +11,7 @@ import xdc.services.spec.Session;
 
 public class ti_targets_arm_rtsarm
 {
-    static final String VERS = "@(#) xdc-I11\n";
+    static final String VERS = "@(#) xdc-K04\n";
 
     static final Proto.Elm $$T_Bool = Proto.Elm.newBool();
     static final Proto.Elm $$T_Num = Proto.Elm.newNum();
@@ -171,11 +171,15 @@ public class ti_targets_arm_rtsarm
             sb.append("'lib/ti.targets.arm.rtsarm.aem4f',\n");
             sb.append("'lib/boot.aem4f',\n");
             sb.append("'lib/auto_init.aem4f',\n");
+            sb.append("'lib/ti.targets.arm.rtsarm.am4f',\n");
+            sb.append("'lib/startup.am4f',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ti.targets.arm.rtsarm.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/boot.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/auto_init.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
+            sb.append("['lib/ti.targets.arm.rtsarm.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/startup.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

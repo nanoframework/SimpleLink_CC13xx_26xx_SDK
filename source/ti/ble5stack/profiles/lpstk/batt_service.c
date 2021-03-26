@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,6 @@ CONST uint8_t battery_levelUUID[ATT_UUID_SIZE] =
 {
   TI_BASE_UUID_128(BATT_LEVEL_UUID)
 };
-
 /*********************************************************************
 * LOCAL VARIABLES
 */

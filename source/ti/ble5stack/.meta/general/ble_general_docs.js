@@ -89,7 +89,7 @@ For more information, refer to the [BLE User's Guide](ble5stack/ble_user_guide/\
 html/ble-stack-5.x/creating-a-custom-bluetooth-low-energy-application-cc13x2_26x2.\
 html#ram-optimization).\n
 __Default__: 8\n
-__Range__: Central Role: 0 to 32, Other Roles: 0 to 8`
+__Range__: Central Role: 0 to 32, Other Roles: 0 to 16`
 
 // Long description for the maxPDUNum configuration parameter
 const maxPDUNumLongDescription = `Maximum number of BLE HCI PDUs.\n

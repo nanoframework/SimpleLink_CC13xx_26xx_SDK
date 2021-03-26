@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2010-2020, Texas Instruments Incorporated
+ Copyright (c) 2010-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@
 #include "ti_ble_config.h"
 
 #ifdef USE_GATT_BUILDER
-#include "ti_services.h"
+#include "ble_gatt_service.h"
 #endif
 
 #endif

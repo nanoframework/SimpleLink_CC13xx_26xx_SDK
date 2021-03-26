@@ -58,7 +58,8 @@ function close()
         return;
     }
 
-    if ((Program.build.target.isa == "v7M") ||
+    if ((Program.build.target.isa == "v6M") ||
+        (Program.build.target.isa == "v7M") ||
         (Program.build.target.isa == "v7M4")) {
         if (Program.sectMap[".bootVecs"] === undefined) {
             Program.sectMap[".intvecs (0) : AT(0) { KEEP(*(.bootVecs)) }"] = new Program.SectionSpec();
@@ -67,7 +68,7 @@ function close()
     }
 }
 /*
- *  @(#) gnu.targets.arm.rtsv7M; 1, 0, 0,; 5-11-2020 15:37:37; /db/ztree/library/trees/xdctargets/xdctargets-w14/src/ xlibrary
+ *  @(#) gnu.targets.arm.rtsv7M; 1, 0, 0,; 9-3-2020 14:59:28; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
 
  */
 

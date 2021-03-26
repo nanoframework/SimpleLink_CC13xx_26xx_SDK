@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       sys_ctrl.c
-*  Revised:        2020-04-08 16:43:43 +0200 (Wed, 08 Apr 2020)
-*  Revision:       57331
+*  Revised:        2020-12-10 16:31:27 +0100 (Thu, 10 Dec 2020)
+*  Revision:       59841
 *
 *  Description:    Driver for the System Control.
 *
@@ -284,8 +284,9 @@ SysCtrlSetRechargeBeforePowerDown( uint32_t xoscPowerMode )
       if ( tcDelta > vddrSleepDelta ) {
          vddrSleepDelta = tcDelta ;
       }
-      vddrSleepTrim = (( HWREG( FLASH_CFG_BASE + FCFG1_OFFSET + FCFG1_O_MISC_TRIM ) & FCFG1_MISC_TRIM_TRIM_RECHARGE_COMP_REFLEVEL_M ) >>
-                                                                                      FCFG1_MISC_TRIM_TRIM_RECHARGE_COMP_REFLEVEL_S ) ;
+      vddrSleepTrim = (( HWREG( FCFG1_BASE + FCFG1_O_MISC_TRIM ) & FCFG1_MISC_TRIM_TRIM_RECHARGE_COMP_REFLEVEL_M ) >>
+                                                                   FCFG1_MISC_TRIM_TRIM_RECHARGE_COMP_REFLEVEL_S ) ;
+
       vddrSleepTrim -= vddrSleepDelta ;
       if ( vddrSleepTrim >  15 ) vddrSleepTrim =  15 ;
       if ( vddrSleepTrim <   1 ) vddrSleepTrim =   1 ;

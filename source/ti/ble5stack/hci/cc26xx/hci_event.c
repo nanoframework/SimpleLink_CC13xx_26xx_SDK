@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2009-2020, Texas Instruments Incorporated
+ Copyright (c) 2009-2021, Texas Instruments Incorporated
  All rights reserved.
 
  IMPORTANT: Your use of this Software is limited to those specific rights
@@ -89,6 +89,9 @@
 #define HCI_CTE_MAX_RF_EXT_BUFFER_SIZE           (512)  //second buffer size (RFE RAM)
 #define HCI_CTE_SAMPLE_RATE_4MHZ                 (4)
 #define HCI_CTE_SAMPLE_RATE_1MHZ                 (1)
+
+#define HCI_PERIODIC_ADV_REPORT_MAX_DATA         (0xFF - HCI_PERIODIC_ADV_REPORT_EVENT_LEN)
+#define HCI_PERIODIC_ADV_REPORT_DATA_INCOMPLETE  (1)
 
 /*******************************************************************************
  * TYPEDEFS
@@ -3546,7 +3549,7 @@ void HCI_ConnectionlessIqReportEvent(uint16 syncHandle,
       {
         // message type, length
         msg->hdr.event	= HCI_GAP_EVENT_EVENT;
-        msg->hdr.status = HCI_LE_EVENT_CODE;
+        msg->hdr.status = HCI_TEST_EVENT_CODE;
 
         // create message
         msg->pData	  = (uint8*)(msg+1);
@@ -3673,6 +3676,560 @@ void HCI_ConnectionlessIqReportEvent(uint16 syncHandle,
                        cteData,
                        (int8 *)&(msg->pData[HCI_EVENT_MIN_LENGTH+HCI_CONNECTIONLESS_IQ_REPORT_EVENT_LEN]));
 
+      // send the message
+      (void)MAP_osal_msg_send( hciTaskID, (uint8 *)msg );
+    }
+  }
+}
+
+/*******************************************************************************
+ * @fn          HCI_ExtConnectionlessIqReportEvent Callback
+ *
+ * @brief       This function is used to generate an Extended I/Q CTE (Oversampling)
+ *              report event after receiving periodic advertise packet with CTE.
+ *
+ * input parameters
+ *
+ * @param       syncHandle    - periodic advertisment sync handle.
+ * @param       channelIndex  - index of the data channel
+ * @param       rssi          - RSSI value of the packet
+ * @param       rssiAntenna   - ID of the antenna on which the RSSI was measured
+ * @param       cteType       - CTE type (0-AoA, 1-AoD with 1us, 2-AoD with 2us)
+ * @param       slotDuration  - Switching and sampling slots (1 - 1us, 2 - 2us)
+ * @param       status        - packet status:
+ *                              0 - CRC was correct
+ *                              1 - CRC was incorrect
+ * @param       eventCounter  - current periodic adv event counter
+ * @param       sampleCount   - number of samples including the 8 reference period
+ * @param       sampleRate    - number of samples per 1us represent CTE accuracy
+ *                              range : 1 - least accuracy (as in 5.1 spec) to 4 - most accuracy
+ * @param       sampleSize    - sample size represent CTE accuracy
+ *                              range : 1 - 8 bit (as in 5.1 spec) or 2 - 16 bits (most accurate)
+ * @param       sampleCtrl    - sample control flags
+ *                              range : bit0=0 - Default filtering, bit0=1 - RAW_RF(no filtering), , bit1..7=0 - spare
+ * @param       cteData       - RF buffer which hold the samples
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      None.
+ */
+void HCI_ExtConnectionlessIqReportEvent(uint16 syncHandle,
+                                        uint8  channelIndex,
+                                        uint16 rssi,
+                                        uint8  rssiAntenna,
+                                        uint8  cteType,
+                                        uint8  slotDuration,
+                                        uint8  status,
+                                        uint16 eventCounter,
+                                        uint16 sampleCount,
+                                        uint8  sampleRate,
+                                        uint8  sampleSize,
+                                        uint8  sampleCtrl,
+                                        uint32 *cteData)
+{
+  uint8 numEvents = 0;
+  uint8 samplesPerEvent;
+  uint16 samplesOffset = 0;
+  uint8 i;
+  uint16 totalDataLen;
+
+  // check if LE Meta-Events are enabled and this event is enabled
+  // Note: the bit number is the same as Connectionless Iq Report Event bit
+  if ( ((pHciEvtMask[BT_EVT_INDEX_LE_META_EVENT] & BT_EVT_MASK_LE_META_EVENT) == 0) ||
+   (((pBleEvtMask[LE_EVT_INDEX_CONNECTIONLESS_IQ_REPORT] & LE_EVT_MASK_CONNECTIONLESS_IQ_REPORT) == 0 )) )
+  {
+    // the event mask is not enabled for this event
+    return;
+  }
+   // case the main source buffer is NULL - do not send the report
+  if (cteData == NULL)
+  {
+    return;
+  }
+  // set the total samples includes over sampling (in case the host enable it by VS command)
+  sampleCount *= (sampleRate * sampleSize);
+
+  // set the number of host event to send
+  numEvents += ((sampleCount / HCI_CTE_MAX_SAMPLES_PER_EVENT) + (((sampleCount % HCI_CTE_MAX_SAMPLES_PER_EVENT) != 0)?1:0));
+  totalDataLen = sampleCount;
+
+  // check if this is for the Host
+  if ( hciGapTaskID != 0 )
+  {
+    hciEvt_BLEExtCteConnectionlessIqReport_t *msg;
+
+    // compose each event
+    for (i=0; i < numEvents; i++)
+    {
+      // set number of sample in current event
+      // should be aligned to sample rate and size
+      samplesPerEvent = (sampleCount < HCI_CTE_MAX_SAMPLES_PER_EVENT)?sampleCount:HCI_CTE_MAX_SAMPLES_PER_EVENT;
+
+      // update the total samples value
+      sampleCount -= samplesPerEvent;
+
+      msg = (hciEvt_BLEExtCteConnectionlessIqReport_t *)MAP_osal_msg_allocate(sizeof( hciEvt_BLEExtCteConnectionlessIqReport_t ) + (2 * samplesPerEvent));
+
+      if( msg )
+      {
+        // message header
+        msg->hdr.event  = HCI_GAP_EVENT_EVENT;
+        msg->hdr.status = HCI_LE_EVENT_CODE; // use status field to pass the HCI Event code
+
+        // event packet
+        msg->BLEEventCode = HCI_BLE_EXT_CONNECTIONLESS_IQ_REPORT_EVENT;
+        msg->totalDataLen = totalDataLen;
+        msg->eventIndex   = i;
+        msg->syncHandle   = syncHandle;
+        msg->channelIndex = channelIndex;
+        msg->rssi         = rssi;
+        msg->rssiAntenna  = rssiAntenna;
+        msg->cteType      = cteType;
+        msg->slotDuration = slotDuration;
+        msg->status       = status;
+        msg->eventCounter = eventCounter;
+        msg->dataLen      = samplesPerEvent;
+        msg->sampleRate   = sampleRate;
+        msg->sampleSize   = sampleSize;
+        msg->sampleCtrl   = sampleCtrl;
+        msg->iqSamples    = (int8 *)((uint8 *)msg + sizeof( hciEvt_BLEExtCteConnectionlessIqReport_t ));
+
+        // copy IQ samples
+        samplesOffset = LL_SetCteSamples(samplesPerEvent,
+                                         slotDuration,
+                                         sampleRate,
+                                         sampleSize,
+                                         sampleCtrl,
+                                         samplesOffset,
+                                         cteData,
+                                         msg->iqSamples);
+
+        // send the message
+        (void)MAP_osal_msg_send( hciGapTaskID, (uint8 *)msg );
+      }
+    }
+  }
+  else
+  {
+    hciPacket_t *msg;
+    uint8 dataLength;
+    uint8 totalLength;
+
+    // compose each event
+    for (i=0; i < numEvents; i++)
+    {
+      // set number of sample in current event
+      // should be aligned to sample rate
+      samplesPerEvent = (sampleCount < HCI_CTE_MAX_SAMPLES_PER_EVENT)?sampleCount:HCI_CTE_MAX_SAMPLES_PER_EVENT;
+
+      // update the total samples value
+      sampleCount -= samplesPerEvent;
+
+      // data length includes I samples and Q samples
+      dataLength = HCI_EXT_CONNECTIONLESS_IQ_REPORT_EVENT_LEN + (samplesPerEvent * 2);
+
+      // OSAL message header + HCI event header + data
+      totalLength = sizeof( hciPacket_t ) + HCI_EVENT_MIN_LENGTH + dataLength;
+
+      msg = (hciPacket_t *)MAP_osal_msg_allocate(totalLength);
+
+      if (msg)
+      {
+        // message type, length
+        msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+        msg->hdr.status = 0xFF;
+
+        // create message
+        msg->pData    = (uint8*)(msg+1);
+        msg->pData[0] = HCI_EVENT_PACKET;
+        msg->pData[1] = HCI_LE_EVENT_CODE;
+        msg->pData[2] = dataLength;
+
+        // populate event
+        msg->pData[3] = HCI_BLE_EXT_CONNECTIONLESS_IQ_REPORT_EVENT; // event code
+        msg->pData[4] = LO_UINT16 (totalDataLen);                   // total samples data length (LSB)
+        msg->pData[5] = HI_UINT16 (totalDataLen);                   // total samples data length (MSB)
+        msg->pData[6] = i;                                          // event number
+        msg->pData[7] = LO_UINT16 (syncHandle);                     // periodic handle (LSB)
+        msg->pData[8] = HI_UINT16 (syncHandle);                     // periodic handle (MSB)
+        msg->pData[9] = channelIndex;                              // index of data channel
+        msg->pData[10] = LO_UINT16 (rssi);                          // rssi (LSB)
+        msg->pData[11] = HI_UINT16 (rssi);                          // rssi (MSB)
+        msg->pData[12] = rssiAntenna;                               // antenna ID
+        msg->pData[13] = cteType;                                   // cte type
+        msg->pData[14] = slotDuration;                              // sampling slot 1us or 2us
+        msg->pData[15] = status;                                    // packet status
+        msg->pData[16] = LO_UINT16 (eventCounter);                  // periodic adv event counter (LSB)
+        msg->pData[17] = HI_UINT16 (eventCounter);                  // periodic adv event counter (MSB)
+        msg->pData[18] = samplesPerEvent;                           // number of samples
+        msg->pData[19] = sampleRate;                                // sample rate
+        msg->pData[20] = sampleSize;                                // sample size
+        msg->pData[21] = sampleCtrl;                                // sample control flags
+
+        // copy IQ samples
+        samplesOffset = LL_SetCteSamples(samplesPerEvent,
+                                         slotDuration,
+                                         sampleRate,
+                                         sampleSize,
+                                         sampleCtrl,
+                                         samplesOffset,
+                                         cteData,
+                                         (int8 *)&(msg->pData[HCI_EVENT_MIN_LENGTH+HCI_EXT_CONNECTIONLESS_IQ_REPORT_EVENT_LEN]));
+
+        // send the message
+        (void)MAP_osal_msg_send( hciTaskID, (uint8 *)msg );
+      }
+    }
+  }
+}
+
+/*********************************************************************
+ * @fn      HCI_PeriodicAdvSyncEstablishedEvent
+ *
+ * @brief   This event indicates the scanner that the Controller has received
+ *          the first periodic advertising packet from an advertiser after the
+ *          HCI_LE_Periodic_Advertising_Create_Sync command has been sent to the Controller.
+ *
+ * @design  /ref did_286039104
+ *
+ * input parameters
+ *
+ * @param   status           - Periodic advertising sync HCI status
+ * @param   syncHandle       - Handle identifying the periodic advertising train assigned by the Controller
+ *                             (Range: 0x0000 to 0x0EFF)
+ * @param   advSid           - Value of the Advertising SID subfield in the ADI field of the PDU
+ * @param   advAddrType      - Advertiser address type
+ *                             0x00 - Public
+ *                             0x01 - Random
+ *                             0x02 - Public Identity Address
+ *                             0x03 - Random Identity Address
+ * @param   advAddress       - Advertiser address
+ * @param   advPhy           - Advertiser PHY
+ *                             0x01 - LE 1M
+ *                             0x02 - LE 2M
+ *                             0x03 - LE Coded
+ * @param   periodicAdvInt   - Periodic advertising interval Range: 0x0006 to 0xFFFF
+ *                             Time = N * 1.25 ms (Time Range: 7.5 ms to 81.91875 s)
+ * @param   advClockAccuracy - Accuracy of the periodic advertiser's clock
+ *                             0x00 - 500 ppm
+ *                             0x01 - 250 ppm
+ *                             0x02 - 150 ppm
+ *                             0x03 - 100 ppm
+ *                             0x04 - 75 ppm
+ *                             0x05 - 50 ppm
+ *                             0x06 - 30 ppm
+ *                             0x07 - 20 ppm
+ *
+ * @return  void
+ */
+void HCI_PeriodicAdvSyncEstablishedEvent( uint8  status,
+                                          uint16 syncHandle,
+                                          uint8  advSid,
+                                          uint8  advAddrType,
+                                          uint8  *advAddress,
+                                          uint8  advPhy,
+                                          uint16 periodicAdvInt,
+                                          uint8  advClockAccuracy )
+{
+  // check if LE Meta-Events are enabled and this event is enabled
+  if ( ((pHciEvtMask[BT_EVT_INDEX_LE_META_EVENT] & BT_EVT_MASK_LE_META_EVENT) == 0) ||
+       ((pBleEvtMask[LE_EVT_INDEX_PERIODIC_ADV_SYNC_ESTABLISHED] & LE_EVT_MASK_PERIODIC_ADV_SYNC_ESTABLISHED) == 0) )
+  {
+    // the event mask is not enabled for this event
+    return;
+  }
+
+  // check if this is for the Host
+  if ( hciGapTaskID != 0 )
+  {
+    hciEvt_BLEPeriodicAdvSyncEstablished_t *msg =
+      (hciEvt_BLEPeriodicAdvSyncEstablished_t *)MAP_osal_msg_allocate(sizeof( hciEvt_BLEPeriodicAdvSyncEstablished_t ));
+
+    if( msg )
+    {
+      // message header
+      msg->hdr.event  = HCI_GAP_EVENT_EVENT;
+      msg->hdr.status = HCI_LE_EVENT_CODE; // use status field to pass the HCI Event code
+
+      // event packet
+      msg->BLEEventCode = HCI_BLE_PERIODIC_ADV_SYNCH_ESTABLISHED_EVENT;
+      msg->status       = status;
+      msg->syncHandle   = syncHandle;
+      msg->sid          = advSid;
+      msg->addrType     = advAddrType;
+      if (advAddress != NULL)
+      {
+        (void)MAP_osal_memcpy( msg->address, advAddress, B_ADDR_LEN );
+      }
+      msg->phy          = advPhy;
+      msg->periodicInterval = periodicAdvInt;
+      msg->clockAccuracy = advClockAccuracy;
+
+      // send the message
+      (void)MAP_osal_msg_send( hciGapTaskID, (uint8 *)msg );
+    }
+  }
+  else
+  {
+    hciPacket_t *msg;
+    uint8 dataLength;
+    uint8 totalLength;
+
+    // data length
+    dataLength = HCI_PERIODIC_ADV_SYNCH_ESTABLISHED_EVENT_LEN;
+
+    // OSAL message header + HCI event header + data
+    totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + dataLength;
+
+    msg = (hciPacket_t *)MAP_osal_msg_allocate(totalLength);
+
+    if (msg)
+    {
+      uint8 *pBuf;
+
+      // message type
+      msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+      msg->hdr.status = 0xFF;
+
+      // point to the byte following the hciPacket_t structure
+      msg->pData = (uint8*)(msg+1);
+      pBuf       = msg->pData;
+
+      *pBuf++ = HCI_EVENT_PACKET;
+      *pBuf++ = HCI_LE_EVENT_CODE;
+      *pBuf++ = dataLength;
+
+      // populate event
+      *pBuf++ = HCI_BLE_PERIODIC_ADV_SYNCH_ESTABLISHED_EVENT;   // event code
+      *pBuf++ = status;
+      *pBuf++ = LO_UINT16(syncHandle);              // sync handle (LSB)
+      *pBuf++ = HI_UINT16(syncHandle);              // sync handle (MSB)
+      *pBuf++ = advSid;
+      *pBuf++ = advAddrType;
+      if (advAddress != NULL)
+      {
+        (void)MAP_osal_memcpy( pBuf, advAddress, B_ADDR_LEN );
+      }
+      pBuf += B_ADDR_LEN;
+      *pBuf++ = advPhy;
+      *pBuf++ = LO_UINT16(periodicAdvInt);          // periodic interval (LSB)
+      *pBuf++ = HI_UINT16(periodicAdvInt);          // periodic interval (MSB)
+      *pBuf = advClockAccuracy;
+      // send the message
+      (void)MAP_osal_msg_send( hciTaskID, (uint8 *)msg );
+    }
+  }
+}
+
+/*********************************************************************
+ * @fn      HCI_LE_PeriodicAdvertisingReportEvent
+ *
+ * @brief   This event indicates the scanner that the Controller has
+ *          received a Periodic Advertising packet.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ * @param   txPower    - Tx Power information (Range: -127 to +20)
+ * @param   rssi       - RSSI value for the received packet (Range: -127 to +20)
+ *                       If the packet contains CTE, this value is not available
+ * @param   cteType    - Constant Tone Extension type
+ *                       0x00 - AoA Constant Tone Extension
+ *                       0x01 - AoD Constant Tone Extension with 1us slots
+ *                       0x02 - AoD Constant Tone Extension with 2us slots
+ *                       0xFF - No Constant Tone Extension
+ * @param   dataStatus - Data status
+ *                       0x00 - Data complete
+ *                       0x01 - Data incomplete, more data to come
+ *                       0x02 - Data incomplete, data truncated, no more to come
+ * @param   dataLen    - Length of the Data field (Range: 0 to 247)
+ * @param   data       - Data received from a Periodic Advertising packet
+ *
+ * @return  void
+ */
+void HCI_PeriodicAdvReportEvent( uint16 syncHandle,
+                                 int8   txPower,
+                                 int8   rssi,
+                                 uint8  cteType,
+                                 uint8  dataStatus,
+                                 uint8  dataLen,
+                                 uint8  *data )
+{
+  // check if LE Meta-Events are enabled and this event is enabled
+  if ( ((pHciEvtMask[BT_EVT_INDEX_LE_META_EVENT] & BT_EVT_MASK_LE_META_EVENT) == 0) ||
+       ((pBleEvtMask[LE_EVT_INDEX_PERIODIC_ADV_REPORT] & LE_EVT_MASK_PERIODIC_ADV_REPORT) == 0) )
+  {
+    // the event mask is not enabled for this event
+    return;
+  }
+
+  // check if this is for the Host
+  if ( hciGapTaskID != 0 )
+  {
+    hciEvt_BLEPeriodicAdvReport_t *msg =
+      (hciEvt_BLEPeriodicAdvReport_t *)MAP_osal_msg_allocate(sizeof( hciEvt_BLEPeriodicAdvReport_t ) + dataLen);
+
+    if( msg )
+    {
+      // message header
+      msg->hdr.event  = HCI_GAP_EVENT_EVENT;
+      msg->hdr.status = HCI_LE_EVENT_CODE; // use status field to pass the HCI Event code
+
+      // event packet
+      msg->BLEEventCode = HCI_BLE_PERIODIC_ADV_REPORT_EVENT;
+      msg->syncHandle   = syncHandle;
+      msg->txPower      = txPower;
+      msg->rssi         = rssi;
+      msg->cteType      = cteType;
+      msg->dataStatus   = dataStatus;
+      msg->dataLen      = dataLen;
+      if ((data != NULL) && (dataLen > 0))
+      {
+        msg->data = ((uint8 *)(msg)) + sizeof( hciEvt_BLEPeriodicAdvReport_t );
+        MAP_osal_memcpy( msg->data, data, dataLen );
+      }
+
+      // send the message
+      (void)MAP_osal_msg_send( hciGapTaskID, (uint8 *)msg );
+    }
+  }
+  else
+  {
+    hciPacket_t *msg;
+    uint8 dataLength;
+    uint8 eventLength;
+    uint8 dataOffset = 0;
+    uint16 totalLength;
+
+    do
+    {
+      // data length
+      dataLength = MIN( dataLen, HCI_PERIODIC_ADV_REPORT_MAX_DATA );
+      dataLen -= dataLength;
+      eventLength = HCI_PERIODIC_ADV_REPORT_EVENT_LEN + dataLength;
+      // OSAL message header + HCI event header + data
+      totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + eventLength;
+
+      msg = (hciPacket_t *)MAP_osal_msg_allocate(totalLength);
+
+      if (msg)
+      {
+        uint8 *pBuf;
+
+        // message type
+        msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+        msg->hdr.status = 0xFF;
+
+        // point to the byte following the hciPacket_t structure
+        msg->pData = (uint8*)(msg+1);
+        pBuf       = msg->pData;
+
+        *pBuf++ = HCI_EVENT_PACKET;
+        *pBuf++ = HCI_LE_EVENT_CODE;
+        *pBuf++ = eventLength;
+
+        // populate event
+        *pBuf++ = HCI_BLE_PERIODIC_ADV_REPORT_EVENT;   // event code
+        *pBuf++ = LO_UINT16(syncHandle);              // sync handle (LSB)
+        *pBuf++ = HI_UINT16(syncHandle);              // sync handle (MSB)
+        *pBuf++ = txPower;
+        *pBuf++ = rssi;
+        *pBuf++ = cteType;
+        *pBuf++ = (dataLen > 0)?HCI_PERIODIC_ADV_REPORT_DATA_INCOMPLETE:dataStatus;
+        *pBuf++ = dataLength;
+        if ((data != NULL) && (dataLength > 0))
+        {
+          MAP_osal_memcpy( pBuf, data + dataOffset, dataLength );
+          dataOffset += dataLength;
+        }
+
+        // send the message
+        (void)MAP_osal_msg_send( hciTaskID, (uint8 *)msg );
+      }
+    }
+    while (dataLen > 0);
+  }
+}
+
+/*********************************************************************
+ * @fn      HCI_PeriodicAdvSyncLostEvent
+ *
+ * @brief   This event indicates the scanner that the Controller has not
+ *          received a Periodic Advertising packet from the train identified
+ *          by syncHandle within the timeout period.
+ *
+ * @design  /ref did_286039104
+ *
+ * @param   syncHandle - Handle identifying the periodic advertising train
+ *
+ * @return  void
+ */
+void HCI_PeriodicAdvSyncLostEvent( uint16 syncHandle )
+{
+  // check if LE Meta-Events are enabled and this event is enabled
+  if ( ((pHciEvtMask[BT_EVT_INDEX_LE_META_EVENT] & BT_EVT_MASK_LE_META_EVENT) == 0) ||
+       ((pBleEvtMask[LE_EVT_INDEX_PERIODIC_ADV_SYNC_LOST] & LE_EVT_MASK_PERIODIC_ADV_SYNC_LOST) == 0) )
+  {
+    // the event mask is not enabled for this event
+    return;
+  }
+
+  // check if this is for the Host
+  if ( hciGapTaskID != 0 )
+  {
+    hciEvt_BLEPeriodicAdvSyncLost_t *msg =
+      (hciEvt_BLEPeriodicAdvSyncLost_t *)MAP_osal_msg_allocate(sizeof( hciEvt_BLEPeriodicAdvSyncLost_t ));
+
+    if( msg )
+    {
+      // message header
+      msg->hdr.event  = HCI_GAP_EVENT_EVENT;
+      msg->hdr.status = HCI_LE_EVENT_CODE; // use status field to pass the HCI Event code
+
+      // event packet
+      msg->BLEEventCode = HCI_BLE_PERIODIC_ADV_SYNCH_LOST_EVENT;
+      msg->syncHandle   = syncHandle;
+
+      // send the message
+      (void)MAP_osal_msg_send( hciGapTaskID, (uint8 *)msg );
+    }
+  }
+  else
+  {
+    hciPacket_t *msg;
+    uint8 dataLength;
+    uint8 totalLength;
+
+    // data length
+    dataLength = HCI_PERIODIC_ADV_SYNCH_LOST_EVENT_LEN;
+
+    // OSAL message header + HCI event header + data
+    totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + dataLength;
+
+    msg = (hciPacket_t *)MAP_osal_msg_allocate(totalLength);
+
+    if (msg)
+    {
+      uint8 *pBuf;
+
+      // message type
+      msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+      msg->hdr.status = 0xFF;
+
+      // point to the byte following the hciPacket_t structure
+      msg->pData = (uint8*)(msg+1);
+      pBuf       = msg->pData;
+
+      *pBuf++ = HCI_EVENT_PACKET;
+      *pBuf++ = HCI_LE_EVENT_CODE;
+      *pBuf++ = dataLength;
+
+      // populate event
+      *pBuf++ = HCI_BLE_PERIODIC_ADV_SYNCH_LOST_EVENT;   // event code
+      *pBuf++ = LO_UINT16(syncHandle);              // sync handle (LSB)
+      *pBuf++ = HI_UINT16(syncHandle);              // sync handle (MSB)
       // send the message
       (void)MAP_osal_msg_send( hciTaskID, (uint8 *)msg );
     }

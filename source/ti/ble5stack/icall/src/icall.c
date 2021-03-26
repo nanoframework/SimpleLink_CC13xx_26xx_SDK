@@ -14,7 +14,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -270,6 +270,9 @@ typedef struct _icall_entity_entry_t
   ICall_ServiceEnum service;
   ICall_TaskEntry *task;
   ICall_ServiceFunc fn;
+#ifdef ICALL_NO_APP_EVENTS
+  appCallback_t appCallback;
+#endif
 } ICall_entityEntry;
 
 /** @internal storage to track all tasks using ICall module */
@@ -700,6 +703,9 @@ static ICall_Errno ICall_primRegisterApp(ICall_RegisterAppArgs *args)
       ICall_entities[i].service = ICALL_SERVICE_CLASS_APPLICATION;
       ICall_entities[i].task = taskentry;
       ICall_entities[i].fn = NULL;
+#ifdef ICALL_NO_APP_EVENTS
+      ICall_entities[i].appCallback = NULL;
+#endif
       args->entity = (ICall_EntityID) i;
       args->msgSyncHdl = taskentry->syncHandle;
       ICall_leaveCSImpl(key);
@@ -923,6 +929,22 @@ static ICall_Errno ICall_primSend(ICall_SendArgs *args)
   hdr->srcentity = args->src;
   hdr->dstentity = args->dest.entityId;
   hdr->format = args->format;
+
+#ifdef ICALL_NO_APP_EVENTS
+  // for applications, call direct to callback without enqueue/event_pend/dequeue
+  if (ICall_entities[args->dest.entityId].service == ICALL_SERVICE_CLASS_APPLICATION)
+  {
+    if (ICall_entities[args->dest.entityId].appCallback != NULL)
+    {
+      uint8_t safeToDealloc = ICall_entities[args->dest.entityId].appCallback(event, (uint8_t *)args->msg);
+      if (args->msg && safeToDealloc)
+      {
+        ICall_freeMsg(args->msg);
+      }
+    }
+    return ICALL_ERRNO_SUCCESS
+  }
+#endif // ICALL_NO_APP_EVENTS
   ICall_msgEnqueue(&ICall_entities[args->dest.entityId].task->queue, args->msg);
   ICALL_SYNC_HANDLE_POST(ICall_entities[args->dest.entityId].task->syncHandle);
 
@@ -2794,6 +2816,22 @@ ICall_Errno ICall_send(ICall_EntityID src,
   hdr->srcentity = src;
   hdr->dstentity = dest;
   hdr->format = format;
+
+#ifdef ICALL_NO_APP_EVENTS
+  // for applications, call direct to callback without enqueue/event_pend/dequeue
+  if (ICall_entities[dest].service == ICALL_SERVICE_CLASS_APPLICATION)
+  {
+    if (ICall_entities[dest].appCallback != NULL)
+    {
+      uint8_t safeToDealloc = ICall_entities[dest].appCallback(0 /*event*/, (uint8_t *)msg);
+      if (msg && safeToDealloc)
+      {
+        ICall_freeMsg(msg);
+      }
+    }
+    return (ICALL_ERRNO_SUCCESS);
+  }
+#endif // ICALL_NO_APP_EVENTS
   ICall_msgEnqueue(&ICall_entities[dest].task->queue, msg);
   ICALL_SYNC_HANDLE_POST(ICall_entities[dest].task->syncHandle);
 
@@ -2889,7 +2927,7 @@ ICall_abort(void)
 #else
   {
     volatile uint8_t j=1;
-	while(j);
+    while(j);
   }
 #endif /* EXT_HAL_ASSERT */
   ICALL_HOOK_ABORT_FUNC();
@@ -4015,3 +4053,27 @@ ICall_Errno ICall_sendServiceComplete(ICall_EntityID src,
   return (ICALL_ERRNO_SUCCESS);
 }
 #endif /* ICALL_LITE*/
+
+#ifdef ICALL_NO_APP_EVENTS
+ICall_Errno ICall_registerAppCback(uint8_t *selfEntity, appCallback_t appCallback)
+{
+  ICall_EntityID   localSelfEntity;
+  ICall_SyncHandle localSyncEvent; // no use
+  ICall_Errno status;
+
+  // ******************************************************************
+  // N0 STACK API CALLS CAN OCCUR BEFORE THIS CALL TO ICall_registerApp
+  // ******************************************************************
+  // Register the current thread as an ICall dispatcher application
+  // so that the application can send and receive messages.
+  status = ICall_registerApp(&localSelfEntity, &localSyncEvent);
+
+  // applicatios should use the task entity ID
+  *selfEntity = localSelfEntity;
+
+  // Save app callback to be used instead of enqueue/event_pend/dequeue
+  ICall_entities[localSelfEntity].appCallback = appCallback;
+
+  return status;
+}
+#endif // ICALL_NO_APP_EVENTS
