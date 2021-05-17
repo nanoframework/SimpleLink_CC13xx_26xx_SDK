@@ -61,7 +61,7 @@
             {
                 "_file": "param_definition.json",
                 "_phy": "ble",
-                "$": ".\/..\/config\/cc2652r_ble_pg21"
+                "$": ".\/..\/config\/cc1352r_ble_pg21"
             },
             {
                 "_file": "param_cmd_mapping.json",

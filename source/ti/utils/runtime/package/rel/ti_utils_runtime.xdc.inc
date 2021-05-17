@@ -55,3 +55,11 @@ lib/gcc/m4f/runtime_debug.a
 lib/gcc/m4f/runtime_release.a
 lib/iar/m4f/runtime_debug.a
 lib/iar/m4f/runtime_release.a
+lib/ccs/m4/runtime_debug.a
+lib/ccs/m4/runtime_release.a
+lib/ticlang/m4/runtime_debug.a
+lib/ticlang/m4/runtime_release.a
+lib/gcc/m4/runtime_debug.a
+lib/gcc/m4/runtime_release.a
+lib/iar/m4/runtime_debug.a
+lib/iar/m4/runtime_release.a

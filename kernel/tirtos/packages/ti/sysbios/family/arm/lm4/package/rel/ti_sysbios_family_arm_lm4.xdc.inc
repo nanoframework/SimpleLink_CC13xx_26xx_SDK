@@ -13,3 +13,7 @@ TimestampProvider.c
 lib/debug/ti.sysbios.family.arm.lm4.am4f
 lib/debug/ti.sysbios.family.arm.lm4.am4fg
 lib/debug/ti.sysbios.family.arm.lm4.arm4f
+lib/debug/ti.sysbios.family.arm.lm4.aem4
+lib/debug/ti.sysbios.family.arm.lm4.am4
+lib/debug/ti.sysbios.family.arm.lm4.am4g
+lib/debug/ti.sysbios.family.arm.lm4.arm4

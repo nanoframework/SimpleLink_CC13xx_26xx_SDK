@@ -12,3 +12,7 @@ ReentSupport.c
 lib/debug/ti.sysbios.rts.ti.am4f
 lib/debug/ti.sysbios.rts.ti.am4fg
 lib/debug/ti.sysbios.rts.ti.arm4f
+lib/debug/ti.sysbios.rts.ti.aem4
+lib/debug/ti.sysbios.rts.ti.am4
+lib/debug/ti.sysbios.rts.ti.am4g
+lib/debug/ti.sysbios.rts.ti.arm4

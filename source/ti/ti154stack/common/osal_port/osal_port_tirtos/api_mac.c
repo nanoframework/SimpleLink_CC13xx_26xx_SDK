@@ -982,6 +982,9 @@ uint8_t ApiMac_convertCapabilityInfo(ApiMac_capabilityInfo_t *pMsgcapInfo)
  */
 void ApiMac_buildMsgCapInfo(uint8_t cInfo, ApiMac_capabilityInfo_t *pPBcapInfo)
 {
+    /* Initialize the structure */
+    memset(pPBcapInfo, 0, sizeof(ApiMac_capabilityInfo_t));
+
     if(cInfo & CAPABLE_PAN_COORD)
     {
         pPBcapInfo->panCoord = 1;

@@ -34,12 +34,10 @@
             "+../../RTLSCtrl/rtls_aoa.c -> rtls_aoa.c",
             "+../../Startup/osal_icall_ble.c -> osal_icall_ble.c",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> rom_init.c",
-            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
             "+../../Startup/main.c -> main.c",
             "+../../Tools/ble_debug.xscfg -> ble_debug.xscfg",
             "+../../Tools/ble_release.xscfg -> ble_release.xscfg",
             "+../../Tools/Defines/rtls_slave_app.opt -> rtls_slave_app.opt",
-            "+../../Tools/Defines/config_def.opt -> config_def.opt",
             "+../../../../../../../source/ti/ble5stack/icall/src/icall.c -> icall.c",
             "+../../../../../../../source/ti/ble5stack/icall/src/inc/icall.h -> icall.h",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_addrs.h -> icall_addrs.h",
@@ -51,11 +49,11 @@
             "+../../../../../../../source/ti/ble5stack/icall/stack/ble_user_config_stack.c -> ble_user_config_stack.c",
             "+../../../../../../../source/ti/ble5stack/icall/app/icall_api_lite.c -> icall_api_lite.c",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_ble_apimsg.h -> icall_ble_apimsg.h",
+            "+../../build_config.opt -> build_config.opt",
             "+../../Tools/rtls_slave_app.cfg -> rtls_slave_app.cfg",
             "+../../rtls_slave.syscfg -> rtls_slave.syscfg",
-            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf",
-            "+../../build_config.opt -> build_config.opt",
-            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html"
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf"
         ]
     }
 ]

@@ -70,7 +70,7 @@ extern "C" {
  *
  *  This define defines what the largest AES key length used in an application is.
  *  Since this implementation needs to support all AES key lengths by default,
- *  temporary buffers and the internal driver state are sized to accomodate AES-256.
+ *  temporary buffers and the internal driver state are sized to accommodate AES-256.
  *  If only AES-128 is used in an application, the driver can be recompiled
  *  with a different #AESCTRDRBG_MAX_KEY_LENGTH to save RAM in the #AESCTRDRBGXX_Object
  *  and reducing stack size requirements.
@@ -107,6 +107,7 @@ typedef struct {
     uint32_t                        reseedInterval;
     int_fast16_t                    returnStatus;
     bool                            isOpen;
+    bool                            isInstantiated;
 } AESCTRDRBGXX_Object;
 
 #ifdef __cplusplus

@@ -1,0 +1,9 @@
+{
+    "overridebuffer": {
+        "Element32b": {
+            "_type": "ELEMENT",
+            "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
+            "$": "0x000F8883"
+        }
+    }
+}

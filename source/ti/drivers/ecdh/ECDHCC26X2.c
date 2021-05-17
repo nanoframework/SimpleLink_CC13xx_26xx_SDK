@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@
 #include <ti/drivers/power/PowerCC26X2.h>
 #include <ti/drivers/ECDH.h>
 #include <ti/drivers/ecdh/ECDHCC26X2.h>
+#include <ti/drivers/cryptoutils/ecc/ECCParams.h>
 #include <ti/drivers/cryptoutils/utils/CryptoUtils.h>
 #include <ti/drivers/cryptoutils/sharedresources/PKAResourceCC26XX.h>
 
@@ -390,6 +391,21 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
 
         case ECDHCC26X2_FSM_COMPUTE_SHARED_SECRET_MULT_PRIVATE_KEY_BY_PUB_KEY_MONTGOMERY:
 
+            /*
+             * As per RFC 7748, Curve25519 will mask the most significant bit
+             * of the final byte for received u-coordinates. The curve length
+             * of the Montgomery curve is used as an identifier here.
+             */
+            if (object->operation.computeSharedSecret->curve->length == ECCPARAMS_CURVE25519_LENGTH)
+            {
+                /* Since PKA RAM can only be accessed by word, compute the most
+                 * significant word of the received Curve25519 public key and
+                 * mask its MSB.
+                 */
+                uint32_t * curve25519PubKeyWord = (uint32_t *) SCRATCH_PUBLIC_X;
+                curve25519PubKeyWord[(ECCPARAMS_CURVE25519_LENGTH / sizeof(uint32_t)) - 1U] &= 0x7FFFFFFF;
+            }
+
             /* Perform an elliptic curve multiplication on a Montgomery curve. Likely Curve25519. */
             PKAEccMontgomeryMultiplyStart(SCRATCH_PRIVATE_KEY,
                                           SCRATCH_PUBLIC_X,
@@ -463,10 +479,10 @@ static int_fast16_t ECDHCC26X2_convertReturnValue(uint32_t pkaResult) {
         case PKA_STATUS_RESULT_0:
             /* Theoretically, PKA_STATUS_RESULT_0 might be caused by other
              * operations failing but the only one that really should yield
-             * 0 is ECC multiplication with invalid inputs that yield the
+             * 0 is ECC multiplication with invalid inputs that can yield the
              * point at infinity.
              */
-            return ECDH_STATUS_POINT_AT_INFINITY;
+            return ECDH_STATUS_PRIVATE_KEY_ZERO;
 
         case PKA_STATUS_X_LARGER_THAN_PRIME:
         case PKA_STATUS_Y_LARGER_THAN_PRIME:
@@ -474,6 +490,9 @@ static int_fast16_t ECDHCC26X2_convertReturnValue(uint32_t pkaResult) {
 
         case PKA_STATUS_POINT_NOT_ON_CURVE:
             return ECDH_STATUS_PUBLIC_KEY_NOT_ON_CURVE;
+
+        case PKA_STATUS_POINT_AT_INFINITY:
+            return ECDH_STATUS_POINT_AT_INFINITY;
 
         default:
             return ECDH_STATUS_ERROR;
@@ -713,7 +732,7 @@ int_fast16_t ECDH_computeSharedSecret(ECDH_Handle handle, ECDH_OperationComputeS
                                operation->curve->length);
 
     /* Montgomery public keys are already in little-endian, so they can be
-     * simply copied.
+     * directly copied.
      */
     if ((operation->curve->curveType == ECCParams_CURVE_TYPE_MONTGOMERY) &&
         (operation->publicKeyDataFormat == ECDH_PUBLIC_KEY_DATA_FORMAT_MONTGOMERY_X_ONLY))

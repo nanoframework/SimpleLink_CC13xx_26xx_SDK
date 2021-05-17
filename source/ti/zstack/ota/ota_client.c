@@ -382,9 +382,9 @@ void otaClient_Init ( Semaphore_Handle appSem, uint8_t stEnt, uint32_t cuiHandle
   if(hasExternalFlash() == true)
   {
       // Save factory image if there is not one
-      if(!OTA_hasFactoryImage())
+      if(!otaClient_hasFactoryImage())
       {
-          OTA_saveFactoryImage();
+          otaClient_saveFactoryImage();
       }
   }
 #endif
@@ -1853,7 +1853,7 @@ void otaClient_loadExtImage(uint8_t imageSelect)
 
 #ifdef FACTORY_IMAGE
 /******************************************************************************
- * @fn          OTA_hasFactoryImage
+ * @fn          otaClient_hasFactoryImage
  *
  * @brief   This function check if the valid factory image exists on external
  *          flash
@@ -1863,7 +1863,7 @@ void otaClient_loadExtImage(uint8_t imageSelect)
  * @return  TRUE If factory image exists on external flash, else FALSE
  *
  */
-bool OTA_hasFactoryImage(void)
+bool otaClient_hasFactoryImage(void)
 {
 #if defined(EXTERNAL_IMAGE_CHECK)
   bool rtn = FALSE;
@@ -1894,13 +1894,13 @@ bool OTA_hasFactoryImage(void)
 
 
 /*******************************************************************************
- * @fn      OTA_saveFactoryImage
+ * @fn      otaClient_saveFactoryImage
  *
  * @brief   This function creates factory image backup of current running image
  *
  * @return  rtn  OTA_Storage_Status_Success/OTA_Storage_FlashError
  */
-uint8_t OTA_saveFactoryImage(void)
+uint8_t otaClient_saveFactoryImage(void)
 {
   uint8_t rtn = OTA_Storage_Status_Success;
   uint32_t dstAddr = otaClient_FindFactoryImgAddr();
@@ -1921,7 +1921,7 @@ uint8_t OTA_saveFactoryImage(void)
 
       /* Erase - external portion to be written*/
       if(otaClient_EraseExtFlashPages(EXT_FLASH_PAGE(dstAddr),
-        (_imgHdr.fixedHdr.imgEndAddr - _imgHdr.imgPayload.startAddr -1),
+        (_imgHdr.fixedHdr.imgEndAddr - _imgHdr.imgPayload.startAddr + 1),
         EFL_PAGE_SIZE) == OTA_Storage_Status_Success)
       {
           /* COPY - image from internal to external */

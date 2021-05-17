@@ -41,6 +41,7 @@
 let Common   = system.getScript("/ti/drivers/Common.js");
 let logError = Common.logError;
 let isCName  = Common.isCName;
+let logWarning = Common.logWarning;
 
 /* Array of power configurables for this device family */
 let config = [
@@ -275,6 +276,20 @@ function getClockFrequencies(clock)
 }
 
 /*
+ *  ======== isExtTcxoSelected ========
+ *  Check the CCFG module to see if an External TCXO has been
+ *  selected.
+ */
+function isExtTcxoSelected()
+{
+    const CCFG = system.modules["/ti/devices/CCFG"];
+    if (CCFG != undefined && CCFG.$static.srcClkHF === "External 48Mhz TCXO") {
+        return (true);
+    }
+    return (false);
+}
+
+/*
  *  ======== validate ========
  *  Validate this module's configuration
  *
@@ -311,6 +326,12 @@ function validate(inst, vo)
     if (!isCName(inst.enableTCXOFunction)) {
         logError(vo, inst, "enableTCXOFunction",
                  "Must contain a valid C function name or NULL");
+    }
+    if ((isExtTcxoSelected() === true) && (inst.enableTCXOFunction === '')){
+        logWarning(vo, inst, "enableTCXOFunction",
+                 "Must contain a valid C function name because an External " +
+                 "TCXO has been chosen as HF Clock Source in the Device " +
+                 "Configuration module");
     }
 }
 

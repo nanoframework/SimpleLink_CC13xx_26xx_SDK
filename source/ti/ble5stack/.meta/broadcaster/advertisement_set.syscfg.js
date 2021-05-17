@@ -46,6 +46,11 @@ const config = [
         name: "meshAdnPeri",
         default: false,
         hidden: true
+    },
+    {
+        name: "meshDeviceName",
+        default: "",
+        hidden: true
     }
 ];
 /*
@@ -73,8 +78,9 @@ function moduleInstances(inst)
 
     if(inst.meshAdnPeri == true)
     {
-        if(inst.numOfAdvSet == 1 || inst.numOfAdvSet == 2)
+        if(inst.numOfAdvSet == 1)
         {
+            advParams_args.advType = "extended";
             advData_args.GAP_ADTYPE_FLAGS = true;
             advData_args.advertisingFlags = ["GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED","GAP_ADTYPE_FLAGS_GENERAL"];
             advData_args.GAP_ADTYPE_LOCAL_NAME_SHORT = true;
@@ -84,15 +90,10 @@ function moduleInstances(inst)
             advData_args.UUID016More = 0xFFF0;
 
             scanResData_args.GAP_ADTYPE_LOCAL_NAME_COMPLETE = true;
-            scanResData_args.completeLocalName = "Simple Mesh and SP";
+            scanResData_args.completeLocalName = inst.meshDeviceName;
             scanResData_args.GAP_ADTYPE_SLAVE_CONN_INTERVAL_RANGE = true;
             scanResData_args.maxConnInterval = 130;
             scanResData_args.GAP_ADTYPE_POWER_LEVEL = true;
-        }
-
-        if(inst.numOfAdvSet == 2)
-        {
-            advParams_args.advType = "extended";
         }
     }
 

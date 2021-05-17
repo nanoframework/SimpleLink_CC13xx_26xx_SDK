@@ -1,10 +1,10 @@
-package.xdc
-package.bld
-Main.xdc
 NdkAgent.java
-Main.xs
+package.xdc
 custom.mak_commentedout
+Main.xs
+Main.xdc
 custom.mak
+package.bld
 java/package.jar
 package/package.bld.xml
 package/build.cfg

@@ -96,8 +96,8 @@ segment count (BT_MESH_TX_SEG_MAX).`
 const maxNumOfSegMsgTXLongDescription = `Maximum number of simultaneous \
 outgoing multi-segment and/or reliable messages.`
 
-// Long description for the maxNumSegInMsg configuration parameter
-const maxNumSegInMsgLongDescription = `Maximum number of segments supported \
+// Long description for the maxNumSegInMsgTX configuration parameter
+const maxNumSegInMsgTXLongDescription = `Maximum number of segments supported \
 for outgoing messages. This value should typically be fine-tuned based on \
 what models the local node supports, i.e. what’s the largest message payload \
 that the node needs to be able to send.\n
@@ -115,6 +115,20 @@ For example, 5 segments means the maximum SDU size is 60 bytes, which leaves \
 Be sure to specify a sufficient number of advertising buffers when setting \
 this option to a higher value. There must be at least three more advertising \
 buffers (BT_MESH_ADV_BUF_COUNT) as there are outgoing segments.`
+
+// Long description for the maxNumSegInMsgRX configuration parameter
+const maxNumSegInMsgRXLongDescription = `Maximum number of segments supported \
+for incoming messages. This value should typically be fine-tuned based on \
+what models the local node supports, i.e. what’s the largest message payload \
+that the node needs to be able to receive. This value affects memory and call \
+stack consumption, which is why the default is lower than the maximum that \
+the specification would allow (32 segments).\n
+
+__Note__: The maximum incoming SDU size is 12 times this number \
+(out of which 4 or 8 bytes is used for the Transport Layer MIC). \
+For example, 5 segments means the maximum SDU size is 60 bytes, which leaves \
+56 bytes for application layer data using a 4-byte MIC and 52 bytes using an \
+8-byte MIC.`
 
 // Long description for the maxNumSegMsgRX configuration parameter
 const maxNumSegMsgRXLongDescription = `Maximum number of simultaneous \
@@ -155,7 +169,8 @@ exports = {
     msgCacheSizeLongDescription: msgCacheSizeLongDescription,
     numAdvBufLongDescription: numAdvBufLongDescription,
     maxNumOfSegMsgTXLongDescription: maxNumOfSegMsgTXLongDescription,
-    maxNumSegInMsgLongDescription: maxNumSegInMsgLongDescription,
+    maxNumSegInMsgTXLongDescription: maxNumSegInMsgTXLongDescription,
+    maxNumSegInMsgRXLongDescription: maxNumSegInMsgRXLongDescription,
     maxNumSegMsgRXLongDescription: maxNumSegMsgRXLongDescription,
     maxSizeRXSduLongDescription: maxSizeRXSduLongDescription,
     modelGroupAddrCountLongDescription: modelGroupAddrCountLongDescription,

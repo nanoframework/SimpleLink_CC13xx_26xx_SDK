@@ -24,6 +24,10 @@
                 {
                     "name": "bt5lecodeds8",
                     "displayName": "BLE, 125 kbps, LE Coded"
+                },
+                {
+                    "name": "wbms2m",
+                    "displayName": "wBMS, 2 mbps, GFSK"
                 }
             ],
             "default": "bt5le1m"
@@ -312,6 +316,12 @@
                 "file": "setting_bt5_le_coded_s8.json",
                 "name": "bt5lecodeds8",
                 "description": "BLE, 125 kbps, LE Coded"
+            },
+            {
+                "file": "setting_wbms_2m.json",
+                "name": "wbms2m",
+                "description": "wBMS, 2 mbps, GFSK",
+                "options": "wbms"
             }
         ]
     }

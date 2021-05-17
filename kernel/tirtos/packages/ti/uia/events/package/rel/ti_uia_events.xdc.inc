@@ -13,3 +13,7 @@ UIAUserCtx.c
 lib/release/ti.uia.events.am4f
 lib/release/ti.uia.events.am4fg
 lib/release/ti.uia.events.arm4f
+lib/release/ti.uia.events.aem4
+lib/release/ti.uia.events.am4
+lib/release/ti.uia.events.am4g
+lib/release/ti.uia.events.arm4

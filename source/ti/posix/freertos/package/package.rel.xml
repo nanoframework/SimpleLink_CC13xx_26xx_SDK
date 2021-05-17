@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--  This file conforms to the DTD xdc/bld/release.dtd -->
-<release name="ti_posix_freertos" label="default" date="1604407019159" buildCount="2" producerId="undefined">
+<release name="ti_posix_freertos" label="default" date="1615226651162" buildCount="1" producerId="undefined">
 <package name="ti.posix.freertos"
     version="1, 0, 0"/>
 <imports>
@@ -81,6 +81,6 @@
     </xdcRoot>
 </references>
 <orphans>
-    <file name="/scratch/xlibrary/.conan/data/tiposix/1.35.01.01/library-sb/ga/build/8dfc7015255f14fb3b2719db05a7818ea9cb3c7c/posix.bld"/>
+    <file name="/scratch/xlibrary/.conan/data/tiposix/1.40.00.02/library-sb/ga/build/8dfc7015255f14fb3b2719db05a7818ea9cb3c7c/posix.bld"/>
 </orphans>
 </release>

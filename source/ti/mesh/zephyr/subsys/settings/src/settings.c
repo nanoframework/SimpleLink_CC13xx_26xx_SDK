@@ -12,10 +12,11 @@
 #include <errno.h>
 #include <kernel.h>
 
+#include "settings/settings_nvs.h"
 #include "settings/settings.h"
 #include <zephyr/types.h>
 
-#include "common/log.h"
+#include <logging/log.h>
 LOG_MODULE_REGISTER(settings, CONFIG_SETTINGS_LOG_LEVEL);
 
 K_MUTEX_DEFINE(settings_lock);
@@ -23,6 +24,47 @@ K_MUTEX_DEFINE(settings_lock);
 extern const struct settings_handler_static settings_handler_bt_mesh;
 
 void settings_store_init(void);
+
+typedef struct
+{
+  uint8_t state;    // page state
+  uint8_t cycle;    // page compaction cycle count. Used to select the 'newest' active page
+                    // at device reset, in the very unlikely scenario that both pages are active.
+  uint8_t mode;     // compact mode
+  uint8_t allActive;  //all items are active or not
+  uint8_t sPage;
+  uint8_t ePage;
+  uint16_t offset;  // page offset
+  uint16_t sOffset;
+  uint16_t eOffset;
+} NVOCMP_pageInfo_t;
+
+typedef struct
+{
+  uint8_t xDstPage;         // xdst page
+  uint8_t xSrcSPage;    // xsrc start page
+  uint8_t xSrcEPage;      // xsrc end page
+  uint8_t xSrcPages;    // no of xsrc pages
+  uint16_t xDstOffset;      // xdst offset
+  uint16_t xSrcSOffset;    // xsrc start offset
+  uint16_t xSrcEOffset;    // xsrc end offset
+} NVOCMP_compactInfo_t;
+
+typedef struct
+{
+  uint8_t nvSize;       // no of NV pages
+  uint8_t headPage;     // head active page
+  uint8_t tailPage;     // transfer destination page
+  uint8_t actPage;      // current active page
+  uint8_t xsrcPage;     // transfer source page
+  uint16_t actOffset;   // active page offset
+  uint16_t xsrcOffset;  // transfer source page offset
+  uint16_t xdstOffset;  // transfer destination page offset
+  NVOCMP_compactInfo_t compactInfo;
+  NVOCMP_pageInfo_t pageInfo[2];
+} NVOCMP_nvHandle_t;
+
+extern NVOCMP_nvHandle_t NVOCMP_nvHandle;
 
 void settings_init(void)
 {
@@ -112,7 +154,7 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 #elif defined(__clang__)
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
     struct settings_handler_static *ch = &settings_handler_bt_mesh;
-#endif /* defined(__IAR_SYSTEMS_ICC__) */        
+#endif /* defined(__IAR_SYSTEMS_ICC__) */
 	const char *tmpnext;
 
 	bestmatch = NULL;

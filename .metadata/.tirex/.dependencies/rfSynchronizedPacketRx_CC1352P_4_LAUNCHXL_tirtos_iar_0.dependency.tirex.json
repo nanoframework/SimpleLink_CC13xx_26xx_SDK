@@ -4,14 +4,14 @@
             "+../../rfSynchronizedPacket.h -> rfSynchronizedPacket.h",
             "+../../README.md -> README.md",
             "+../../state-machine.png -> state-machine.png",
-            "+../../rfSynchronizedPacketRx.syscfg -> rfSynchronizedPacketRx.syscfg",
+            "+../rfSynchronizedPacketRx.syscfg -> rfSynchronizedPacketRx.syscfg",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../rfSynchronizedPacketRx.c -> rfSynchronizedPacketRx.c",
             "+../../StateMachine.c -> StateMachine.c",
             "+../../StateMachine.h -> StateMachine.h",
+            "+../main_tirtos.c -> main_tirtos.c",
             "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS.icf -> CC1352P_4_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

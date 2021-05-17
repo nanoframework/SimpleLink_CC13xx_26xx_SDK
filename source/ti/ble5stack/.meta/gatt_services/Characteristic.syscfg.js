@@ -217,7 +217,11 @@ let config = [
             { name: 'GATT_PROP_READ'  },
             { name: 'GATT_PROP_WRITE'  },
             { name: 'GATT_PROP_WRITE_NO_RSP'  },
-            { name: 'GATT_PROP_NOTIFY'  }
+            { name: 'GATT_PROP_NOTIFY'  },
+            { name: 'GATT_PROP_BCAST' },
+            { name: 'GATT_PROP_INDICATE' },
+            { name: 'GATT_PROP_AUTHEN' },
+            { name: 'GATT_PROP_EXTENDED' },
         ]
     },
     {
@@ -227,7 +231,13 @@ let config = [
         minSelections   : 0,
         options         : [
             { name: 'GATT_PERMIT_READ'  },
-            { name: 'GATT_PERMIT_WRITE' }
+            { name: 'GATT_PERMIT_WRITE' },
+            { name: 'GATT_PERMIT_AUTHEN_READ'  },
+            { name: 'GATT_PERMIT_AUTHEN_WRITE'  },
+            { name: 'GATT_PERMIT_AUTHOR_READ'  },
+            { name: 'GATT_PERMIT_AUTHOR_WRITE'  },
+            { name: 'GATT_PERMIT_ENCRYPT_READ'  },
+            { name: 'GATT_PERMIT_ENCRYPT_WRITE'  },
         ]
     }
 ];

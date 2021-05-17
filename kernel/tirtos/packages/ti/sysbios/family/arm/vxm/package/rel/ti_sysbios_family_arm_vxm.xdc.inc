@@ -9,3 +9,7 @@ TimestampProvider.c
 lib/debug/ti.sysbios.family.arm.vxm.am4f
 lib/debug/ti.sysbios.family.arm.vxm.am4fg
 lib/debug/ti.sysbios.family.arm.vxm.arm4f
+lib/debug/ti.sysbios.family.arm.vxm.aem4
+lib/debug/ti.sysbios.family.arm.vxm.am4
+lib/debug/ti.sysbios.family.arm.vxm.am4g
+lib/debug/ti.sysbios.family.arm.vxm.arm4

@@ -14,6 +14,7 @@ hide ICall_dispatcher
 hide ICall_enterCriticalSection
 hide ICall_leaveCriticalSection
 hide abort
+hide smpInitiatorProcessPairingConfirm
 hide HCI_ReadLocalVersionInfoCmd
 hide abort
 hide rfMode
@@ -23,6 +24,7 @@ hide LL_DirectTestRxTest
 hide LL_DirectTestEnd
 hide LL_EXT_ModemTestRx
 hide LL_EXT_EnhancedModemTestTx
+hide LL_WriteDefaultDataLen
 hide LL_EXT_EnhancedModemHopTestTx
 hide LL_EXT_EnhancedModemTestRx
 hide ll_GenerateDHKey
@@ -60,6 +62,7 @@ hide gapPeriProcessConnUpdateCompleteEvt
 hide gapPeriProcessConnEvt
 hide gapProcessBLEEvents
 hide gapScan_processStartEndCb
+hide gapScan_filterDiscMode
 hide GAP_SetParamValue
 hide GATT_VerifyReadPermissions
 hide GATT_VerifyWritePermissions
@@ -112,6 +115,9 @@ hide llAllocConnId
 hide GapScan_disable
 hide llFindNextSecCmd
 hide llSetupExtHdr
+hide llSetupConnRxDataEntryQueue
+hide llConnTerminate
+hide llReplaceRxBuffers
 hide rfSetup
 hide llAllocRfMem
 hide llInit_TaskEnd
@@ -149,4 +155,6 @@ rename NIST256_a                  as NIST_Curve_P256_a
 rename NIST256_b                  as NIST_Curve_P256_b
 rename NIST256_Gx                 as NIST_Curve_P256_Gx
 rename NIST256_Gy                 as NIST_Curve_P256_Gy
+rename ECDSA_sign as ROM_ECDSA_sign
+rename ECDSA_verif as ROM_ECDSA_verif
 // Leave this line here.

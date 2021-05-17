@@ -19,3 +19,7 @@ HeapCallback.c
 lib/debug/ti.sysbios.heaps.am4f
 lib/debug/ti.sysbios.heaps.am4fg
 lib/debug/ti.sysbios.heaps.arm4f
+lib/debug/ti.sysbios.heaps.aem4
+lib/debug/ti.sysbios.heaps.am4
+lib/debug/ti.sysbios.heaps.am4g
+lib/debug/ti.sysbios.heaps.arm4

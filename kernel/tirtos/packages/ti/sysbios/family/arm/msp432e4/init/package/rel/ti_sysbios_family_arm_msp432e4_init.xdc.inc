@@ -13,3 +13,7 @@ lib/Boot.aem4f
 lib/Boot.am4f
 lib/Boot.am4fg
 lib/Boot.arm4f
+lib/Boot.aem4
+lib/Boot.am4
+lib/Boot.am4g
+lib/Boot.arm4

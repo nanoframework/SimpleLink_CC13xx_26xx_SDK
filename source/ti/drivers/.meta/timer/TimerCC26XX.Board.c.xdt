@@ -106,7 +106,6 @@ const Timer_Config Timer_config[`countDef`] = {
     %    }
     % }
     {
-        .fxnTablePtr = &TimerCC26XX_fxnTable,
         .object    = &timerCC26XXObjects[`inst.$name`],
         .hwAttrs   = &timerCC26XXHWAttrs[`inst.$name`]
     },

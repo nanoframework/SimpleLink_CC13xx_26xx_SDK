@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       chipinfo.c
-*  Revised:        2020-10-08 13:53:12 +0200 (Thu, 08 Oct 2020)
-*  Revision:       58979
+*  Revised:        2020-11-19 14:57:59 +0100 (Thu, 19 Nov 2020)
+*  Revision:       59512
 *
 *  Description:    Collection of functions returning chip information.
 *
@@ -157,6 +157,15 @@ ChipInfo_GetChipType( void )
             }
             else {
                chipType = CHIP_TYPE_CC2652   ;
+            }
+         }
+         break;
+      case 0x5:
+         if ( fcfg1Cc13 ) {
+            if ( fcfg1Pa ) {
+               chipType = CHIP_TYPE_CC2672P3 ;
+            } else {
+               chipType = CHIP_TYPE_CC2672R3 ;
             }
          }
          break;

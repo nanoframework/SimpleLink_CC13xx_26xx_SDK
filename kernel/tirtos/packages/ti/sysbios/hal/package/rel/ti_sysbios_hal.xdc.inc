@@ -31,3 +31,7 @@ TimerNull.c
 lib/debug/ti.sysbios.hal.am4f
 lib/debug/ti.sysbios.hal.am4fg
 lib/debug/ti.sysbios.hal.arm4f
+lib/debug/ti.sysbios.hal.aem4
+lib/debug/ti.sysbios.hal.am4
+lib/debug/ti.sysbios.hal.am4g
+lib/debug/ti.sysbios.hal.arm4

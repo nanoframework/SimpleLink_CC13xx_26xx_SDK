@@ -121,6 +121,7 @@ blePeripheralRole.appliedActivity = DmmAppliedActivityBLE;
 
 const custom1Role = new StackRole("custom", "Custom 1",
     "CUSTOM1_STACK_POLICY_IDX", DmmStackRoles.custom1);
+
 const custom2Role = new StackRole("custom", "Custom 2",
     "CUSTOM2_STACK_POLICY_IDX", DmmStackRoles.custom2);
 

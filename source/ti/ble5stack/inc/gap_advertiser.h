@@ -607,6 +607,13 @@ typedef struct
   uint8_t status;         //!< Event status
 } GapAdv_periodicAdvEvt_t;
 
+typedef struct
+{
+  osal_event_hdr_t hdr;
+  uint8_t opcode;
+  uint8_t dataType;
+} gapAdvDataUpdateEvent_t;
+
 /** @} End GapAdv_Structs */
 
 /*-------------------------------------------------------------------

@@ -85,7 +85,7 @@ const config = {
 				{
                     name: "recieveWindow",
                     displayName: "Recive Window",
-                    default: 255,
+                    default: 50,
                     hidden: true,
                     description: "Friend Receive Window",
                     longDescription: Docs.recieveWindowLongDescription
@@ -308,10 +308,75 @@ function onFeatureChange(inst,ui)
     {
         // Change the device role according to the proxy value
         // When Proxy is used, the central role should be enables as well
-        inst.proxy || inst.gattBearer ?
-        inst.deviceRole = "PERIPHERAL_CFG+CENTRAL_CFG" :
-        inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG";
+        inst.proxy || inst.gattBearer || inst.meshApp != "meshOnly" ?
+        inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG" :
+        inst.deviceRole = "BROADCASTER_CFG+OBSERVER_CFG";
+        changeGroupsStateMesh(inst,ui);
     }
+}
+
+/*
+ * ======== changeGroupsStateMesh ========
+ * This function hide/unhide the BLE roles groups, when the Mesh module
+ * exist (mesh is enabled).
+ * The selected features and meshApp used determine which groups will
+ * be used.
+ *
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function changeGroupsStateMesh(inst,ui)
+{
+    // Hide Central Group
+    inst.hideCentralGroup = true;
+    Common.hideGroup(Common.getGroupByName(inst.$module.config, "centralConfig"), inst.hideCentralGroup, ui);
+    // Hide Observer Group
+    inst.hideObserverGroup = true;
+    Common.hideGroup(Common.getGroupByName(inst.$module.config, "observerConfig"), inst.hideObserverGroup, ui);
+
+    if(inst.meshApp == "meshOnly")
+    {
+        // When using Mesh only Broadcaster Group should not be used, therefore, hide Broadcaster group
+        inst.hideBroadcasterGroup = true;
+
+        if(inst.deviceRole.includes("PERIPHERAL_CFG"))
+        {
+            // UnHide Peripheral Group
+            inst.hidePeripheralGroup = false;
+            // UnHide Bond Manager
+            inst.hideBondMgrGroup = false;
+            // Enable bondManager
+            inst.bondManager = true;
+        }
+
+        if(inst.deviceRole.includes("BROADCASTER_CFG"))
+        {
+            // Hide Peripheral Group
+            inst.hidePeripheralGroup = true;
+            // Hide Bond Manager
+            inst.hideBondMgrGroup = true;
+            // Disable bondManager
+            inst.bondManager = false;
+        }
+    }
+
+    if(inst.meshApp == "meshAndPeri" || inst.meshApp == "meshAndPeriOadOffchip" || inst.meshApp == "meshAndPeriOadOnchip")
+    {
+        // When using Mesh+SP, the Broadcaster, Peripheral and BondMgr Groups should be used
+        // UnHide Broadcaster Group
+        inst.hideBroadcasterGroup = false;
+        // UnHide Peripheral Group
+        inst.hidePeripheralGroup = false;
+        // UnHide Bond Manager
+        inst.hideBondMgrGroup = false;
+        // Enable bondManager
+        inst.bondManager = true;
+    }
+
+    // Hide/UnHide Broadcaster, Peripheral and BondMgr Groups
+    Common.hideGroup(Common.getGroupByName(inst.$module.config, "broadcasterConfig"), inst.hideBroadcasterGroup, ui);
+    Common.hideGroup(Common.getGroupByName(inst.$module.config, "peripheralConfig"), inst.hidePeripheralGroup, ui);
+    Common.hideGroup(Common.getGroupByName(inst.$module.config, "bondMgrConfig"), inst.hideBondMgrGroup, ui);
 }
 
 /*
@@ -327,6 +392,10 @@ function validate(inst, validation)
     if(inst.recieveWindow < 1 || inst.recieveWindow > 255)
     {
         validation.logError("Recive Window range is 1 to 255", inst, "recieveWindow");
+    }
+    if (inst.recieveWindow > 50)
+    {
+        validation.logWarning("Power consumption may increese at LPN when Recieve Window > 50 [mS]", inst, "recieveWindow")
     }
     if(inst.queueSize < 2 || inst.queueSize > 65536)
     {
@@ -392,5 +461,6 @@ function validate(inst, validation)
 exports = {
     config: config,
     validate: validate,
-    onFeatureChange: onFeatureChange
+    onFeatureChange: onFeatureChange,
+    changeGroupsStateMesh: changeGroupsStateMesh
 };

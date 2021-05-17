@@ -38,10 +38,9 @@
             "+../../otsupport/otinstance.h -> otsupport/otinstance.h",
             "+../../release_oad.cfg -> release_oad.cfg",
             "+../../cli.c -> cli.c",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
             "+../../bim_oad_debug_image_bin.h -> bim_oad_debug_image_bin.h",
             "+../../bim_oad_debug_image_bin.c -> bim_oad_debug_image_bin.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS_OAD.cmd -> CC1352P_4_LAUNCHXL_TIRTOS_OAD.cmd",
+            "+cc13x2_cc26x2_tirtos_oad.cmd -> cc13x2_cc26x2_tirtos_oad.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

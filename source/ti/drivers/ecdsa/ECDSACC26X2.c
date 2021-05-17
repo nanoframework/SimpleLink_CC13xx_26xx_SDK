@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -938,8 +938,8 @@ int_fast16_t ECDSA_sign(ECDSA_Handle handle, ECDSA_OperationSign *operation) {
     object->trngConfig.object       = &object->trngObject;
     object->trngConfig.hwAttrs      = &object->trngHwAttrs;
 
-    trngParams.returnBehavior   = TRNG_RETURN_BEHAVIOR_CALLBACK;
-    trngParams.callbackFxn      = ECDSACC26X2_trngCallback;
+    trngParams.returnBehavior       = TRNG_RETURN_BEHAVIOR_CALLBACK;
+    trngParams.cryptoKeyCallbackFxn = ECDSACC26X2_trngCallback;
 
     object->trngHandle = TRNG_construct(&object->trngConfig, &trngParams);
 

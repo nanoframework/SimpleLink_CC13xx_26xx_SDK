@@ -4,23 +4,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-/*********************************************************************
-* INCLUDES
-*/
+
 #ifdef CONFIG_BT_SETTINGS
 #include <zephyr.h>
 #include <storage/flash_map.h>
 
-/*********************************************************************
-* PUBLIC FUNCTION DECLARATIONS
-*/
 void dev_page_layout(struct device *dev,
                     const struct flash_pages_layout **layout,
                     size_t *layout_size);
 
-/*********************************************************************
-* GLOBAL VARIABLES
-*/
 // Flash Area Structure
 const struct flash_area default_flash_map[] =
 {
@@ -28,7 +20,6 @@ const struct flash_area default_flash_map[] =
   .fa_off = DT_FLASH_AREA_0_OFFSET,
   .fa_dev_name = DT_FLASH_AREA_0_DEV,
   .fa_size = DT_FLASH_AREA_0_SIZE,},
-//	UTIL_LISTIFY(DT_FLASH_AREA_NUM, FLASH_AREA_FOO, ~)
 };
 
 // Number of Flash Areas
@@ -37,9 +28,6 @@ const int flash_map_entries = ARRAY_SIZE(default_flash_map);
 // Flash Area Structure Array
 const struct flash_area *flash_map = default_flash_map;
 
-/*********************************************************************
-* LOCAL VARIABLES
-*/
 // Device Layout
 static const struct flash_pages_layout device_flash_layout =
 {
@@ -66,9 +54,6 @@ struct device dev_struct = {
   .config = NULL, //&dev_config;
 };
 
-/*********************************************************************
-* PUBLIC FUNCTIONS
-*/
 void dev_page_layout(struct device *dev,
                     const struct flash_pages_layout **layout,
                     size_t *layout_size)

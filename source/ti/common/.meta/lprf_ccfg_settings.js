@@ -100,7 +100,7 @@ const boardSpecificCCFGSettings = {
         dioBootloaderBackdoor: 13,
         levelBootloaderBackdoor: "Active low"
     },
-    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
+    LP_CC2652RB_CCFG_SETTINGS: {
         enableBootloader: true,
         enableBootloaderBackdoor: true,
         dioBootloaderBackdoor: 13,

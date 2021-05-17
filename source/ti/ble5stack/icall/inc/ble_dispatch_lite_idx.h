@@ -363,21 +363,8 @@
 // <<INSERT_LOOP:(uint32)icall_liteErrorFunction,>>
 // <<INSERT:#endif // (...)>>
 
-// <<INSERT:#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))>>
-// <<BEGIN_COUNT>>
 #define IDX_HCI_EXT_SetQOSParameters	                 JT_INDEX(132)
-// <<END_COUNT>>
-// <<INSERT:#else // !(...)>>
-// <<INSERT_LOOP:(uint32)icall_liteErrorFunction,>>
-// <<INSERT:#endif // (...)>>
-
-// <<INSERT:#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))>>
-// <<BEGIN_COUNT>>
 #define IDX_HCI_EXT_SetQOSDefaultParameters	             JT_INDEX(133)
-// <<END_COUNT>>
-// <<INSERT:#else // !(...)>>
-// <<INSERT_LOOP:(uint32)icall_liteErrorFunction,>>
-// <<INSERT:#endif // (...)>>
 
 // <<INSERT:#ifdef LL_TEST_MODE>>
 // <<BEGIN_COUNT>>

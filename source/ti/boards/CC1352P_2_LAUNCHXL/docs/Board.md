@@ -65,7 +65,7 @@ The following BoosterPack(s) are used with some driver examples.
     Be sure that the bent pin(s) do not make contact with the IC or any other
     component, bend them enough to make sure they don't connect to the CC3200
     Audio BoosterPack.
-  * Attach the CC3200 Audio BoosterPack to the CC1312R1_LAUNCHXL.
+  * Attach the CC3200 Audio BoosterPack to the CC1352P_2_LAUNCHXL.
   * Run jumper wires between the following pins on the CC3200 Audio BoosterPack:
     - DIN: `P3.3` and `P3.9`
     - DOUT: `P3.4` and `P3.10`

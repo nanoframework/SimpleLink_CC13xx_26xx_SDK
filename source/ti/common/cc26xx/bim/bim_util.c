@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2012-2020, Texas Instruments Incorporated
+ Copyright (c) 2012-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -97,7 +97,7 @@ void jumpToPrgEntry(uint32_t prgEntry)
     asm(" LDR SP, [R0, #0x0] ");
     asm(" BX R2 ");
 
-#elif defined(__TI_COMPILER_VERSION__)
+#elif defined(__TI_COMPILER_VERSION__) || defined(__clang__)
     static uint32_t temp;
     temp = prgEntry;
     // Reset the stack pointer,

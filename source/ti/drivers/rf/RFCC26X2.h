@@ -105,10 +105,9 @@ Board configuration
 
 The RF driver handles RF core hardware interrupts and uses software interrupts
 for its internal state machine. For managing the interrupt priorities, it
-expects the existence of a global #RFCC26XX_HWAttrsV2 object. This is
-usually defined in the board support file, for example `CC2652RB_LAUNCHXL.c`,
-but when developing on custom boards, it might be kept anywhere in the
-application. By default, the priorities are set to the lowest possible value:
+expects the existence of a global #RFCC26XX_HWAttrsV2 object. This object is configured
+in SysConfig and defined in the generated file `ti_drivers_config.c`.
+By default, the priorities are set to the lowest possible value:
 
 @code
 const RFCC26XX_HWAttrsV2 RFCC26XX_hwAttrs = {
@@ -1936,6 +1935,9 @@ extern RF_Handle RF_open(RF_Object *pObj, RF_Mode *pRfMode, RF_RadioSetup *pRadi
  *
  *  Allows a RF client (high-level driver or application) to close its connection
  *  to the RF driver.
+ *  RF_close pends on all commands in the command queue before closing the connection.
+ *  If a client has access to the radio by using RF_RequestAccess API, and the same client calls RF_close, 
+ *  then the connection to the RF driver is closed immediately without waiting for the access duration to be over.  
  *
  *  @note Calling context : Task
  *

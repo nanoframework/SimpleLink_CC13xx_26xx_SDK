@@ -48,6 +48,8 @@
         <file name="sleep.c"/>
         <file name="timer.c"/>
         <file name="package.bld"/>
+        <file name="Settings.syscfg.js"/>
+        <file name="Settings_config.h.xdt"/>
         <file name="package/package.cfg.xdc.inc"/>
     </release>
     </releases>

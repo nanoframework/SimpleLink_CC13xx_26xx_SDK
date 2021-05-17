@@ -1220,6 +1220,12 @@ struct llConnExtraParams_t
   uint8   connMaxTimeExternalUpdateInd:1; // connection external update indication for the maximum connection time.
   uint32  connMinTimeLength:31;           // connection minimum time length
   uint32  connMaxTimeLength:31;           // connection maximum time length
+  /* Starvation Handling */
+  uint8   StarvationMode:1;               // connection starvation mode on/off
+  uint8   prevTransmitSeqNum:1;           // connection previous TransmitSeqNum (SN BIT received)
+  uint8   currTransmitSeqNum:1;           // connection current TransmitSeqNum (SN BIT received)
+  uint8   numLSTORetries:3;               // connection number of retries in LSTO state
+  uint8   reserved:2;					  // reserved
 }; 
 
 // Connection Data
@@ -1712,8 +1718,6 @@ extern rfOpCmd_RadioSetup_t rfSetup;
 // FW Parameter structure (for Extended Data Length)
 extern rfOpImmedCmd_RW_FwParam_t fwParCmd;
 extern rfOpCmd_runImmedCmd_t     runFwParCmd;
-extern rfOpImmedCmd_ForceClkEnab_t enableRamCmd;
-extern rfOpCmd_runImmedCmd_t       runEnableRamCmd;
 
 // Device Addresses
 extern uint8 ownPublicAddr[];
@@ -1823,7 +1827,12 @@ extern llCoex_t llCoex;
 // QOS PARAMETERS
 //***************
 // Qos default parameters
-extern uint8  qosDefaultParameterPriority;
+extern uint8  qosDefaultPriorityConnParameter;
+extern uint8  qosDefaultPriorityAdvParameter;
+extern uint8  qosDefaultPriorityScnParameter;
+extern uint8  qosDefaultPriorityInitParameter;
+extern uint8  qosDefaultPriorityPerAdvParameter;
+extern uint8  qosDefaultPriorityPerScnParameter;
 
 /*******************************************************************************
  * FUNCTIONS
@@ -1920,10 +1929,14 @@ extern llConnState_t        *llAllocConnId( void );
 extern void                 llReleaseConnId( llConnState_t * );
 extern void                 llReleaseAllConnId( void );
 extern uint16               llGetMinCI( uint16  );
+extern uint16               llFindNextActiveConnId( uint16 );
 extern uint8                llGetNextConn( void );
+extern uint16               llGetLstoNumOfEventsLeftMargin( uint16 );
+extern uint8                llSetStarvationMode( uint16 , uint8 );
 extern void                 llRealignConn( llConnState_t *, uint32 );
 extern void                 llSortActiveConns( uint8 *, uint8 );
 extern void                 llShellSortActiveConns(uint8 *activeConns, uint8 numActiveConns);
+extern void                 llConnCheckCleanRxQueue( llConnState_t * );
 extern void                 llConnCleanup( llConnState_t * );
 extern void                 llConnTerminate( llConnState_t *, uint8  );
 extern uint8                llConnExists( uint8, uint8 *, uint8 );

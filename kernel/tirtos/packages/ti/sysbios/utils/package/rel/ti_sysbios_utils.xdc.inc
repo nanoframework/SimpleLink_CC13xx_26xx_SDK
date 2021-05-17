@@ -11,3 +11,7 @@ Load_CPU.c
 lib/debug/ti.sysbios.utils.am4f
 lib/debug/ti.sysbios.utils.am4fg
 lib/debug/ti.sysbios.utils.arm4f
+lib/debug/ti.sysbios.utils.aem4
+lib/debug/ti.sysbios.utils.am4
+lib/debug/ti.sysbios.utils.am4g
+lib/debug/ti.sysbios.utils.arm4

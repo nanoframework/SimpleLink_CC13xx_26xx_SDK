@@ -45,8 +45,6 @@ exports = {
     config: {},
     templates: {
         "/ti/ti154stack/templates/ti_154stack_config.h.xdt":
-            "/ti/ti154stack/templates/ti_154stack_config.h.xdt",
-        "/ti/ti154stack/templates/ti_154stack_features.h.xdt":
-            "/ti/ti154stack/templates/ti_154stack_features.h.xdt"
+            "/ti/ti154stack/templates/ti_154stack_config.h.xdt"
     }
 };

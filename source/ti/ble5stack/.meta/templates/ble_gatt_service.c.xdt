@@ -53,7 +53,7 @@ function listOr(list) {
 #include "util.h"
 /* This Header file contains all BLE API and icall structure definition */
 #include "icall_ble_api.h"
-#include "ble_gatt_service.h"
+#include "ti_ble_gatt_service.h"
 
 #ifdef SYSCFG
 #include "ti_ble_config.h"
@@ -182,10 +182,11 @@ static gattCharCfg_t *`comboName`Config;
 * Profile Attributes - Table
 *********************************************************************/
 % for (let i = 0; i < serviceMod.$instances.length; i++) {
+% let servType = (serviceMod.$instances[i].serviceType == "Primary Service" ? "primaryServiceUUID" : "secondaryServiceUUID");
 static gattAttribute_t `serviceMod.$instances[i].name`AttrTbl[] =
 {
   {
-    { ATT_BT_UUID_SIZE, primaryServiceUUID },
+    { ATT_BT_UUID_SIZE, `servType` },
     GATT_PERMIT_READ,
     `i`,
     (uint8 *)&`serviceMod.$instances[i].name`Service
@@ -253,10 +254,13 @@ static bStatus_t gatt_`serviceMod.$instances[i].name`_WriteAttrCB(uint16_t connH
                                                           gattAttribute_t *pAttr,
                                                           uint8_t *pValue, uint16_t len,
                                                           uint16_t offset, uint8_t method);
+static bStatus_t gatt_`serviceMod.$instances[i].name`_AuthorizationCB(uint16_t connHandle,
+                                                          gattAttribute_t *pAttr, uint8_t opcode);
 % }
 
 % let readCbFuncArrayNoDuplicate = [];
 % let WriteCbFuncArrayNoDuplicate = [];
+% let AuthoCbFuncArrayNoDuplicate = [];
 % for (let jRead = 0; jRead < serviceMod.$instances.length; jRead++) {
   % if(readCbFuncArrayNoDuplicate.indexOf(serviceMod.$instances[jRead].userReadCBfunc) < 0){
     % readCbFuncArrayNoDuplicate.push(serviceMod.$instances[jRead].userReadCBfunc);
@@ -266,6 +270,12 @@ static bStatus_t gatt_`serviceMod.$instances[i].name`_WriteAttrCB(uint16_t connH
 % for (let jWrite = 0; jWrite < serviceMod.$instances.length; jWrite++) {
   % if(WriteCbFuncArrayNoDuplicate.indexOf(serviceMod.$instances[jWrite].userWriteCBfunc) < 0){
     % WriteCbFuncArrayNoDuplicate.push(serviceMod.$instances[jWrite].userWriteCBfunc);
+  % }
+% }
+
+% for (let jAutho = 0; jAutho < serviceMod.$instances.length; jAutho++) {
+  % if(AuthoCbFuncArrayNoDuplicate.indexOf(serviceMod.$instances[jAutho].userAuthorizationCBfunc) < 0){
+    % AuthoCbFuncArrayNoDuplicate.push(serviceMod.$instances[jAutho].userAuthorizationCBfunc);
   % }
 % }
 
@@ -286,6 +296,12 @@ extern bStatus_t `WriteCbFuncArrayNoDuplicate[kWrite]`(uint16_t connHandle,
                                                           uint16_t offset, uint8_t method);
 % }
 %}
+
+% for (let kAutho = 0; kAutho < AuthoCbFuncArrayNoDuplicate.length; kAutho++) {
+%if(AuthoCbFuncArrayNoDuplicate[kAutho] != ""){
+extern bStatus_t `AuthoCbFuncArrayNoDuplicate[kAutho]`(uint16_t connHandle,
+                                                                    gattAttribute_t *pAttr, uint8_t opcode);
+%}
 % }
 
 /*********************************************************************
@@ -297,7 +313,7 @@ CONST gattServiceCBs_t `serviceMod.$instances[i].name`CBs =
 {
   gatt_`serviceMod.$instances[i].name`_ReadAttrCB,  // Read callback function pointer
   gatt_`serviceMod.$instances[i].name`_WriteAttrCB, // Write callback function pointer
-  NULL                                              // Authorization callback function pointer
+  gatt_`serviceMod.$instances[i].name`_AuthorizationCB  // Authorization callback function pointer
 };
 % }
 
@@ -538,4 +554,29 @@ static bStatus_t gatt_`serviceMod.$instances[i].name`_WriteAttrCB(uint16_t connH
   return SUCCESS;
 %}
 }
+% }
+/*********************************************************************
+* @fn      AuthorizationCB
+*
+* @brief   Validate attribute data prior to a write operation
+*
+* @param   connHandle - connection message was received on
+* @param   pAttr - pointer to attribute
+* @param   opcode
+*
+* @return  SUCCESS, blePending or Failure
+********************************************************************/
+% for (let i = 0; i < serviceMod.$instances.length; i++) {
+static bStatus_t gatt_`serviceMod.$instances[i].name`_AuthorizationCB(uint16_t connHandle,
+                                                                 gattAttribute_t *pAttr,
+                                                                 uint8_t opcode)
+{
+%if(!(serviceMod.$instances[i].userAuthorizationCBfunc.localeCompare("") == 0)){
+  return `serviceMod.$instances[i].userAuthorizationCBfunc`(connHandle, pAttr, opcode);
+%}
+%else{
+  return SUCCESS;
+%}
+}
+% }
 % }

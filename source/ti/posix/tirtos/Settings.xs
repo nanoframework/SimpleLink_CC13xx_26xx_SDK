@@ -66,11 +66,8 @@ function module$use()
     xdc.useModule('ti.sysbios.knl.Mailbox');
     xdc.useModule('ti.sysbios.knl.Queue');
     xdc.useModule('ti.sysbios.knl.Semaphore');
+    xdc.useModule('ti.sysbios.gates.GateMutex');
     Task = xdc.useModule('ti.sysbios.knl.Task');
-
-    /* create a gate instance for use by mqueue module */
-    var Gate = xdc.useModule('ti.sysbios.gates.GateMutex');
-    Program.global.tiposix_mqGate = Gate.create();
 
     /*
      *  BIOS posix uses the Idle task to clean up detached pthreads that

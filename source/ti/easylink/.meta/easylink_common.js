@@ -48,14 +48,17 @@ const minInt8t = -128;
 // appropriate RF settings when a device is being used without a LaunchPad
 const deviceToBoard = {
     CC1352R: "CC1352R1_LAUNCHXL",
-    CC1352P: "CC1352P1_LAUNCHXL",
-    CC1312: "CC1312R1_LAUNCHXL",
+    CC1352P1: "CC1352P1_LAUNCHXL",
+    CC1312R1F3RGZ: "CC1312R1_LAUNCHXL",
     CC2642: "CC26X2R1_LAUNCHXL",
     CC2652P1FSIP: "LP_CC2652PSIP",
     CC2652R1FSIP: "LP_CC2652RSIP",
     CC2652R1: "CC26X2R1_LAUNCHXL",
     CC2652RB: "CC2652RB_LAUNCHXL",
-    CC2652P1FRGZ: "CC1352P_4_LAUNCHXL"
+    CC2652P1FRGZ: "CC1352P_4_LAUNCHXL",
+    CC2652R7: "LP_CC2652R7",
+    CC1312R7RGZ: "LP_CC1312R7",
+    CC1352P7: "LP_CC1352P7_1"
 };
 
 // Settings for ti/devices/CCFG module
@@ -86,6 +89,18 @@ const easylinkCCFGSettings = {
     },
     LP_CC2652RSIP_CCFG_SETTINGS: {
         forceVddr: false
+    },
+    LP_CC1312R7_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2652R7_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC1352P7_1_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC1352P7_4_CCFG_SETTINGS: {
+        forceVddr: false
     }
 };
 
@@ -107,6 +122,10 @@ const supportedMigrations = {
         CC1352P1F3RGZ: {},
         CC1352P1_LAUNCHXL: {}
     },
+    LP_CC1352P7_1: {
+        CC1352P7RGZ: {},
+        LP_CC1352P7_1: {}
+    },
     CC1352P_2_LAUNCHXL: {
         CC1352P1F3RGZ: {},
         CC1352P_2_LAUNCHXL: {},
@@ -117,13 +136,29 @@ const supportedMigrations = {
         CC1352P_4_LAUNCHXL: {},
         CC2652P1FRGZ: {}
     },
+    LP_CC1352P7_4: {
+        CC1352P7RGZ: {},
+        LP_CC1352P7_4: {}
+    },
     CC1312R1_LAUNCHXL: {
         CC1312R1F3RGZ: {},
         CC1312R1_LAUNCHXL: {},
         LP_CC2652RSIP: {disable: sub1To24Text},
         CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
         CC2652R1FSIP: {disable: sub1To24Text},
-        CC2652R1FRGZ: {disable: sub1To24Text}
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text}
+    },
+    LP_CC1312R7: {
+        CC1312R7RGZ: {},
+        LP_CC1312R7: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text}
     },
     CC26X2R1_LAUNCHXL: {
         CC2652R1FRGZ: {},
@@ -131,7 +166,9 @@ const supportedMigrations = {
         CC26X2R1_LAUNCHXL: {},
         LP_CC2652RSIP: {},
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
-        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text}
     },
     LP_CC2652RSIP: {
         CC2652R1FRGZ: {},
@@ -139,7 +176,17 @@ const supportedMigrations = {
         CC26X2R1_LAUNCHXL: {},
         LP_CC2652RSIP: {},
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
-        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text}
+    },
+    LP_CC2652R7: {
+        CC2652R7RGZ: {},
+        LP_CC2652R7: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text}
     },
 
     // Devices
@@ -147,7 +194,9 @@ const supportedMigrations = {
         CC1352R1F3RGZ: {},
         CC1312R1F3RGZ: {},
         CC1312R1_LAUNCHXL: {},
-        CC1352R1_LAUNCHXL: {}
+        CC1352R1_LAUNCHXL: {},
+        CC1312R7RGZ: {},
+        LP_CC1312R7: {}
     },
     CC1352P1F3RGZ: {
         CC1352P1F3RGZ: {},
@@ -155,13 +204,30 @@ const supportedMigrations = {
         CC1352P_2_LAUNCHXL: {},
         CC1352P_4_LAUNCHXL: {}
     },
+    CC1352P7RGZ: {
+        CC1352P7RGZ: {},
+        LP_CC1352P7_1: {},
+        LP_CC1352P7_4: {}
+    },
     CC1312R1F3RGZ: {
         CC1312R1F3RGZ: {},
         CC1312R1_LAUNCHXL: {},
         LP_CC2652RSIP: {disable: sub1To24Text},
         CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
         CC2652R1FSIP: {disable: sub1To24Text},
-        CC2652R1FRGZ: {disable: sub1To24Text}
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text}
+    },
+    CC1312R7RGZ: {
+        CC1312R7RGZ: {},
+        LP_CC1312R7: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text}
     },
     CC2652R1FRGZ: {
         CC2652R1FRGZ: {},
@@ -169,7 +235,9 @@ const supportedMigrations = {
         CC26X2R1_LAUNCHXL: {},
         LP_CC2652RSIP: {},
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
-        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text}
     },
     CC2652R1FSIP: {
         CC2652R1FRGZ: {},
@@ -183,6 +251,14 @@ const supportedMigrations = {
         CC1352P_2_LAUNCHXL: {},
         CC1352P_4_LAUNCHXL: {},
         CC2652P1FRGZ: {}
+    },
+    CC2652R7RGZ: {
+        CC2652R7RGZ: {},
+        LP_CC2652R7: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text}
     }
 };
 
@@ -387,7 +463,8 @@ function migrate(currTarget, migrationTarget, env, projectName = null)
             }
         }
 
-        if(boardRepresentation === "CC1312R1_LAUNCHXL")
+        if(boardRepresentation === "CC1312R1_LAUNCHXL"
+           || boardRepresentation === "LP_CC1312R7")
         {
             for(const phy of phyInstances)
             {
@@ -499,7 +576,11 @@ function device2DeviceFamily(deviceId)
     let driverString = null;
 
     /* Determine libraries required by device name. */
-    if(deviceId.match(/CC13.2/))
+    if(deviceId.match(/CC13.2.7/))
+    {
+        driverString = "DeviceFamily_CC13X2X7";
+    }
+    else if(deviceId.match(/CC13.2/))
     {
         driverString = "DeviceFamily_CC13X2";
     }
@@ -510,6 +591,10 @@ function device2DeviceFamily(deviceId)
     else if(deviceId.match(/CC26.0R2/))
     {
         driverString = "DeviceFamily_CC26X0R2";
+    }
+    else if(deviceId.match(/CC26.2.7/))
+    {
+        driverString = "DeviceFamily_CC26X2X7";
     }
     else if(deviceId.match(/CC26.2/))
     {

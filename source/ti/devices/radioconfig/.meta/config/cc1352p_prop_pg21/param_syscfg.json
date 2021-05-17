@@ -93,47 +93,47 @@
                 },
                 {
                     "name": "2gfsk50kbps12dev868wsun1a",
-                    "displayName": "Wi-SUN, 50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth"
+                    "displayName": "Wi-SUN mode #1a, 50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth"
                 },
                 {
-                    "name": "2gfsk50kbps25dev868wsun1b",
-                    "displayName": "50 kbps, 2-GFSK, 25 kHz deviation, 915 MHz, WiSUN mode #1b"
+                    "name": "2gfsk50kbps25dev915wsun1b",
+                    "displayName": "Wi-SUN mode #1b, 50 kbps, 25 kHz Deviation, 2-GFSK, 98 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk100kbps25dev915wsun2a",
-                    "displayName": "Wi-SUN, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
-                },
-                {
-                    "name": "2gfsk100kbps25dev868wsun2a",
-                    "displayName": "Wi-SUN, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
+                    "displayName": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk100kbps50dev915wsun2b",
-                    "displayName": "Wi-SUN, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth"
+                    "displayName": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth"
+                },
+                {
+                    "name": "2gfsk150kbps75dev868wsun3",
+                    "displayName": "Wi-SUN mode #3, 150 kbps, 37.5 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk200kbps50dev915wsun4a",
-                    "displayName": "200 kbps, 2-GFSK, 50 kHz deviation, 915 MHz, WiSUN mode #4a"
+                    "displayName": "Wi-SUN mode #4a, 200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk200kbps100dev915wsun4b",
-                    "displayName": "Wi-SUN, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
+                    "displayName": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
                     "name": "wbdsss480ksps30kbps",
-                    "displayName": "WB-DSSS, 30 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:8"
+                    "displayName": "WB-DSSS, 30 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:8"
                 },
                 {
                     "name": "wbdsss480ksps60kbps",
-                    "displayName": "WB-DSSS, 60 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
+                    "displayName": "WB-DSSS, 60 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
                 },
                 {
                     "name": "wbdsss480ksps120kbps",
-                    "displayName": "WB-DSSS, 120 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
+                    "displayName": "WB-DSSS, 120 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
                 },
                 {
                     "name": "wbdsss480ksps240kbps",
-                    "displayName": "WB-DSSS, 240 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:"
+                    "displayName": "WB-DSSS, 240 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:1"
                 },
                 {
                     "name": "custom868",
@@ -153,7 +153,7 @@
                     "displayName": "50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
                 },
                 {
-                    "name": "2gfsk200kpbs433mhz",
+                    "name": "2gfsk200kbps433mhz",
                     "displayName": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
@@ -161,12 +161,12 @@
                     "displayName": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
                 },
                 {
-                    "name": "slr2500bps2gfsk433mhz",
-                    "displayName": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
-                },
-                {
                     "name": "slr5kbps2gfsk433mhz",
                     "displayName": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
+                },
+                {
+                    "name": "slr2500bps2gfsk433mhz",
+                    "displayName": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
                 },
                 {
                     "name": "ook48kbps433mhz",
@@ -922,17 +922,20 @@
             {
                 "file": "setting_tc719.json",
                 "name": "2gfsk50kbps915",
-                "description": "50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth"
+                "description": "50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc737.json",
                 "name": "2gfsk100kbps50dev868",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc751.json",
                 "name": "2gfsk200kbps100dev868",
-                "description": "200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
+                "description": "200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc784.json",
@@ -947,22 +950,26 @@
             {
                 "file": "setting_tc706_154g.json",
                 "name": "2gfsk50kbps154g",
-                "description": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth"
+                "description": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc152_154g.json",
                 "name": "2gfsk100kbps154g",
-                "description": "100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
+                "description": "100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth",
+                "options": "ieee_15_4g,disable_high_pa"
             },
             {
                 "file": "setting_tc746_154g.json",
                 "name": "2gfsk200kbps154g",
-                "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth"
+                "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc778_154g.json",
                 "name": "2gfsk500kbps154g",
-                "description": "500 kbps, 190 kHz Deviation, 2-GFSK, 1150 kHz RX Bandwidth"
+                "description": "500 kbps, 190 kHz Deviation, 2-GFSK, 1150 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc881.json",
@@ -977,72 +984,82 @@
             {
                 "file": "setting_tc597.json",
                 "name": "ook48kbps",
-                "description": "4.8 kbps, OOK, 39 kHz RX Bandwidth"
+                "description": "4.8 kbps, OOK, 39 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc216.json",
                 "name": "2gfsk100kbpswmbusc",
-                "description": "WMBUS C-Mode, 100 kbps, 2-GFSK, 235 kHz RX Bandwidth"
+                "description": "WMBUS C-Mode, 100 kbps, 2-GFSK, 235 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc210.json",
                 "name": "2gfsk100kbpswmbust",
-                "description": "WMBUS T-Mode, 100 kbps, 2-GFSK, 235 kHz RX Bandwidth"
+                "description": "WMBUS T-Mode, 100 kbps, 2-GFSK, 235 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc720.json",
                 "name": "2gfsk50kbps12dev868wsun1a",
-                "description": "Wi-SUN, 50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth"
+                "description": "Wi-SUN mode #1a, 50 kbps, 12.5 kHz Deviation, 2-GFSK, 68 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
-                "file": "setting_tc706_154g_d.json",
-                "name": "2gfsk50kbps25dev868wsun1b",
-                "description": "50 kbps, 2-GFSK, 25 kHz deviation, 915 MHz, WiSUN mode #1b"
+                "file": "setting_tc721.json",
+                "name": "2gfsk50kbps25dev915wsun1b",
+                "description": "Wi-SUN mode #1b, 50 kbps, 25 kHz Deviation, 2-GFSK, 98 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc740.json",
                 "name": "2gfsk100kbps25dev915wsun2a",
-                "description": "Wi-SUN, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
-            },
-            {
-                "file": "setting_tc741.json",
-                "name": "2gfsk100kbps25dev868wsun2a",
-                "description": "Wi-SUN, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
+                "description": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc736.json",
                 "name": "2gfsk100kbps50dev915wsun2b",
-                "description": "Wi-SUN, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth"
+                "description": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
-                "file": "setting_tc746_154g_d.json",
+                "file": "setting_tc742.json",
+                "name": "2gfsk150kbps75dev868wsun3",
+                "description": "Wi-SUN mode #3, 150 kbps, 37.5 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
+            },
+            {
+                "file": "setting_tc753.json",
                 "name": "2gfsk200kbps50dev915wsun4a",
-                "description": "200 kbps, 2-GFSK, 50 kHz deviation, 915 MHz, WiSUN mode #4a"
+                "description": "Wi-SUN mode #4a, 200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc750.json",
                 "name": "2gfsk200kbps100dev915wsun4b",
-                "description": "Wi-SUN, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
+                "description": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc383.json",
                 "name": "wbdsss480ksps30kbps",
-                "description": "WB-DSSS, 30 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:8"
+                "description": "WB-DSSS, 30 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:8"
             },
             {
                 "file": "setting_tc382.json",
                 "name": "wbdsss480ksps60kbps",
-                "description": "WB-DSSS, 60 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
+                "description": "WB-DSSS, 60 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
             },
             {
                 "file": "setting_tc381.json",
                 "name": "wbdsss480ksps120kbps",
-                "description": "WB-DSSS, 120 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
+                "description": "WB-DSSS, 120 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
             },
             {
                 "file": "setting_tc380.json",
                 "name": "wbdsss480ksps240kbps",
-                "description": "WB-DSSS, 240 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 622 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:"
+                "description": "WB-DSSS, 240 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:1"
             },
             {
                 "file": "setting_tc706_custom.json",
@@ -1058,18 +1075,14 @@
             },
             {
                 "file": "setting_tc148.json",
-                "name": "2gfsk200kpbs433mhz",
+                "name": "2gfsk200kbps433mhz",
                 "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
             },
             {
                 "file": "setting_tc112_154g.json",
                 "name": "2gfsk50kbps154g433mhz",
-                "description": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
-            },
-            {
-                "file": "setting_tc441.json",
-                "name": "slr2500bps2gfsk433mhz",
-                "description": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
+                "description": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc440.json",
@@ -1077,9 +1090,15 @@
                 "description": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
             },
             {
+                "file": "setting_tc441.json",
+                "name": "slr2500bps2gfsk433mhz",
+                "description": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
+            },
+            {
                 "file": "setting_tc599.json",
                 "name": "ook48kbps433mhz",
-                "description": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth"
+                "description": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc112_custom.json",
@@ -1096,32 +1115,38 @@
             {
                 "file": "setting_tc220_rx.json",
                 "name": "gfsk24kbps169mhzrx",
-                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, RX"
+                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, RX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc220_tx_ch1-5.json",
                 "name": "gfsk24kbps169mhzch15tx",
-                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 1-5, TX"
+                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 1-5, TX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc220_tx_ch6.json",
                 "name": "gfsk24kbps169mhzch6tx",
-                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 6, TX"
+                "description": "WMBUS N-MODE, 2.4 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 6, TX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc221_rx.json",
                 "name": "gfsk48kbps169mhzrx",
-                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, RX"
+                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, RX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc221_tx_ch1-5.json",
                 "name": "gfsk48kbps169mhzch15tx",
-                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 1-5, TX"
+                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 1-5, TX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc221_tx_ch6.json",
                 "name": "gfsk48kbps169mhzch6tx",
-                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 6, TX"
+                "description": "WMBUS N-MODE, 4.8 kbps, 2.4 kHz Deviation, 2-GFSK, 10 kHz RX Bandwidth, channel 6, TX",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc220_rx_custom.json",
@@ -1133,17 +1158,20 @@
             {
                 "file": "setting_tc900.json",
                 "name": "2gfsk100kbps",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc901.json",
                 "name": "2gfsk250kbps",
-                "description": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth"
+                "description": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc902.json",
                 "name": "2msk250kbps",
-                "description": "250 kbps, 62.5 kHz Deviation, MSK, 471 kHz RX Bandwidth"
+                "description": "250 kbps, 62.5 kHz Deviation, MSK, 471 kHz RX Bandwidth",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc900_custom.json",

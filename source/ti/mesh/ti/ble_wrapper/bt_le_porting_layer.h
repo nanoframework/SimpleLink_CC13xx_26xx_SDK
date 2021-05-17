@@ -112,14 +112,14 @@ static GapAdv_params_t meshAdvParams = {
 #ifdef CONFIG_BT_MESH_PROXY
 typedef ssize_t (*pFxnZephyrWriteGattCb_t)(struct bt_conn *conn,
                   const struct bt_gatt_attr *attr,
-                  void *buf, u16_t len, u16_t offset);
+                  void *buf, uint16_t len, uint16_t offset);
 
 typedef void (*pFxnZephyrGattCccChangedCb_t)(const struct bt_gatt_attr *attr,
-               u16_t value);
+               uint16_t value);
 
-typedef bool (*pFxnZephyrGattCccWriteCb_t)(struct bt_conn *conn,
+typedef ssize_t (*pFxnZephyrGattCccWriteCb_t)(struct bt_conn *conn,
              const struct bt_gatt_attr *attr,
-             u16_t value);
+             uint16_t value);
 
 typedef struct
 {
@@ -221,8 +221,8 @@ bStatus_t mesh_portingLayer_convertZephScanParam(
                                       const struct bt_le_scan_param *inParam,
                                       uint8_t *type,
                                       uint8_t *filter_dup,
-                                      uint8_t *interval,
-                                      uint8_t *window);
+                                      uint16_t *interval,
+                                      uint16_t *window);
 #ifdef CONFIG_BT_MESH_PROXY
 bStatus_t mesh_portingLayer_convertNewConnParams(
                                       gapEstLinkReqEvent_t *inputNewConnection,

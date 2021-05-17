@@ -195,45 +195,57 @@ static void SHA2CC26X2_cleanUpAfterOperation(SHA2CC26X2_Object *object) {
          */
         object->returnStatus = SHA2_STATUS_ERROR;
 
-    } else if (SHA2_dataBytesRemaining == 0 &&
-               readIntermediateDigest == true) {
-        /*
-         * Last transaction has finished and we need to store an intermediate
-         * digest.
-         */
-        SHA2GetDigest(object->digest,
-                      intermediateDigestSizeTable[object->hashType]);
+    } else {
+        if (readIntermediateDigest == true) {
+            /*
+             * Last transaction has finished and we need to store an intermediate
+             * digest.
+             */
+            SHA2GetDigest(object->digest,
+                          intermediateDigestSizeTable[object->hashType]);
 
-        readIntermediateDigest = false;
+            readIntermediateDigest = false;
+        }
 
-    } else if (SHA2_dataBytesRemaining >= blockSize) {
-        /*
-         * Start another transaction
-         */
-        uint32_t transactionLength = floorUint32(SHA2_dataBytesRemaining,
-                                                 blockSize);
+        if (SHA2_dataBytesRemaining >= blockSize) {
+            /*
+             * Start another transaction
+             */
+            uint32_t transactionLength = floorUint32(SHA2_dataBytesRemaining,
+                                                     blockSize);
 
-        SHA2ComputeIntermediateHash(SHA2_data,
-                               object->digest,
-                               hashModeTable[object->hashType],
-                               transactionLength);
+            /* SHA2ComputeIntermediateHash reads out and writes back
+             * intermediate digest sizes of the the final digest size. For
+             * SHA-224 and SHA-384, this produces incorrect results. Instead,
+             * the digest size of SHA-256 and SHA-512 should be used instead.
+             * This is why we are writing the digest to the accelerator here
+             * first to cover the difference in digest sizes.
+             */
+            SHA2SetDigest(object->digest,
+                          intermediateDigestSizeTable[object->hashType]);
 
-        SHA2_dataBytesRemaining -= transactionLength;
-        SHA2_data += transactionLength;
-        object->bytesProcessed += transactionLength;
-        readIntermediateDigest = true;
+            SHA2ComputeIntermediateHash(SHA2_data,
+                                   object->digest,
+                                   hashModeTable[object->hashType],
+                                   transactionLength);
 
-        HwiP_restore(key);
-        return;
+            SHA2_dataBytesRemaining -= transactionLength;
+            SHA2_data += transactionLength;
+            object->bytesProcessed += transactionLength;
+            readIntermediateDigest = true;
 
-    } else if (SHA2_dataBytesRemaining > 0) {
-        /*
-         * Copy remaining data into buffer
-         */
-        memcpy(object->buffer, SHA2_data, SHA2_dataBytesRemaining);
-        object->bytesInBuffer += SHA2_dataBytesRemaining;
-        SHA2_dataBytesRemaining = 0;
+            HwiP_restore(key);
+            return;
+        } else if (SHA2_dataBytesRemaining > 0) {
+            /*
+             * Copy remaining data into buffer
+             */
+            memcpy(object->buffer, SHA2_data, SHA2_dataBytesRemaining);
+            object->bytesInBuffer += SHA2_dataBytesRemaining;
+            SHA2_dataBytesRemaining = 0;
+        }
     }
+
 
     /*
      * Since we got here, every transaction has been finished
@@ -1021,7 +1033,7 @@ int_fast16_t SHA2_cancelOperation(SHA2_Handle handle) {
 
     if (!object->operationInProgress) {
         HwiP_restore(key);
-        return SHA2_STATUS_ERROR;
+        return SHA2_STATUS_SUCCESS;
     }
 
     /* Reset the accelerator. Immediately stops ongoing operations. */

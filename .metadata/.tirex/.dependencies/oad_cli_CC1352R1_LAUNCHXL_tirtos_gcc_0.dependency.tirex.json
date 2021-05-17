@@ -39,10 +39,9 @@
             "+../../release_oad.cfg -> release_oad.cfg",
             "+../../cli.c -> cli.c",
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
             "+../../bim_oad_debug_image_bin.h -> bim_oad_debug_image_bin.h",
             "+../../bim_oad_debug_image_bin.c -> bim_oad_debug_image_bin.c",
-            "+CC1352R1_LAUNCHXL_TIRTOS_OAD.lds -> CC1352R1_LAUNCHXL_TIRTOS_OAD.lds",
+            "+cc13x2_cc26x2_tirtos_oad.lds -> cc13x2_cc26x2_tirtos_oad.lds",
             "+../../missing/cxxhelpers.c -> missing/cxxhelpers.c",
             "+../makefile.defs -> makefile.defs"
         ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,6 +69,11 @@
 
 // Maximum number of pins (# available depends on package configuration)
 #define MAX_NUM_PINS 31
+
+// Macro used to return the minimum of two numbers
+#ifndef MIN
+#  define MIN(n, m)    (((n) > (m)) ? (m) : (n))
+#endif
 
 /// Last DIO number available on package + device combination
 uint32_t pinUpperBound = 0;
@@ -250,6 +255,11 @@ uint32_t PINCC26XX_getPinCount(){
                          FCFG1_IOCONF_GPIO_CNT_M ) >>
                        FCFG1_IOCONF_GPIO_CNT_S ) ;
 
+    // Workaround for CC26x4 or other devices that support > 32 pins.
+    // Due to driverlib limitations, more than 32 pins cannot be supported
+    // To prevent overflowing pinGpioConfigTable, limit the pin count here
+    pinCount = MIN(MAX_NUM_PINS, pinCount);
+
     return pinCount;
 }
 
@@ -284,11 +294,14 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
             pinLowerBound = 3;
             reservedPinMask |= 0x07;
             break;
+        case CHIP_TYPE_CC1311P3:
+        case CHIP_TYPE_CC2651P3:
         case CHIP_TYPE_CC1352P:
         case CHIP_TYPE_CC2652P:
         case CHIP_TYPE_CC1352P7:
         case CHIP_TYPE_CC2652P7:
-            if (ChipInfo_GetPackageType() == PACKAGE_7x7) {
+            if (ChipInfo_GetPackageType() == PACKAGE_7x7 ||
+                ChipInfo_GetPackageType() == PACKAGE_5x5) {
                 pinLowerBound = 5;
                 reservedPinMask |= 0x1F;
             }
@@ -299,9 +312,12 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
             }
             break;
         default:
-            /* CHIP_TYPE_CC2640
+            /* Lower bound begins at DIO0. No lower bound restrictions needed.
+             * CHIP_TYPE_CC1311R3
+             * CHIP_TYPE_CC2640
              * CHIP_TYPE_CC2650
              * CHIP_TYPE_CC2640R2
+             * CHIP_TYPE_CC2651R3
              * CHIP_TYPE_CC2642
              * CHIP_TYPE_CC2652
              * CHIP_TYPE_CC2652R7
@@ -395,7 +411,7 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
     // If we boot from shutdown, the IOs are latched, this opens the latches again
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
     HWREG(AON_SYSCTL_BASE + AON_SYSCTL_O_SLEEPCTL) = AON_SYSCTL_SLEEPCTL_IO_PAD_SLEEP_DIS;
-#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2)
+#else
     HWREG(AON_PMCTL_BASE + AON_PMCTL_O_SLEEPCTL) = AON_PMCTL_SLEEPCTL_IO_PAD_SLEEP_DIS;
 #endif
 

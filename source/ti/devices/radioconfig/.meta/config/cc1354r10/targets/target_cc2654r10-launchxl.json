@@ -1,0 +1,13 @@
+{
+    "target": {
+        "Name": "LP_CC2654R10",
+        "Revision": [],
+        "Description": "CC2654R10 LP (FPGA).",
+        "DeviceName": "CC2654R10",
+        "DevicePackage": "VQFN 7x7",
+        "FrontEnd": "XD",
+        "PaSettings": "pasettings.json",
+        "RfDesign": "CC1352EM-XD7793-XD24",
+        "DefaultCategory": "Settings"
+    }
+}

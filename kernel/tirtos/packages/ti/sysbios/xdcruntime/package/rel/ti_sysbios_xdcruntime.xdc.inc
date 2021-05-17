@@ -14,3 +14,7 @@ CacheSupport.c
 lib/debug/ti.sysbios.xdcruntime.am4f
 lib/debug/ti.sysbios.xdcruntime.am4fg
 lib/debug/ti.sysbios.xdcruntime.arm4f
+lib/debug/ti.sysbios.xdcruntime.aem4
+lib/debug/ti.sysbios.xdcruntime.am4
+lib/debug/ti.sysbios.xdcruntime.am4g
+lib/debug/ti.sysbios.xdcruntime.arm4

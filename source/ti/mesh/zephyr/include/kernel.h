@@ -14,9 +14,11 @@
 #include <stdbool.h>
 #include <stdatomic.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <limits.h>
 
 #include <toolchain.h>
+#include <sys_clock.h>
 #include <zephyr/types.h>
 #include <sys/atomic.h>
 #include <sys/util.h>
@@ -41,17 +43,143 @@
 
 #define K_NO_WAIT 0
 #define K_FOREVER BIOS_WAIT_FOREVER
-#define USECS_TO_MSECS 1000
 
-static inline u32_t k_uptime_get_32(void)
+#define K_THREAD_STACK_DEFINE		K_KERNEL_STACK_DEFINE
+
+#define K_THREAD_STACK_SIZEOF		K_KERNEL_STACK_SIZEOF
+
+#define USECS_TO_MSECS 1000
+#define k_panic() \
+{\
+  volatile uint8_t x = 0;\
+  while(1)\
+  {\
+    x++;\
+  }\
+}
+/** @brief System-wide macro to denote "forever" in milliseconds
+ *
+ *  Usage of this macro is limited to APIs that want to expose a timeout value
+ *  that can optionally be unlimited, or "forever".
+ *  This macro can not be fed into kernel functions or macros directly. Use
+ *  @ref SYS_TIMEOUT_MS instead.
+ */
+#define SYS_FOREVER_MS (-1)
+
+/** @brief System-wide macro to convert milliseconds to kernel timeouts
+ */
+#define SYS_TIMEOUT_MS(ms) ((ms) == SYS_FOREVER_MS ? K_FOREVER : K_MSEC(ms))
+
+static inline uint32_t k_uptime_get_32(void)
 {
     return ((Clock_getTicks() * Clock_tickPeriod) / USECS_TO_MSECS);
 }
 
-static inline s64_t k_uptime_get(void)
+static inline int64_t k_uptime_get(void)
 {
     return k_uptime_get_32();
 }
+
+#define z_tick_get k_uptime_get
+
+/** @brief Convert ticks to milliseconds
+ *
+ * Converts time values in ticks to milliseconds.
+ * Computes result in 32 bit precision.
+ * Rounds up to the next highest output unit.
+ *
+ * @return The converted time value
+ */
+static inline uint32_t k_ticks_to_ms_ceil32(uint32_t t)
+{
+    return t/4000;  // 4000 - RAT_TICKS_IN_1MS
+}
+
+/** @brief Convert milliseconds to ticks
+ *
+ * Converts time values in milliseconds to ticks.
+ * Computes result in 32 bit precision.
+ * Rounds up to the next highest output unit.
+ *
+ * @return The converted time value
+ */
+static inline uint32_t k_ms_to_ticks_ceil32(uint32_t t)
+{
+    return t*4000; // 4000 - RAT_TICKS_IN_1MS
+}
+
+/* Returns the uptime expiration (relative to an unlocked "now"!) of a
+ * timeout object.  When used correctly, this should be called once,
+ * synchronously with the user passing a new timeout value.  It should
+ * not be used iteratively to adjust a timeout.
+ */
+static inline uint64_t z_timeout_end_calc(k_timeout_t timeout)
+{
+    k_ticks_t dt;
+
+    if (K_TIMEOUT_EQ(timeout, K_FOREVER)) {
+        return UINT64_MAX;
+    } else if (K_TIMEOUT_EQ(timeout, K_NO_WAIT)) {
+        return z_tick_get();
+    }
+
+    dt = k_ms_to_ticks_ceil32(timeout);
+
+    return z_tick_get() + MAX(1, dt);
+}
+
+typedef struct
+{
+    uint16_t _slab_block_size;
+    uint16_t _slab_num_blocks;
+    uint16_t _num_free_blocks;
+} k_mem_slab;
+
+#define K_MEM_SLAB_DEFINE(name, slab_block_size, slab_num_blocks, slab_align) \
+    static k_mem_slab name = \
+    { \
+    ._slab_block_size = slab_block_size, \
+    ._slab_num_blocks = slab_num_blocks, \
+    ._num_free_blocks = slab_num_blocks, \
+    }
+
+static inline void k_mem_slab_free(k_mem_slab *slab, void **mem)
+{
+    free(*mem);
+    slab->_num_free_blocks++;
+}
+
+static inline int k_mem_slab_alloc(k_mem_slab *slab, void **mem, k_timeout_t timeout)
+{
+    volatile void *_mem;
+    // Make sure there are blocks to alloc
+    if (slab->_num_free_blocks == 0)
+    {
+        return -ENOMEM;
+    }
+
+    // Make sure slab is not null
+    if (!slab)
+    {
+        return -EINVAL;
+    }
+
+    // Allocate memory block
+    _mem = malloc(slab->_slab_block_size);
+
+    *mem = (void *)_mem;
+
+    // Decrement the block count
+    slab->_num_free_blocks--;
+
+    return 0;
+}
+
+static inline uint32_t k_mem_slab_num_free_get(k_mem_slab *slab)
+{
+    return slab->_num_free_blocks;
+}
+
 
 struct k_thread {
     Task_Struct taskStruct;
@@ -95,7 +223,7 @@ static inline void k_yield(void)
     Task_yield();
 }
 
-static inline void k_sleep(u32_t ms)
+static inline void k_sleep(uint32_t ms)
 {
     // Task_sleep takes in the amount of ticks to sleep
     Task_sleep(ms * USECS_TO_MSECS / Clock_tickPeriod);
@@ -103,7 +231,7 @@ static inline void k_sleep(u32_t ms)
 
 struct _timeout {
     //sys_dnode_t node;
-    s32_t dticks;
+    int32_t dticks;
     //_timeout_func_t fn;
 };
 
@@ -112,7 +240,7 @@ struct k_work;
 struct k_work_poll;
 
 /* private, used by k_poll and k_work_poll */
-typedef int (*_poller_cb_t)(struct k_poll_event *event, u32_t state);
+typedef int (*_poller_cb_t)(struct k_poll_event *event, uint32_t state);
 struct _poller {
     volatile bool is_polling;
     struct k_thread *thread;
@@ -163,10 +291,10 @@ enum {
 #define CONFIG_NUM_COOP_PRIORITIES (Task_numPriorities/2)
 #define CONFIG_NUM_PREEMPT_PRIORITIES (Task_numPriorities/2 - 1)
 
-#define K_THREAD_STACK_DEFINE(v, s) \
+#define K_KERNEL_STACK_DEFINE(v, s) \
     __aligned(8) char v[s];
 
-#define K_THREAD_STACK_SIZEOF(sym) sizeof(sym)
+#define K_KERNEL_STACK_SIZEOF(sym) sizeof(sym)
 
 #define K_PRIO_COOP(x) (-(CONFIG_NUM_COOP_PRIORITIES - (x)))
 #define K_PRIO_PREEMPT(x) (x)
@@ -407,7 +535,7 @@ extern void k_delayed_work_init(struct k_delayed_work *work,
  */
 extern int k_delayed_work_submit_to_queue(struct k_work_q *work_q,
                       struct k_delayed_work *work,
-                      s32_t delay);
+                      int32_t delay);
 
 /**
  * @brief Cancel a delayed work item.
@@ -491,7 +619,7 @@ static inline void k_work_submit(struct k_work *work)
  * @req K-DWORK-001
  */
 static inline int k_delayed_work_submit(struct k_delayed_work *work,
-                    s32_t delay)
+                    int32_t delay)
 {
     return k_delayed_work_submit_to_queue(&k_sys_work_q, work, delay);
 }
@@ -508,7 +636,7 @@ static inline int k_delayed_work_submit(struct k_delayed_work *work,
  * @return Remaining time (in milliseconds).
  * @req K-DWORK-001
  */
-static inline s32_t k_delayed_work_remaining_get(struct k_delayed_work *work)
+static inline int32_t k_delayed_work_remaining_get(struct k_delayed_work *work)
 {
     // todo
     //return k_ticks_to_ms_floor64(z_timeout_remaining(&work->timeout));
@@ -568,7 +696,7 @@ extern int k_work_poll_submit_to_queue(struct k_work_q *work_q,
                        struct k_work_poll *work,
                        struct k_poll_event *events,
                        int num_events,
-                       s32_t timeout);
+                       int32_t timeout);
 
 /**
  * @brief Submit a triggered work item to the system workqueue.
@@ -604,7 +732,7 @@ extern int k_work_poll_submit_to_queue(struct k_work_q *work_q,
 static inline int k_work_poll_submit(struct k_work_poll *work,
                      struct k_poll_event *events,
                      int num_events,
-                     s32_t timeout)
+                     int32_t timeout)
 {
     return k_work_poll_submit_to_queue(&k_sys_work_q, work,
                         events, num_events, timeout);
@@ -715,7 +843,7 @@ static inline void k_mutex_init(struct k_mutex *mutex)
   mutex->initialized = TRUE;
 }
 
-static inline int k_mutex_lock(struct k_mutex *mutex, s32_t timeout)
+static inline int k_mutex_lock(struct k_mutex *mutex, int32_t timeout)
 {
   // Init the mutex if first use
   if (!mutex->initialized)
@@ -778,9 +906,9 @@ struct k_mem_pool {
 };
 
 struct k_mem_block_id {
-    u32_t pool : 8;
-    u32_t level : 4;
-    u32_t block : 20;
+    uint32_t pool : 8;
+    uint32_t level : 4;
+    uint32_t block : 20;
 };
 
 struct k_mem_block {
@@ -849,7 +977,7 @@ struct k_mem_block {
  * @req K-MPOOL-002
  */
 extern int k_mem_pool_alloc(struct k_mem_pool *pool, struct k_mem_block *block,
-                size_t size, s32_t timeout);
+                size_t size, int32_t timeout);
 
 /**
  * @brief Allocate memory from a memory pool with malloc() semantics

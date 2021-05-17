@@ -130,7 +130,7 @@ typedef struct
  * GLOBAL VARIABLES
  */
 
-byte ZDP_TransID = 0;
+byte ZDP_SeqNum = 0;
 uint8_t childIndex = 0;
 
 /*********************************************************************
@@ -158,6 +158,7 @@ void zdpProcessAddrReq( zdoIncomingMsg_t *inMsg );
 
 static uint8_t  ZDP_Buf[ ZDP_BUF_SZ ];
 static uint8_t *ZDP_TmpBuf = ZDP_Buf+1;
+static uint8_t ZDP_TransID = 0;
 
 byte ZDP_TxOptions = AF_TX_OPTIONS_NONE;
 ZDO_MsgCB_t *zdoMsgCBs = (ZDO_MsgCB_t *)NULL;
@@ -239,16 +240,23 @@ CONST zdpMsgProcItem_t zdpMsgProcs[] =
 static afStatus_t fillAndSend( uint8_t *transSeq, zAddrType_t *addr, cId_t clusterID, byte len )
 {
   afAddrType_t afAddr;
+  afStatus_t status = afStatus_FAILED;
 
   memset( &afAddr, 0, sizeof(afAddrType_t) );
   ZADDR_TO_AFADDR( addr, afAddr );
 
   *(ZDP_TmpBuf-1) = *transSeq;
 
-  return AF_DataRequest( &afAddr, &ZDApp_epDesc, clusterID,
+  status = AF_DataRequest( &afAddr, &ZDApp_epDesc, clusterID,
                            (uint16_t)(len+1), (uint8_t*)(ZDP_TmpBuf-1),
-                           transSeq, ZDP_TxOptions,  AF_DEFAULT_RADIUS );
+                           &ZDP_TransID, ZDP_TxOptions,  AF_DEFAULT_RADIUS );
 
+  if ( status == afStatus_SUCCESS )
+  {
+    (*transSeq)++;
+  }
+
+  return status;
 }
 
 /*********************************************************************
@@ -299,7 +307,7 @@ afStatus_t ZDP_NWKAddrOfInterestReq( zAddrType_t *dstAddr, uint16_t nwkAddr,
   ZDP_TmpBuf[0] = LO_UINT16( nwkAddr );
   ZDP_TmpBuf[1] = HI_UINT16( nwkAddr );
 
-  return fillAndSend( &ZDP_TransID, dstAddr, cmd, 2 );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, cmd, 2 );
 }
 
 /*********************************************************************
@@ -343,7 +351,7 @@ afStatus_t ZDP_NwkAddrReq( uint8_t *IEEEAddress, byte ReqType,
   *pBuf++ = ReqType;
   *pBuf++ = StartIndex;
 
-  return fillAndSend( &ZDP_TransID, &dstAddr, NWK_addr_req, len );
+  return fillAndSend( &ZDP_SeqNum, &dstAddr, NWK_addr_req, len );
 }
 
 /*********************************************************************
@@ -377,7 +385,7 @@ afStatus_t ZDP_IEEEAddrReq( uint16_t shortAddr, byte ReqType,
   *pBuf++ = ReqType;
   *pBuf++ = StartIndex;
 
-  return fillAndSend( &ZDP_TransID, &dstAddr, IEEE_addr_req, len );
+  return fillAndSend( &ZDP_SeqNum, &dstAddr, IEEE_addr_req, len );
 }
 
 /*********************************************************************
@@ -456,7 +464,7 @@ afStatus_t ZDP_MatchDescReq( zAddrType_t *dstAddr, uint16_t nwkAddr,
     }
   }
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Match_Desc_req, len );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Match_Desc_req, len );
 }
 
 /*********************************************************************
@@ -483,7 +491,7 @@ afStatus_t ZDP_SimpleDescReq( zAddrType_t *dstAddr, uint16_t nwkAddr,
   ZDP_TmpBuf[1] = HI_UINT16( nwkAddr );
   ZDP_TmpBuf[2] = endPoint;
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Simple_Desc_req, 3 );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Simple_Desc_req, 3 );
 }
 
 /*********************************************************************
@@ -521,7 +529,7 @@ afStatus_t ZDP_UserDescSet( zAddrType_t *dstAddr, uint16_t nwkAddr,
 
   OsalPort_memcpy( pBuf, UserDescriptor->desc, len );
 
-  return fillAndSend( &ZDP_TransID, dstAddr, User_Desc_set, (AF_MAX_USER_DESCRIPTOR_LEN + addrLen) );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, User_Desc_set, (AF_MAX_USER_DESCRIPTOR_LEN + addrLen) );
 }
 
 /*********************************************************************
@@ -545,7 +553,7 @@ afStatus_t ZDP_ServerDiscReq( uint16_t serverMask, byte SecurityEnable )
   *pBuf++ = LO_UINT16( serverMask );
   *pBuf = HI_UINT16( serverMask );
 
-  FillAndSendTxOptions( &ZDP_TransID, &dstAddr, Server_Discovery_req, 2,
+  FillAndSendTxOptions( &ZDP_SeqNum, &dstAddr, Server_Discovery_req, 2,
              ((SecurityEnable) ? AF_EN_SECURITY : AF_TX_OPTIONS_NONE) );
 }
 
@@ -582,7 +590,7 @@ afStatus_t ZDP_DeviceAnnce( uint16_t nwkAddr, uint8_t *IEEEAddr,
   ZDP_TmpBuf[10] = capabilities;
   len++;
 
-  return fillAndSend( &ZDP_TransID, &dstAddr, Device_annce, len );
+  return fillAndSend( &ZDP_SeqNum, &dstAddr, Device_annce, len );
 }
 
 /*********************************************************************
@@ -1246,7 +1254,7 @@ afStatus_t ZDP_EndDeviceBindReq( zAddrType_t *dstAddr,
     *pBuf++ = HI_UINT16(OutClusterList[i]);
   }
 
-  return fillAndSend( &ZDP_TransID, dstAddr, End_Device_Bind_req, len );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, End_Device_Bind_req, len );
 }
 
 /*********************************************************************
@@ -1303,7 +1311,7 @@ afStatus_t ZDP_BindUnbindReq( uint16_t BindOrUnbind, zAddrType_t *dstAddr,
     *pBuf++ = HI_UINT16( destinationAddr->addr.shortAddr );
   }
 
-  FillAndSendTxOptions( &ZDP_TransID, dstAddr, BindOrUnbind, len, AF_MSG_ACK_REQUEST );
+  FillAndSendTxOptions( &ZDP_SeqNum, dstAddr, BindOrUnbind, len, AF_MSG_ACK_REQUEST );
 }
 
 /*********************************************************************
@@ -1340,7 +1348,7 @@ afStatus_t ZDP_MgmtNwkDiscReq( zAddrType_t *dstAddr,
   *pBuf++ = ScanDuration;
   *pBuf = StartIndex;
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Mgmt_NWK_Disc_req, len );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Mgmt_NWK_Disc_req, len );
 }
 
 /*********************************************************************
@@ -1365,7 +1373,7 @@ afStatus_t ZDP_MgmtDirectJoinReq( zAddrType_t *dstAddr,
   osal_cpyExtAddr( ZDP_TmpBuf, deviceAddr );
   ZDP_TmpBuf[Z_EXTADDR_LEN] = capInfo;
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Mgmt_Direct_Join_req, (Z_EXTADDR_LEN + 1) );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Mgmt_Direct_Join_req, (Z_EXTADDR_LEN + 1) );
 }
 
 /*********************************************************************
@@ -1400,12 +1408,12 @@ afStatus_t ZDP_MgmtPermitJoinReq( zAddrType_t *dstAddr, byte duration,
     tmpAddr.addrMode = Addr16Bit;
     tmpAddr.addr.shortAddr = NLME_GetShortAddr();
 
-    fillAndSend( &ZDP_TransID, &tmpAddr, Mgmt_Permit_Join_req,
+    fillAndSend( &ZDP_SeqNum, &tmpAddr, Mgmt_Permit_Join_req,
                       ZDP_MGMT_PERMIT_JOIN_REQ_SIZE );
   }
 
   // Send the message
-  return fillAndSend( &ZDP_TransID, dstAddr, Mgmt_Permit_Join_req,
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Mgmt_Permit_Join_req,
                       ZDP_MGMT_PERMIT_JOIN_REQ_SIZE );
 }
 
@@ -1441,7 +1449,7 @@ afStatus_t ZDP_MgmtLeaveReq( zAddrType_t *dstAddr, uint8_t *IEEEAddr, uint8_t Re
     ZDP_TmpBuf[Z_EXTADDR_LEN] |= ZDP_MGMT_LEAVE_REQ_REJOIN;
   }
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Mgmt_Leave_req, (Z_EXTADDR_LEN + 1) );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Mgmt_Leave_req, (Z_EXTADDR_LEN + 1) );
 }
 
 /*********************************************************************
@@ -1497,7 +1505,7 @@ afStatus_t ZDP_MgmtNwkUpdateReq( zAddrType_t *dstAddr,
     }
   }
 
-  return fillAndSend( &ZDP_TransID, dstAddr, Mgmt_NWK_Update_req, len );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, Mgmt_NWK_Update_req, len );
 }
 
 
@@ -2123,7 +2131,7 @@ afStatus_t ZDP_InvalidCmdReq( zAddrType_t *dstAddr )
       ZDP_TmpBuf[index] = 0;
   }
 
-  return fillAndSend( &ZDP_TransID, dstAddr, ZDO_invalid_cmd_req, ZDO_INVALID_CMD_LEN );
+  return fillAndSend( &ZDP_SeqNum, dstAddr, ZDO_invalid_cmd_req, ZDO_INVALID_CMD_LEN );
 }
 
 #endif

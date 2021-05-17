@@ -376,13 +376,13 @@ const config = {
 						{
 							name         : 'healthSrvMaxFaultsFound',
 							displayName  : 'Health Server Max Faults',
-							hidden	     : false,
+							hidden	     : true,
 							default      : Common.sigModelMapping["health_srv"].maxFaults
 						},
 						{
 							name         : 'healthSrvCbk',
 							displayName  : 'Health Server Callback',
-							hidden	     : false,
+							hidden	     : true,
 							default      : Common.sigModelMapping["health_srv"].healthSrvCbk
 						}
 					]
@@ -440,11 +440,11 @@ function validate(inst, validation)
 	if(inst.default_ttl>255 || inst.default_ttl<1){
         validation.logError("Valid range is 1 to 255",inst,"default_ttl");
 	}
-	if(inst.relay_retransmit_count>255 || inst.relay_retransmit_count<1){
-        validation.logError("Valid range is 1 to 255",inst,"relay_retransmit_count");
+	if(inst.relay_retransmit_count>255 || inst.relay_retransmit_count<0){
+        validation.logError("Valid range is 0 to 255",inst,"relay_retransmit_count");
 	}
-	if(inst.net_transmit_count>255 || inst.net_transmit_count<1){
-        validation.logError("Valid range is 1 to 255",inst,"net_transmit_count");
+	if(inst.net_transmit_count>255 || inst.net_transmit_count<0){
+        validation.logError("Valid range is 0 to 255",inst,"net_transmit_count");
 	}
 	if(inst.net_transmit_int_ms>320 || inst.net_transmit_int_ms<10 || inst.net_transmit_int_ms%10 != 0 ){
         validation.logError("Must be greater than 0, less than or equal to 320, and a multiple of 10.",inst,"net_transmit_int_ms");

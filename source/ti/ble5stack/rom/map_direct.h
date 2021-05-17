@@ -580,8 +580,8 @@
 // V5.0 LE AE API
 #define MAP_LE_SetAdvSetRandAddr                                     LE_SetAdvSetRandAddr
 #define MAP_LE_SetExtAdvParams                                       LE_SetExtAdvParams
-#define MAP_LE_SetExtAdvData                                         LE_SetExtAdvData
-#define MAP_LE_SetExtScanRspData                                     LE_SetExtScanRspData
+#define MAP_LE_SetExtAdvData                                         LE_SetExtAdvData_hook
+#define MAP_LE_SetExtScanRspData                                     LE_SetExtScanRspData_hook
 #define MAP_LE_SetExtAdvEnable                                       LE_SetExtAdvEnable
 #define MAP_LE_RemoveAdvSet                                          LE_RemoveAdvSet
 #define MAP_LE_ClearAdvSets                                          LE_ClearAdvSets
@@ -611,7 +611,7 @@
 #define MAP_llSetupExtAdv                                            llSetupExtAdv
 #define MAP_llSetupExtAdvLegacy                                      llSetupExtAdvLegacy
 #define MAP_llSetupExtScan                                           llSetupExtScan_sPatch
-#define MAP_llSetupExtInit                                           llSetupExtInit
+#define MAP_llSetupExtInit                                           llSetupExtInit_sPatch
 #define MAP_llSetupExtHdr                                            llSetupExtHdr
 #define MAP_llSetupExtData                                           llSetupExtData
 #define MAP_llGetExtHdrLen                                           llGetExtHdrLen
@@ -1157,7 +1157,7 @@
 #define MAP_smpInitiatorProcessMasterID                              smpInitiatorProcessMasterID
 #define MAP_smpInitiatorProcessPairingConfirm                        smpInitiatorProcessPairingConfirm
 #define MAP_smpInitiatorProcessPairingDHKeyCheck                     smpInitiatorProcessPairingDHKeyCheck
-#define MAP_smpInitiatorProcessPairingPubKey                         smpInitiatorProcessPairingPubKey
+#define MAP_smpInitiatorProcessPairingPubKey                         smpInitiatorProcessPairingPubKey_sPatch
 #define MAP_smpInitiatorProcessPairingRandom                         smpInitiatorProcessPairingRandom
 #define MAP_smpInitiatorProcessPairingRsp                            smpInitiatorProcessPairingRsp_sPatch
 #define MAP_smpInitiatorProcessSigningInfo                           smpInitiatorProcessSigningInfo
@@ -1170,7 +1170,7 @@
 #define MAP_smpResponderProcessEncryptionInformation                 smpResponderProcessEncryptionInformation
 #define MAP_smpResponderProcessIdentityAddrInfo                      smpResponderProcessIdentityAddrInfo
 #define MAP_smpResponderProcessIdentityInfo                          smpResponderProcessIdentityInfo
-#define MAP_smpResponderProcessIncoming                              smpResponderProcessIncoming
+#define MAP_smpResponderProcessIncoming                              smpResponderProcessIncoming_sPatch
 #define MAP_smpResponderProcessMasterID                              smpResponderProcessMasterID
 #define MAP_smpResponderProcessPairingConfirm                        smpResponderProcessPairingConfirm
 #define MAP_smpResponderProcessPairingDHKeyCheck                     smpResponderProcessPairingDHKeyCheck
@@ -1349,6 +1349,7 @@ extern uint8 MAP_llSetupCte( void *connPtr, uint8 req);
 extern uint8 MAP_llFreeCteSamplesEntryQueue( void );
 extern uint8 MAP_LL_EXT_SetLocationingAccuracy( uint16 handle, uint8  sampleRate1M, uint8  sampleSize1M,
                                                 uint8  sampleRate2M, uint8  sampleSize2M, uint8  sampleCtrl);
+extern void MAP_llSetRfReportAodPackets( void );
 
 /*******************************************************************************
  * RF hooks
@@ -1365,6 +1366,7 @@ extern uint8  MAP_llDmmSetAdvHandle(uint8 handle, uint8 clear);
 extern void   MAP_llDmmDynamicFree(void);
 extern uint8  MAP_llDmmDynamicAlloc(void);
 extern uint32_t MAP_LL_AbortedCback( uint8 preempted );
+extern uint8  MAP_llSetStarvationMode(uint16 connId, uint8 setOnOffValue);
 
 
 /*******************************************************************************
@@ -1439,4 +1441,9 @@ extern uint8_t MAP_gapScan_periodicAdvCmdStatusCBs( void *pMsg );
 extern uint8_t MAP_gapScan_processBLEPeriodicAdvCBs( void *pMsg );
 extern void MAP_llClearPeriodicScanSets( void );
 extern void MAP_llUpdateExtScanAcceptSyncInfo( void );
+
+extern uint8_t LE_SetExtAdvData_hook( void * pMsg );
+extern uint8_t LE_SetExtScanRspData_hook( void * pMsg);
+extern uint8 MAP_gapAdv_handleAdvHciCmdComplete( void *pMsg );
+
 #endif // MAP_DIRECT_H

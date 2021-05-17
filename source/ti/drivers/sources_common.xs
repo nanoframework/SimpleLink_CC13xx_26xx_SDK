@@ -41,6 +41,7 @@ var commonHeaders = [
     "SDFatFS.h",
     "SPI.h",
     "Timer.h",
+    "./timer/TimerSupport.h",
     "UART.h",
     "UART2.h",
     "./uart2/UART2Support.h",

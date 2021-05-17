@@ -89,7 +89,6 @@
             "+../../application/wsn_node/RadioProtocol.h -> application/wsn_node/RadioProtocol.h",
             "+../../application/wsn_node/easylink/EasyLink.c -> application/wsn_node/easylink/EasyLink.c",
             "+../../application/wsn_node/easylink/EasyLink.h -> application/wsn_node/easylink/EasyLink.h",
-            "+../../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
             "+../makefile.defs -> makefile.defs"
         ]
     }

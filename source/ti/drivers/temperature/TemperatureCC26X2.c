@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -400,7 +400,7 @@ void Temperature_init() {
         HwiP_Params_init(&hwiParams);
         hwiParams.priority = TemperatureCC26X2_config.intPriority;
         hwiParams.enableInt = true;
-        HwiP_construct(&batmonHwi, INT_BATMON_COMB, temperatureHwiFxn, NULL);
+        HwiP_construct(&batmonHwi, INT_BATMON_COMB, temperatureHwiFxn, &hwiParams);
 
         disableTempUpperLimit();
         disableTempLowerLimit();

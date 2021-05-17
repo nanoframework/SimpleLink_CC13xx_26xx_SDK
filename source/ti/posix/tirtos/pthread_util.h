@@ -41,6 +41,61 @@
 
 #include "time.h"
 
+/*  CLOCK_REALTIME represents the realtime clock for the system. For this
+ *  clock, clock_gettime() returns the time since the beginning of the
+ *  Epoch. SYS/BIOS implements clock_gettime() and clock_settime() with
+ *  the ti.sysbios.hal.Seconds module for CLOCK_REALTIME.
+ *
+ *  For SYS/BIOS, CLOCK_MONOTONIC represents the ti.sysbios.knl.Clock
+ *  system clock.
+ *
+ *  clock_gettime(CLOCK_MONOTONIC) will keep track of Clock tick rollovers
+ *  to ensure that it is monotonic. The tick count is 32 bits, so at a
+ *  1 msec tick rate, the count rolls over every 4294967296 / 1000 seconds,
+ *  or about every 50 days.
+ *
+ *  To detect rollover, we'll save the current tick count in clock_gettime()
+ *  to prevTicks. If the current tick count is less than prevTicks, the
+ *  tick count has rolled over and we'll increment rolloverCount.
+ *  If clock_gettime() is not called sufficiently often (e.g. every 49 days
+ *  for a 1 msec tick rate), the tick count could rollover twice without
+ *  being detected. Although clock_gettime(CLOCK_MONOTONIC) would still
+ *  detect one rollover, the time would be off (by 50 days for a 1 msec
+ *  tick rate). To prevent this from happening, we use a Clock object
+ *  with a timeout of 0xFFFFFFFF ticks, and a timeout function that
+ *  checks for rollover. This prevents the application from having to
+ *  call clock_gettime() sufficiently often to keep an accurate time.
+ *
+ *  Each time the tick count rolls over, there will be a remainder of ticks
+ *  that don't make up a whole second. We need to take this into account
+ *  in clock_gettime(). The following definitions are for that purpose.
+ */
+
+/*
+ *  The maximum number of ticks before the tick count rolls over. We use
+ *  0xFFFFFFFF instead of 0x100000000 to avoid 64-bit math.
+ */
+#define MAX_TICKS 0xFFFFFFFF
+#define TICKS_PER_SEC (1000000 / Clock_tickPeriod)
+
+/* The integral number of seconds in a period of MAX_TICKS */
+#define MAX_SECONDS (MAX_TICKS / TICKS_PER_SEC)
+
+/* The total number of system ticks in MAX_SECONDS seconds */
+#define MAX_SECONDS_TICKS (MAX_SECONDS * TICKS_PER_SEC)
+
+/*
+ *  MAX_TICKS - MAX_SECONDS_TICKS is the number of ticks left over that
+ *  don't make up a whole second.  We add 1 to get the remaining number
+ *  of ticks when the tick count wraps back to 0.  REM_TICKS could
+ *  theoritically be equivalent to 1 second (when the tick period divides
+ *  0x100000000 evenly), so it is not really a "remainder", since it ranges
+ *  from 1 to TICKS_PER_SEC, instead of from 0 to TICKS_PER_SEC - 1.
+ *  However, this will not affect the seconds calculation in clock_gettime(),
+ *  so we can ignore this special case.
+ */
+#define REM_TICKS ((MAX_TICKS - MAX_SECONDS_TICKS) + 1)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

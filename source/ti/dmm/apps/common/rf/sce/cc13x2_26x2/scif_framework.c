@@ -406,6 +406,9 @@ SCIF_RESULT_T scifInit(const SCIF_DATA_T* pScifDriverSetup) {
   */
 void scifUninit(void) {
 
+    // Wait until the there are no more pending wake-up signals
+    while (HWREG(AUX_SCE_BASE + AUX_SCE_O_WUSTAT) & AUX_SCE_WUSTAT_WU_SIGNAL_M);
+
     // Wait until the Sensor Controller is idle (it might still be running, though not for long)
     while (!(HWREG(AUX_SCE_BASE + AUX_SCE_O_CPUSTAT) & AUX_SCE_CPUSTAT_SLEEP_M));
 
@@ -1065,4 +1068,4 @@ uint16_t scifGetActiveTaskIds(void) {
 //@}
 
 
-// Generated on 2019-09-30 11:33:18.740
+// Generated on 2021-02-04 

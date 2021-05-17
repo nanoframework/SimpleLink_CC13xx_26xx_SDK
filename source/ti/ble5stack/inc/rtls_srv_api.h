@@ -482,7 +482,10 @@ extern bStatus_t RTLSSrv_setConnCteTransmitParams(uint16_t connHandle,
  *
  * @param connHandle - Connection handle
  * @param enable - Enable or disable CTE Request for a connection (1 or 0)
- * @param interval - Requested interval for initiating the CTE Request procedure in number of connection events (1 to 0xFFFF)
+ * @param interval - Requested interval for initiating the CTE Request procedure in number of connection events (1 to 0xFFFF).\n
+ *                   1 means the next CTE Request procedure is initiated at the connection interval following the completion
+ *                   of a previous CTE Request procedure.\n
+ *                   The first CTE Request procedure is sent as soon as possible no matter the value set for this parameter.
  * @param length - Min length of the CTE being requested in 8 &mu;s units (2 to 20)
  * @param type - Requested CTE type (0 - AoA, 1 - AoD with 1&mu;s slots, 2 - AoD with 2&mu;s slots)
  *

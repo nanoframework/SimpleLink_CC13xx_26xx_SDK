@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,25 @@ let Common = system.getScript("/ti/drivers/Common.js");
 let logError = Common.logError;
 let logWarning = Common.logWarning;
 
-/* Flash sector size for CC13X2 & CC26X2 devices is 0x2000 */
-const SECTORSIZE = 0x2000;
+/* Define Flash sector size based on device type */
+let SECTORSIZE;
+
+let NVS_SECTORSIZE_MAP = [
+    {prefix: "CC13.4",   sector_size: 0x800},
+    {prefix: "CC26.4",   sector_size: 0x800},
+    {prefix: "CC13",     sector_size: 0x2000},
+    {prefix: "CC26",     sector_size: 0x2000}
+];
+
+for (let i = 0; i < NVS_SECTORSIZE_MAP.length; i++) {
+    let nsm = NVS_SECTORSIZE_MAP[i];
+
+    if (system.deviceData.deviceId.match(nsm.prefix)) {
+        SECTORSIZE = nsm.sector_size;
+        break;
+    }
+}
+
 
 let config = [
     {

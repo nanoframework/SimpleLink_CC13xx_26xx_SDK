@@ -1,6 +1,6 @@
 {
     "target": {
-        "Name": "LAUNCHXL-CC26X2RB",
+        "Name": "LP_CC2652RB",
         "Revision": [],
         "Description": "CC2652RBLP. 7x7 VQFN48 package. Internal bias, differential output. 2.4 GHz frequency band.",
         "DeviceName": "CC2652RB",

@@ -234,6 +234,13 @@ function getRfDesignOptions(deviceId)
             {name: "LAUNCHXL-CC1352P-4"}
         ];
     }
+    else if(deviceId === "CC1352P7RGZ")
+    {
+        newRfDesignOptions = [
+            {name: "LP_CC1352P7-1"},
+            {name: "LP_CC1352P7-4"}
+        ];
+    }
     else if(deviceId === "CC1352R1F3RGZ")
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC1352R1"}];
@@ -261,6 +268,14 @@ function getRfDesignOptions(deviceId)
     else if(deviceId === "CC2652R1FSIP")
     {
         newRfDesignOptions = [{name: "LP_CC2652RSIP"}];
+    }
+    else if(deviceId === "CC1312R7RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC1312R7"}];
+    }
+    else if(deviceId === "CC2652R7RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652R7"}];
     }
 
     return(newRfDesignOptions);
@@ -301,11 +316,26 @@ function getPropPhySettings(inst, deviceId)
             phySettings = system.getScript("/ti/easylink/rf_config/"
                 + "CC1352P_2_LAUNCHXL_rf_defaults.js").defaultPropPhyList;
         }
+        else if(rfDesign === "LP_CC1352P7-1")
+        {
+            phySettings = system.getScript("/ti/easylink/rf_config/"
+                + "LP_CC1352P7_1_rf_defaults.js").defaultPropPhyList;
+        }
+        else if(rfDesign === "LP_CC1352P7-4")
+        {
+            phySettings = system.getScript("/ti/easylink/rf_config/"
+                + "LP_CC1352P7_4_rf_defaults.js").defaultPropPhyList;
+        }
     }
     else if(deviceId === "CC1352P1F3RGZ")
     {
         phySettings = system.getScript("/ti/easylink/rf_config/"
             + "CC1352P1_LAUNCHXL_rf_defaults.js").defaultPropPhyList;
+    }
+    else if(deviceId === "CC1352P7RGZ")
+    {
+        phySettings = system.getScript("/ti/easylink/rf_config/"
+            + "LP_CC1352P7_1_rf_defaults.js").defaultPropPhyList;
     }
 
     if(deviceId === "CC1352R1F3RGZ")
@@ -337,6 +367,16 @@ function getPropPhySettings(inst, deviceId)
     {
         phySettings = system.getScript("/ti/easylink/rf_config/"
             + "LP_CC2652RSIP_rf_defaults.js").defaultPropPhyList;
+    }
+    else if(deviceId === "CC1312R7RGZ")
+    {
+        phySettings = system.getScript("/ti/easylink/rf_config/"
+            + "LP_CC1312R7_rf_defaults.js").defaultPropPhyList;
+    }
+    else if(deviceId === "CC2652R7RGZ")
+    {
+        phySettings = system.getScript("/ti/easylink/rf_config/"
+            + "LP_CC2652R7_rf_defaults.js").defaultPropPhyList;
     }
 
     return(phySettings);
@@ -572,8 +612,9 @@ function validate(inst, validation)
         }
         else if(srfStudioBoardName.includes("LP_"))
         {
-            // SIP LaunchPads; SmartRF Studio and SysConfig board
-            // names are identical
+            // For SIP LaunchPads, SmartRF Studio and SysConfig board
+            // names are identical. But not for 704K.
+            srfStudioBoardName = srfStudioBoardName.replace("P7_", "P7-");
         }
         else
         {
@@ -609,12 +650,14 @@ function validate(inst, validation)
         const rcName = "radioConfig" + Common.underscoreToCamelCase(phy.name);
         const radioConfigInst = inst[rcName];
 
-        if((inst.rfDesign === "LAUNCHXL-CC1352P-4")
+        if((inst.rfDesign === "LAUNCHXL-CC1352P-4"
+            || inst.rfDesign === "LP_CC1352P7-4")
             && (phy.name === "EasyLink_Phy_200kbps2gfsk"))
         {
             validation.logError(`EasyLink stack does not support this PHY when `
                 + `${system.getReference(inst, "rfDesign")} is set to `
-                + `LAUNCHXL-CC1352P-4`, inst, "EasyLink_Phy_200kbps2gfsk");
+                + `LAUNCHXL-CC1352P-4 or LP_CC1352P7-4`,
+            inst, "EasyLink_Phy_200kbps2gfsk");
             return;
         }
 

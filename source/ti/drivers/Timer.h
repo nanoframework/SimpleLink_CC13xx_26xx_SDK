@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -171,6 +171,10 @@
 
 #include <stdint.h>
 
+#include <ti/drivers/dpl/HwiP.h>
+#include <ti/drivers/dpl/SemaphoreP.h>
+#include <ti/drivers/Power.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -320,87 +324,52 @@ typedef struct {
     uint32_t             period;
 } Timer_Params;
 
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_control().
- */
-typedef int_fast16_t (*Timer_ControlFxn)(Timer_Handle handle,
-    uint_fast16_t cmd, void *arg);
+/*! @cond NODOC */
+#define TIMER_BASE_OBJECT \
+    /* Timer control variables */ \
+    Timer_Mode                 mode;         /* Blocking or Callback mode */ \
+    Timer_CallBackFxn          callBack;     /* Callback function pointer */ \
+    Power_NotifyObj            notifyObj;    /* Ptr to current I2C transaction */ \
+    uint32_t                   timer; \
+    uint32_t                   period; \
+    uint32_t                   prescaler; \
+    \
+    /* Timer RTOS objects */ \
+    HwiP_Handle                hwiHandle;    /* Hwi object handle */ \
+    SemaphoreP_Struct          semStruct;    /* Grants exclusive access to I2C */ \
+    SemaphoreP_Handle          semHandle;    /* Signal I2C transfer complete */ \
+    \
+    bool                       isRunning;    /* Flag to show module is open */ \
+/*! @endcond */
 
 /*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_close().
- */
-typedef void (*Timer_CloseFxn)(Timer_Handle handle);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_getCount().
- */
-typedef uint32_t (*Timer_GetCountFxn)(Timer_Handle handle);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_init().
- */
-typedef void (*Timer_InitFxn)(Timer_Handle handle);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_open().
- */
-typedef Timer_Handle (*Timer_OpenFxn)(Timer_Handle handle,
-    Timer_Params *params);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_setPeriod().
- */
-typedef int32_t (*Timer_SetPeriodFxn)(Timer_Handle handle,
-    Timer_PeriodUnits periodUnits, uint32_t period);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_start().
- */
-typedef int32_t (*Timer_StartFxn)(Timer_Handle handle);
-
-/*!
- *  @brief      A function pointer to a driver specific implementation of
- *              Timer_stop().
- */
-typedef void (*Timer_StopFxn)(Timer_Handle handle);
-
-/*!
- *  @brief      The definition of a timer function table that contains the
- *              required set of functions to control a specific timer driver
- *              implementation.
+ *  @cond NODOC
+ *  Timer Object. Applications must not access any member variables of
+ *  this structure!
  */
 typedef struct {
-    /*! Function to close the specified timer. */
-    Timer_CloseFxn closeFxn;
+    TIMER_BASE_OBJECT
+} Timer_Object;
+/*! @endcond */
 
-    /*! Implementation-specific control function. */
-    Timer_ControlFxn controlFxn;
+/*! @cond NODOC */
+#define TIMER_BASE_HWATTRS \
+    /*! Timer Peripheral's base address */ \
+    uint32_t baseAddress; \
+    /*! Timer Peripheral's interrupt vector */ \
+    uint32_t intNum; \
+    /*! Timer Peripheral's interrupt priority*/ \
+    uint32_t intPriority;
+/*! @endcond */
 
-    /*! Function to get the count of the specified timer. */
-    Timer_GetCountFxn getCountFxn;
-
-    /*! Function to initialize the driver instance. */
-    Timer_InitFxn initFxn;
-
-    /*! Function to open the specified timer. */
-    Timer_OpenFxn openFxn;
-
-    /*! Function to set the period of the specified timer. */
-    Timer_SetPeriodFxn setPeriodFxn;
-
-    /*! Function to start the specified timer. */
-    Timer_StartFxn startFxn;
-
-    /*! Function to stop the specified timer. */
-    Timer_StopFxn stopFxn;
-} Timer_FxnTable;
+/*!
+ *  @cond NODOC
+ *  Timer HWAttrs.
+ */
+typedef struct {
+    TIMER_BASE_HWATTRS
+} Timer_HWAttrs;
+/*! @endcond */
 
 /*!
  *  @brief  Timer Global configuration
@@ -414,15 +383,19 @@ typedef struct {
  *  @sa     Timer_init()
  */
 typedef struct Timer_Config_ {
-    /*! Pointer to a table of driver-specific implementations of timer APIs. */
-    Timer_FxnTable const *fxnTablePtr;
-
     /*! Pointer to a driver-specific data object. */
     void                 *object;
 
     /*! Pointer to a driver-specific hardware attributes structure. */
     void           const *hwAttrs;
 } Timer_Config;
+
+/*!
+ *  @cond NODOC
+ *  Timer Config.
+ */
+extern const Timer_Config Timer_config[];
+/*! @endcond */
 
 /*!
  *  @brief  Function to close a timer. The corresponding timer

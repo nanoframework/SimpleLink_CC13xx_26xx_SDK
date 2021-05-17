@@ -79,9 +79,13 @@ void bleStack_createTasks()
 
 int bleStack_initGap(uint8_t role, ICall_EntityID appSelfEntity, uint16_t paramUpdateDecision, void *bleApp_bondMgrCBs)
 {
-  // Pass all parameter update requests to the app for it to decide
-  GAP_SetParamValue(GAP_PARAM_LINK_UPDATE_DECISION, paramUpdateDecision);
+  if (role & (GAP_PROFILE_PERIPHERAL))
+  {
+      // Pass all parameter update requests to the app for it to decide
+      GAP_SetParamValue(GAP_PARAM_LINK_UPDATE_DECISION, paramUpdateDecision);
+  }
 
+#if defined ( GAP_BOND_MGR )
 #if 0
   // Setup the GAP Bond Manager. For more information see the GAP Bond Manager
   // section in the User's Guide
@@ -92,6 +96,7 @@ int bleStack_initGap(uint8_t role, ICall_EntityID appSelfEntity, uint16_t paramU
 
   // Start Bond Manager and register callback
   VOID GAPBondMgr_Register((gapBondCBs_t *)bleApp_bondMgrCBs);
+#endif
 
   // Register with GAP for HCI/Host messages. This is needed to receive HCI
   // events. For more information, see the HCI section in the User's Guide:

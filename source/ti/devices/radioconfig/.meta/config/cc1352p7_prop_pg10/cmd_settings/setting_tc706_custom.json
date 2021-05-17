@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "Custom (50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings))",
-        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 863-930 MHz band. (Pre-silicon settings)",
+        "Name": "Custom (50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Preview settings))",
+        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 863-930 MHz band. (Preview settings)",
         "Frequency": "915",
         "Patch": {
             "Define": "RF_MODE_AUTO",

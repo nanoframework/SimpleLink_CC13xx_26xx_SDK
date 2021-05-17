@@ -1,17 +1,17 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (FPGA)",
-        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band",
+        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Pre-silicon settings)",
+        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Pre-silicon settings)",
         "Frequency": "2405",
         "Patch": {
             "Define": "RF_MODE_AUTO",
-            "Cpe": "rf_patch_cpe_ieee_802_15_4",
+            "Cpe": "rf_patch_cpe_multi_protocol",
             "Mce": [],
             "Rfe": []
         },
         "Command": [
             {
-                "_name": "CMD_RADIO_SETUP",
+                "_name": "CMD_RADIO_SETUP_PA",
                 "Field": [
                     {
                         "_name": "commandNo",
@@ -67,7 +67,7 @@
                     },
                     {
                         "_name": "config.biasMode",
-                        "$": "1"
+                        "$": "0"
                     },
                     {
                         "_name": "config.analogCfgMode",
@@ -79,20 +79,41 @@
                     },
                     {
                         "_name": "txPower",
-                        "$": "0x001F"
+                        "$": "0xFFFF"
                     },
                     {
                         "_name": "pRegOverride",
                         "$": "0"
+                    },
+                    {
+                        "_name": "pRegOverrideTxStd",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pRegOverrideTx20",
+                        "$": "0"
                     }
                 ],
-                "OverrideField": {
-                    "_name": "pRegOverride",
-                    "Block": [
-                        "override_ieee_802_15_4.json",
-                        "override_fpga_ieee.json"
-                    ]
-                }
+                "OverrideField": [
+                    {
+                        "_name": "pRegOverride",
+                        "Block": "override_ieee_802_15_4.json"
+                    },
+                    {
+                        "_name": "pRegOverrideTxStd",
+                        "Block": [
+                            "override_txstd_placeholder.json",
+                            "override_txstd_settings.json"
+                        ]
+                    },
+                    {
+                        "_name": "pRegOverrideTx20",
+                        "Block": [
+                            "override_tx20_placeholder.json",
+                            "override_tx20_settings.json"
+                        ]
+                    }
+                ]
             },
             {
                 "_name": "CMD_FS",

@@ -157,7 +157,8 @@ const config = [
     {
         name: "useMulti",
         displayName: "Use Multi-Protocol Patch",
-        description: "Use multi-protocol rather than individual protocol patches",
+        description: "Use multi-protocol versus single-protocol patches",
+        hidden: Common.isDeviceClass10() || Common.isDeviceClass3(),
         default: false
     },
     // Stack specific override

@@ -1,19 +1,11 @@
 {
     "devicelist": {
-        "version": "2.20.0",
+        "version": "2.21.0",
         "DeviceGroup": [
             {
                 "Name": "Sub-1 GHz",
                 "Description": "Texas Instruments RF devices for the Sub 1 GHz ISM band.",
                 "Device": [
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC1352P"
-                        },
-                        "Brief": "Dual Band, High PA",
-                        "DeviceType": "Wireless MCU"
-                    },
                     {
                         "DeviceName": {
                             "_family": "Agama",
@@ -25,9 +17,9 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC1352R"
+                            "$": "CC1312R7"
                         },
-                        "Brief": "Dual Band",
+                        "Brief": "Sub-1GHz",
                         "DeviceType": "Wireless MCU"
                     },
                     {
@@ -49,15 +41,39 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC1312R"
+                            "$": "CC1352P"
                         },
-                        "Brief": "Sub-1GHz",
+                        "Brief": "Dual Band, High PA",
                         "DeviceType": "Wireless MCU"
                     },
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC1312R7"
+                            "$": "CC1352R"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2672P"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2672R"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC1312R"
                         },
                         "Brief": "Sub-1GHz",
                         "DeviceType": "Wireless MCU"
@@ -167,31 +183,15 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC2652P"
+                            "$": "CC2652R7"
                         },
-                        "Brief": "2.4 GHz, High PA",
+                        "Brief": "2.4 GHz",
                         "DeviceType": "Wireless MCU"
                     },
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC2652PSIP"
-                        },
-                        "Brief": "2.4 GHz, High PA (SIP)",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC2652RB"
-                        },
-                        "Brief": "2.4 GHz (BAW)",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC2652R"
+                            "$": "CC2652P7"
                         },
                         "Brief": "2.4 GHz",
                         "DeviceType": "Wireless MCU"
@@ -215,25 +215,41 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC2652R7"
-                        },
-                        "Brief": "2.4 GHz",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC2652P7"
-                        },
-                        "Brief": "2.4 GHz",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
                             "$": "CC2652RSIP"
                         },
                         "Brief": "2.4 GHz (SIP)",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2652PSIP"
+                        },
+                        "Brief": "2.4 GHz, High PA (SIP)",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2652P"
+                        },
+                        "Brief": "2.4 GHz, High PA",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2652RB"
+                        },
+                        "Brief": "2.4 GHz (BAW)",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2652R"
+                        },
+                        "Brief": "2.4 GHz",
                         "DeviceType": "Wireless MCU"
                     },
                     {

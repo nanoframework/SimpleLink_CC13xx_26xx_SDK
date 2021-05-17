@@ -100,7 +100,7 @@ void func_callback(struct bt_mesh_model *model,
 int update_callback(struct bt_mesh_model *model);
 int init_callback(struct bt_mesh_model *model);
 void reset_callback(struct bt_mesh_model *model);
-int settings_commit_callback(struct bt_mesh_model *model);
+int start_callback(struct bt_mesh_model *model);
 int fault_get_cur_callback(struct bt_mesh_model *model, uint8_t *test_id,
                            uint16_t *company_id, uint8_t *faults,
                            uint8_t *fault_count);
@@ -131,10 +131,19 @@ extern void mesh_erpc_register(void);
  int mesh_init(void)
  {
      int err = 0;
+     int i = 0;
 
      // Register to the ICALL from the eRPC context
      mesh_erpc_register();
 
+     // Return an error if there is an element with no models
+     for(i = 0; i < comp_data->elem_count; i++)
+     {
+         if((comp_data->elem + i)->model_count == 0 && (comp_data->elem + i)->vnd_model_count == 0)
+         {
+             return -1;
+         }
+     }
      err = bt_mesh_init(prov_data, comp_data);
      if (err != 0) {
          return -1;
@@ -239,6 +248,9 @@ int bt_mesh_init_comp_raw_init(const struct bt_mesh_comp_raw *comp_raw)
     {
       return -1;
     }
+
+    // Reset the elements data
+    memset(comp_data->elem, 0, sizeof(struct bt_mesh_elem) * comp_data->elem_count);
 
     return 0;
 }
@@ -502,7 +514,7 @@ int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const
         // Update the bt_mesh_model_cb with the wrappers callbacks
         struct bt_mesh_model_cb cb_wrappers =
         {
-         .settings_commit = model_raw->cb->settings_commit ? settings_commit_callback: NULL,
+         .start = model_raw->cb->start ? start_callback: NULL,
          .init = model_raw->cb->init ? init_callback: NULL,
          .reset = model_raw->cb->reset ? reset_callback: NULL
         };
@@ -1170,22 +1182,22 @@ void reset_callback(struct bt_mesh_model *model)
 }
 
 /*********************************************************************
-* @fn      settings_commit callback wrapper
+* @fn      start callback wrapper
 *
-* @brief   Calls the bt_mesh_model_cb settings_commit callback defined in the
+* @brief   Calls the bt_mesh_model_cb start callback defined in the
 *          application side.
 *
 * @param   None.
 *
 * @return  None.
 */
-int settings_commit_callback(struct bt_mesh_model *model)
+int start_callback(struct bt_mesh_model *model)
 {
 
     model_info_t curr_model_info = get_model_info(model);
 
     // Call the eRPC named callback
-    settings_commit_cb(curr_model_info.elem_index, curr_model_info.is_vnd, curr_model_info.model_index);
+    start_cb(curr_model_info.elem_index, curr_model_info.is_vnd, curr_model_info.model_index);
 
     return 0;
 }

@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       sys_ctrl.c
-*  Revised:        2020-12-10 16:31:27 +0100 (Thu, 10 Dec 2020)
-*  Revision:       59841
+*  Revised:        2020-12-10 13:53:19 +0100 (Thu, 10 Dec 2020)
+*  Revision:       59832
 *
 *  Description:    Driver for the System Control.
 *

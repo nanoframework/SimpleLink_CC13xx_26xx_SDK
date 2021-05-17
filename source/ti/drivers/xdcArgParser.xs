@@ -12,9 +12,9 @@ function getDeviceWareOpts(xdcArgs)
     var argMap = parseArgs(xdcArgs);
 
     return ({
+        "cc26x4ware": argMap["cc26x4ware"],
         "cc26xxware": argMap["cc26xxware"],
-        "cc32xxware": argMap["cc32xxware"],
-        "msp432e4DriverLib": argMap["msp432e4DriverLib"]
+        "cc32xxware": argMap["cc32xxware"]
     });
 }
 
@@ -31,16 +31,16 @@ function parseArgs(xdcArgs) {
 
         var path = String(arg.split("=").pop());
 
+        if (arg.match(/^CC26X4WARE=/)) {
+            argMap["cc26x4ware"] = path;
+        }
+
         if (arg.match(/^CC26XXWARE=/)) {
             argMap["cc26xxware"] = path;
         }
 
         if (arg.match(/^CC32XXWARE=/)) {
             argMap["cc32xxware"] = path;
-        }
-
-        if (arg.match(/^MSP432E4DRIVERLIB=/)) {
-            argMap["msp432e4DriverLib"] = path;
         }
     }
 

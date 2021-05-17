@@ -14,3 +14,7 @@ SyncEvent.c
 lib/debug/ti.sysbios.syncs.am4f
 lib/debug/ti.sysbios.syncs.am4fg
 lib/debug/ti.sysbios.syncs.arm4f
+lib/debug/ti.sysbios.syncs.aem4
+lib/debug/ti.sysbios.syncs.am4
+lib/debug/ti.sysbios.syncs.am4g
+lib/debug/ti.sysbios.syncs.arm4

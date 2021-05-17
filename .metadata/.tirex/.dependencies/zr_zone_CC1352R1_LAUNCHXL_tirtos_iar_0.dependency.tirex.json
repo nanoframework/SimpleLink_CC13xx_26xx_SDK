@@ -11,9 +11,9 @@
             "+../../../../../../../source/ti/ti154stack/services/saddr/saddr.c -> saddr.c",
             "+../../../../../../../source/ti/ti154stack/services/saddr/saddr.h -> saddr.h",
             "+../../../../../../../source/ti/ti154stack/services/sdata/sdata.h -> sdata.h",
-            "+../../../../../../../source/ti/zstack/startup/main.c -> main.c",
             "+../../../../../../../source/ti/zstack/startup/zstackstartup.c -> zstackstartup.c",
             "+../../../../../../../source/ti/zstack/startup/zstackstartup.h -> zstackstartup.h",
+            "+../../../../../../../source/ti/zstack/startup/main.c -> main.c",
             "+../../../../../../../source/ti/zstack/stack/api/zstackapi.c -> zstackapi.c",
             "+../../../../../../../source/ti/zstack/stack/api/zstackapi.h -> zstackapi.h",
             "+../../../../../../../source/ti/zstack/apps/zone/zcl_sample_app_def.h -> zcl_sample_app_def.h",
@@ -25,6 +25,8 @@
             "+../../../../../../../source/ti/ti154stack/common/util/mac_util.h -> mac_util.h",
             "+../../../../../../../source/ti/ti154stack/common/util/util_timer.c -> util_timer.c",
             "+../../../../../../../source/ti/ti154stack/common/util/util_timer.h -> util_timer.h",
+            "+../../../../../../../source/ti/common/time/utc_clock.c -> utc_clock.c",
+            "+../../../../../../../source/ti/common/time/utc_clock.h -> utc_clock.h",
             "+../../../../../../../source/ti/zstack/stack/gp/gp_common.c -> gp_common.c",
             "+../../../../../../../source/ti/zstack/stack/gp/gp_common.h -> gp_common.h",
             "+../../../../../../../source/ti/zstack/stack/gp/gp_interface.h -> gp_interface.h",
@@ -39,6 +41,7 @@
             "+../../../../../../../source/ti/zstack/stack/bdb/touchlinkapp/touchlink_initiator_app.h -> touchlink_initiator_app.h",
             "+../../../../../../../source/ti/zstack/stack/bdb/touchlinkapp/touchlink_target_app.c -> touchlink_target_app.c",
             "+../../../../../../../source/ti/zstack/stack/bdb/touchlinkapp/touchlink_target_app.h -> touchlink_target_app.h",
+            "+../../../../../../../source/ti/zstack/stack/zcl/zcl_datatypes.h -> zcl_datatypes.h",
             "+../../../../../../../source/ti/zstack/stack/zcl/zcl.c -> zcl.c",
             "+../../../../../../../source/ti/zstack/stack/zcl/zcl.h -> zcl.h",
             "+../../../../../../../source/ti/zstack/stack/zcl/zcl_port.c -> zcl_port.c",
@@ -160,7 +163,7 @@
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
             "+../../../../../../../source/ti/zstack/boards/CC1352R1_LAUNCHXL/CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
             "+../../../../../../../source/ti/zstack/rtos/app.cfg -> app.cfg",
-            "+../../../../../../../source/ti/zstack/boards/CC1352R1_LAUNCHXL/cc13x2lp.icf -> cc13x2lp.icf",
+            "+../../../../../../../source/ti/zstack/boards/cc13x2_cc26x2/cc13x2_cc26x2.icf -> cc13x2_cc26x2.icf",
             "+../../zr_zone.syscfg -> zr_zone.syscfg"
         ]
     }

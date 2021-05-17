@@ -3,7 +3,7 @@
         "files": [
             "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_release.cfg -> ble_release.cfg",
             "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_debug.cfg -> ble_debug.cfg",
-            "+../../cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
+            "+../../../../../../../source/ti/ble5stack/common/cc26xx/ccs/cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
             "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.c -> software_stacks/ti15_4stack/radio_configuration/mac_user_config.c",
             "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.h -> software_stacks/ti15_4stack/radio_configuration/mac_user_config.h",
             "+../../../../../../../source/ti/ti154stack/apps/sensor/advanced_config.h -> application/sensor/advanced_config.h",
@@ -22,8 +22,8 @@
             "+../../../../../../../source/ti/ti154stack/common/util/mac_util.c -> application/sensor/util/mac_util.c",
             "+../../../../../../../source/ti/ti154stack/common/util/mac_util.h -> application/sensor/util/mac_util.h",
             "+../../../../../../../source/ti/ti154stack/inc/mac_api.h -> software_stacks/ti15_4stack/mac/mac_api.h",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/macTask.c -> software_stacks/ti15_4stack/stack_user_api/macTask.c",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.c -> software_stacks/ti15_4stack/stack_user_api/api_mac.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/macTask.c -> software_stacks/ti15_4stack/stack_user_api/macTask.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/api_mac.c -> software_stacks/ti15_4stack/stack_user_api/api_mac.c",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.h -> software_stacks/ti15_4stack/stack_user_api/api_mac.h",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/osal_port.c -> software_stacks/ti15_4stack/osal_port/osal_port.c",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port.h -> software_stacks/ti15_4stack/osal_port/osal_port.h",
@@ -33,8 +33,8 @@
             "+../../../../../../../source/ti/dmm/apps/common/ti154stack/source/ble_remote_display/app/remote_display.h -> application/ble_remote_display/remote_display.h",
             "+../../../../../../../source/ti/dmm/dmm_scheduler.h -> dmm/dmm_scheduler.h",
             "+../../../../../../../source/ti/dmm/dmm_policy.h -> dmm/dmm_policy.h",
-            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154.c -> dmm/application_policy/dmm_priority_ble_154.c",
-            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154.h -> dmm/application_policy/dmm_priority_ble_154.h",
+            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154sensor.c -> dmm/application_policy/dmm_priority_ble_154sensor.c",
+            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154sensor.h -> dmm/application_policy/dmm_priority_ble_154sensor.h",
             "+../../../../../../../source/ti/dmm/apps/common/ti154stack/source/ble_remote_display/rd_ble_user_config.c -> software_stacks/ble_stack/icall_ble/rd_ble_user_config.c",
             "+../../../../../../../source/ti/dmm/remote_display_profile_154/cc26xx/remote_display_gatt_profile.c -> software_stacks/ble_stack/profiles/remote_display_gatt_profile.c",
             "+../../../../../../../source/ti/dmm/remote_display_profile_154/remote_display_gatt_profile.h -> software_stacks/ble_stack/profiles/remote_display_gatt_profile.h",
@@ -92,6 +92,9 @@
             "+../../../../../../../source/ti/ti154stack/tracer/itm_private.h -> software_stacks/ti15_4stack/mac/hal/target/itm_private.h",
             "+../../../../../../../source/ti/ti154stack/tracer/dbg.h -> software_stacks/ti15_4stack/mac/hal/target/dbg.h",
             "+../../../../../../../source/ti/ti154stack/hal/crypto/crypto_mac_api.h -> software_stacks/ti15_4stack/hal/crypto/crypto_mac_api.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_defs.h -> software_stacks/ti15_4stack/hal/platform/hal_defs.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_mcu.h -> software_stacks/ti15_4stack/hal/platform/hal_mcu.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_types.h -> software_stacks/ti15_4stack/hal/platform/hal_types.h",
             "+../../../../../../../source/ti/ti154stack/hal/rf/rf_mac_api.h -> software_stacks/ti15_4stack/hal/rf/rf_mac_api.h",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_activity.c -> software_stacks/ti15_4stack/mac/low_level/mac_activity.c",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_activity.h -> software_stacks/ti15_4stack/mac/low_level/mac_activity.h",
@@ -119,7 +122,6 @@
             "+../../README.html -> README.html",
             "+../../dmm_154sensor_sm_remote_display_2_4g.syscfg -> dmm_154sensor_sm_remote_display_2_4g.syscfg",
             "+../../../../../../../source/ti/dmm/apps/dmm_154sensor_remote_display/source/main.c -> application/main.c",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
             "+../makefile.defs -> makefile.defs"
         ]
     }

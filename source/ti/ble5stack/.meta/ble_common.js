@@ -427,9 +427,11 @@ const deviceToBoard = {
   CC1352P1: "CC1352P1_LAUNCHXL",
   CC2642R1: "CC26X2R1_LAUNCHXL",
   CC2652R1: "CC26X2R1_LAUNCHXL",
-  CC2652RB: "CC2652RB_LAUNCHXL",
+  CC2652RB: "LP_CC2652RB",
   CC2652P1FSIP: "LP_CC2652PSIP",
-  CC2652R1FSIP: "LP_CC2652RSIP"
+  CC2652R1FSIP: "LP_CC2652RSIP",
+  CC2652R7: "LP_CC2652R7",
+  CC1352P7: "LP_CC1352P7"
 };
 
 // Settings for ti/devices/CCFG module
@@ -442,7 +444,10 @@ const bleCentralCCFGSettings = {
   CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {},
   LP_CC2652RSIP_CCFG_SETTINGS: {},
   LP_CC2652PSIP_CCFG_SETTINGS: {},
-  CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
+  LP_CC2652R7_CCFG_SETTINGS: {},
+  LP_CC1352P7_1_CCFG_SETTINGS: {},
+  LP_CC1352P7_4_CCFG_SETTINGS: {},
+  LP_CC2652RB_CCFG_SETTINGS: {
     srcClkLF: "Derived from HF XOSC"
   }
 };
@@ -471,8 +476,8 @@ const supportedMigrations = {
     {target: "CC2652R1FRGZ"},
     {target: "CC2652R1FSIP"},
   ],
-  CC2652RB_LAUNCHXL: [
-    {target: "CC2652RB_LAUNCHXL"},
+  LP_CC2652RB: [
+    {target: "LP_CC2652RB"},
     {target: "CC2652RB"},
   ],
   LP_CC2652PSIP: [
@@ -512,7 +517,7 @@ const supportedMigrations = {
   ],
   CC2652RB: [
     {target: "CC2652RB"},
-    {target: "CC2652RB_LAUNCHXL"},
+    {target: "LP_CC2652RB"},
   ],
   CC2652R1FSIP: [
     {target: "CC2652R1FRGZ"},
@@ -937,7 +942,15 @@ function device2DeviceFamily(deviceId)
     let driverString = null;
 
     /* Determine libraries required by device name. */
-    if(deviceId.match(/CC13.2/))
+    if(deviceId.match(/CC1352P7/))
+    {
+        driverString = "DeviceFamily_CC13X2X7";
+    }
+    else if(deviceId.match(/CC2652.7/))
+    {
+        driverString = "DeviceFamily_CC26X2X7";
+    }
+    else if(deviceId.match(/CC13.2/))
     {
         driverString = "DeviceFamily_CC13X2";
     }
@@ -1062,6 +1075,16 @@ function getRadioScript(rfDesign, deviceId)
             radioSettings = system.getScript("/ti/ble5stack/rf_config/"
                 + "CC1352P_2_LAUNCHXL_rf_defaults.js");
         }
+        else if(rfDesign === "LP_CC1352P7-1")
+        {
+            radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+                + "LP_CC1352P7_1_rf_defaults.js");
+        }
+        else if(rfDesign === "LP_CC1352P7-4")
+        {
+            radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+                + "LP_CC1352P7_4_rf_defaults.js");
+        }
     }
     else if(deviceId === "CC1352P1F3RGZ")
     {
@@ -1087,18 +1110,22 @@ function getRadioScript(rfDesign, deviceId)
     else if(deviceId === "CC2652RB1FRGZ")
     {
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
-            + "CC2652RB_LAUNCHXL_rf_defaults.js");
+            + "LP_CC2652RB_rf_defaults.js");
     }
     else if(deviceId === "CC2652R1FSIP")
     {
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
             + "LP_CC2652RSIP_rf_defaults.js");
     }
-
     else if(deviceId === "CC2652P1FSIP")
     {
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
             + "LP_CC2652PSIP_rf_defaults.js");
+    }
+    else if(deviceId === "CC2652R7RGZ")
+    {
+        radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+            + "LP_CC2652R7_rf_defaults.js");
     }
     return(radioSettings);
 }

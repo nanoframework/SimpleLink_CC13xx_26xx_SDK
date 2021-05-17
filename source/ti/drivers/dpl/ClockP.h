@@ -69,8 +69,9 @@ extern "C" {
  *  @brief    Number of bytes greater than or equal to the size of any RTOS
  *            ClockP object.
  *
- *  nortos:   32 (biggest of the HW-specific ClockP instance structs)
- *  SysBIOS:  40
+ *  NoRTOS:   32 (biggest of the HW-specific ClockP instance structs)
+ *  BIOS 6.x: 40
+ *  BIOS 7.x: 36
  *  FreeRTOS: 68
  */
 #define ClockP_STRUCT_SIZE   (68)

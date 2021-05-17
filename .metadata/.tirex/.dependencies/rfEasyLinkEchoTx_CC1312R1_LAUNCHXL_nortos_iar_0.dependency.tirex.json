@@ -10,10 +10,9 @@
             "+../EasyLinkEcho_ErrorTxRx.png -> EasyLinkEcho_ErrorTxRx.png",
             "+../rfEasyLinkEchoTx_nortos.c -> rfEasyLinkEchoTx_nortos.c",
             "+../main_nortos.c -> main_nortos.c",
-            "+../rfEasyLinkEchoTx_nortos.syscfg -> rfEasyLinkEchoTx_nortos.syscfg",
+            "+../rfEasyLinkEchoTx_gptimer.syscfg -> rfEasyLinkEchoTx_gptimer.syscfg",
             "+../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
-            "+../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
-            "+CC1312R1_LAUNCHXL_NoRTOS.icf -> CC1312R1_LAUNCHXL_NoRTOS.icf"
+            "+cc13x2_cc26x2_nortos.icf -> cc13x2_cc26x2_nortos.icf"
         ]
     }
 ]

@@ -361,14 +361,21 @@ function getDeviceIsa(devId = null)
 
     switch (true) {
         case /CC32/.test(devId):
+        case /CC(?:13|26).1/.test(devId):
             isa = "m4";
             break;
-        case /CC[12][36].0/.test(devId):
+        case /CC(?:13|26).0/.test(devId):
             isa = "m3";
             break;
-        case /CC[12][36].2/.test(devId):
+        case /CC(?:13|26).2/.test(devId):
         case /MSP432/.test(devId):
             isa = "m4f";
+            break;
+        case /CC(?:13|26).4/.test(devId):
+            isa = "m33f";
+            break;
+        case /CC23/.test(devId):
+            isa = "m0";
             break;
         default:
             isa = devId;

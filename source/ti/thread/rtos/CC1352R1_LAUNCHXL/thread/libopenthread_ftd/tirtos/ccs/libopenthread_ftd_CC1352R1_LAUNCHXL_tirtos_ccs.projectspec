@@ -51,9 +51,9 @@
             -D_DEFAULT_SOURCE=1
             -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc1352-ccs.h&quot;&apos;
             -I${WorkspaceDirPath}/libmbedcrypto_CC1352R1_LAUNCHXL_tirtos_ccs/config
-            -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc1352-config-ide.h&quot;&apos;
             -DOPENTHREAD_FTD=1
             -DOPENTHREAD_CONFIG_FILE=&apos;&quot;openthread-config-cc1352-ccs-ftd.h&quot;&apos;
+            -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc1352-config-ide.h&quot;&apos;
             -I${WorkspaceDirPath}/libopenthread_ftd_CC1352R1_LAUNCHXL_tirtos_ccs/config
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core
             -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src

@@ -62,7 +62,7 @@ let config = [
  *          deviceDir:    "", // name of the directory in /ti/devices/
  *                            // containing driverlib
  *          deviceDefine: ""  // DeviceFamily #define
- *          deviceGroup:  "", // one of "LPRF", "WIFI", "MSP", "TIVA"
+ *          deviceGroup:  "", // one of "LPRF", "WIFI"
  *      }
  */
 function getAttrs(deviceId, part)
@@ -99,6 +99,11 @@ function getAttrs(deviceId, part)
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC26X2";
     }
+    else if (deviceId.match(/CC26.4/)) {
+        result.deviceDir = "cc13x4_cc26x4";
+        result.deviceGroup = "LPRF";
+        result.deviceDefine = "DeviceFamily_CC26X4";
+    }
     else if (deviceId.match(/CC13.0/)) { /* issue: remove, not suported?? */
         result.deviceDir = "cc13x0";
         result.deviceGroup = "LPRF";
@@ -118,21 +123,6 @@ function getAttrs(deviceId, part)
         result.deviceDir = "cc32xx";
         result.deviceGroup = "WIFI";
         result.deviceDefine = "DeviceFamily_CC3220";
-    }
-    else if (deviceId.match(/MSP432E/)) {
-        result.deviceDir = "msp432e4";
-        result.deviceGroup = "TIVA";
-        if (part && part.match(/MSP432E411/)) {
-            result.deviceDefine = "DeviceFamily_MSP432E411Y";
-        }
-        else {
-            result.deviceDefine = "DeviceFamily_MSP432E401Y";
-        }
-    }
-    else if (deviceId.match(/dragon/)) {
-        result.deviceDir = "mtxx";
-        result.deviceGroup = "MTXX";
-        result.deviceDefine = "DeviceFamily_MTL";
     }
     else {
         result.deviceDir = "";
@@ -157,9 +147,6 @@ function getAttrs(deviceId, part)
 //     let templates = {
 //         LPRF: "ti/devices/{devDir}/driverlib/bin/{tcDir}/driverlib.lib",
 //         WIFI: "ti/devices/{devDir}/driverlib/{tcDir}/Release/driverlib.a",
-//         TIVA: "ti/devices/{devDir}/driverlib/lib/{tcDir}/m4f/{devDir}_driverlib.a",
-//         MSP:  "ti/devices/{devDir}/driverlib/{tcDir}/{devDir}_driverlib.lib",
-//         MTXX: ""
 //     };
 
 //     let lib;

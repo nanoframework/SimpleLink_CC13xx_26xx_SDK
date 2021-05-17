@@ -6,10 +6,9 @@
             "+../../overview.rov.json -> overview.rov.json",
             "+../../easylink/EasyLink.c -> easylink/EasyLink.c",
             "+../../rfEasyLinkRx.c -> rfEasyLinkRx.c",
-            "+../../rfEasyLinkRx.syscfg -> rfEasyLinkRx.syscfg",
+            "+../rfEasyLinkRx.syscfg -> rfEasyLinkRx.syscfg",
             "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352P1_LAUNCHXL_fxns.c -> CC1352P1_LAUNCHXL_fxns.c",
-            "+CC1352P1_LAUNCHXL_TIRTOS.lds -> CC1352P1_LAUNCHXL_TIRTOS.lds"
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds"
         ]
     }
 ]

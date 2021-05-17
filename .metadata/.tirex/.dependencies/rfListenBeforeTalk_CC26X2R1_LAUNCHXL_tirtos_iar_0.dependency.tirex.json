@@ -4,13 +4,12 @@
             "+../../application_settings.c -> application_settings.c",
             "+../../application_settings.h -> application_settings.h",
             "+../../README.md -> README.md",
-            "+../../rfListenBeforeTalk.syscfg -> rfListenBeforeTalk.syscfg",
+            "+../rfListenBeforeTalk.syscfg -> rfListenBeforeTalk.syscfg",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../rfListenBeforeTalk.c -> rfListenBeforeTalk.c",
             "+../main_tirtos.c -> main_tirtos.c",
             "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
-            "+CC26X2R1_LAUNCHXL_TIRTOS.icf -> CC26X2R1_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

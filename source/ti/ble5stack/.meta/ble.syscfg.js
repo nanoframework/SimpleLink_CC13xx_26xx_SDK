@@ -132,6 +132,10 @@ const moduleStatic = {
                     name: "CENTRAL_CFG"
                 },
                 {
+                    displayName: "Broadcaster + Observer",
+                    name: "BROADCASTER_CFG+OBSERVER_CFG"
+                },
+                {
                     displayName: "Central + Broadcaster",
                     name: "CENTRAL_CFG+BROADCASTER_CFG"
                 },
@@ -313,7 +317,7 @@ function validate(inst, validation)
  */
 function ondeviceRoleChange(inst,ui)
 {
-    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG")
+    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG" || inst.deviceRole == "BROADCASTER_CFG+OBSERVER_CFG")
     {
         inst.maxConnNum = 0;
         inst.maxPDUNum = 0;
@@ -365,7 +369,7 @@ function ondeviceRoleChange(inst,ui)
     }
 
     // Enable peerConnParamUpdateRejectInd only when using Central or Peripheral role combinations
-    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG")
+    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG" || inst.deviceRole == "BROADCASTER_CFG+OBSERVER_CFG")
     {
         ui.peerConnParamUpdateRejectInd.hidden = true;
     }
@@ -417,7 +421,6 @@ function onMeshChange(inst,ui)
 {
     if(inst.mesh)
     {
-        inst.deviceRole = "PERIPHERAL_CFG+CENTRAL_CFG";
         ui.meshApp.hidden = false;
         ui.nwpMode.hidden = false;
     }
@@ -427,10 +430,10 @@ function onMeshChange(inst,ui)
         ui.nwpMode.hidden = true;
     }
 
-    // Hide/Unhide groups since the Mesh Module was added/removes
-    changeGroupsState(inst,ui);
     // Disable the option to configure proxy when mesh+sp app is used
     changeProxyState(inst,ui);
+    // Hide/Unhide groups since the Mesh Module was added/removes
+    changeGroupsState(inst,ui);
 }
 
 /*
@@ -442,16 +445,15 @@ function onMeshChange(inst,ui)
  */
 function onMeshAppChange(inst,ui)
 {
-    // Hide/Unhide groups since the meshApp combination has been changed
-    changeGroupsState(inst,ui);
+    if(inst.meshApp != "meshOnly")
+    {
+        inst.numOfDefAdvSets = 1;
+        inst.numOfAdvSets    = 1;
+    }
     // Disable the option to configure proxy when mesh+sp app is used
     changeProxyState(inst,ui);
-
-    // Change the device role according to the proxy value
-    // When Proxy is used, the central role should be enables as well
-    inst.proxy || inst.gattBearer ?
-    inst.deviceRole = "PERIPHERAL_CFG+CENTRAL_CFG" :
-    inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG";
+    // Hide/Unhide groups since the meshApp combination has been changed
+    changeGroupsState(inst,ui);
 }
 
 /*
@@ -469,20 +471,18 @@ function changeProxyState(inst,ui)
         inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG";
         inst.proxy = false;
         ui.proxy.readOnly = true;
-        inst.gattBearer = false;
-        ui.gattBearer.readOnly = true;
     }
     else if(inst.mesh && inst.meshApp == "meshOnly")
     {
         ui.proxy.readOnly = false;
-        ui.gattBearer.readOnly = false;
         // Change the device role according to the proxy value
         // When Proxy is used, the central role should be enables as well
         inst.proxy || inst.gattBearer ?
-        inst.deviceRole = "PERIPHERAL_CFG+CENTRAL_CFG" :
-        inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG";
+        inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG" :
+        inst.deviceRole = "BROADCASTER_CFG+OBSERVER_CFG";
     }
 }
+
 
 /*
  * ======== changeGroupsState ========
@@ -493,7 +493,7 @@ function changeProxyState(inst,ui)
  */
 function changeGroupsState(inst,ui)
 {
-    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG")
+    if(inst.deviceRole == "BROADCASTER_CFG" || inst.deviceRole == "OBSERVER_CFG" || inst.deviceRole == "BROADCASTER_CFG+OBSERVER_CFG")
     {
         // Hide Bond Manager
         inst.hideBondMgrGroup = true;
@@ -508,32 +508,24 @@ function changeGroupsState(inst,ui)
 
     if(inst.mesh)
     {
-        // Hide Central Group
-        inst.hideCentralGroup = true;
-        Common.hideGroup(Common.getGroupByName(inst.$module.config, "centralConfig"), inst.hideCentralGroup, ui);
-
-        // Hide Observer Group
-        inst.hideObserverGroup = true;
-        Common.hideGroup(Common.getGroupByName(inst.$module.config, "observerConfig"), inst.hideObserverGroup, ui);
-
-        // UnHide Peripheral Group
-        inst.hidePeripheralGroup = false;
-        Common.hideGroup(Common.getGroupByName(inst.$module.config, "peripheralConfig"), inst.hidePeripheralGroup, ui);
-
-        // Hide/UnHide Broadcaster Group
-        inst.meshApp == "meshAndPeri" || inst.meshApp == "meshAndPeriOadOffchip" || inst.meshApp == "meshAndPeriOadOnchip"?
-        inst.hideBroadcasterGroup = false : inst.hideBroadcasterGroup = true;
-        Common.hideGroup(Common.getGroupByName(inst.$module.config, "broadcasterConfig"), inst.hideBroadcasterGroup, ui);
-
+        // UnHide the Mesh Group
         system.utils.showGroupConfig("bleMeshConfig", inst, ui);
+        // Keep the Configguration Client configurable hidden
         ui.configurationClient.hidden = true;
+        // If static provisioning is not enable, keep the deviceOwnAddress configurable hidden
         if(!inst.staticProv)
         {
             ui.deviceOwnAddress.hidden = true;
         }
 
+        // Call the prov data Authentication Method onChange function to hide/unhide the relevant
+        // configurables
         meshProvDataScript.onOobAuthenticationMethodChange(inst,ui);
+        // Call the Mesh features onChange function to hide/unhide the relevant configurables
         meshFeaturesScript.onFeatureChange(inst,ui);
+
+        // Hide/UnHide BLE roles groups when using Mesh
+        meshFeaturesScript.changeGroupsStateMesh(inst,ui);
     }
     else
     {
@@ -583,7 +575,7 @@ function getLibs(inst)
         const LPName = rfDesign.rfDesign;
         let devLibsFolder = "cc26x2r1";
 
-        // DeviceFamily_CC26X2 devices are using the libs from the
+        // DeviceFamily_CC26X2 and DeviceFamily_CC26X2X7 devices are using the libs from the
         // cc26x2r1 folder.
         if(devFamily == "DeviceFamily_CC26X2")
         {
@@ -602,6 +594,21 @@ function getLibs(inst)
         else if(devFamily == "DeviceFamily_CC13X2")
         {
             if(LPName == "LAUNCHXL-CC1352P-2" || LPName == "LAUNCHXL-CC1352P-4")
+            {
+                devLibsFolder = "cc1352p";
+            }
+            else
+            {
+                devLibsFolder = "cc13x2r1";
+            }
+        }
+        else if(devFamily == "DeviceFamily_CC26X2X7")
+        {
+            devLibsFolder = "cc26x2r1";
+        }
+        else if(devFamily == "DeviceFamily_CC13X2X7")
+        {
+            if(LPName == "LP_CC1352P7-4")
             {
                 devLibsFolder = "cc1352p";
             }
@@ -660,10 +667,14 @@ function moduleInstances(inst)
         dependencyModule.push(
         {
             name            : 'services',
-            displayName     : 'Services',
+            displayName     : 'Service',
             useArray        : true,
             moduleName      : '/ti/ble5stack/gatt_services/Service',
             collapsed       : true,
+            args            : {
+                hiddenServName : "1",
+                numOfServices  : 1
+            }
         });
     }
     if(inst.mesh)

@@ -49,11 +49,11 @@
                 },
                 {
                     "_name": "whitening.init",
-                    "$": "0xD1"
+                    "$": "0x51"
                 },
                 {
                     "_name": "whitening.bOverride",
-                    "$": "0"
+                    "$": "1"
                 },
                 {
                     "_name": "phyMode.mainMode",

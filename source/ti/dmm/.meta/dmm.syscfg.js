@@ -87,6 +87,38 @@ function numApplicationStates(onChange)
 }
 
 /**
+ *  ======== numCustomActivities ========
+ *  Generates the configurable for setting
+ *  the amount of custom activities
+ *
+ *  @param onChange - Function to invoke on configurable value change
+ *  @returns        - The number configurable for setting the amount
+ *                    of custom activities
+ */
+function numCustomActivities(onChange)
+{
+    const numCustomActivityOptions = [];
+
+    for (let i = 0; i <= commonConfig.maxCustomActivitiesSupported; i++)
+    {
+        numCustomActivityOptions.push({
+            name: i
+        });
+    }
+
+    return({
+        name: "numCustomActivities",
+        displayName: "Number of Custom Activities",
+        description: docs.numCustomActivities.description,
+        longDescription: docs.numCustomActivities.longDescription,
+        default: 1,
+        onChange: onChange,
+        options: numCustomActivityOptions,
+        hidden: true
+    });
+}
+
+/**
  *  ======== generateAppStatesConfig ========
  *  Generates a series of configurables to allow the
  *  user to add custom application states
@@ -112,7 +144,7 @@ function generateAppStatesConfig()
         }
     })];
 
-    // Generate the configurables text for specifying state identifiers
+    // Generate the configurable text for specifying state identifiers
     for(let i = 0; i < commonConfig.maxAppStatesSupported; i++)
     {
         config.push({
@@ -122,6 +154,59 @@ function generateAppStatesConfig()
             longDescription: docs.applicationState.longDescription,
             default: "DMMPOLICY_APPSTATE_STATE" + i,
             placeholder: "DMMPOLICY_APPSTATE_STATE" + i,
+            hidden: i !== 0
+        });
+    }
+
+    return config;
+}
+
+/**
+ *  ======== generateCustomActivityConfig ========
+ *  Generates a series of configurables to allow the
+ *  user to add custom activities
+ *
+ *  @returns - An array containing a configurable to specify the number of
+ *             custom activities and a series of text/boolean configurables
+ */
+function generateCustomActivityConfig()
+{
+    const config = [numCustomActivities((inst, ui) =>
+    {
+
+        if (inst.stackRoles.includes("custom1") || inst.stackRoles.includes("custom2"))
+        {
+            for(let i = 0; i < commonConfig.maxCustomActivitiesSupported; i++)
+            {
+
+                // Only show the amount of custom activities that the user wants to create
+                if(i < inst.numCustomActivities)
+                {
+                    ui["customActivity" + i].hidden = false;
+                }
+                else
+                {
+                    ui["customActivity" + i].hidden = true;
+                }
+            }
+        }
+    })];
+
+    if (config.numCustomActivities > 0)
+    {
+        config.numCustomActivities.hidden = false;
+    }
+
+    // Generate the configurable text for specifying activity identifiers
+    for(let i = 0; i < commonConfig.maxCustomActivitiesSupported; i++)
+    {
+        config.push({
+            name: "customActivity" + i,
+            displayName: "Custom Activity Name " + i,
+            description: docs.customActivities.description,
+            longDescription: docs.customActivities.longDescription,
+            default: "DMMPOLICY_ACTIVITY_CUSTOM" + i,
+            placeholder: "DMMPOLICY_ACTIVITY_CUSTOM" + i,
             hidden: i !== 0
         });
     }
@@ -180,6 +265,12 @@ const dmmConfig = [
         onChange: onLockStackRolesChange
     },
     commonConfig.stackRoles(commonConfig.options.NOT_HIDDEN),
+    {
+        name: "customActivities",
+        displayName: "Custom Activities",
+        description: docs.customActivities.description,
+        config: generateCustomActivityConfig()
+    },
     {
         name: "applicationStates",
         displayName: "Application States",
@@ -289,7 +380,7 @@ function validate(inst, validation)
 {
     validation.logInfo("Reserved for bitmask Any", inst,
         "applicationState0");
-    // Check if all aplication states are valid C identifiers
+    // Check if all application states are valid C identifiers
     for(let i = 0; i < inst.numApplicationStates; i++)
     {
         if(inst["applicationState" + i].match("^[A-z_][A-z0-9_]*$") == null
@@ -297,6 +388,17 @@ function validate(inst, validation)
         {
             validation.logError("Application state must be a valid C "
                 + "identifier", inst, "applicationState" + i);
+        }
+    }
+
+    // Check if all custom activities are valid C identifiers
+    for(let i = 0; i < inst.numCustomActivities; i++)
+    {
+        if(inst["customActivity" + i].match("^[A-z_][A-z0-9_]*$") == null
+            || inst["customActivity" + i].match("^__") != null)
+        {
+            validation.logError("Custom activity must be a valid C "
+                + "identifier", inst, "customActivity" + i);
         }
     }
 
@@ -433,6 +535,7 @@ exports = {
     templates: {
         "/ti/dmm/templates/ti_dmm_application_policy.c.xdt": true,
         "/ti/dmm/templates/ti_dmm_application_policy.h.xdt": true,
+        "/ti/dmm/templates/ti_dmm_custom_activities.h.xdt": true,
 
         "/ti/utils/build/GenLibs.cmd.xdt": {
             modName: "/ti/dmm/dmm",

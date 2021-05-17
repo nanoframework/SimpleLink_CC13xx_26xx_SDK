@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@
 #include <stdbool.h>
 
 #include <ti/drivers/dpl/SemaphoreP.h>
+#include <ti/drivers/dpl/HwiP.h>
 
 #ifdef __cplusplus
 extern "C" {

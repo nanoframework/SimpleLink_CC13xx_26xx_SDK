@@ -1,11 +1,11 @@
 {
     "setting": {
-        "Name": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (FPGA)",
-        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 863-930 MHz band.",
+        "Name": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings)",
+        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 863-930 MHz band.(Pre-silicon settings)",
         "Frequency": "868",
         "Patch": {
             "Define": "RF_MODE_AUTO",
-            "Cpe": "rf_patch_cpe_prop",
+            "Cpe": "rf_patch_cpe_multi_protocol",
             "Mce": [],
             "Rfe": []
         },
@@ -147,8 +147,7 @@
                     "Block": [
                         "override_prop_common.json",
                         "override_prop_common_sub1g.json",
-                        "override_tc106.json",
-                        "override_fpga_prop.json"
+                        "override_tc106.json"
                     ]
                 }
             },

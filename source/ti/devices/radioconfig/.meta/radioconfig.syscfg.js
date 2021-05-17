@@ -96,6 +96,30 @@ function validateRfParams(inst, validation, phyType, phyGroup) {
 }
 
 /*
+ *  ======== validateFrontendSettings ========
+ *  Check that RF parameters are supported by dependant RF commands
+ *
+ *  @param inst - module instance
+ *  @param validation - validation object
+ *  @phyGroup - currently used PHY group
+ */
+function validateFrontendSettings(inst, validation, phyGroup) {
+    let freqBand = 2400;
+    let cfgName = "fe24g";
+    if ("freqBand" in inst) {
+        freqBand = inst.freqBand;
+        cfgName = "feSub1g";
+    }
+    const id = RfDesign.getFrontEnd(freqBand);
+    const fe = CmdHandler.getFrontendSettings(phyGroup, id);
+    if (fe === null) {
+        const rfinst = RfDesign.$static;
+        Common.logError(validation, rfinst, cfgName,
+            "This frontend setting is not supported for the current RF Design");
+    }
+}
+
+/*
  *  ======== updateTxPowerVisibility ========
  *  Update the visibility of txPower configurables
  *
@@ -299,6 +323,7 @@ exports = {
     pruneConfig: pruneConfig,
     getPaUsage: getPaUsage,
     validateRfParams: validateRfParams,
+    validateFrontendSettings: validateFrontendSettings,
     modules: modules,
     moduleInstances: moduleInstances,
     templates: {

@@ -40,7 +40,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2020, Texas Instruments Incorporated
+ Copyright (c) 2013-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -210,7 +210,7 @@ keep                            { readonly section .img_hdr };
 place at address mem:ENTRY_START { readonly section .intvec };
 keep                             { readonly section .intvec };
 
-define block ROSTK with size = 1       { section .rostk };
+define block ROSTK       { section .rostk };
 
 // All other pieces of codes
 place in FLASH { readonly,

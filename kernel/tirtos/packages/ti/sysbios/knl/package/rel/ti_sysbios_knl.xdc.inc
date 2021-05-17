@@ -35,3 +35,7 @@ Queue.c
 lib/debug/ti.sysbios.knl.am4f
 lib/debug/ti.sysbios.knl.am4fg
 lib/debug/ti.sysbios.knl.arm4f
+lib/debug/ti.sysbios.knl.aem4
+lib/debug/ti.sysbios.knl.am4
+lib/debug/ti.sysbios.knl.am4g
+lib/debug/ti.sysbios.knl.arm4

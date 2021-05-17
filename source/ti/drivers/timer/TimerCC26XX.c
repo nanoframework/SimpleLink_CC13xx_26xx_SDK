@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Texas Instruments Incorporated
+ * Copyright (c) 2019-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,36 +40,25 @@
 #include <ti/drivers/Timer.h>
 #include <ti/drivers/timer/GPTimerCC26XX.h>
 #include <ti/drivers/timer/TimerCC26XX.h>
-
-void TimerCC26XX_close(Timer_Handle handle);
-int_fast16_t TimerCC26XX_control(Timer_Handle handle,
-     uint_fast16_t cmd, void *arg);
-uint32_t TimerCC26XX_getCount(Timer_Handle handle);
-void TimerCC26XX_init(Timer_Handle handle);
-Timer_Handle TimerCC26XX_open(Timer_Handle handle, Timer_Params *params);
-int32_t TimerCC26XX_setPeriod(Timer_Handle handle, Timer_PeriodUnits periodUnits, uint32_t period);
-int32_t TimerCC26XX_start(Timer_Handle handle);
-void TimerCC26XX_stop(Timer_Handle handle);
+#include <ti/drivers/timer/TimerSupport.h>
 
 /* Internal callback function */
 static void TimerCC26XX_callbackfxn(GPTimerCC26XX_Handle gptHandle, GPTimerCC26XX_IntMask intMask);
 
-/* Function table for TimerCC26XX implementation */
-const Timer_FxnTable TimerCC26XX_fxnTable = {
-    .closeFxn     = TimerCC26XX_close,
-    .openFxn      = TimerCC26XX_open,
-    .startFxn     = TimerCC26XX_start,
-    .stopFxn      = TimerCC26XX_stop,
-    .initFxn      = TimerCC26XX_init,
-    .getCountFxn  = TimerCC26XX_getCount,
-    .controlFxn   = TimerCC26XX_control,
-    .setPeriodFxn = TimerCC26XX_setPeriod
+extern uint_least8_t Timer_count;
+
+/* Default Parameters */
+static const Timer_Params defaultParams = {
+    .timerMode     = Timer_ONESHOT_BLOCKING,
+    .periodUnits   = Timer_PERIOD_COUNTS,
+    .timerCallback = NULL,
+    .period        = (uint16_t) ~0
 };
 
 /*
- *  ======== TimerCC26XX_close ========
+ *  ======== Timer_close ========
  */
-void TimerCC26XX_close(Timer_Handle handle)
+void Timer_close(Timer_Handle handle)
 {
     TimerCC26XX_Object *object = handle->object;
 
@@ -91,18 +80,18 @@ void TimerCC26XX_close(Timer_Handle handle)
 }
 
 /*
- *  ======== TimerCC26XX_control ========
+ *  ======== Timer_control ========
  */
-int_fast16_t TimerCC26XX_control(Timer_Handle handle,
+int_fast16_t Timer_control(Timer_Handle handle,
         uint_fast16_t cmd, void *arg)
 {
     return (Timer_STATUS_UNDEFINEDCMD);
 }
 
 /*
- *  ======== TimerCC26XX_getCount ========
+ *  ======== Timer_getCount ========
  */
-uint32_t TimerCC26XX_getCount(Timer_Handle handle)
+uint32_t Timer_getCount(Timer_Handle handle)
 {
     TimerCC26XX_Object const *object = handle->object;
     uint32_t count;
@@ -124,7 +113,7 @@ void TimerCC26XX_callbackfxn(GPTimerCC26XX_Handle gptHandle, GPTimerCC26XX_IntMa
 
     /* Callback not created when using Timer_FREE_RUNNING */
     if (object->mode != Timer_CONTINUOUS_CALLBACK) {
-        TimerCC26XX_stop(handle);
+        Timer_stop(handle);
     }
     if (object->mode != Timer_ONESHOT_BLOCKING) {
         object->callBack(handle, Timer_STATUS_SUCCESS);
@@ -132,22 +121,32 @@ void TimerCC26XX_callbackfxn(GPTimerCC26XX_Handle gptHandle, GPTimerCC26XX_IntMa
 }
 
 /*
- *  ======== TimerCC26XX_init ========
- */
-void TimerCC26XX_init(Timer_Handle handle)
-{
-    return;
-}
-
-/*
  *  ======== TimerCC26XX_open ========
  */
-Timer_Handle TimerCC26XX_open(Timer_Handle handle, Timer_Params *params)
+Timer_Handle Timer_open(uint_least8_t index, Timer_Params *params)
 {
-    TimerCC26XX_HWAttrs const *hwAttrs = handle->hwAttrs;
-    TimerCC26XX_Object *object = handle->object;
+    Timer_Handle               handle = NULL;
+    TimerCC26XX_HWAttrs const *hwAttrs;
+    TimerCC26XX_Object        *object;
     GPTimerCC26XX_Params       gptParams;
-    int_fast16_t status;
+    int_fast16_t               status;
+
+    /* Verify driver index and state */
+    if (index < Timer_count) {
+        /* If parameters are NULL use defaults */
+        if (params == NULL) {
+            params = (Timer_Params *) &defaultParams;
+        }
+
+        /* Get handle for this driver instance */
+        handle = (Timer_Handle) &(Timer_config[index]);
+        object = handle->object;
+        hwAttrs = handle->hwAttrs;
+    }
+    else
+    {
+        return (NULL);
+    }
 
     /* Check if timer is already open */
     uint32_t key = HwiP_disable();
@@ -217,7 +216,7 @@ Timer_Handle TimerCC26XX_open(Timer_Handle handle, Timer_Params *params)
         /* Set Timer Period and Units */
         status = Timer_setPeriod(handle, params->periodUnits, object->period);
         if (status != Timer_STATUS_SUCCESS) {
-            TimerCC26XX_close(handle);
+            Timer_close(handle);
             return (NULL);
         }
 
@@ -226,7 +225,7 @@ Timer_Handle TimerCC26XX_open(Timer_Handle handle, Timer_Params *params)
             object->semHandle = SemaphoreP_constructBinary(&(object->semStruct), 0);
 
             if (object->semHandle == NULL) {
-                TimerCC26XX_close(handle);
+                Timer_close(handle);
                 return (NULL);
             }
         }
@@ -242,99 +241,46 @@ Timer_Handle TimerCC26XX_open(Timer_Handle handle, Timer_Params *params)
 }
 
 /*
- *  ======== TimerCC26XX_setPeriod ========
+ *  ======== TimerSupport_timerDisable ========
  */
-int32_t TimerCC26XX_setPeriod(Timer_Handle handle, Timer_PeriodUnits periodUnits, uint32_t period)
+void TimerSupport_timerDisable(Timer_Handle handle)
+{
+    TimerCC26XX_Object *object = handle->object;
+
+    GPTimerCC26XX_stop(object->gptHandle);
+}
+
+/*
+ *  ======== TimerSupport_timerEnable ========
+ */
+void TimerSupport_timerEnable(Timer_Handle handle)
+{
+    TimerCC26XX_Object *object = handle->object;
+
+    GPTimerCC26XX_start(object->gptHandle);
+}
+
+/*
+ *  ======== TimerSupport_timerFullWidth ========
+ */
+bool TimerSupport_timerFullWidth(Timer_Handle handle)
 {
     TimerCC26XX_HWAttrs const *hwAttrs = handle->hwAttrs;
+
+    if (hwAttrs->subTimer == TimerCC26XX_timer32)
+    {
+        return (true);
+    }
+
+    return (false);
+}
+
+/*
+ *  ======== TimerSupport_timerLoad ========
+ */
+void TimerSupport_timerLoad(Timer_Handle handle)
+{
     TimerCC26XX_Object *object = handle->object;
-    ClockP_FreqHz              clockFreq;
 
-    /* Check for valid period */
-    ClockP_getCpuFreq(&clockFreq);
-
-    if (periodUnits == Timer_PERIOD_US) {
-        /* Checks if the calculated period will fit in 32-bits */
-        if (period >= ((uint32_t) ~0) / (clockFreq.lo / 1000000)) {
-
-            return (Timer_STATUS_ERROR);
-        }
-
-        period = period * (clockFreq.lo / 1000000);
-    }
-    else if (periodUnits == Timer_PERIOD_HZ) {
-        /* If period > clockFreq */
-        if ((period = clockFreq.lo / period) == 0) {
-
-            return (Timer_STATUS_ERROR);
-        }
-    }
-
-    /* If using a half timer */
-    if (hwAttrs->subTimer != TimerCC26XX_timer32) {
-            /* 24-bit resolution for the half timer */
-            if (period >= (1 << 24)) {
-
-                return (Timer_STATUS_ERROR);
-            }
-    }
-
-    object->period = period;
-
-    /*Set period */
     GPTimerCC26XX_setLoadValue(object->gptHandle, object->period);
-
-    return (Timer_STATUS_SUCCESS);
-}
-
-/*
- *  ======== TimerCC26XX_start ========
- */
-int32_t TimerCC26XX_start(Timer_Handle handle)
-{
-    TimerCC26XX_Object *object = handle->object;
-
-    /* Check if timer is already running */
-    uint32_t key = HwiP_disable();
-    if (object->isRunning) {
-        HwiP_restore(key);
-        return(Timer_STATUS_ERROR);
-    }
-    object->isRunning = true;
-    GPTimerCC26XX_start(object->gptHandle);
-    HwiP_restore(key);
-
-    /* Pend on semaphore in blocking mode */
-    if (object->mode == Timer_ONESHOT_BLOCKING) {
-        /* Pend forever, ~0 */
-        SemaphoreP_pend(object->semHandle, SemaphoreP_WAIT_FOREVER);
-    }
-
-    return (Timer_STATUS_SUCCESS);
-}
-
-/*
- *  ======== TimerCC26XX_stop ========
- */
-void TimerCC26XX_stop(Timer_Handle handle)
-{
-    TimerCC26XX_Object *object = handle->object;
-    bool               flag = false;
-
-    uint32_t key = HwiP_disable();
-    if (object->isRunning) {
-        object->isRunning = false;
-        /* Post the Semaphore when called from the callback */
-        if (object->mode == Timer_ONESHOT_BLOCKING) {
-            flag = true;
-        }
-
-        GPTimerCC26XX_stop(object->gptHandle);
-    }
-    HwiP_restore(key);
-
-    if (flag) {
-        /* Post semaphore in oneshot blocking mode */
-        SemaphoreP_post(object->semHandle);
-    }
 }

@@ -24,3 +24,7 @@ BIOS.c
 lib/debug/ti.sysbios.am4f
 lib/debug/ti.sysbios.am4fg
 lib/debug/ti.sysbios.arm4f
+lib/debug/ti.sysbios.aem4
+lib/debug/ti.sysbios.am4
+lib/debug/ti.sysbios.am4g
+lib/debug/ti.sysbios.arm4

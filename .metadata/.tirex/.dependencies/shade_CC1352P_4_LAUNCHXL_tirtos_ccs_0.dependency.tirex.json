@@ -45,8 +45,7 @@
             "+../../disp_utils.h -> disp_utils.h",
             "+../../shade.c -> shade.c",
             "+../../shade.h -> shade.h",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS.cmd -> CC1352P_4_LAUNCHXL_TIRTOS.cmd",
+            "+cc13x2_cc26x2_tirtos.cmd -> cc13x2_cc26x2_tirtos.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

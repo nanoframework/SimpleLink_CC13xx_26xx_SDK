@@ -42,11 +42,11 @@
  *  probability of collision. A collision would occur when two different inputs
  *  map to the same output.
  *
- *  It is not currently technologicaly feasible to derive an input from
+ *  It is not currently technologically feasible to derive an input from
  *  the hash digest (output) itself.
  *
  *  Hashes are often used to ensure the integrity of messages. They are also
- *  used to as constituent parts of more complicated cyptographic schemes.
+ *  used to as constituent parts of more complicated cryptographic schemes.
  *  HMAC is a message authentication code that is based on hash functions such
  *  as SHA2 rather than a block cipher.
  *  Hashes may themselves be used as or form a part of key derivation functions
@@ -340,9 +340,9 @@ extern "C" {
  * @brief   The way in which SHA2 function calls return after performing an
  * operation.
  *
- * Not all SHA2 operations exhibit the specified return behavor. Functions that do not
+ * Not all SHA2 operations exhibit the specified return behavior. Functions that do not
  * require significant computation and cannot offload that computation to a background thread
- * behave like regular functions. Which functions exhibit the specfied return behavior is not
+ * behave like regular functions. Which functions exhibit the specified return behavior is not
  * implementation dependent. Specifically, a software-backed implementation run on the same
  * CPU as the application will emulate the return behavior while not actually offloading
  * the computation to the background thread.
@@ -373,6 +373,7 @@ typedef enum {
                                              *   are available after the function returns.
                                              */
 } SHA2_ReturnBehavior;
+
 
 /*!
  *  @brief  Enum for the hash types supported by the driver.
@@ -494,7 +495,6 @@ extern const uint_least8_t SHA2_count;
  *  @sa     #SHA2_Params_init()
  */
 extern const SHA2_Params SHA2_defaultParams;
-
 
 /*!
  *  @brief  Initializes the SHA2 driver module.
@@ -705,7 +705,7 @@ int_fast16_t SHA2_hashData(SHA2_Handle handle,
  *  @brief  Creates a keyed hash of @c data with @c key.
  *
  *  This function signs @c data using @c key using the keyed-hash message
- *  authenication code (HMAC) algorithm specified in FIPS 198-1.
+ *  authentication code (HMAC) algorithm specified in FIPS 198-1.
  *
  *  This function expects all of @c data to be available in contiguous memory.
  *
@@ -760,13 +760,13 @@ void SHA2_reset(SHA2_Handle handle);
  *  @brief Aborts an ongoing SHA2 operation and clears internal buffers.
  *
  *  Aborts an ongoing hash operation of this driver instance. The operation will
- *  terminate as though an error occured and the status code of the operation will be
+ *  terminate as though an error occurred and the status code of the operation will be
  *  #SHA2_STATUS_CANCELED in this case.
  *
  *  @param  handle      A #SHA2_Handle returned from #SHA2_open()
  *
- *  @retval #SHA2_STATUS_SUCCESS               The operation was canceled.
- *  @retval #SHA2_STATUS_ERROR                 The operation was not canceled. There may be no operation to cancel.
+ *  @retval #SHA2_STATUS_SUCCESS               The operation was canceled or there was no
+ *                                             operation in progress to be canceled.
  */
 int_fast16_t SHA2_cancelOperation(SHA2_Handle handle);
 
@@ -777,7 +777,7 @@ int_fast16_t SHA2_cancelOperation(SHA2_Handle handle);
  *  run-time. The hash type is usually specified during #SHA2_open().
  *
  *  Neither is it allowed to call this function during a running hash operation
- *  nor during an incomplete multistep hash operation. In this case
+ *  nor during an incomplete multi-step hash operation. In this case
  *  #SHA2_STATUS_ERROR would be returned.
  *
  *  @pre    #SHA2_open() has to be called first.

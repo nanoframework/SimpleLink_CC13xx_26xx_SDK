@@ -8,3 +8,4 @@ package/package.cfg.xdc.inc
 lib/debug/ti.sysbios.rts.iar.arm4f
 package/package_ti.sysbios.rts.iar.c
 MultithreadSupport.c
+lib/debug/ti.sysbios.rts.iar.arm4

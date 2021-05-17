@@ -18,6 +18,7 @@ package/package.xdc.inc
 .meta/model.gv.xdt
 .meta/rpc.gv.xdt
 .meta/rpc.component.js
+product-linux.json
 package/package.cfg.xdc.inc
 lib/gcc/m4f/rpc_debug.a
 package/package_ti.rpc.c

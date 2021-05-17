@@ -3984,6 +3984,10 @@ static void *zclParseInConfigReportRspCmd( zclParseCmd_t *pCmd )
   {
     return (void *)NULL;
   }
+  else if( pCmd->dataLen == 1 )
+  {
+    numAttr = 1;
+  }
   else
   {
     numAttr = pCmd->dataLen / sizeof(zclCfgReportStatus_t);

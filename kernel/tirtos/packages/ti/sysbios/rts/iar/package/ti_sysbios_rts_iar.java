@@ -222,9 +222,11 @@ public class ti_sysbios_rts_iar
         sb.append("}\n");
         sb.append("pkg.build.libraries = [\n");
             sb.append("'lib/debug/ti.sysbios.rts.iar.arm4f',\n");
+            sb.append("'lib/debug/ti.sysbios.rts.iar.arm4',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/debug/ti.sysbios.rts.iar.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.rts.iar.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

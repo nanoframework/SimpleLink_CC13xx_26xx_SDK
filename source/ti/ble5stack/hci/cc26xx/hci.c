@@ -98,7 +98,7 @@ extern RF_Handle rfHandle;
 
 // Major Version (8 bits) . Minor Version (4 bits) . SubMinor Version (4 bits)
 #if defined( CC26X2 ) || defined(CC13X2) || defined(CC13X2P)
-#define HCI_REVISION                                 0x0220  // HCI Version BLE5 2.2.0
+#define HCI_REVISION                                 0x0221  // HCI Version BLE5 2.2.1
 #elif defined( CC26XX )
 #define HCI_REVISION                                 0x0111  // HCI Version BLE5 1.1.1
 #else // !CC26X2 && !CC13X2 && !CC26XX && !CC13XX
@@ -1555,6 +1555,38 @@ hciStatus_t HCI_LE_SetAdvDataCmd( uint8  dataLen,
   return( HCI_SUCCESS );
 #endif // AE_CFG
 }
+
+/*******************************************************************************
+ * This LE API is used to set the Advertising data.
+ *
+ * Public function defined in hci.h.
+ */
+ hciStatus_t HCI_LE_SetExtAdvData( aeSetDataCmd_t *pCmdParams )
+{
+  hciStatus_t status;
+
+  status = LE_SetExtAdvData(pCmdParams);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_ADV_DATA, sizeof(status), &status );
+
+  return status;
+}
+
+/*******************************************************************************
+ * This LE API is used to set the Advertising Scan Response data.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_LE_SetExtScanRspData( aeSetDataCmd_t *pCmdParams )
+{
+  hciStatus_t status;
+
+  status = LE_SetExtScanRspData(pCmdParams);
+
+  MAP_HCI_CommandCompleteEvent( HCI_LE_SET_SCAN_RSP_DATA, sizeof(status), &status );
+
+  return status;
+}
 #endif // ADV_NCONN_CFG | ADV_CONN_CFG
 
 
@@ -2046,7 +2078,7 @@ hciStatus_t HCI_LE_RandCmd( void )
 }
 
 
-//#if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
+#if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_CONN_CFG) || (CTRL_CONFIG & INIT_CFG))
 /*******************************************************************************
  * This LE API is used to start encryption in a connection.
  *
@@ -2068,8 +2100,6 @@ hciStatus_t HCI_LE_StartEncyptCmd( uint16  connHandle,
 
   return( HCI_SUCCESS );
 }
-//#endif // INIT_CFG
-
 
 /*******************************************************************************
  * This LE API is used by the Host to send to the Controller a positive LTK
@@ -2120,7 +2150,7 @@ hciStatus_t HCI_LE_LtkReqNegReplyCmd( uint16 connHandle )
 
   return( HCI_SUCCESS );
 }
-
+#endif // INIT_CFG || ADV_CONN_CFG
 
 /*******************************************************************************
  * This LE API is used to read the Controller's supported states.
@@ -3104,7 +3134,7 @@ hciStatus_t HCI_LE_WriteRfPathCompCmd( int16 txPathParam,
   return( HCI_SUCCESS );
 }
 
-
+#if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_CONN_CFG) || (CTRL_CONFIG & INIT_CFG))
 /*******************************************************************************
  * Used to enable or disable sampling received Constant Tone Extension fields on a
  * connection and to set the antenna switching pattern and switching and sampling slot 
@@ -3264,7 +3294,7 @@ hciStatus_t HCI_LE_ReadAntennaInformationCmd( void )
 
   return( HCI_SUCCESS );
 }
-
+#endif // (ADV_CONN_CFG | INIT_CFG)
 
 #if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_NCONN_CFG) || (CTRL_CONFIG & ADV_CONN_CFG))
 /*******************************************************************************
@@ -5027,7 +5057,6 @@ hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap )
 }
 #endif // CTRL_CONFIG & SCAN_CFG
 
-#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
 /*******************************************************************************
  * This HCI EXTENSION API is used to set the QOS Parameters.
  *
@@ -5057,11 +5086,15 @@ hciStatus_t HCI_EXT_SetQOSParameters( uint8  taskType,
  *
  * Public function defined in hci.h.
  */
-hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValue )
+hciStatus_t HCI_EXT_SetQOSDefaultParameters(uint32 paramDefaultVal,
+                                            uint8  paramType,
+                                            uint8  taskType)
 {
   hciStatus_t status;
 
-  status = MAP_LL_EXT_SetQOSDefaultParameters( defaultParamConnPriorityValue );
+  status = MAP_LL_EXT_SetQOSDefaultParameters( paramDefaultVal,
+                                               paramType,
+                                               taskType);
 
   MAP_HCI_CommandCompleteEvent( HCI_EXT_SET_QOS_DEFAULT_PARAMETERS,
                                 sizeof(status),
@@ -5069,7 +5102,6 @@ hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValu
 
   return( HCI_SUCCESS );
 }
-#endif // (ADV_CONN_CFG | INIT_CFG)
 
 /*******************************************************************************
  * This API is used to enable or disable the Coex feature.

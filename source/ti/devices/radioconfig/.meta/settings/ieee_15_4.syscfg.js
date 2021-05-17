@@ -80,6 +80,8 @@ const settingSpecific = {
 function validate(inst, validation) {
     /* Validation common to all PHY groups */
     Common.validateBasic(inst, validation);
+    /* Validate front-end settings */
+    RFBase.validateFrontendSettings(inst, validation, PHY_GROUP);
 }
 
 /*!

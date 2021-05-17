@@ -1,7 +1,7 @@
 [{
         "name": "Release Notes",
         "resourceType": "file",
-        "location": "../../release_notes_simplelink_cc13x2_26x2_sdk_4_20_01_04.html",
+        "location": "../../release_notes_simplelink_cc13x2_26x2_sdk_5_10_00_48.html",
         "devices": ["CC1352R1F3", "CC2642R1F"],
         "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
         "categories": ["Documents"],
@@ -234,6 +234,16 @@
         "subCategories": ["TI Z-Stack"]
     },
     {
+        "name": "TI Z-Stack Battery Life Calculator",
+        "resourceType": "file",
+        "location": "../../docs/zigbee/Z-STACK-CALC.html",
+        "devices": ["CC1352R1F3", "CC2642R1F"],
+        "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
+        "categories": ["Documents"],
+        "mainCategories": ["Documents"],
+        "subCategories": ["TI Z-Stack"]
+    },
+    {
         "name": "TI 15.4-Stack Quick Start Guide",
         "resourceType": "file",
         "location": "../../docs/simplelink_mcu_sdk/html/quickstart-guide/ti154stack-quick-start.html",
@@ -274,6 +284,16 @@
         "subCategories": ["TI 15.4-Stack"]
     },
     {
+        "name": "TI 15.4-Stack Battery Life Calculator",
+        "resourceType": "file",
+        "location": "../../docs/ti154stack/TI-15.4-STACK-CALC.html",
+        "devices": ["CC1352R1F3", "CC2642R1F"],
+        "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
+        "categories": ["Documents"],
+        "mainCategories": ["Documents"],
+        "subCategories": ["TI 15.4-Stack"]
+    },
+    {
         "name": "TI DMM User’s Guide",
         "resourceType": "file",
         "location": "../../docs/dmm/dmm_user_guide/dmm-users-guide.html",
@@ -306,7 +326,7 @@
     {
         "name": "TI Drivers Power Management",
         "resourceType": "file",
-        "location": "../../docs/tidrivers/Power_Management.pdf",
+        "location": "../../docs/drivers/Power_Management.pdf",
         "devices": ["CC1352R1F3", "CC2642R1F"],
         "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
         "categories": ["Documents", "Drivers"],
@@ -316,7 +336,7 @@
     {
         "name": "TI Drivers Runtime APIs",
         "resourceType": "file",
-        "location": "../../docs/tidrivers/tidriversAPIs.html",
+        "location": "../../docs/drivers/tidriversAPIs.html",
         "devices": ["CC1352R1F3", "CC2642R1F"],
         "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
         "categories": ["Documents", "Drivers"],

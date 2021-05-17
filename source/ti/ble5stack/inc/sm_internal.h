@@ -281,6 +281,8 @@ extern smResponderCBs_t *pfnResponderCBs;
 extern uint16 smRspWaitingConnHandle;
 
 extern smEccRecycleKeys_t localEccKeys;
+// These are the "Debug Mode" keys as defined in Vol 3, Part H, section 2.3.5.6.1 of the BLE 5.2 Core spec
+extern smpPairingPublicKey_t sm_eccKeys_sc_host_debug;
 
 /*********************************************************************
  * SM Task Internal Functions
@@ -378,6 +380,7 @@ extern uint8 smpInitiatorProcessMasterID( smpMasterID_t *pParsedMsg );
 extern uint8 smpInitiatorProcessPairingConfirm( smpPairingConfirm_t *pParsedMsg );
 extern uint8 smpInitiatorProcessPairingDHKeyCheck( smpPairingDHKeyCheck_t *pParsedMsg );
 extern uint8 smpInitiatorProcessPairingPubKey( smpPairingPublicKey_t *pParsedMsg );
+extern uint8 smpInitiatorProcessPairingPubKey_sPatch( smpPairingPublicKey_t *pParsedMsg );
 extern uint8 smpInitiatorProcessPairingRandom( smpPairingRandom_t *pParsedMsg,
                                                uint16_t connHandle);
 extern uint8 smpInitiatorProcessPairingRsp( smpPairingRsp_t *parsedMsg );
@@ -397,6 +400,7 @@ extern uint8 smpResponderProcessEncryptionInformation( smpEncInfo_t *pParsedMsg 
 extern uint8 smpResponderProcessIdentityAddrInfo( smpIdentityAddrInfo_t *pParsedMsg );
 extern uint8 smpResponderProcessIdentityInfo( smpIdentityInfo_t *pParsedMsg );
 extern uint8 smpResponderProcessIncoming( linkDBItem_t *pLinkItem, uint8 cmdID, smpMsgs_t *pParsedMsg );
+extern uint8 smpResponderProcessIncoming_sPatch( linkDBItem_t *pLinkItem, uint8 cmdID, smpMsgs_t *pParsedMsg );
 extern uint8 smpResponderProcessMasterID( smpMasterID_t *pParsedMsg );
 extern uint8 smpResponderProcessPairingConfirm( smpPairingConfirm_t *pParsedMsg );
 extern uint8 smpResponderProcessPairingDHKeyCheck( smpPairingDHKeyCheck_t *pParsedMsg );

@@ -1,6 +1,6 @@
 {
     "setting": {
-        "Name": "Wi-SUN, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+        "Name": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
         "Description": "200 kbps, 2-GFSK, 100 kHz deviation WiSUN mode #4b compatible PHY.",
         "Frequency": "920.8",
         "Patch": {

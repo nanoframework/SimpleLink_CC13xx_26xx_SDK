@@ -10,6 +10,7 @@ OBJECTS = src_core_api_backbone_router_api.obj src_core_api_backbone_router_ftd_
 NAME = libopenthread_mtd
 
 CFLAGS = -I../.. \
+    -Ohz \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
@@ -26,15 +27,17 @@ CFLAGS = -I../.. \
     --diag_suppress=Pa050 \
     -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_4_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
-    --c++ \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h" \
     -DOPENTHREAD_MTD=1 \
     -DOPENTHREAD_CONFIG_FILE="openthread-config-cc1352-iar-mtd.h" \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_4_LAUNCHXL/thread/libopenthread_mtd/tirtos/iar/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src \
+    --vla
 
-CPPFLAGS = -I../.. \
+CPPFLAGS = --c++ \
+    -I../.. \
+    -Ohz \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
@@ -51,10 +54,9 @@ CPPFLAGS = -I../.. \
     --diag_suppress=Pa050 \
     -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_4_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
-    --c++ \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h" \
     -DOPENTHREAD_MTD=1 \
     -DOPENTHREAD_CONFIG_FILE="openthread-config-cc1352-iar-mtd.h" \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_4_LAUNCHXL/thread/libopenthread_mtd/tirtos/iar/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src

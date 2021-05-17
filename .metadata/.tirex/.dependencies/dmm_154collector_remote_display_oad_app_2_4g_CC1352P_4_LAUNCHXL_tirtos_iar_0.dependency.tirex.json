@@ -44,8 +44,8 @@
             "+../../../../../../../source/ti/common/cui/cui.h -> cui.h",
             "+../../../../../../../source/ti/dmm/dmm_scheduler.h -> dmm_scheduler.h",
             "+../../../../../../../source/ti/dmm/dmm_policy.h -> dmm_policy.h",
-            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154.c -> dmm_priority_ble_154.c",
-            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154.h -> dmm_priority_ble_154.h",
+            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154collector.c -> dmm_priority_ble_154collector.c",
+            "+../../../../../../../source/ti/dmm/dmm_priority_ble_154collector.h -> dmm_priority_ble_154collector.h",
             "+../../../../../../../source/ti/common/nv/nvocmp.c -> nvocmp.c",
             "+../../../../../../../source/ti/common/nv/nvocmp.h -> nvocmp.h",
             "+../../../../../../../source/ti/common/nv/crc.c -> crc.c",
@@ -82,6 +82,9 @@
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c -> rcosc_calibration.c",
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.h -> rcosc_calibration.h",
             "+../../../../../../../source/ti/ti154stack/hal/crypto/crypto_mac_api.h -> crypto_mac_api.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_defs.h -> hal_defs.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_mcu.h -> hal_mcu.h",
+            "+../../../../../../../source/ti/ti154stack/hal/platform/hal_types.h -> hal_types.h",
             "+../../../../../../../source/ti/ti154stack/hal/rf/rf_mac_api.h -> rf_mac_api.h",
             "+../../../../../../../source/ti/ti154stack/inc/mac_api.h -> mac_api.h",
             "+../../../../../../../source/ti/ti154stack/tracer/itm.c -> itm.c",
@@ -121,15 +124,14 @@
             "+../../../../../../../source/ti/ti154stack/rom/icall_osal_rom_jt.h -> icall_osal_rom_jt.h",
             "+../../../../../../../source/ti/ti154stack/rom/fh_map_direct.h -> fh_map_direct.h",
             "+../../../../../../../source/ti/ti154stack/rom/icall_osal_map_direct.h -> icall_osal_map_direct.h",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/macTask.c -> macTask.c",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.c -> api_mac.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/macTask.c -> macTask.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/api_mac.c -> api_mac.c",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.h -> api_mac.h",
             "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_oad_release.cfg -> ble_oad_release.cfg",
-            "+../../dmm_app_and_stack_oad_agama.icf -> dmm_app_and_stack_oad_agama.icf",
-            "+../../cc26xx_app_and_stack_agama_oad.icf -> cc26xx_app_and_stack_agama_oad.icf",
+            "+../../../../../../../source/ti/dmm/apps/common/tirtos/iar/dmm_app_and_stack_oad_agama.icf -> dmm_app_and_stack_oad_agama.icf",
+            "+../../../../../../../source/ti/dmm/apps/common/tirtos/iar/cc26xx_app_and_stack_agama_oad.icf -> cc26xx_app_and_stack_agama_oad.icf",
             "+../../README.html -> README.html",
-            "+../../dmm_154collector_remote_display_2_4g.syscfg -> dmm_154collector_remote_display_2_4g.syscfg",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c"
+            "+../../dmm_154collector_remote_display_2_4g.syscfg -> dmm_154collector_remote_display_2_4g.syscfg"
         ]
     }
 ]

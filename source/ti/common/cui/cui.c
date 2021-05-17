@@ -23,7 +23,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2020, Texas Instruments Incorporated
+ Copyright (c) 2016-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -57,25 +57,26 @@
  
  
  *****************************************************************************/
-
+ 
 /******************************************************************************
  Includes
  *****************************************************************************/
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-
+#ifndef CUI_POSIX
 #include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Clock.h>
-
+#else
+#include <unistd.h>
+#endif
 #include <ti/drivers/dpl/HwiP.h>
+#include <ti/drivers/dpl/SemaphoreP.h>
+#include <ti/drivers/dpl/SystemP.h>
 #include <ti/drivers/UART.h>
 #include <ti/drivers/uart/UARTCC26XX.h>
 #include <ti/drivers/utils/Random.h>
 #include <ti/drivers/apps/LED.h>
-#include <xdc/runtime/System.h>
 #include DeviceFamily_constructPath(driverlib/cpu.h)
 #include "ti_drivers_config.h"
 
@@ -160,12 +161,13 @@ typedef struct
  * [General Global Variables]
  */
 static bool gModuleInitialized = false;
-static Semaphore_Params gSemParams;
 
 static CUI_clientHandle_t gClientHandles[MAX_CLIENTS];
 static uint32_t gMaxStatusLines[MAX_CLIENTS];
-static Semaphore_Handle gClientsSem;
-static Semaphore_Struct gClientsSemStruct;
+
+static SemaphoreP_Params gSemParams;
+static SemaphoreP_Handle gClientsSem;
+static SemaphoreP_Struct gClientsSemStruct;
 
 /*
  * [UART Specific Global Variables]
@@ -176,8 +178,9 @@ static UART_Handle gUartHandle = NULL;
 static uint8_t gUartTxBuffer[CUI_NUM_UART_CHARS];
 static uint8_t gUartRxBuffer[CUI_NUM_UART_CHARS];
 #endif
-static Semaphore_Handle gUartSem;
-static Semaphore_Struct gUartSemStruct;
+
+static SemaphoreP_Handle gUartSem;
+static SemaphoreP_Struct gUartSemStruct;
 
 static uint8_t gRingBuff[512];
 static size_t gRingBuffHeadIdx = 0;
@@ -196,8 +199,9 @@ static bool gCursorActive;
 static CUI_cursorInfo_t gCursorInfo;
 
 static CUI_menuResource_t gMenuResources[MAX_REGISTERED_MENUS];
-static Semaphore_Handle gMenuSem;
-static Semaphore_Struct gMenuSemStruct;
+
+static SemaphoreP_Handle gMenuSem;
+static SemaphoreP_Struct gMenuSemStruct;
 
 char menuBuff[CUI_MENU_START_ESCAPE_LEN             // Escape characters
               + MAX_MENU_LINE_LEN + CUI_NL_CR_LEN   // Additional new line and return char
@@ -219,8 +223,9 @@ CUI_menu_t *cuiMultiMenu = (CUI_menu_t *)&cuiMultiMenuData;
  * [Status Line Variables]
  */
 static CUI_statusLineResource_t* gStatusLineResources[MAX_CLIENTS];
-static Semaphore_Handle gStatusSem;
-static Semaphore_Struct gStatusSemStruct;
+
+static SemaphoreP_Handle gStatusSem;
+static SemaphoreP_Struct gStatusSemStruct;
 
 /******************************************************************************
  Local Functions Prototypes
@@ -267,16 +272,14 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
      */
     if (!gModuleInitialized && _pParams->manageUart)
     {
-
         // Semaphore Setup
-        Semaphore_Params_init(&gSemParams);
+        SemaphoreP_Params_init(&gSemParams);
         //set all sems in this module to be binary sems
-        gSemParams.mode = Semaphore_Mode_BINARY;
+        gSemParams.mode = SemaphoreP_Mode_BINARY;
 
         // Client Setup
         {
-            Semaphore_construct(&gClientsSemStruct, 1, &gSemParams);
-            gClientsSem = Semaphore_handle(&gClientsSemStruct);
+            gClientsSem = SemaphoreP_construct(&gClientsSemStruct, 1, &gSemParams);
 
             for (int i = 0; i < MAX_CLIENTS; i++)
             {
@@ -290,11 +293,9 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
 
         {
             // UART semaphore setup
-            Semaphore_construct(&gUartSemStruct, 1, &gSemParams);
-            gUartSem = Semaphore_handle(&gUartSemStruct);
+            gUartSem = SemaphoreP_construct(&gUartSemStruct, 1, &gSemParams);
 #ifndef CUI_MIN_FOOTPRINT
-            Semaphore_construct(&gMenuSemStruct, 1, &gSemParams);
-            gMenuSem = Semaphore_handle(&gMenuSemStruct);
+            gMenuSem = SemaphoreP_construct(&gMenuSemStruct, 1, &gSemParams);
 #endif
             {
                 // General UART setup
@@ -352,8 +353,7 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
 
             // Status Lines Setup
             {
-                Semaphore_construct(&gStatusSemStruct, 1, &gSemParams);
-                gStatusSem = Semaphore_handle(&gStatusSemStruct);
+                gStatusSem = SemaphoreP_construct(&gStatusSemStruct, 1, &gSemParams);
             }
         }
 
@@ -400,7 +400,7 @@ CUI_clientHandle_t CUI_clientOpen(CUI_clientParams_t* _pParams)
         return 0U;
     }
 
-    Semaphore_pend(gClientsSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gClientsSem, SemaphoreP_WAIT_FOREVER);
 
     if (numClients >= MAX_CLIENTS)
     {
@@ -435,7 +435,7 @@ CUI_clientHandle_t CUI_clientOpen(CUI_clientParams_t* _pParams)
 
     numClients++;
 
-    Semaphore_post(gClientsSem);
+    SemaphoreP_post(gClientsSem);
 
     return randomNumber;
 }
@@ -467,7 +467,8 @@ CUI_retVal_t CUI_close()
     // Only close the module if it's been initialized
     if (gModuleInitialized)
     {
-        Semaphore_pend(gStatusSem, BIOS_WAIT_FOREVER);
+        SemaphoreP_pend(gStatusSem, SemaphoreP_WAIT_FOREVER);
+
         char clearScreenStr[] = CUI_ESC_CLR CUI_ESC_TRM_MODE CUI_ESC_CUR_HIDE;
         CUI_writeString(clearScreenStr, strlen(clearScreenStr));
         for (uint8_t i = 0; i < MAX_CLIENTS; i++)
@@ -478,7 +479,7 @@ CUI_retVal_t CUI_close()
             }
         }
         UART_close(gUartHandle);
-        Semaphore_post(gStatusSem);
+        SemaphoreP_post(gStatusSem);
     }
 
     gModuleInitialized = false;
@@ -518,7 +519,7 @@ CUI_retVal_t CUI_registerMenu(const CUI_clientHandle_t _clientHandle, CUI_menu_t
         return CUI_MISSING_UART_UPDATE_FN;
     }
 
-    Semaphore_pend(gMenuSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gMenuSem, SemaphoreP_WAIT_FOREVER);
 
     int freeIndex = -1;
     int numMenus = 0;
@@ -536,7 +537,7 @@ CUI_retVal_t CUI_registerMenu(const CUI_clientHandle_t _clientHandle, CUI_menu_t
         else if (_pMenu == gMenuResources[i].pMenu)
         {
             // Do not allow multiple of the same menu to be registered
-            Semaphore_post(gMenuSem);
+            SemaphoreP_post(gMenuSem);
             return CUI_INVALID_PARAM;
         }
         else
@@ -547,7 +548,8 @@ CUI_retVal_t CUI_registerMenu(const CUI_clientHandle_t _clientHandle, CUI_menu_t
 
     if (-1 == freeIndex)
     {
-        Semaphore_post(gMenuSem);
+        SemaphoreP_post(gMenuSem);
+
         return CUI_MAX_MENUS_REACHED;
     }
 
@@ -654,7 +656,7 @@ CUI_retVal_t CUI_registerMenu(const CUI_clientHandle_t _clientHandle, CUI_menu_t
     gCurrMenuItemEntry = gpMainMenu->numItems - 1;
 
     CUI_dispMenu(false);
-    Semaphore_post(gMenuSem);
+    SemaphoreP_post(gMenuSem);
 
     return CUI_SUCCESS;
 }
@@ -689,7 +691,7 @@ CUI_retVal_t CUI_deRegisterMenu(const CUI_clientHandle_t _clientHandle, CUI_menu
         return CUI_MISSING_UART_UPDATE_FN;
     }
 
-    Semaphore_pend(gMenuSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gMenuSem, SemaphoreP_WAIT_FOREVER);
 
     int matchingIndex = -1;
     int numMenus = 0;
@@ -712,7 +714,8 @@ CUI_retVal_t CUI_deRegisterMenu(const CUI_clientHandle_t _clientHandle, CUI_menu
 
     if (-1 == matchingIndex)
     {
-        Semaphore_post(gMenuSem);
+        SemaphoreP_post(gMenuSem);
+
         return CUI_RESOURCE_NOT_ACQUIRED;
     }
 
@@ -825,7 +828,7 @@ CUI_retVal_t CUI_deRegisterMenu(const CUI_clientHandle_t _clientHandle, CUI_menu
         /* Default to the Help item that was given to it */
         gCurrMenuItemEntry = 0;
 
-        System_snprintf(buff, sizeof(buff),
+        SystemP_snprintf(buff, sizeof(buff),
             CUI_ESC_CUR_HIDE CUI_ESC_CUR_MENU_BTM CUI_ESC_CLR_UP CUI_ESC_CUR_HOME,
             MAX_MENU_LINE_LEN);
         CUI_writeString(buff, strlen(buff));
@@ -834,7 +837,8 @@ CUI_retVal_t CUI_deRegisterMenu(const CUI_clientHandle_t _clientHandle, CUI_menu
     gMenuResources[matchingIndex].clientHash = 0U;
     gMenuResources[matchingIndex].pMenu = NULL;
 
-    Semaphore_post(gMenuSem);
+    SemaphoreP_post(gMenuSem);
+
     return CUI_SUCCESS;
 }
 
@@ -1222,7 +1226,7 @@ CUI_retVal_t CUI_statusLinePrintf(const CUI_clientHandle_t _clientHandle,
     offset += gStatusLineResources[clientIndex][_lineId].lineOffset;
 
     //TODO: Remove magic length number
-    System_snprintf(statusLineBuff, 32,
+    SystemP_snprintf(statusLineBuff, 32,
         CUI_ESC_CUR_HIDE CUI_ESC_CUR_HOME CUI_ESC_CUR_LINE CUI_ESC_CLR_STAT_LINE_VAL "%c",
          offset, CUI_STATUS_LINE_START_CHAR);
 #endif
@@ -1240,7 +1244,7 @@ CUI_retVal_t CUI_statusLinePrintf(const CUI_clientHandle_t _clientHandle,
     }
 
     va_start(args, _format);
-    System_vsnprintf(&statusLineBuff[strlen(statusLineBuff)], availableLen, _format, args);
+    SystemP_vsnprintf(&statusLineBuff[strlen(statusLineBuff)], availableLen, _format, args);
     va_end(args);
 
     retVal = CUI_updateRemLen(&availableLen, statusLineBuff, buffSize);
@@ -1254,7 +1258,7 @@ CUI_retVal_t CUI_statusLinePrintf(const CUI_clientHandle_t _clientHandle,
 
     if (gStatusLineResources[clientIndex][_lineId].refreshInd)
     {
-        System_snprintf(&statusLineBuff[strlen(statusLineBuff)], availableLen, " %c", refreshChars[refreshCharIdx]);
+        SystemP_snprintf(&statusLineBuff[strlen(statusLineBuff)], availableLen, " %c", refreshChars[refreshCharIdx]);
         refreshCharIdx = (refreshCharIdx + 1) % sizeof(refreshChars);
     }
 
@@ -1289,6 +1293,7 @@ CUI_retVal_t CUI_statusLinePrintf(const CUI_clientHandle_t _clientHandle,
  */
 void CUI_assert(const char* _assertMsg, const bool _spinLock)
 {
+#ifndef CUI_POSIX
     if (BIOS_ThreadType_Main == BIOS_getThreadType())
     {
         /*
@@ -1299,6 +1304,8 @@ void CUI_assert(const char* _assertMsg, const bool _spinLock)
         // TODO: solve this issue CUI_ledAssert();
         while(1){};
     }
+#endif
+
     if (!gModuleInitialized)
     {
         CUI_params_t params;
@@ -1312,12 +1319,12 @@ void CUI_assert(const char* _assertMsg, const bool _spinLock)
     // Display this in the line between the menu and the status lines
     uint32_t offset = CUI_INITIAL_STATUS_OFFSET - 1;
 
-    System_snprintf(tmp, sizeof(tmp),
+    SystemP_snprintf(tmp, sizeof(tmp),
         CUI_ESC_CUR_HIDE CUI_ESC_CUR_HOME CUI_ESC_CUR_LINE CUI_ESC_CLR_STAT_LINE_VAL "%c",
         offset, CUI_STATUS_LINE_START_CHAR);
     CUI_writeString(tmp, strlen(tmp));
 
-    System_snprintf(statusLineBuff, sizeof(statusLineBuff),  CUI_COLOR_RED "%s%c" CUI_COLOR_RESET, _assertMsg, CUI_END_CHAR);
+    SystemP_snprintf(statusLineBuff, sizeof(statusLineBuff),  CUI_COLOR_RED "%s%c" CUI_COLOR_RESET, _assertMsg, CUI_END_CHAR);
 
     CUI_writeString(statusLineBuff, strlen(statusLineBuff));
 
@@ -1450,9 +1457,7 @@ static CUI_retVal_t CUI_writeString(void * _buffer, size_t _size)
     {
         return CUI_UART_FAILURE;
     }
-
-
-    Semaphore_pend(gUartSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gUartSem, SemaphoreP_WAIT_FOREVER);
 
     UART_writeCancel(gUartHandle);
 
@@ -1469,7 +1474,12 @@ static CUI_retVal_t CUI_writeString(void * _buffer, size_t _size)
             {
                UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], gRingBuffPendLen);
             }
+
+#ifndef CUI_POSIX
             Task_sleep(100);
+#else
+            usleep(1000);
+#endif
             UART_writeCancel(gUartHandle);
             if ((sizeof(gRingBuff) - gRingBuffPendLen) >= _size)
             {
@@ -1513,7 +1523,8 @@ static CUI_retVal_t CUI_writeString(void * _buffer, size_t _size)
         UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], gRingBuffPendLen);
     }
 
-    Semaphore_post(gUartSem);
+    SemaphoreP_post(gUartSem);
+
     return CUI_SUCCESS;
 }
 
@@ -1546,7 +1557,7 @@ static CUI_retVal_t CUI_validateHandle(const CUI_clientHandle_t _clientHandle)
 
 static CUI_retVal_t CUI_acquireStatusLine(const CUI_clientHandle_t _clientHandle, const char _pLabel[MAX_STATUS_LINE_LABEL_LEN], const bool _refreshInd, uint32_t* _pLineId)
 {
-    Semaphore_pend(gStatusSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gStatusSem, SemaphoreP_WAIT_FOREVER);
 
     int clientIndex = CUI_getClientIndex(_clientHandle);
     if (clientIndex == -1)
@@ -1564,7 +1575,7 @@ static CUI_retVal_t CUI_acquireStatusLine(const CUI_clientHandle_t _clientHandle
         }
     }
 
-    Semaphore_post(gStatusSem);
+    SemaphoreP_post(gStatusSem);
 
     if (-1 == freeIndex)
     {
@@ -1582,7 +1593,7 @@ static CUI_retVal_t CUI_acquireStatusLine(const CUI_clientHandle_t _clientHandle
 
     //Add a ": " to every label
     memset(gStatusLineResources[clientIndex][freeIndex].label, '\0', sizeof(gStatusLineResources[clientIndex][freeIndex].label));
-    System_snprintf(gStatusLineResources[clientIndex][freeIndex].label,
+    SystemP_snprintf(gStatusLineResources[clientIndex][freeIndex].label,
              MAX_STATUS_LINE_LABEL_LEN + strlen(CUI_LABEL_VAL_SEP),
              "%s%s", _pLabel, CUI_LABEL_VAL_SEP);
     gStatusLineResources[clientIndex][freeIndex].lineOffset = offset;
@@ -1648,7 +1659,7 @@ static void CUI_updateCursor(void)
     char buff[32];
     if (gCursorActive)
     {
-        System_snprintf(buff, sizeof(buff),
+        SystemP_snprintf(buff, sizeof(buff),
             CUI_ESC_CUR_HOME CUI_ESC_CUR_ROW_COL CUI_ESC_CUR_SHOW,
             gCursorInfo.row, gCursorInfo.col);
         CUI_writeString(buff, strlen(buff));
@@ -1876,7 +1887,7 @@ static void CUI_dispMenu(bool _menuPopulated)
      *  CUI_END_CHAR are accounted for in the menuBuff already.
      */
 #if !defined(CUI_SCROLL_PRINT)
-    System_snprintf(menuBuff, 32,
+    SystemP_snprintf(menuBuff, 32,
         CUI_ESC_CUR_HIDE CUI_ESC_CUR_MENU_BTM CUI_ESC_CLR_UP CUI_ESC_CUR_HOME "%c",
         MAX_MENU_LINE_LEN, CUI_MENU_START_CHAR);
 #endif

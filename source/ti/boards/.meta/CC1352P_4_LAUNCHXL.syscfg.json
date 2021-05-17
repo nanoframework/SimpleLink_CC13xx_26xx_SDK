@@ -379,9 +379,9 @@
             "description" : "SKY13317-373LF RF Antenna Switch",
             "longDescription" : "[__SKYWORKS&reg; SKY13317-373LF__](http://www.skyworksinc.com/Product/586/SKY13317-373LF) single-pole, triple throw (SP3T) antenna switch.",
             "signals": {
-                "24GHZ": {"type": "RF", "connection": 41},
-                "HIGH_PA": {"type": "RF", "connection": 42},
-                "SUB1GHZ": {"type": "RF", "connection": 43}
+                "24GHZ": {"type": "RF_24GHZ", "connection": 41},
+                "HIGH_PA": {"type": "RF_HIGH_PA", "connection": 42},
+                "SUB1GHZ": {"type": "RF_SUB1GHZ", "connection": 43}
             }
         },
 

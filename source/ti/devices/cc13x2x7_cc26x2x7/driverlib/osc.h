@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       osc.h
-*  Revised:        2020-12-11 09:58:05 +0100 (Fri, 11 Dec 2020)
-*  Revision:       59848
+*  Revised:        2020-12-11 09:56:37 +0100 (Fri, 11 Dec 2020)
+*  Revision:       59847
 *
 *  Description:    Defines and prototypes for the system oscillator control.
 *

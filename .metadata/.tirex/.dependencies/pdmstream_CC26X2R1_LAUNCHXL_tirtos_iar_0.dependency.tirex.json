@@ -6,14 +6,9 @@
             "+../../README.html -> README.html",
             "+../../overview.rov.json -> overview.rov.json",
             "+../main_tirtos.c -> main_tirtos.c",
+            "+../pdmstream.syscfg -> pdmstream.syscfg",
             "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board_legacy.html -> Board_legacy.html",
-            "+../../Board.h -> Board.h",
-            "+../../CC26X2R1_LAUNCHXL.c -> CC26X2R1_LAUNCHXL.c",
-            "+../../CC26X2R1_LAUNCHXL.h -> CC26X2R1_LAUNCHXL.h",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
-            "+../../ccfg.c -> ccfg.c",
-            "+CC26X2R1_LAUNCHXL_TIRTOS.icf -> CC26X2R1_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

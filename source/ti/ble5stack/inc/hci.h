@@ -359,6 +359,7 @@ extern "C"
 #include "bcomdef.h"
 #include "osal.h"
 #include "ll_common.h"
+#include "ll_ae.h"
 #include "hal_assert.h"
 
 /*
@@ -1751,8 +1752,6 @@ extern hciStatus_t HCI_LE_ReadBufSizeCmd( void );
  */
 extern hciStatus_t HCI_LE_ReadLocalSupportedFeaturesCmd( void );
 
-/// @cond NODOC
-
 /**
  * Set this device's Random address.
  *
@@ -1805,6 +1804,34 @@ extern hciStatus_t HCI_LE_SetAdvParamCmd( uint16 advIntervalMin,
  */
 extern hciStatus_t HCI_LE_SetAdvDataCmd( uint8 dataLen,
                                          uint8 *pData );
+/**
+ * Set the Advertising data.
+ * This function will be called only when BLE3_CMD compilation flag
+ * is set
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_LE_SET_ADV_DATA
+ *
+ * @param pCmdParams - Pointer to input parameters
+ *
+ * @return @ref HCI_SUCCESS
+ */
+hciStatus_t HCI_LE_SetExtAdvData( aeSetDataCmd_t *pCmdParams );
+
+/**
+ * Set the Advertising Scan Response data.
+ * This function will be called only when BLE3_CMD compilation flag
+ * is set
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_LE_SET_SCAN_RSP_DATA
+ *
+ * @param pCmdParams - Pointer to input parameters
+ *
+ * @return @ref HCI_SUCCESS
+ */
+
+hciStatus_t HCI_LE_SetExtScanRspData( aeSetDataCmd_t *pCmdParams );
 
 /**
  * Set the Advertising Scan Response data.
@@ -1926,8 +1953,6 @@ extern hciStatus_t HCI_LE_CreateConnCmd( uint16 scanInterval,
  */
 extern hciStatus_t HCI_LE_CreateConnCancelCmd( void );
 
-/// @endcond // NODOC
-
 /**
  * Read the white list.
  *
@@ -1979,8 +2004,6 @@ extern hciStatus_t HCI_LE_AddWhiteListCmd( uint8 addrType,
 extern hciStatus_t HCI_LE_RemoveWhiteListCmd( uint8 addrType,
                                               uint8 *devAddr );
 
-/// @cond NODOC
-
 /**
  * Update the connection parameters.
  *
@@ -2005,8 +2028,6 @@ extern hciStatus_t HCI_LE_ConnUpdateCmd( uint16 connHandle,
                                          uint16 connTimeout,
                                          uint16 minLen,
                                          uint16 maxLen );
-
-/// @endcond // NODOC
 
 /**
  * Update the current data channel map.
@@ -2095,8 +2116,6 @@ extern hciStatus_t HCI_LE_EncryptCmd( uint8 *key,
  */
 extern hciStatus_t HCI_LE_RandCmd( void );
 
-/// @cond NODOC
-
 /**
  * Start encryption in a connection.
  *
@@ -2143,8 +2162,6 @@ extern hciStatus_t HCI_LE_LtkReqReplyCmd( uint16 connHandle,
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_LE_LtkReqNegReplyCmd( uint16 connHandle );
-
-/// @endcond // NODOC
 
 /**
  * Read the Controller's supported states.
@@ -2204,8 +2221,6 @@ extern hciStatus_t HCI_LE_TestEndCmd( void );
 
 // V4.1
 
-/// @cond NODOC
-
 /**
  * Positively reply to the Connection Parameter Update Request
  *
@@ -2253,8 +2268,6 @@ extern hciStatus_t HCI_LE_RemoteConnParamReqReplyCmd( uint16 connHandle,
  */
 extern hciStatus_t HCI_LE_RemoteConnParamReqNegReplyCmd( uint16 connHandle,
                                                          uint8  reason );
-
-/// @endcond // NODOC
 
 // V4.2 Extended Data Length
 
@@ -2428,8 +2441,6 @@ extern hciStatus_t HCI_LE_ReadPeerResolvableAddressCmd( uint8  peerIdAddrType,
 extern hciStatus_t HCI_LE_ReadLocalResolvableAddressCmd( uint8  localIdAddrType,
                                                          uint8 *localIdAddr );
 
-/// @cond NODOC
-
 /**
  * Disable / Enable Address Resolution
  *
@@ -2445,8 +2456,6 @@ extern hciStatus_t HCI_LE_ReadLocalResolvableAddressCmd( uint8  localIdAddrType,
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_LE_SetAddressResolutionEnableCmd( uint8 addrResolutionEnable );
-
-/// @endcond // NODOC
 
 /**
  * Set Resolvable Private Address Timeout
@@ -2487,8 +2496,6 @@ extern hciStatus_t HCI_LE_SetPrivacyModeCmd( uint8  peerIdAddrType,
 
 // V4.2 Secure Connections
 
-/// @cond NODOC
-
 /**
  * Read local P-256 Public Key
  *
@@ -2505,7 +2512,6 @@ extern hciStatus_t HCI_LE_SetPrivacyModeCmd( uint8  peerIdAddrType,
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_LE_ReadLocalP256PublicKeyCmd( void );
-
 
 /**
  * Generate Diffie-Hellman Key
@@ -2527,8 +2533,6 @@ extern hciStatus_t HCI_LE_ReadLocalP256PublicKeyCmd( void );
  */
 extern hciStatus_t HCI_LE_GenerateDHKeyCmd( uint8 *publicKey );
 
-/// @endcond // NODOC
-
 // V5.0 2M and Coded PHY
 
 /**
@@ -2547,7 +2551,6 @@ extern hciStatus_t HCI_LE_GenerateDHKeyCmd( uint8 *publicKey );
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_LE_ReadPhyCmd( uint16 connHandle );
-
 
 /**
  * Set Default PHY
@@ -3463,8 +3466,6 @@ extern hciStatus_t HCI_EXT_EnhancedModemTestRxCmd( uint8 rfPhy,
  */
 extern hciStatus_t HCI_EXT_EndModemTestCmd( void );
 
-/// @cond NODOC
-
 /**
  * Set this device's BLE address (BDADDR).
  *
@@ -3488,8 +3489,6 @@ extern hciStatus_t HCI_EXT_EndModemTestCmd( void );
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_EXT_SetBDADDRCmd( uint8 *bdAddr );
-
-/// @endcond // NODOC
 
 /**
  * Set this device's Sleep Clock Accuracy.
@@ -3994,8 +3993,6 @@ extern hciStatus_t HCI_EXT_OverlappedProcessingCmd( uint8 mode );
 extern hciStatus_t HCI_EXT_NumComplPktsLimitCmd( uint8 limit,
                                                  uint8 flushOnEvt );
 
-/// @cond NODOC
-
 /**
  * Get Connection Info
  *
@@ -4032,8 +4029,6 @@ extern hciStatus_t HCI_EXT_GetConnInfoCmd( uint8         *numAllocConns,
                                            uint8         *numActiveConns,
                                            hciConnInfo_t *activeConnInfo );
 
-/// @endcond // NODOC
-
 /**
  * Set the maximum Rx and Tx Octets (in bytes) and Time (in us).
  *
@@ -4069,7 +4064,6 @@ extern hciStatus_t HCI_EXT_SetMaxDataLenCmd( uint16 txOctets,
  */
 extern hciStatus_t HCI_EXT_SetDtmTxPktCntCmd( uint16 txPktCnt );
 
-/// @cond NODOC
 
 /**
  * Read this device's BLE Random Address.
@@ -4202,14 +4196,20 @@ extern hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap );
  *              according to the entered parameter type.
  *
  * @design      /ref did_361975877
+ * @design      /ref did_408769671
  *
  * input parameters
  *
  * @param       taskType  - The type of task.
- *                          For connections: LL_QOS_CONN_TASK_TYPE.
+ *                          For Connections task type:        LL_QOS_CONN_TASK_TYPE.
+ *                          For Advertise task type:          LL_QOS_ADV_TASK_TYPE.
+ *                          For Scan task type:               LL_QOS_SCN_TASK_TYPE.
+ *                          For Initiator task type:          LL_QOS_INIT_TASK_TYPE.
+ *                          For Periodic Advertise task type: LL_QOS_PERIODIC_ADV_TASK_TYPE.
+ *                          For Periodic Scan task type:      LL_QOS_PERIODIC_SCN_TASK_TYPE.
  *
  * @param       paramType  - The type of parameter.
- *                           General: LL_QOS_TYPE_PRIORITY
+ *                           General: LL_QOS_TYPE_PRIORITY.
  *                           For connections: LL_QOS_TYPE_CONN_MIN_LENGTH /
  *                                            LL_QOS_TYPE_CONN_MAX_LENGTH.
  *
@@ -4219,7 +4219,7 @@ extern hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap );
  *                                                                 LL_QOS_MEDIUM_PRIORITY,
  *                                                                 LL_QOS_HIGH_PRIORITY.
  *                                                                 Range [0-2].
- *                           For connections:
+ *                           For connections only:
  *                           LL_QOS_TYPE_CONN_MIN_LENGTH optional values: Time in [us].
  *                                                                        for coded connection   Range [LL_MIN_LINK_DATA_TIME_CODED (2704 us) - LL_MAX_LINK_DATA_TIME_CODED (17040 us)].
  *                                                                        for uncoded connection Range [LL_MIN_LINK_DATA_TIME (328 us) - LL_MAX_LINK_DATA_TIME_UNCODED (2120 us)].
@@ -4232,6 +4232,8 @@ extern hciStatus_t HCI_EXT_SetExtScanChannels( uint8 extScanChannelsMap );
  *
  *
  * @param       taskHandle  - The Task Handle of which we want to update it's parameters.
+ *                            This variable is not relevent for LL_QOS_SCN_TASK_TYPE / LL_QOS_INIT_TASK_TYPE because
+ *                            There is only 1 set for scanner or initiator.
  *
  * output parameters
  *
@@ -4248,19 +4250,37 @@ extern hciStatus_t HCI_EXT_SetQOSParameters( uint8  taskType,
  * @brief       This API is used to set the Default QOS Parameters Values.
  *
  * @design      /ref did_361975877
+ * @design      /ref did_408769671
  *
  * input parameters
  *
- * @param       defaultParamConnPriorityValue       - The default value for connection's priority.
- *                                                    Options: LL_QOS_LOW_PRIORITY /  LL_QOS_MEDIUM_PRIORITY / LL_QOS_HIGH_PRIORITY.
- *                                                    Range [0-2].
+ * @param       paramDefaultVal   - The default value of this qos type.
+ *                                  For LL_QOS_TYPE_PRIORITY optional values: LL_QOS_LOW_PRIORITY,
+ *                                                                            LL_QOS_MEDIUM_PRIORITY,
+ *                                                                            LL_QOS_HIGH_PRIORITY.
+ *                                                                            Range [0-2].
+ *
+ * @param       paramType         - The type of parameter.
+ *                                  General: LL_QOS_TYPE_PRIORITY.
+ *                                  For connections: LL_QOS_TYPE_CONN_MIN_LENGTH /
+ *                                                   LL_QOS_TYPE_CONN_MAX_LENGTH.
+ *
+ * @param       taskType          - The type of task we would like to change it's default value.
+ *                                  For Connections task type:        LL_QOS_CONN_TASK_TYPE.
+ *                                  For Advertise task type:          LL_QOS_ADV_TASK_TYPE.
+ *                                  For Scan task type:               LL_QOS_SCN_TASK_TYPE.
+ *                                  For Initiator task type:          LL_QOS_INIT_TASK_TYPE.
+ *                                  For Periodic Advertise task type: LL_QOS_PERIODIC_ADV_TASK_TYPE.
+ *                                  For Periodic Scan task type:      LL_QOS_PERIODIC_SCN_TASK_TYPE.
  * output parameters
  *
  * @param       None.
  *
  * @return      @ref HCI_SUCCESS
  */
-extern hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValue );
+extern hciStatus_t HCI_EXT_SetQOSDefaultParameters(uint32 paramDefaultVal,
+                                                   uint8  paramType,
+                                                   uint8  taskType);
 
 /**
  * Enable or disable the Coex feature.
@@ -4273,8 +4293,6 @@ extern hciStatus_t HCI_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPrior
  * @return @ref HCI_SUCCESS
  */
 extern hciStatus_t HCI_EXT_CoexEnableCmd( uint8 enable );
-
-/// @endcond // NODOC
 
 #ifdef __cplusplus
 }

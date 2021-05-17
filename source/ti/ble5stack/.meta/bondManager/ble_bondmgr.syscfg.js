@@ -224,6 +224,14 @@ const config = {
             hidden: false,
             default: false
         },
+		{
+            name: "allowDebugKeys",
+            displayName: "Allow Receiving Debug Keys",
+            longDescription: Docs.allowDebugKeysLongDescription,
+            onChange: onAllowDebugKeysChange,
+            hidden: false,
+            default: true
+        },
         {
             name: "eraseBondWhileInConn",
             displayName: "Erase Bond In Active Connections",
@@ -357,12 +365,14 @@ function onSecureConnChange(inst, ui)
         ui.ECCKeyRegenPolicy.hidden = true;
         ui.LTKSize.hidden = true;
         ui.eccDebugKeys.hidden = true;
+		ui.allowDebugKeys.hidden = true;
     }
     else
     {
         ui.ECCKeyRegenPolicy.hidden = false;
         ui.LTKSize.hidden = false;
         ui.eccDebugKeys.hidden = false;
+		ui.allowDebugKeys.hidden = false;
     }
 
 }
@@ -385,6 +395,26 @@ function onEccDebugKeysChange(inst, ui)
     else
     {
         ui.ECCKeyRegenPolicy.hidden = false;
+    }
+}
+
+/*
+* ======== onAllowDebugKeysChange ========
+* When not using allowDebugKeys, debug keys will not be used. Therefore, hide eccDebugKeys
+*
+*
+* @param inst - Module instance containing the config that changed
+* @param ui - The User Interface object
+*/
+function onAllowDebugKeysChange(inst, ui)
+{
+    if(inst.allowDebugKeys)
+    {
+        ui.eccDebugKeys.hidden = false;
+    }
+    else
+    {
+        ui.eccDebugKeys.hidden = true;
     }
 }
 

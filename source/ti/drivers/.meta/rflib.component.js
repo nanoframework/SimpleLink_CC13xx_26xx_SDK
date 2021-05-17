@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,23 +37,18 @@
 
 "use strict";
 
-const topModules = [];
 const displayName = "TI Drivers";
 const description = "TI Drivers System Configuration";
-const deviceId = system.deviceData.deviceId;
 
-/* Only export RF module if device is supported */
-if ((deviceId.match(/CC13.0|CC26.0/)) || (deviceId.match(/CC13.2|CC26.2/))) {
-    topModules.push(
-        {
-            displayName: displayName,
-            description: description,
-            modules: [
-                "/ti/drivers/RF"
-            ]
-        }
-    );
-}
+const topModules = [
+    {
+        displayName: displayName,
+        description: description,
+        modules: [
+            "/ti/drivers/RF"
+        ]
+    }
+];
 
 exports = {
     displayName: displayName,

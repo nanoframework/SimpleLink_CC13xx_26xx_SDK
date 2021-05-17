@@ -40,7 +40,6 @@
             <arg>--aeabi</arg>
             <arg>--thumb</arg>
             <arg>--diag_suppress=Pa050</arg>
-            <arg>--c++</arg>
         </args>
     </extraOptions>
 

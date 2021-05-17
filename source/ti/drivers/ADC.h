@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,7 @@
  *  @li @ref ti_drivers_ADC_Examples_open "Opening an ADC instance"
  *  @li @ref ti_drivers_ADC_Examples_convert "Taking an ADC sample"
  *  @li @ref ti_drivers_ADC_Examples_convert_microvolts "Converting a sample to microvolts"
+ *  @li @ref ti_drivers_ADC_Examples_convert_chain "Executing multi-channel sampling"
  *
  *  @anchor ti_drivers_ADC_Examples_open
  *  ## Opening an ADC instance
@@ -136,6 +137,34 @@
  *  if (res == ADC_STATUS_SUCCESS)
  *  {
  *      adcValueUv = ADC_convertToMicroVolts(adc, adcValue);
+ *  }
+ *  @endcode
+ *
+ *  @anchor ti_drivers_ADC_Examples_convert_chain
+ *  ## Executing multi-channel sampling
+ *
+ *  ADC_convertChain() provides an optimized way to perform
+ *  ADC conversions for several ADC instances (multi-channel sampling).
+ *  It takes a list of identically configured ADC instances and returns
+ *  a buffer with the corresponding result values once the conversion
+ *  is finished. One typical use-case would be reading a group of sensors
+ *  that share the sampling duration.
+ *
+ *  Should the configuration of the ADC instances differ, the configuration
+ *  of the first instance in the list is used to set the parameters of the
+ *  entire conversion chain.
+ *  @code
+ *  ADC_Handle   adc[ADC_COUNT];
+ *  int_fast16_t res;
+ *  uint16_t     retValues[ADC_COUNT];
+ *  uint8_t      i;
+ *
+ *  res = ADC_convertChain(adc, retValues, ADC_COUNT);
+ *  if (res == ADC_STATUS_SUCCESS)
+ *  {
+ *      for (i = 0; i < ADC_COUNT; i++) {
+ *          print(retValues[i]);
+ *      }
  *  }
  *  @endcode
  *
@@ -292,6 +321,14 @@ typedef int_fast16_t (*ADC_ConvertFxn) (ADC_Handle handle, uint16_t *value);
 /*!
  *  @private
  *  @brief      A function pointer to a driver specific implementation of
+ *              ADC_ConvertChainFxn().
+ */
+typedef int_fast16_t (*ADC_ConvertChainFxn) (ADC_Handle *handleList,
+    uint16_t *dataBuffer, uint8_t channelCount);
+
+/*!
+ *  @private
+ *  @brief      A function pointer to a driver specific implementation of
  *              ADC_convertToMicroVolts().
  */
 typedef uint32_t (*ADC_ConvertToMicroVoltsFxn) (ADC_Handle handle,
@@ -325,6 +362,9 @@ typedef struct {
 
     /*! Function to initiate an ADC single channel conversion */
     ADC_ConvertFxn    convertFxn;
+
+    /*! Function to initiate an ADC multi-channel conversion */
+    ADC_ConvertChainFxn convertChainFxn;
 
     /*! Function to convert ADC result to microvolts */
     ADC_ConvertToMicroVoltsFxn convertToMicroVolts;
@@ -407,6 +447,29 @@ extern int_fast16_t ADC_control(ADC_Handle handle, uint_fast16_t cmd,
  *  @sa     ADC_convertToMicroVolts()
  */
 extern int_fast16_t ADC_convert(ADC_Handle handle, uint16_t *value);
+
+/*!
+ *  @brief  Function to perform a multi-channel ADC conversion
+ *
+ *  Function to perform a multi-channel sample conversion.
+ *
+ *  @pre    ADC_open() has been called
+ *
+ *  @param[in]      handleList    A list of #ADC_Handle which have returned
+ *                                from ADC_open()
+ *  @param[in,out]  dataBuffer    A pointer to a uint16_t data buffer to store
+ *                                the conversion result
+ *  @param[in]      channelCount  The number of channels that make up the list
+ *                                of #ADC_Handle
+ *
+ *  @retval #ADC_STATUS_SUCCESS  The conversion was successful.
+ *  @retval #ADC_STATUS_ERROR    The conversion failed and @p value is
+ *                               invalid.
+ *
+ *  @sa     ADC_convert()
+ */
+extern int_fast16_t ADC_convertChain(ADC_Handle *handleList,
+    uint16_t *dataBuffer, uint8_t channelCount);
 
 /*!
  *  @brief  Function to convert a raw ADC sample into microvolts.

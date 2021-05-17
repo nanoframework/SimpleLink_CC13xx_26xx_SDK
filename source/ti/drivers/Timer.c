@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,11 @@
 #include <stdlib.h>
 
 #include <ti/drivers/dpl/HwiP.h>
-#include <ti/drivers/Timer.h>
+#include <ti/drivers/dpl/SemaphoreP.h>
+#include <ti/drivers/dpl/ClockP.h>
 
-extern const Timer_Config Timer_config[];
-extern const uint_least8_t Timer_count;
+#include <ti/drivers/Timer.h>
+#include <ti/drivers/timer/TimerSupport.h>
 
 /* Default Parameters */
 static const Timer_Params defaultParams = {
@@ -47,74 +48,12 @@ static const Timer_Params defaultParams = {
     .period        = (uint16_t) ~0
 };
 
-static bool isInitialized = false;
-
-/*
- *  ======== Timer_control ========
- */
-int_fast16_t Timer_control(Timer_Handle handle, uint_fast16_t cmd, void *arg)
-{
-    return handle->fxnTablePtr->controlFxn(handle, cmd, arg);
-}
-
-/*
- *  ======== Timer_close ========
- */
-void Timer_close(Timer_Handle handle)
-{
-    handle->fxnTablePtr->closeFxn(handle);
-}
-
-/*
- *  ======== Timer_getCount ========
- */
-uint32_t Timer_getCount(Timer_Handle handle)
-{
-    return handle->fxnTablePtr->getCountFxn(handle);
-}
-
 /*
  *  ======== Timer_init ========
  */
 void Timer_init(void)
 {
-    uint_least8_t i;
-    uint_fast32_t key;
-
-    key = HwiP_disable();
-
-    if (!isInitialized) {
-        isInitialized = (bool) true;
-
-        /* Call each driver's init function */
-        for (i = 0; i < Timer_count; i++) {
-            Timer_config[i].fxnTablePtr->initFxn((Timer_Handle) &(Timer_config[i]));
-        }
-    }
-
-    HwiP_restore(key);
-}
-
-/*
- *  ======== Timer_open ========
- */
-Timer_Handle Timer_open(uint_least8_t index, Timer_Params *params)
-{
-    Timer_Handle handle = NULL;
-
-    /* Verify driver index and state */
-    if (isInitialized && (index < Timer_count)) {
-        /* If parameters are NULL use defaults */
-        if (params == NULL) {
-            params = (Timer_Params *) &defaultParams;
-        }
-
-        /* Get handle for this driver instance */
-        handle = (Timer_Handle) &(Timer_config[index]);
-        handle = handle->fxnTablePtr->openFxn(handle, params);
-    }
-
-    return (handle);
+    /* Do nothing */
 }
 
 /*
@@ -130,7 +69,40 @@ void Timer_Params_init(Timer_Params *params)
  */
 int32_t Timer_setPeriod(Timer_Handle handle, Timer_PeriodUnits periodUnits, uint32_t period)
  {
-    return handle->fxnTablePtr->setPeriodFxn(handle, periodUnits, period);
+    Timer_Object        *object = handle->object;
+    ClockP_FreqHz        clockFreq;
+
+    ClockP_getCpuFreq(&clockFreq);
+
+    if (periodUnits == Timer_PERIOD_US) {
+        /* Checks if the calculated period will fit in 32-bits */
+        if (period >= ((uint32_t) ~0) / (clockFreq.lo / 1000000)) {
+            return (Timer_STATUS_ERROR);
+        }
+        period = period * (clockFreq.lo / 1000000);
+    }
+    else if (periodUnits == Timer_PERIOD_HZ) {
+        /* If period > clockFreq */
+        if ((period = clockFreq.lo / period) == 0) {
+            return (Timer_STATUS_ERROR);
+        }
+    }
+
+    /* If using a half timer */
+    if (!TimerSupport_timerFullWidth(handle)) {
+        if (period > 0xFFFF) {
+            /* 24-bit resolution for the half timer */
+            if (period >= (1 << 24)) {
+                return (Timer_STATUS_ERROR);
+            }
+        }
+    }
+
+    object->period = period;
+
+    TimerSupport_timerLoad(handle);
+
+    return (Timer_STATUS_SUCCESS);
  }
 
 /*
@@ -138,7 +110,29 @@ int32_t Timer_setPeriod(Timer_Handle handle, Timer_PeriodUnits periodUnits, uint
  */
 int32_t Timer_start(Timer_Handle handle)
 {
-    return handle->fxnTablePtr->startFxn(handle);
+    Timer_Object              *object = handle->object;
+    uintptr_t                  key;
+
+    /* Check if timer is already running */
+    key = HwiP_disable();
+
+    if (object->isRunning) {
+        HwiP_restore(key);
+        return (Timer_STATUS_ERROR);
+    }
+
+    object->isRunning = true;
+
+    TimerSupport_timerEnable(handle);
+
+    HwiP_restore(key);
+
+    if (object->mode == Timer_ONESHOT_BLOCKING) {
+        /* Pend forever, ~0 */
+        SemaphoreP_pend(object->semHandle, SemaphoreP_WAIT_FOREVER);
+    }
+
+    return (Timer_STATUS_SUCCESS);
 }
 
 /*
@@ -146,5 +140,24 @@ int32_t Timer_start(Timer_Handle handle)
  */
 void Timer_stop(Timer_Handle handle)
 {
-    handle->fxnTablePtr->stopFxn(handle);
+    Timer_Object              *object = handle->object;
+    uintptr_t                  key;
+    bool                       flag = false;
+
+    key = HwiP_disable();
+
+    if (object->isRunning) {
+        object->isRunning = false;
+        /* Post the Semaphore when called from the Hwi */
+        if (object->mode == Timer_ONESHOT_BLOCKING) {
+            flag = true;
+        }
+        TimerSupport_timerDisable(handle);
+    }
+
+    HwiP_restore(key);
+
+    if (flag) {
+        SemaphoreP_post(object->semHandle);
+    }
 }

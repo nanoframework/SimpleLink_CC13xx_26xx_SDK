@@ -36,6 +36,7 @@
 
 #include <stdint.h>
 
+#include <ti/sysbios/BIOS.h>
 #if defined(ti_sysbios_BIOS_version) && (ti_sysbios_BIOS_version <= 0x6FFFF)
 
 #include <ti/utils/osal/Timestamp.h>

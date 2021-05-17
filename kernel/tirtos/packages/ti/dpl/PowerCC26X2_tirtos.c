@@ -40,7 +40,7 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/sysbios/knl/Swi.h>
-#include <ti/sysbios/family/arm/m3/Hwi.h>
+#include <ti/sysbios/hal/Hwi.h>
 
 /* driverlib header files */
 #include <ti/devices/DeviceFamily.h>

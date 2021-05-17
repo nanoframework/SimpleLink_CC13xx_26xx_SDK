@@ -10,6 +10,7 @@ OBJECTS = src_cli_cli.obj src_cli_cli_coap.obj src_cli_cli_coap_secure.obj src_c
 NAME = libopenthread_cli_mtd
 
 CFLAGS = -I../../.. \
+    -Ohz \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
@@ -27,14 +28,17 @@ CFLAGS = -I../../.. \
     -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc13x2_26x2.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libmbedcrypto/config \
     -DOPENTHREAD_MTD=1 \
-    --c++ \
     -DOPENTHREAD_CONFIG_FILE="openthread-config-cc13x2_26x2-iar-mtd.h" \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/config \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc13x2_26x2-config.h" \
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/lib/iar/m4f/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src \
-    --cpu=Cortex-M4F
+    --cpu=Cortex-M4F \
+    --vla
 
-CPPFLAGS = -I../../.. \
+CPPFLAGS = --c++ \
+    -I../../.. \
+    -Ohz \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
@@ -52,9 +56,9 @@ CPPFLAGS = -I../../.. \
     -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc13x2_26x2.h" \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libmbedcrypto/config \
     -DOPENTHREAD_MTD=1 \
-    --c++ \
     -DOPENTHREAD_CONFIG_FILE="openthread-config-cc13x2_26x2-iar-mtd.h" \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/config \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc13x2_26x2-config.h" \
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/lib/iar/m4f/config \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src \
     --cpu=Cortex-M4F

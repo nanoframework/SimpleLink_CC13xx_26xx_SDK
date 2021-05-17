@@ -7,8 +7,6 @@
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.h -> Application/rcosc_calibration.h",
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/util.c -> Application/util.c",
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/util.h -> Application/util.h",
-            "+../../../../../../../source/ti/ble5stack/common/cc26xx/ecc/ECCROMCC26XX.c -> Drivers/ECC/ECCROMCC26XX.c",
-            "+../../../../../../../source/ti/ble5stack/common/cc26xx/ecc/ECCROMCC26XX.h -> Drivers/ECC/ECCROMCC26XX.h",
             "+../../../../../../../source/ti/ble5stack/icall/src/icall.c -> ICall/icall.c",
             "+../../../../../../../source/ti/ble5stack/icall/src/inc/icall.h -> ICall/icall.h",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_addrs.h -> ICall/icall_addrs.h",

@@ -8,13 +8,12 @@
             "+../../rfEcho_MissedFirstPacket.png -> rfEcho_MissedFirstPacket.png",
             "+../../rfEcho_MissingFirstCouplePackets.png -> rfEcho_MissingFirstCouplePackets.png",
             "+../../rfEcho_ErrorTxRx.png -> rfEcho_ErrorTxRx.png",
-            "+../../rfEchoTx.syscfg -> rfEchoTx.syscfg",
+            "+../rfEchoTx.syscfg -> rfEchoTx.syscfg",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../rfEchoTx.c -> rfEchoTx.c",
             "+../main_tirtos.c -> main_tirtos.c",
             "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352P1_LAUNCHXL_fxns.c -> CC1352P1_LAUNCHXL_fxns.c",
-            "+CC1352P1_LAUNCHXL_TIRTOS.lds -> CC1352P1_LAUNCHXL_TIRTOS.lds"
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds"
         ]
     }
 ]

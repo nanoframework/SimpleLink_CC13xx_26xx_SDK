@@ -74,7 +74,9 @@ $Release Date: PACKAGE RELEASE DATE $
 */
 #ifdef CONFIG_BT_MESH_PROXY
 #define BT_MESH_CONN_FREE 0xFFFF
-#endif
+#define CONN_LIST_SIZE CONFIG_BT_MAX_CONN
+#endif /* CONFIG_BT_MESH_PROXY */
+
 
 /******************************************************************************
  * LOCAL FUNCTIONS DECLARATIONS
@@ -86,7 +88,7 @@ static struct bt_conn *mesh_portingLayer_getConnByHandle(
 static struct bt_conn *mesh_portingLayer_getFreeConn(void);
 static int             mesh_portingLayer_freeConnByHandle(
                                                     uint16_t connectionHandle);
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 static bStatus_t       mesh_portingLayer_registerZephyrScanCB(
                                                     bt_le_scan_cb_t cb);
 
@@ -99,7 +101,7 @@ bStatus_t mesh_portingLayer_gattReadAttCB(uint16 connHandle,
                                           uint8 *pValue, uint16 *pLen,
                                           uint16 offset, uint16 maxLen,
                                           uint8 method );
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 
 /******************************************************************************
 * GLOBAL VARIABLES
@@ -115,7 +117,7 @@ bStatus_t mesh_portingLayer_gattReadAttCB(uint16 connHandle,
 static uint8 meshAdvHandle;
 
 // Zephyr BT Structure
-struct bt_dev bt_dev;
+struct bt_dev bt_dev = {.hci_version = BT_HCI_VERSION_5_1};
 
 #ifdef CONFIG_BT_MESH_PROXY
 // BLE device name
@@ -183,14 +185,14 @@ static struct bt_conn_cb *pZephyrConnCBs;
 static uint16 mtuSize = 0;
 
 // Zephyr connection object
-static struct bt_conn connection;
+static struct bt_conn connectionList[CONN_LIST_SIZE];
 
 // Size of the last written prov_out
 static uint8 lastProvDataOutValSize;
 
 // Size of the last written proxy_out
 static uint8 lastProxyDataOutValSize;
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 
 /******************************************************************************
  * EMPTY FUNCTIONS
@@ -198,18 +200,18 @@ static uint8 lastProxyDataOutValSize;
 #ifdef CONFIG_BT_MESH_PROXY
 ssize_t bt_gatt_attr_read_ccc(struct bt_conn *conn,
                               const struct bt_gatt_attr *attr, void *buf,
-                              u16_t len, u16_t offset){return 0;}
+                              uint16_t len, uint16_t offset){return 0;}
 ssize_t bt_gatt_attr_read_chrc(struct bt_conn *conn,
                                const struct bt_gatt_attr *attr, void *buf,
-                               u16_t len, u16_t offset){return 0;}
+                               uint16_t len, uint16_t offset){return 0;}
 ssize_t bt_gatt_attr_read_service(struct bt_conn *conn,
                                  const struct bt_gatt_attr *attr,
-                                 void *buf, u16_t len, u16_t offset){return 0;}
+                                 void *buf, uint16_t len, uint16_t offset){return 0;}
 ssize_t bt_gatt_attr_write_ccc(struct bt_conn *conn,
                                const struct bt_gatt_attr *attr,
-                               const void *buf, u16_t len, u16_t offset,
-                               u8_t flags){return 0;}
-#endif
+                               const void *buf, uint16_t len, uint16_t offset,
+                               uint8_t flags){return 0;}
+#endif /* CONFIG_BT_MESH_PROXY */
 
 /******************************************************************************
 * CALLBACKS
@@ -259,7 +261,7 @@ void mesh_portingLayer_scanCB(uint32_t evt, void* pMsg, uintptr_t arg)
   {
 
       // Set scanned adv type to non-connectable in Zephyr format
-      adv_type = BT_LE_ADV_NONCONN_IND;
+      adv_type = BT_HCI_ADV_NONCONN_IND;
 
       // Copy RSSI
       rssi = pAdvRpt->rssi;
@@ -376,6 +378,10 @@ bStatus_t mesh_portingLayer_newConnectionCB(gapEstLinkReqEvent_t *inputConn)
   {
     return INVALIDPARAMETER;
   }
+
+  // Stop the Mesh advertising
+  status = bt_le_adv_stop();
+  BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status || bleAlreadyInRequestedMode == status);
 
   // Get connection object pointer to fill
   outputConn = mesh_portingLayer_getFreeConn();
@@ -630,10 +636,19 @@ bStatus_t mesh_portingLayer_proxyProvAttWriteCB( writeCbParams_t *params )
  *
  * @brief   Initializes the handle in internal connection structure
  */
+
 static void mesh_portingLayer_initConnHandle(void)
 {
-  // Flag that conn is free
-  connection.handle = BT_MESH_CONN_FREE;
+  int i = 0;
+
+  // Initialize connection objects list
+  for (i = 0; i < CONN_LIST_SIZE; i++)
+  {
+    struct bt_conn * currConn = &connectionList[i];
+
+    currConn->handle = BT_MESH_CONN_FREE;
+  }
+
 }
 
 /******************************************************************************
@@ -649,11 +664,21 @@ static void mesh_portingLayer_initConnHandle(void)
 static struct bt_conn *mesh_portingLayer_getConnByHandle(
                                                      uint16_t connectionHandle)
 {
-  // Compare handles
-  if (connection.handle == connectionHandle)
+  int i = 0;
+
+  // Search for a connection with the given connection handle
+  // and return it's instance if found
+  for (i = 0; i < CONN_LIST_SIZE; i++)
   {
-    return &connection;
+    struct bt_conn * currConn = &connectionList[i];
+
+    if ( (currConn->handle != BT_MESH_CONN_FREE) && (currConn->handle == connectionHandle) )
+    {
+      return currConn;
+    }
   }
+
+  // If no connection object is found, return NULL
   return NULL;
 }
 
@@ -666,13 +691,21 @@ static struct bt_conn *mesh_portingLayer_getConnByHandle(
  */
 static struct bt_conn *mesh_portingLayer_getFreeConn(void)
 {
-  // If connection handle is marked as free
-  if (connection.handle == BT_MESH_CONN_FREE)
+  int i = 0;
+
+
+  // Find the first available connection object and return it
+  for (i = 0; i < CONN_LIST_SIZE; i++)
   {
-    return &connection;
+    struct bt_conn * currConn = &connectionList[i];
+
+    if (currConn->handle == BT_MESH_CONN_FREE)
+    {
+      return currConn;
+    }
   }
 
-  // Connection is still ongoing
+  // If no connection object is available, return NULL
   return NULL;
 }
 
@@ -725,7 +758,7 @@ void mesh_portingLayer_setDeviceName(uint8_t *name)
 {
   pBleName = (const char *)name;
 }
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 
 
 /******************************************************************************
@@ -761,7 +794,7 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
   static uint8_t  *scnRspData   = NULL;
   static uint8_t   scnRspLen    = 0;
   uint8_t          newSdLen      = 0;
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 
   // Verify input parameters are legal
   if (!param || !ad || (0 == ad_len))
@@ -780,7 +813,7 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
   {
     newSdLen += sd[i].data_len+2;  // add 2 for length and type parameters
   }
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
 
   // Parse Zephyr BLE Stack structures into TI BLE Stack structures
   status = mesh_portingLayer_convertZephAdvParam(param, &tiParams);
@@ -802,7 +835,7 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
 
 #ifdef CONFIG_BT_MESH_PROXY
     mesh_portingLayer_initConnHandle();
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
   }
 
   // If data length has changed, free buffer and reallocate a new one
@@ -908,11 +941,11 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
     status = GapAdv_loadByHandle(meshAdvHandle, GAP_ADV_DATA_TYPE_SCAN_RSP,
                                  scnRspLen, scnRspData);
     BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
-#else
+#else /* CONFIG_BT_MESH_PROXY */
     // Proxy must be enabled for scannable advertisement - Profile defines are
     // not aligned
     BT_LE_PORTING_LAYER_ASSERT(FAILURE);
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */
   }
 
   // Enable continuous advertising (The zephyr default)
@@ -956,8 +989,8 @@ int bt_le_adv_stop(void)
 int bt_le_scan_start(const struct bt_le_scan_param *param, bt_le_scan_cb_t cb)
 {
   bStatus_t status;
-  uint8_t   temp8, type, filter_dup, interval, window;
-  uint16_t  temp16;
+  uint8_t   temp8, type, filter_dup;
+  uint16_t  temp16, interval, window;
 
   status = mesh_portingLayer_convertZephScanParam(param, &type, &filter_dup,
                                                   &interval, &window);
@@ -1234,7 +1267,7 @@ const char *bt_get_name(void)
  *
  * @return Zero on success or (negative) error code on failure.
  */
-int bt_conn_disconnect(struct bt_conn *conn, u8_t reason)
+int bt_conn_disconnect(struct bt_conn *conn, uint8_t reason)
 {
     GAP_TerminateLinkReq(conn->handle, HCI_DISCONNECT_REMOTE_USER_TERM);
     return 0;
@@ -1295,7 +1328,7 @@ void bt_conn_unref(struct bt_conn *conn)
  *
  * @return MTU in bytes
  */
-u16_t bt_gatt_get_mtu(struct bt_conn *conn)
+uint16_t bt_gatt_get_mtu(struct bt_conn *conn)
 {
     return mtuSize;
 }
@@ -1332,7 +1365,7 @@ int bt_gatt_notify_cb(struct bt_conn *conn,
   for (int i = 0; i < 6; i++)
   {
     // Check if attribute is from provisioning table
-    if ((getProvService())->attrs[i].handle == params->attr->handle)
+    if (getProvService() && (getProvService())->attrs[i].handle == params->attr->handle)
     {
       pService = getProvService();
       pChrCfg = getProvClientCharConfig();
@@ -1341,7 +1374,7 @@ int bt_gatt_notify_cb(struct bt_conn *conn,
       break;
     }
     // Check if attribute is from proxy table
-    else if ((getProxyService())->attrs[i].handle == params->attr->handle)
+    else if (getProxyService() && (getProxyService())->attrs[i].handle == params->attr->handle)
     {
       pService = getProxyService();
       pChrCfg = getProxyClientCharConfig();
@@ -1367,4 +1400,4 @@ int bt_gatt_notify_cb(struct bt_conn *conn,
 
   return SUCCESS;
 }
-#endif
+#endif /* CONFIG_BT_MESH_PROXY */

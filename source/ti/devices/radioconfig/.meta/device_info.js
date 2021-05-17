@@ -39,7 +39,7 @@
 "use strict";
 
 // Module version
-const RADIO_CONFIG_VERSION = "1.8";
+const RADIO_CONFIG_VERSION = "1.9";
 
 // Common utility functions
 const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
@@ -53,6 +53,8 @@ const DevNameMap = {
     CC1352R1F3RGZ: "cc1352r",
     CC1352P1F3RGZ: "cc1352p",
     CC1312R1F3RGZ: "cc1312r",
+    CC2672R3RGZ: "cc2672r",
+    CC2672P3RGZ: "cc2672p",
     CC2652R1FRGZ: "cc2652r",
     CC2642R1FRGZ: "cc2642r",
     CC2652P1FRGZ: "cc2652p",
@@ -61,16 +63,25 @@ const DevNameMap = {
     // SIP
     CC2652R1FSIP: "cc2652rsip",
     CC2652P1FSIP: "cc2652psip",
-    // Agama 704
+    // Device class 7
     CC1312R7RGZ: "cc1312r7",
     CC2652R7RGZ: "cc2652r7",
     CC2652P7RGZ: "cc2652p7",
     CC1352P7RGZ: "cc1352p7",
-    // Agama Lite
+    // Device class 3
     CC2651R3RGZ: "cc2651r3",
+    CC2651R3RKP: "cc2651r3",
     CC2651P3RGZ: "cc2651p3",
+    CC2651P3RKP: "cc2651p3",
+    CC1311R3RGZ: "cc1311r3",
+    CC1311R3RKP: "cc1311r3",
     CC1311P3RGZ: "cc1311p3",
-    CC1311R3RGZ: "cc1311r3"
+    // Device class 10
+    CC2654R10RGZ: "cc2654r10",
+    CC2654P10RGZ: "cc2654p10",
+    CC1314R10RGZ: "cc1314r10",
+    CC1354R10RGZ: "cc1354r10",
+    CC1354P10RGZ: "cc1354p10"
 };
 
 // SmartRF Studio compatible device name
@@ -78,10 +89,14 @@ const DeviceName = DevNameMap[Common.Device] || "none";
 const DeviceSupported = DeviceName !== "none";
 
 // True if High PA device
-const HighPaDevice = DeviceName.includes("cc1352p") || DeviceName.includes("cc2652p");
+const HighPaDevice = DeviceName.includes("cc1352p")
+    || DeviceName.includes("cc2652p")
+    || DeviceName.includes("cc2672p")
+    || DeviceName.includes("cc1311p")
+    || DeviceName.includes("cc2651p");
 
 // True if wBMS support
-const wbmsSupport = DeviceName === "cc2642r";
+const wbmsSupport = DeviceName === "cc2642r" || DeviceName === "cc2652r";
 
 /*
  * Global device information
@@ -137,14 +152,6 @@ exports = {
 function loadConfiguration(phy) {
     const fileName = DevInfo.phyGroup[phy].paramPath + "param_syscfg.json";
     const devCfg = system.getScript(fileName);
-    if (wbmsSupport) {
-        devCfg.configs[0].options.push(
-            {
-                name: "wbms2m",
-                description: "wBMS, 2 Mbps"
-            }
-        );
-    }
     return devCfg;
 }
 
@@ -291,13 +298,7 @@ function getFilePathPhy(file, phy) {
 function addPhyGroup(phy) {
     const phyPath = getFilePathPhy("rf_command_definitions.json", phy);
     const phyDir = phyPath.slice(0, -1);
-    let paramPath;
-    if (DeviceName === "cc2652p" && phy === Common.PHY_PROP) {
-        paramPath = getFilePathPhy("categories.json", phy) + "../";
-    }
-    else {
-        paramPath = getFilePathPhy("param_definition.json", phy);
-    }
+    const paramPath = getFilePathPhy("categories.json", phy) + "../";
 
     const phyInfo = {
         phy: phy,

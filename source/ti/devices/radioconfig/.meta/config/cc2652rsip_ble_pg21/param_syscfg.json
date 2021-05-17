@@ -7,23 +7,23 @@
             "options": [
                 {
                     "name": "bt5le1m",
-                    "displayName": "Bluetooth 5, 1 Mbps"
+                    "displayName": "BLE, 1 Mbps, LE 1M (Preview)"
                 },
                 {
                     "name": "bt5le1madvnc",
-                    "displayName": "Bluetooth 5, 1 Mbps, BT4 compatible"
+                    "displayName": "BLE, 1 Mbps, BT4 (Preview)"
                 },
                 {
                     "name": "bt5le2m",
-                    "displayName": "Bluetooth 5, 2 Mbps"
+                    "displayName": "BLE, 2 Mbps, LE 2M (Preview)"
                 },
                 {
                     "name": "bt5lecodeds2",
-                    "displayName": "Bluetooth 5, 500 kbps"
+                    "displayName": "BLE, 500 kbps, LE Coded (Preview)"
                 },
                 {
                     "name": "bt5lecodeds8",
-                    "displayName": "Bluetooth 5, 125 kbps"
+                    "displayName": "BLE, 125 kbps, LE Coded (Preview)"
                 }
             ],
             "default": "bt5le1m"
@@ -287,86 +287,32 @@
         }
     ],
     "phys": {
-        "ble": {
-            "standard": [
-                {
-                    "name": "bt5le1m",
-                    "description": "Bluetooth 5, 1 Mbps",
-                    "file": "setting_bt5_le_1m.json"
-                },
-                {
-                    "name": "bt5le1madvnc",
-                    "description": "Bluetooth 5, 1 Mbps, BT4 compatible",
-                    "file": "setting_bt5_le_1m_adv_nc.json"
-                },
-                {
-                    "name": "bt5le2m",
-                    "description": "Bluetooth 5, 2 Mbps",
-                    "file": "setting_bt5_le_2m.json"
-                },
-                {
-                    "name": "bt5lecodeds2",
-                    "description": "Bluetooth 5, 500 kbps",
-                    "file": "setting_bt5_le_coded_s2.json"
-                },
-                {
-                    "name": "bt5lecodeds8",
-                    "description": "Bluetooth 5, 125 kbps",
-                    "file": "setting_bt5_le_coded_s8.json"
-                }
-            ],
-            "highPA": [
-                {
-                    "name": "bt5le1m",
-                    "description": "Bluetooth 5, 1 Mbps",
-                    "file": "setting_bt5_le_1m.json"
-                },
-                {
-                    "name": "bt5le1madvnc",
-                    "description": "Bluetooth 5, 1 Mbps, BT4 compatible",
-                    "file": "setting_bt5_le_1m_adv_nc.json"
-                },
-                {
-                    "name": "bt5le2m",
-                    "description": "Bluetooth 5, 2 Mbps",
-                    "file": "setting_bt5_le_2m.json"
-                },
-                {
-                    "name": "bt5lecodeds2",
-                    "description": "Bluetooth 5, 500 kbps",
-                    "file": "setting_bt5_le_coded_s2.json"
-                },
-                {
-                    "name": "bt5lecodeds8",
-                    "description": "Bluetooth 5, 125 kbps",
-                    "file": "setting_bt5_le_coded_s8.json"
-                },
-                {
-                    "name": "bt5le1mp10",
-                    "description": "Bluetooth 5, 1 Mbps, 10 dBm",
-                    "file": "setting_bt5_le_1m_10_dbm.json"
-                },
-                {
-                    "name": "bt5le1madvncp10",
-                    "description": "Bluetooth 5, 1 Mbps, BT4 compatible, 10 dBm",
-                    "file": "setting_bt5_le_1m_adv_nc_10_dbm.json"
-                },
-                {
-                    "name": "bt5le2mp10",
-                    "description": "Bluetooth 5, 2 Mbps, 10 dBm",
-                    "file": "setting_bt5_le_2m_10_dbm.json"
-                },
-                {
-                    "name": "bt5lecodeds2p10",
-                    "description": "Bluetooth 5, 500 kbps, 10 dBm",
-                    "file": "setting_bt5_le_coded_s2_10_dbm.json"
-                },
-                {
-                    "name": "bt5lecodeds8p10",
-                    "description": "Bluetooth 5, 125 kbps, 10 dBm",
-                    "file": "setting_bt5_le_coded_s8_10_dbm.json"
-                }
-            ]
-        }
+        "ble": [
+            {
+                "file": "setting_bt5_le_1m.json",
+                "name": "bt5le1m",
+                "description": "BLE, 1 Mbps, LE 1M (Preview)"
+            },
+            {
+                "file": "setting_bt5_le_1m_adv_nc.json",
+                "name": "bt5le1madvnc",
+                "description": "BLE, 1 Mbps, BT4 (Preview)"
+            },
+            {
+                "file": "setting_bt5_le_2m.json",
+                "name": "bt5le2m",
+                "description": "BLE, 2 Mbps, LE 2M (Preview)"
+            },
+            {
+                "file": "setting_bt5_le_coded_s2.json",
+                "name": "bt5lecodeds2",
+                "description": "BLE, 500 kbps, LE Coded (Preview)"
+            },
+            {
+                "file": "setting_bt5_le_coded_s8.json",
+                "name": "bt5lecodeds8",
+                "description": "BLE, 125 kbps, LE Coded (Preview)"
+            }
+        ]
     }
 }

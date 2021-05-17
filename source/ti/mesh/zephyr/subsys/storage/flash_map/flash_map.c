@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2017 Nordic Semiconductor ASA
+ * Copyright (c) 2015 Runtime Inc
+ * Copyright (c) 2017 Linaro Ltd
+ * Copyright (c) 2020 Gerson Fernando Budke <nandojve@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifdef CONFIG_BT_SETTINGS
 #include <zephyr/types.h>
@@ -8,28 +16,20 @@
 #include <drivers/flash.h>
 #include <zephyr.h>
 
-/******************************************************************************
- * STRUCTURES
- */
+
 struct layout_data {
-	u32_t area_idx;
-	u32_t area_off;
-	u32_t area_len;
+	uint32_t area_idx;
+	uint32_t area_off;
+	uint32_t area_len;
 	void *ret;        /* struct flash_area* or struct flash_sector* */
-	u32_t ret_idx;
-	u32_t ret_len;
+	uint32_t ret_idx;
+	uint32_t ret_len;
 	int status;
 };
 
-/*********************************************************************
-* GLOBAL VARIABLES
-*/
 extern const struct flash_area *flash_map;
 extern const int flash_map_entries;
 
-/*********************************************************************
-* STATIC FUNCTIONS
-*/
 static struct flash_area const *get_flash_area_from_id(int idx)
 {
 	for (int i = 0; i < flash_map_entries; i++) {
@@ -73,8 +73,9 @@ static bool should_bail(const struct flash_pages_info *info,
 	return false;
 }
 
+
 // Iterate over all flash pages on a device
-static void flash_page_foreach(struct device *dev, flash_page_cb cb, void *data)
+static void flash_page_foreach(const struct device *dev, flash_page_cb cb, void *data)
 {
   const struct flash_driver_api *api = dev->driver_api;
   const struct flash_pages_layout *layout;
@@ -108,10 +109,10 @@ static void flash_page_foreach(struct device *dev, flash_page_cb cb, void *data)
  * flash_area_get_sectors(). A lot of this can be inlined once
  * flash_area_to_sectors() is removed.
  */
-static int flash_area_layout(int idx, u32_t *cnt, void *ret,
+static int flash_area_layout(int idx, uint32_t *cnt, void *ret,
 flash_page_cb cb, struct layout_data *cb_data)
 {
-	struct device *flash_dev;
+	const struct device *flash_dev;
 
 	cb_data->area_idx = idx;
 
@@ -162,11 +163,8 @@ static bool get_sectors_cb(const struct flash_pages_info *info, void *datav)
 	return true;
 }
 
-/*********************************************************************
-* PUBLIC FUNCTIONS
-*/
 
-int flash_area_open(u8_t id, const struct flash_area **fap)
+int flash_area_open(uint8_t id, const struct flash_area **fap)
 {
 	const struct flash_area *area;
 
@@ -184,7 +182,7 @@ int flash_area_open(u8_t id, const struct flash_area **fap)
 	return 0;
 }
 
-int flash_area_get_sectors(int idx, u32_t *cnt, struct flash_sector *ret)
+int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret)
 {
 	struct layout_data data;
 	int err = flash_area_layout(idx, cnt, ret, get_sectors_cb, &data);

@@ -28,12 +28,12 @@
     </makefiles>
     <targets>
         <target name="ti.targets.arm.elf.M4F"
-            version="ti.targets.arm.elf.M4F{1,0,20.2,1"
-            rawVersion="20.2.1"
+            version="ti.targets.arm.elf.M4F{1,0,20.2,4"
+            rawVersion="20.2.4"
             platform="ti.platforms.tiva:TM4C1294NCPDT:1"
             isa="v7M4"
             suffix="em4f"
-            rootDir="/scratch/xlibrary/.conan/data/ticodegen/20.2.1.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
+            rootDir="/scratch/xlibrary/.conan/data/ticodegen/20.2.4.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c"
             os="undefined"
             rts="ti.targets.arm.rtsarm">
             <model endian="little"

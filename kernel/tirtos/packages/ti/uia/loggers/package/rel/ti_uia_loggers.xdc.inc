@@ -15,3 +15,7 @@ LoggerMin.c
 lib/release/ti.uia.loggers.am4f
 lib/release/ti.uia.loggers.am4fg
 lib/release/ti.uia.loggers.arm4f
+lib/release/ti.uia.loggers.aem4
+lib/release/ti.uia.loggers.am4
+lib/release/ti.uia.loggers.am4g
+lib/release/ti.uia.loggers.arm4

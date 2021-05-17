@@ -200,7 +200,7 @@ function getPaTableValues(rfDesign, tableOptions)
                                                     config.displayName.valueOf() >= 14);
     }
     // If using CC1352P-4 device
-    else if(rfDesign == "LAUNCHXL-CC1352P-4" || rfDesign == "LP_CC2652PSIP")
+    else if(rfDesign == "LAUNCHXL-CC1352P-4" || rfDesign == "LP_CC2652PSIP" || rfDesign == "LP_CC1352P7-4")
     {
         currentOptions = tableOptions.filter(config => config.displayName.valueOf() <= 10);
     }
@@ -227,6 +227,13 @@ function getRfDesignOptions(deviceId)
             {name: "LAUNCHXL-CC1352P-4"}
         ];
     }
+    else if(deviceId === "CC1352P7RGZ")
+    {
+        newRfDesignOptions = [
+            {name: "LP_CC1352P7-1"},
+            {name: "LP_CC1352P7-4"}
+        ];
+    }
     else if(deviceId === "CC1352R1F3RGZ")
     {
         newRfDesignOptions = [{name: "LAUNCHXL-CC1352R1"}];
@@ -241,7 +248,7 @@ function getRfDesignOptions(deviceId)
     }
     else if(deviceId === "CC2652RB1FRGZ")
     {
-        newRfDesignOptions = [{name: "LAUNCHXL-CC2652RB"}];
+        newRfDesignOptions = [{name: "LP_CC2652RB"}];
     }
     else if(deviceId === "CC2652P1FSIP")
     {
@@ -250,6 +257,10 @@ function getRfDesignOptions(deviceId)
     else if(deviceId === "CC2652R1FSIP")
     {
         newRfDesignOptions = [{name: "LP_CC2652RSIP"}];
+    }
+    else if(deviceId === "CC2652R7RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652R7"}];
     }
 
     return(newRfDesignOptions);
@@ -324,10 +335,10 @@ function moduleInstances(inst)
         permission: "ReadOnly"
     }
 
-    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC2652PSIP")
+    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC2652PSIP" || inst.rfDesign == "LP_CC1352P7-4")
     {
         args.highPA = true;
-        if(inst.rfDesign == "LAUNCHXL-CC1352P-4")
+        if(inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC1352P7-4")
         {
             args.phyType = "bt5le1mp10";
             args.txPowerHi = "10";

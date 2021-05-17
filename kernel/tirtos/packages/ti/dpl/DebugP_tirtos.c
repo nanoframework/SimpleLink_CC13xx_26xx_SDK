@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,9 +46,11 @@
  */
 void _DebugP_assert(int expression, const char *file, int line)
 {
+#ifndef ti_sysbios_runtime_Assert__include
     if (!expression) {
         xdc_runtime_Assert_raise__I(Module__MID, file, line, 0U);
     }
+#endif
 }
 /*
  *  ======== DebugP_log0 ========

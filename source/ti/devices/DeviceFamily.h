@@ -64,15 +64,16 @@ extern "C" {
 #define DeviceFamily_ID_CC26X2                 5
 #define DeviceFamily_ID_CC3200                 6
 #define DeviceFamily_ID_CC3220                 7
-#define DeviceFamily_ID_MSP432E401Y            8
-#define DeviceFamily_ID_MSP432E411Y            9
-#define DeviceFamily_ID_CC13X1                 10
-#define DeviceFamily_ID_CC26X1                 11
-#define DeviceFamily_ID_CC13X2X7               12
-#define DeviceFamily_ID_CC26X2X7               13
-#define DeviceFamily_ID_CC13X1_CC26X1          14
-#define DeviceFamily_ID_CC13X2_CC26X2          15
-#define DeviceFamily_ID_CC13X2X7_CC26X2X7      16
+#define DeviceFamily_ID_CC13X1                 8
+#define DeviceFamily_ID_CC26X1                 9
+#define DeviceFamily_ID_CC13X2X7               10
+#define DeviceFamily_ID_CC26X2X7               11
+#define DeviceFamily_ID_CC13X1_CC26X1          12
+#define DeviceFamily_ID_CC13X2_CC26X2          13
+#define DeviceFamily_ID_CC13X2X7_CC26X2X7      14
+#define DeviceFamily_ID_CC13X4_CC26X4          15
+#define DeviceFamily_ID_CC13X4                 16
+#define DeviceFamily_ID_CC26X4                 17
 
 /*
  * DeviceFamily_PARENT_XYZ values.
@@ -83,8 +84,8 @@ extern "C" {
  */
 #define DeviceFamily_PARENT_CC13X0_CC26X0      1
 #define DeviceFamily_PARENT_CC13X2_CC26X2      2
-#define DeviceFamily_PARENT_MSP432E4X1Y        3
-#define DeviceFamily_PARENT_CC13X1_CC26X1      4
+#define DeviceFamily_PARENT_CC13X1_CC26X1      3
+#define DeviceFamily_PARENT_CC13X4_CC26X4      4
 
 /*
  * Lookup table that sets DeviceFamily_ID, DeviceFamily_DIRECTORY, and
@@ -112,6 +113,11 @@ extern "C" {
     #define DeviceFamily_DIRECTORY      cc13x2x7_cc26x2x7
     #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
 
+#elif defined(DeviceFamily_CC13X4)
+    #define DeviceFamily_ID             DeviceFamily_ID_CC13X4
+    #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+
 #elif defined(DeviceFamily_CC26X0)
     #define DeviceFamily_ID             DeviceFamily_ID_CC26X0
     #define DeviceFamily_DIRECTORY      cc26x0
@@ -137,6 +143,11 @@ extern "C" {
     #define DeviceFamily_DIRECTORY      cc13x2x7_cc26x2x7
     #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
 
+#elif defined(DeviceFamily_CC26X4)
+    #define DeviceFamily_ID             DeviceFamily_ID_CC26X4
+    #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+
 #elif defined(DeviceFamily_CC13X1_CC26X1)
     #define DeviceFamily_ID             DeviceFamily_ID_CC13X1_CC26X1
     #define DeviceFamily_DIRECTORY      cc13x1_cc26x1
@@ -152,6 +163,11 @@ extern "C" {
     #define DeviceFamily_DIRECTORY      cc13x2x7_cc26x2x7
     #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
 
+#elif defined(DeviceFamily_CC13X4_CC26X4)
+    #define DeviceFamily_ID             DeviceFamily_ID_CC13X4_CC26X4
+    #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+
 #elif defined(DeviceFamily_CC3200)
     #define DeviceFamily_ID             DeviceFamily_ID_CC3200
     #define DeviceFamily_DIRECTORY      cc32xx
@@ -159,22 +175,6 @@ extern "C" {
 #elif defined(DeviceFamily_CC3220)
     #define DeviceFamily_ID             DeviceFamily_ID_CC3220
     #define DeviceFamily_DIRECTORY      cc32xx
-
-#elif defined(DeviceFamily_MSP432E401Y)
-    #define DeviceFamily_ID             DeviceFamily_ID_MSP432E401Y
-    #define DeviceFamily_PARENT         DeviceFamily_PARENT_MSP432E4X1Y
-    #define DeviceFamily_DIRECTORY      msp432e4
-    #if !defined(__MSP432E401Y__)
-        #define __MSP432E401Y__
-    #endif
-
-#elif defined(DeviceFamily_MSP432E411Y)
-    #define DeviceFamily_ID             DeviceFamily_ID_MSP432E411Y
-    #define DeviceFamily_PARENT         DeviceFamily_PARENT_MSP432E4X1Y
-    #define DeviceFamily_DIRECTORY      msp432e4
-    #if !defined(__MSP432E411Y__)
-        #define __MSP432E411Y__
-    #endif
 
 #else
     #error "DeviceFamily_XYZ undefined. You must define a DeviceFamily_XYZ!"
@@ -187,7 +187,6 @@ extern "C" {
     + defined(DeviceFamily_CC26X1) + defined(DeviceFamily_CC26X2)           \
     + defined(DeviceFamily_CC26X2X7)                                        \
     + defined(DeviceFamily_CC3200) + defined(DeviceFamily_CC3220)           \
-    + defined(DeviceFamily_MSP432E401Y) + defined(DeviceFamily_MSP432E411Y) \
     ) > 1
     #error More then one DeviceFamily has been defined!
 #endif

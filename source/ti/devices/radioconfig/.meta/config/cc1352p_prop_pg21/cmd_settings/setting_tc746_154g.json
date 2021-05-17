@@ -135,7 +135,7 @@
                     },
                     {
                         "_name": "intFreq",
-                        "$": "0x0C00"
+                        "$": "0x0999"
                     },
                     {
                         "_name": "loDivider",

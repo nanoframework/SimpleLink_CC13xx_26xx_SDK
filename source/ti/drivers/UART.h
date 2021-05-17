@@ -703,7 +703,7 @@ extern void UART_close(UART_Handle handle);
  *          #UART_Handle.
  *
  *  Commands for %UART_control() can originate from UART.h or from implementation
- *  specific UART*.h (_UARTCC26XX.h_, _UARTMSP432E4.h_, etc.. ) files.
+ *  specific UART*.h (_UARTCC26XX.h_, etc.. ) files.
  *  While commands from UART.h are API portable across driver implementations,
  *  not all implementations may support all these commands.
  *  Conversely, commands from driver implementation specific UART*.h files add

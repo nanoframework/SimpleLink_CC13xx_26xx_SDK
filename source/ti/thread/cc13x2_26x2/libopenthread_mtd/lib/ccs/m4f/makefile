@@ -37,9 +37,9 @@ CFLAGS = -I../../.. \
     -D_DEFAULT_SOURCE=1 \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc13x2_26x2.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_cc13x2_26x2_ccs/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \
     -DOPENTHREAD_MTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc13x2_26x2-ccs-mtd.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \
     -I${WorkspaceDirPath}/libopenthread_mtd_cc13x2_26x2_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \
@@ -81,9 +81,9 @@ CPPFLAGS = -I../../.. \
     -D_DEFAULT_SOURCE=1 \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc13x2_26x2.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_cc13x2_26x2_ccs/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \
     -DOPENTHREAD_MTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc13x2_26x2-ccs-mtd.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \
     -I${WorkspaceDirPath}/libopenthread_mtd_cc13x2_26x2_ccs/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \

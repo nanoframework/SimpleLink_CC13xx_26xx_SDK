@@ -39,12 +39,7 @@
 #include <ti/drivers/itm/hw_cpu_itm.h>
 
 #include <ti/devices/DeviceFamily.h>
-#if (DeviceFamily_PARENT != DeviceFamily_PARENT_MSP432E4X1Y)
-    #include DeviceFamily_constructPath(inc/hw_types.h)
-#else
-    /* MSP defines the HWREG type in a different header, include it */
-    #include DeviceFamily_constructPath(driverlib/types.h)
-#endif
+#include DeviceFamily_constructPath(inc/hw_types.h)
 
 #include <stdint.h>
 #include <stdbool.h>

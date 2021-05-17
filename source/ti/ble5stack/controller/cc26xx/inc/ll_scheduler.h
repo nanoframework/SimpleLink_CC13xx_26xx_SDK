@@ -138,11 +138,6 @@ extern "C"
 #define LL_NUM_TASK_BLOCKS                    (NUM_TASK_BLOCKS_ADV_NCONN_CFG + \
                                                NUM_TASK_BLOCKS_SCAN_CFG + 1)
 
-// scheduler priority
-#define SCHEDULER_PRIORITY_LOW                          0
-#define SCHEDULER_PRIORITY_MED                          1
-#define SCHEDULER_PRIORITY_HIGH                         2
-
 /*******************************************************************************
  * TYPEDEFS
  */

@@ -80,7 +80,10 @@ extern "C" {
 #define DeviceType_ID_CC2652RB      11
 #define DeviceType_ID_CC2652RSIP    12
 #define DeviceType_ID_CC2652PSIP    13
-
+#define DeviceType_ID_CC1352P7_1    14
+#define DeviceType_ID_CC1352P7_4    15
+#define DeviceType_ID_CC1312R7      16
+#define DeviceType_ID_CC2652R7      17
 /*
  * Lookup table that sets DeviceType_ID based on the defined device type
  * in ti_drivers_config.h
@@ -105,12 +108,20 @@ extern "C" {
     #define DeviceType_ID       DeviceType_ID_CC2642R1
 #elif defined(LAUNCHXL_CC26X2R1)
     #define DeviceType_ID       DeviceType_ID_CC2652R1
-#elif defined(LAUNCHXL_CC2652RB)
+#elif defined(LP_CC2652RB)
     #define DeviceType_ID       DeviceType_ID_CC2652RB
 #elif defined(LP_CC2652RSIP)
     #define DeviceType_ID       DeviceType_ID_CC2652RSIP
 #elif defined(LP_CC2652PSIP)
     #define DeviceType_ID       DeviceType_ID_CC2652PSIP
+#elif defined(LP_CC1352P7_1)
+    #define DeviceType_ID       DeviceType_ID_CC1352P7_1
+#elif defined(LP_CC1352P7_4)
+    #define DeviceType_ID       DeviceType_ID_CC1352P7_4
+#elif defined(LP_CC1312R7)
+    #define DeviceType_ID       DeviceType_ID_CC1312R7
+#elif defined(LP_CC2652R7)
+    #define DeviceType_ID       DeviceType_ID_CC2652R7
 #else
     #define DeviceType_ID       DeviceType_ID_GENERIC
 #endif
@@ -125,9 +136,13 @@ extern "C" {
     + defined(LAUNCHXL_CC1352P_4)                                       \
     + defined(CONFIG_CC2642R1FRGZ)                                      \
     + defined(LAUNCHXL_CC26X2R1)                                        \
-    + defined(LAUNCHXL_CC2652RB)                                        \
-    + defined(LP_CC2652RSIP)                                        \
-    + defined(LP_CC2652PSIP)                                        \
+    + defined(LP_CC2652RB)                                        \
+    + defined(LP_CC2652RSIP)                                            \
+    + defined(LP_CC2652PSIP)                                            \
+    + defined(LP_CC1352P7_1)                                            \
+    + defined(LP_CC1352P7_4)                                            \
+    + defined(LP_CC1312R7)                                              \
+    + defined(LP_CC2652R7)                                              \
     ) > 1
     #error "More then one DeviceType has been defined!"
 #endif

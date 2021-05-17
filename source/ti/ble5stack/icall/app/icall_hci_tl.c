@@ -62,6 +62,7 @@
 #if defined(GAP_BOND_MGR)
 #include "gapbondmgr_internal.h"
 #endif //GAP_BOND_MGR
+#include "gap_internal.h"
 
 #if (defined(HCI_TL_FULL) || defined(PTM_MODE))
 #include "inc/npi_ble.h"
@@ -122,7 +123,6 @@
  * highest order bit of this field can be used to switch the rules parameter
  * from specifying a pointer to an extended array of rules for large commands.
  */
-
 // Number of parameters supported
 #define HCI_MAX_NUM_ARGS                          12
 #define HCI_DEFAULT_NUM_RULES                      8
@@ -250,6 +250,10 @@
 #define HCI_MAX_TL_AE_DATA_LEN                   251
 
 #define ADV_LEGACY_SET_HANDLE                    0
+
+#ifdef BLE3_CMD
+#define GAP_MAKE_ADDR_RS(pAddr)  ((pAddr[B_ADDR_LEN-1] |= STATIC_ADDR_HDR))
+#endif
 /*********************************************************************
  * TYPEDEFS
  */
@@ -346,7 +350,6 @@ typedef struct
 extern uint32         lastAppOpcodeIdxSent;
 extern const uint16_t ll_buildRevision;
 extern gattAttribute_t gattAttrTbl[];
-
 /*********************************************************************
  * LOCAL VARIABLES
  */
@@ -368,6 +371,33 @@ static aeEnableScanCmd_t    hci_tl_cmdScanEnable;
 #if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
 static uint8_t              host_tl_gapScannerInitialized;
 #endif
+
+#ifdef BLE3_CMD
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+// Default - infinite advertising
+uint16_t advDuration = 0;
+uint8_t advHandleLegacy = 0xFF;
+uint8_t advUpdateApp = 0;
+uint8_t advLegacyState = 0;
+uint8_t advEventCntr = 0;
+uint8_t maxConnReached = 0;
+#endif
+
+#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
+// Default - infinite scan
+uint16_t scanDuration = 0;
+uint8_t legacyScanFlag = 0;
+uint8_t numDev = 0;
+uint8_t scanSummarySent = 0;
+#endif
+
+uint8_t advNotice = 0;
+uint8_t scanNotice = 0;
+uint8_t sendEstEvt = 0;
+uint8_t maxNumReports = 0;
+uint8_t legacyConnCancel = 0;
+deviceInfo_t *deviceInfoArr = NULL;
+#endif // BLE3_CMD
 
 #if defined(GAP_BOND_MGR)
 uint32_t host_tl_defaultPasscode = B_APP_DEFAULT_PASSCODE;
@@ -579,6 +609,8 @@ static hciEntry_t hciTranslationTable[] =
   HCI_TRANSLATION_ENTRY(HCI_EXT_MAP_PM_IO_PORT,                        IDX_CAST IDX_HCI_EXT_MapPmIoPortCmd,                       HU8,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_SET_FREQ_TUNE,                         IDX_CAST IDX_HCI_EXT_SetFreqTuneCmd,                       HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_SAVE_FREQ_TUNE,                        IDX_CAST IDX_HCI_EXT_SaveFreqTuneCmd,                      HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_PARAMETERS,                    IDX_CAST IDX_HCI_EXT_SetQOSParameters,                     HU8,     HU8,     HU32,    HU16,    HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_DEFAULT_PARAMETERS,            IDX_CAST IDX_HCI_EXT_SetQOSDefaultParameters,              HU32,    HU8,     HU8,     HNP,     HNP,     HNP,     HNP,     HNP),
 #ifndef HOST_CONFIG
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & ADV_NCONN_CFG )
   HCI_TRANSLATION_ENTRY(HCI_EXT_LE_SET_EXT_VIRTUAL_ADV_ADDRESS,        IDX_CAST IDX_HCI_EXT_SetVirtualAdvAddrCmd,                 HU8,     HAB,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
@@ -594,8 +626,6 @@ static hciEntry_t hciTranslationTable[] =
   HCI_TRANSLATION_ENTRY(HCI_EXT_GET_CONNECTION_INFO,                   IDX_CAST IDX_HCI_EXT_GetConnInfoCmd,                       HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_GET_ACTIVE_CONNECTION_INFO,            IDX_CAST IDX_HCI_EXT_GetActiveConnInfoCmd,                 HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
   HCI_TRANSLATION_ENTRY(HCI_EXT_OVERLAPPED_PROCESSING,                 IDX_CAST IDX_HCI_EXT_OverlappedProcessingCmd,              HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
-  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_PARAMETERS,                    IDX_CAST IDX_HCI_EXT_SetQOSParameters,                     HU8,     HU8,     HU32,    HU16,    HNP,     HNP,     HNP,     HNP),
-  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_QOS_DEFAULT_PARAMETERS,            IDX_CAST IDX_HCI_EXT_SetQOSDefaultParameters,              HU8,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
 #endif // (defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG)))
 
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & ADV_CONN_CFG)
@@ -1323,6 +1353,20 @@ static void HCI_TL_SendCommandPkt(hciPacket_t *pMsg)
                     args[10],
                     args[11]);
   }
+#ifdef BLE3_CMD
+  else
+  {
+    // adv and scan notice hci command doesn't return command complete or command status event.
+    if( cmdOpCode == HCI_EXT_ADV_EVENT_NOTICE )
+    {
+      advNotice = 1;
+    }
+    else if( cmdOpCode == HCI_EXT_SCAN_EVENT_NOTICE )
+    {
+      scanNotice = 1;
+    }
+  }
+#endif // BLE3_CMD
 #ifndef HOST_CONFIG
   else
   {
@@ -3066,46 +3110,133 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
       case GAP_EVT_SCAN_INT_ENDED:
       case GAP_EVT_SCAN_WND_ENDED:
       {
-        uint8_t data[7];
-        data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        data[2] = 0;  // Status
-        data[3] = BREAK_UINT32(event, 0);
-        data[4] = BREAK_UINT32(event, 1);
-        data[5] = BREAK_UINT32(event, 2);
-        data[6] = BREAK_UINT32(event, 3);
-        HCI_TL_SendVSEvent(data, sizeof(data));
-        if (pData)
+#ifdef BLE3_CMD
+        if ( (event == GAP_EVT_SCAN_INT_ENDED) ||
+             (event == GAP_EVT_SCAN_WND_ENDED) )
         {
-          ICall_free(pData);
+          // send scan notice event
+          uint8_t data[5] = {0};
+          data[0] = LO_UINT16(HCI_EXT_SCAN_EVENT_NOTICE_EVENT);
+          data[1] = HI_UINT16(HCI_EXT_SCAN_EVENT_NOTICE_EVENT);
+          data[2] = SUCCESS;
+          data[3] = LO_UINT16(HCI_EXT_SCAN_EVENT_NOTICE);
+          data[4] = HI_UINT16(HCI_EXT_SCAN_EVENT_NOTICE);
+
+          HCI_TL_SendVSEvent(data, 5);
         }
-        break;
-      }
-      case GAP_EVT_SCAN_DISABLED:
-      {
-        if (pData)
+        else if( legacyScanFlag )
         {
-          GapScan_Evt_End_t * advEndRpt = (GapScan_Evt_End_t *) pData;
-          uint8_t data[9];
+          uint8_t *pDataOut = NULL;
+          if( maxNumReports )
+          {
+            uint8_t pktLen = 4 + 8*numDev;
+            uint8_t i;
+
+            pDataOut = ICall_malloc(pktLen);
+            if( pDataOut )
+            {
+              uint8_t ind = 4;
+              pDataOut[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_DISCOVERY_EVENT);
+              pDataOut[1] = HI_UINT16(HCI_EXT_GAP_DEVICE_DISCOVERY_EVENT);
+              pDataOut[2] = 0;      // Status
+              pDataOut[3] = numDev; // Number of devices discovered
+              // Copy the devices information
+              for (i = 0; i < numDev; i++)
+              {
+                pDataOut[ind] = deviceInfoArr[i].evtType;
+                ind++;
+                pDataOut[ind] = deviceInfoArr[i].addrType;
+                ind++;
+                VOID memcpy(&pDataOut[ind], deviceInfoArr[i].addr, B_ADDR_LEN);
+                ind += B_ADDR_LEN;
+              }
+              HCI_TL_SendVSEvent(pDataOut, pktLen);
+              scanSummarySent = 1;
+              numDev = 0;
+            }
+          }
+          if( pDataOut )
+          {
+            ICall_free(pDataOut);
+          }
+        }
+        else
+        {
+#endif
+          uint8_t data[7];
           data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
           data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-          data[2] = 0; // Status
+          data[2] = 0;  // Status
           data[3] = BREAK_UINT32(event, 0);
           data[4] = BREAK_UINT32(event, 1);
           data[5] = BREAK_UINT32(event, 2);
           data[6] = BREAK_UINT32(event, 3);
-          data[7] = advEndRpt->reason;    //Reason
-          data[8] = advEndRpt->numReport; //Number of Report collected
           HCI_TL_SendVSEvent(data, sizeof(data));
+#ifdef BLE3_CMD
+	}
+#endif
+        if (pData)
+        {
           ICall_free(pData);
         }
         break;
       }
+
+      case GAP_EVT_SCAN_DISABLED:
+      {
+#ifdef BLE3_CMD
+        if( legacyScanFlag && !scanSummarySent )
+        {
+          uint8_t data[4];
+          data[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_DISCOVERY_EVENT);
+          data[1] = HI_UINT16(HCI_EXT_GAP_DEVICE_DISCOVERY_EVENT);
+          data[2] = bleGAPUserCanceled; // Status
+          data[3] = 0; // numDev;
+          // Send the event
+          HCI_TL_SendVSEvent(data, sizeof(data));
+          numDev = 0;
+          legacyScanFlag = 0;
+        }
+        else if( legacyScanFlag && scanSummarySent )
+        {
+          legacyScanFlag = 0;
+          scanSummarySent = 0;
+        }
+        else
+        {
+#endif
+          if (pData)
+          {
+            GapScan_Evt_End_t * advEndRpt = (GapScan_Evt_End_t *) pData;
+            uint8_t data[9];
+            data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+            data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+            data[2] = 0; // Status
+            data[3] = BREAK_UINT32(event, 0);
+            data[4] = BREAK_UINT32(event, 1);
+            data[5] = BREAK_UINT32(event, 2);
+            data[6] = BREAK_UINT32(event, 3);
+            data[7] = advEndRpt->reason;    //Reason
+            data[8] = advEndRpt->numReport; //Number of Report collected
+            HCI_TL_SendVSEvent(data, sizeof(data));
+            ICall_free(pData);
+          }
+#ifdef BLE3_CMD
+        }
+#endif
+        if (pData)
+        {
+          ICall_free(pData);
+        }
+        break;
+      }
+
       case GAP_EVT_ADV_REPORT:
       {
         host_tl_sendAdvReport(event, (GapScan_Evt_AdvRpt_t *) pData);
         break;
       }
+
       default:
       {
         break;
@@ -3137,84 +3268,134 @@ static void host_tl_sendAdvReport(uint32_t event, GapScan_Evt_AdvRpt_t * advRpt)
       return;
   }
   remainingLength = advRpt->dataLen;
+
   // Got the Report, Map it to the Extended Report Event...
   do
   {
     //Check Length, if bigger than MAX_REPORT_DATA_SIZE, split it...
     if (remainingLength > MAX_REPORT_DATA_SIZE)
     {
-        dataLen = MAX_REPORT_DATA_SIZE;
+      dataLen = MAX_REPORT_DATA_SIZE;
     }
     else
     {
-        dataLen = remainingLength;
+      dataLen = remainingLength;
     }
-
-    // OSAL message header + HCI event header + data
-    totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + \
-                  GAP_SCAN_EVENT_HEADER + GAP_SCAN_EVENT_LENGTH + dataLen;
-
-    // allocate memory for OSAL hdr + packet
-    msg = (hciPacket_t *)ICall_allocMsg(totalLength);
-    if (msg)
+#ifdef BLE3_CMD
+    if( legacyScanFlag )
     {
-      // message type, HCI event type
-      msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
-      msg->hdr.status = 0xFF;
-
-      // packet
-      msg->pData    = (uint8_t*)(msg+1);
-      msg->pData[0] = HCI_EVENT_PACKET;
-      msg->pData[1] = HCI_VE_EVENT_CODE;
-      msg->pData[2] = GAP_SCAN_EVENT_LENGTH + GAP_SCAN_EVENT_HEADER + dataLen;
-
-      msg->pData[3] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-      msg->pData[4] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-      msg->pData[5] = 0; // Status
-      msg->pData[6] = BREAK_UINT32(event, 0);
-      msg->pData[7] = BREAK_UINT32(event, 1);
-      msg->pData[8] = BREAK_UINT32(event, 2);
-      msg->pData[9] = BREAK_UINT32(event, 3);
-      msg->pData[10] = advRpt->evtType;  //Start of the event structure.
-      msg->pData[11] = advRpt->addrType;
-      memcpy(&msg->pData[12], advRpt->addr, B_ADDR_LEN);
-      msg->pData[18] = advRpt->primPhy;
-      msg->pData[19] = advRpt->secPhy;
-      msg->pData[20] = advRpt->advSid;
-      msg->pData[21] = advRpt->txPower;
-      msg->pData[22] = advRpt->rssi;
-      msg->pData[23] = advRpt->directAddrType;
-      memcpy(&msg->pData[24], advRpt->directAddr, B_ADDR_LEN);
-      msg->pData[30] = LO_UINT16(advRpt->periodicAdvInt);
-      msg->pData[31] = HI_UINT16(advRpt->periodicAdvInt);
-      msg->pData[32] = LO_UINT16(dataLen);
-      msg->pData[33] = HI_UINT16(dataLen);
-      // copy data
-      if (advRpt->dataLen)
+      // BLE3 reports only Legacy advertisement
+      if( advRpt->evtType & 0x10 )
       {
-          memcpy(&msg->pData[34], advRpt->pData + (advRpt->dataLen - remainingLength) , dataLen);
-      }
+        uint8_t rptLen = 13 + dataLen;
+        uint8_t *dataOut = NULL;
 
-      if (remainingLength > MAX_REPORT_DATA_SIZE)
-      {
-          // This is not the last packet
-          msg->pData[10] &= AE_EVT_TYPE_COMPLETE_MASK;
-          msg->pData[10] |= AE_EVT_TYPE_INCOMPLETE_MORE_TO_COME;
-      }
+        dataOut = (uint8_t *)osal_mem_alloc(rptLen);
+        if( dataOut )
+        {
+          if( (maxNumReports) && (numDev < maxNumReports)
+             || (!maxNumReports))
+          {
+            // Build the event
+            dataOut[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
+            dataOut[1] = HI_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
+            dataOut[2] = 0; // status
+            dataOut[3] = getAgamaToBLE3EventProp(advRpt->evtType); // adv type
+            dataOut[4] = advRpt->addrType;
+            // Peer's address
+            osal_memcpy(&dataOut[5], advRpt->addr, B_ADDR_LEN);
+            dataOut[11] = (uint8_t)advRpt->rssi;
+            dataOut[12] = dataLen;
+            // Copy the advData
+            osal_memcpy(&dataOut[13], advRpt->pData, dataLen);
 
-      // Send to High Layer.
-      if (HCI_TL_CommandStatusCB)
-      {
-        HCI_TL_CommandStatusCB(msg->pData, HCI_EVENT_MIN_LENGTH + msg->pData[2]);
-      }
+            HCI_TL_SendVSEvent(dataOut, rptLen);
 
-      // We're done with this message.
-      ICall_freeMsg(msg);
+            // Saving the device info
+            deviceInfoArr[numDev].evtType = dataOut[3];
+            deviceInfoArr[numDev].addrType = dataOut[4];
+            osal_memcpy(deviceInfoArr[numDev].addr, advRpt->addr, B_ADDR_LEN);
+            numDev++;
+          }
+        }
+        //Free the message and the payload
+        if (dataOut)
+        {
+          ICall_free(dataOut);
+        }
+      }
     }
     else
     {
-        HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
+#endif
+      // OSAL message header + HCI event header + data
+      totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + \
+                    GAP_SCAN_EVENT_HEADER + GAP_SCAN_EVENT_LENGTH + dataLen;
+
+      // allocate memory for OSAL hdr + packet
+      msg = (hciPacket_t *)ICall_allocMsg(totalLength);
+      if (msg)
+      {
+        // message type, HCI event type
+        msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+        msg->hdr.status = 0xFF;
+
+        // packet
+        msg->pData    = (uint8_t*)(msg+1);
+        msg->pData[0] = HCI_EVENT_PACKET;
+        msg->pData[1] = HCI_VE_EVENT_CODE;
+        msg->pData[2] = GAP_SCAN_EVENT_LENGTH + GAP_SCAN_EVENT_HEADER + dataLen;
+
+        msg->pData[3] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        msg->pData[4] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        msg->pData[5] = 0; // Status
+        msg->pData[6] = BREAK_UINT32(event, 0);
+        msg->pData[7] = BREAK_UINT32(event, 1);
+        msg->pData[8] = BREAK_UINT32(event, 2);
+        msg->pData[9] = BREAK_UINT32(event, 3);
+        msg->pData[10] = advRpt->evtType;  //Start of the event structure.
+        msg->pData[11] = advRpt->addrType;
+        memcpy(&msg->pData[12], advRpt->addr, B_ADDR_LEN);
+        msg->pData[18] = advRpt->primPhy;
+        msg->pData[19] = advRpt->secPhy;
+        msg->pData[20] = advRpt->advSid;
+        msg->pData[21] = advRpt->txPower;
+        msg->pData[22] = advRpt->rssi;
+        msg->pData[23] = advRpt->directAddrType;
+        memcpy(&msg->pData[24], advRpt->directAddr, B_ADDR_LEN);
+        msg->pData[30] = LO_UINT16(advRpt->periodicAdvInt);
+        msg->pData[31] = HI_UINT16(advRpt->periodicAdvInt);
+        msg->pData[32] = LO_UINT16(dataLen);
+        msg->pData[33] = HI_UINT16(dataLen);
+        // copy data
+        if (advRpt->dataLen)
+        {
+            memcpy(&msg->pData[34], advRpt->pData + (advRpt->dataLen - remainingLength) , dataLen);
+        }
+
+        if (remainingLength > MAX_REPORT_DATA_SIZE)
+        {
+            // This is not the last packet
+            msg->pData[10] &= AE_EVT_TYPE_COMPLETE_MASK;
+            msg->pData[10] |= AE_EVT_TYPE_INCOMPLETE_MORE_TO_COME;
+        }
+
+        // Send to High Layer.
+        if (HCI_TL_CommandStatusCB)
+        {
+          HCI_TL_CommandStatusCB(msg->pData, HCI_EVENT_MIN_LENGTH + msg->pData[2]);
+        }
+
+        // We're done with this message.
+        ICall_freeMsg(msg);
+      }
+      else
+      {
+          HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
+      }
+#ifdef BLE3_CMD
     }
+#endif
     // Update the local variable to send the rest of the payload.
     remainingLength-=dataLen;
   }while(remainingLength > 0);
@@ -3295,6 +3476,22 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
 
     switch(event)
     {
+#ifdef BLE3_CMD
+      case GAP_EVT_ADV_END:
+      {
+        // Allocate data to send over TL
+        uint8_t totalLength = 5;
+        dataOut = (uint8_t *)osal_mem_alloc(totalLength);
+        dataOut[0] = LO_UINT16(HCI_EXT_ADV_EVENT_NOTICE_EVENT);
+        dataOut[1] = HI_UINT16(HCI_EXT_ADV_EVENT_NOTICE_EVENT);
+        dataOut[2] = SUCCESS;
+        dataOut[3] = LO_UINT16(HCI_EXT_ADV_EVENT_NOTICE);
+        dataOut[4] = HI_UINT16(HCI_EXT_ADV_EVENT_NOTICE);
+
+        HCI_TL_SendVSEvent(dataOut, totalLength);
+        break;
+      }
+#endif
       case GAP_EVT_ADV_SET_TERMINATED:
         // Extract status
         status = ((GapAdv_setTerm_t *)pData)->status;
@@ -3327,27 +3524,61 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
         break;
     }
 
-    // Allocate data to send over TL
-    uint8_t totalLength = HCI_EXT_GAP_ADV_EVENT_MIN_LENGTH + dataLen;
-    dataOut = (uint8_t *)osal_mem_alloc(totalLength);
-
-    // If data was allocated
-    if(dataOut)
+#ifdef BLE3_CMD
+    if( advHandle != advHandleLegacy)
     {
-      dataOut[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-      dataOut[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-      dataOut[2] = status;
-      dataOut[3] = BREAK_UINT32(event, 0);
-      dataOut[4] = BREAK_UINT32(event, 1);
-      dataOut[5] = BREAK_UINT32(event, 2);
-      dataOut[6] = BREAK_UINT32(event, 3);
-      dataOut[7] = advHandle;
-      dataOut[8] = dataLen;
-      osal_memcpy(&dataOut[9], (uint8_t *) pData, dataLen);
+#endif
+      // Allocate data to send over TL
+      uint8_t totalLength = HCI_EXT_GAP_ADV_EVENT_MIN_LENGTH + dataLen;
+      dataOut = (uint8_t *)osal_mem_alloc(totalLength);
 
-      HCI_TL_SendVSEvent(dataOut, totalLength);
+      // If data was allocated
+      if(dataOut)
+      {
+        dataOut[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        dataOut[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        dataOut[2] = status;
+        dataOut[3] = BREAK_UINT32(event, 0);
+        dataOut[4] = BREAK_UINT32(event, 1);
+        dataOut[5] = BREAK_UINT32(event, 2);
+        dataOut[6] = BREAK_UINT32(event, 3);
+        dataOut[7] = advHandle;
+        dataOut[8] = dataLen;
+        osal_memcpy(&dataOut[9], (uint8_t *) pData, dataLen);
+
+        HCI_TL_SendVSEvent(dataOut, totalLength);
+      }
+#ifdef BLE3_CMD
     }
-
+    else
+    {
+      dataLen = 3;
+      dataOut = (uint8_t *)osal_mem_alloc(dataLen);
+      if( event == GAP_EVT_ADV_START_AFTER_ENABLE )
+      {
+        dataOut[0] = LO_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+        dataOut[1] = HI_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+        dataOut[2] = status;
+        if( advLegacyState == 0 )
+        {
+          HCI_TL_SendVSEvent(dataOut, dataLen);
+          advLegacyState = 1;
+        }
+        advUpdateApp = 0;
+      }
+      else if( event == GAP_EVT_ADV_END_AFTER_DISABLE )
+      {
+        dataOut[0] = LO_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
+        dataOut[1] = HI_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
+        dataOut[2] = status;
+        if( advLegacyState && (advUpdateApp == 0) )
+        {
+          HCI_TL_SendVSEvent(dataOut, dataLen);
+          advLegacyState = 0;
+        }
+      }
+    }
+#endif
     //Free the message and the payload
     if (dataOut)
     {
@@ -4002,6 +4233,38 @@ static uint8_t processExtMsg(hciPacket_t *pMsg)
   // IMPORTANT!! Fill in Payload (if needed) in case statement
 
   HCI_TL_SendVSEvent(rspBuf, (6 + rspDataLen));
+
+#ifdef BLE3_CMD
+  if( sendEstEvt )
+  {
+    // An error occured when "HCI_EXT_GAP_EST_LINK_REQ" was called
+    uint8_t pDataOut[20] = {0};
+
+    pDataOut[0] = LO_UINT16(HCI_EXT_GAP_LINK_ESTABLISHED_EVENT);
+    pDataOut[1] = HI_UINT16(HCI_EXT_GAP_LINK_ESTABLISHED_EVENT);
+    pDataOut[2] = bleIncorrectMode;
+    pDataOut[12] = GAP_PROFILE_CENTRAL;
+
+    HCI_TL_SendVSEvent(pDataOut, 20);
+    sendEstEvt = 0;
+  }
+
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+  if( maxConnReached )
+  {
+    uint8_t pDataOut[3] = {0};
+
+    // Send Make discoverable done with max connection reached
+    pDataOut[0] = LO_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+    pDataOut[1] = HI_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+    pDataOut[2] = HCI_ERROR_CODE_CONN_LIMIT_EXCEEDED;
+
+    HCI_TL_SendVSEvent(pDataOut, 3);
+    maxConnReached = 0;
+  }
+#endif // HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG )
+
+#endif// BLE3_CMD
 
   return(deallocateIncoming);
 }
@@ -4842,6 +5105,7 @@ static uint8_t processExtMsgATT(uint8_t cmdID, hciExtCmd_t *pCmd)
                                       pCmd->len-3, &msg) == SUCCESS)
         {
           attHandleValueInd_t *pInd = &msg.handleValueInd;
+#ifndef BLE3_CMD
           gattCharCfg_t *indCharCfg = (gattCharCfg_t *)*(uint32_t*)(gattAttrTbl[3].pValue);
           if(indCharCfg == NULL)
           {
@@ -4851,17 +5115,20 @@ static uint8_t processExtMsgATT(uint8_t cmdID, hciExtCmd_t *pCmd)
           uint16 value = GATTServApp_ReadCharCfg( connHandle, indCharCfg );
           if(value & GATT_CLIENT_CFG_INDICATE)
           {
+#endif
             stat = GATT_Indication(connHandle, pInd, pBuf[2], appTaskID);
             if ((stat == SUCCESS) && (pInd->pValue != NULL))
             {
               safeToDealloc = FALSE; // payload passed to GATT
             }
           }
+#ifndef BLE3_CMD
           else
           {
             stat = FAILURE;
           }
         }
+#endif
       }
       break;
 
@@ -5399,6 +5666,51 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
   {
     case HCI_EXT_GAP_DEVICE_INIT:
     {
+#if BLE3_CMD
+      uint8_t profileRole = pBuf[0];
+      uint8_t IRK[KEYLEN] = {0};
+      uint8_t SRK[KEYLEN] = {0};
+	  uint8_t addr[B_ADDR_LEN] = {0}; // The decvice address type and address must be configures with GAP_configDeviceAddr
+
+#if defined(GAP_BOND_MGR)
+      // Register with bond manager after starting device - not to prevent using GapBondMgr with BLE3_CMD flag
+      GAPBondMgr_Register((gapBondCBs_t *) &host_tl_bondCB);
+#endif
+
+      if( !osal_memcmp(&pBuf[2+KEYLEN], SRK, KEYLEN) )
+      {
+        // Copy and set the SRK
+        osal_memcpy(SRK, &pBuf[2+KEYLEN], KEYLEN);
+        GapConfig_SetParameter(GAP_CONFIG_PARAM_SRK, SRK);
+      }
+
+      if( !osal_memcmp(&pBuf[1], IRK, KEYLEN) )
+      {
+        // Copy and set the IRK
+        osal_memcpy(IRK, &pBuf[2], KEYLEN);
+        GapConfig_SetParameter(GAP_CONFIG_PARAM_IRK, IRK);
+
+        // This mode is set to enable saving the IRK given
+        stat = GAP_DeviceInit(profileRole, appTaskID, ADDRMODE_RP_WITH_PUBLIC_ID, addr);
+      }
+      else
+      {
+        // IRK was all 0's - the address mode can be changed with HCI_EXT_GAP_CONFIG_DEVICE_ADDR
+        stat = GAP_DeviceInit(profileRole, appTaskID, ADDRMODE_PUBLIC, addr);
+      }
+      // Maximum number of adv reports
+      maxNumReports  = pBuf[1];
+
+      if( maxNumReports )
+      {
+        // Allocating the memory for device info
+        deviceInfoArr = (deviceInfo_t *)osal_mem_alloc(maxNumReports*sizeof(deviceInfo_t));
+        osal_memset(deviceInfoArr, 0, maxNumReports*sizeof(deviceInfo_t));
+      }
+
+      // ignoring pSignCounter
+
+#else // !BLE3_CMD
       uint8_t zeroAddr[B_ADDR_LEN] = {0};
 
 #if defined(GAP_BOND_MGR)
@@ -5410,6 +5722,7 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       stat = GAP_DeviceInit(pBuf[0], appTaskID, pBuf[1],
                             memcmp(&pBuf[2], zeroAddr, B_ADDR_LEN) ?
                               &pBuf[2] : NULL);
+#endif // BLE3_CMD
       break;
     }
 
@@ -5422,8 +5735,27 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
     
 #if (HOST_CONFIG & (CENTRAL_CFG | PERIPHERAL_CFG))
     case HCI_EXT_GAP_TERMINATE_LINK:
+    {
+#ifndef BLE3_CMD
       stat = GAP_TerminateLinkReq(BUILD_UINT16(pBuf[0], pBuf[1]), pBuf[2]);
+#else //BLE3_CMD
+      uint16_t connHandle = BUILD_UINT16(pBuf[0], pBuf[1]);
+      if( connHandle != 0xFFFE )
+      {
+        stat = GAP_TerminateLinkReq(BUILD_UINT16(pBuf[0], pBuf[1]), pBuf[2]);
+      }
+      else
+      {
+#if (HOST_CONFIG & (CENTRAL_CFG))
+        stat = GapInit_cancelConnect();
+        legacyConnCancel = 1;
+#else
+        stat = FAILURE;
+#endif
+      }
+#endif
       break;
+    }
 
     case HCI_EXT_GAP_UPDATE_LINK_PARAM_REQ:
     {
@@ -5604,6 +5936,16 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       uint16_t id = (uint16_t)pBuf[0];
       uint16_t value = BUILD_UINT16(pBuf[1], pBuf[2]);
 
+#ifdef BLE3_CMD
+      if( (id != TGAP_AUTH_TASK_ID) && (id < TGAP_PARAMID_MAX) )
+      {
+        stat = BLE3ToAgama_setParam(id, value);
+      }
+      else
+      {
+        stat = INVALIDPARAMETER;
+      }
+#else // !BLE3_CMD
 #if !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES)
       if (id == GAP_PARAM_GATT_TESTCODE)
       {
@@ -5631,6 +5973,7 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       {
         stat = INVALIDPARAMETER;
       }
+#endif // BLE3_CMD
       break;
     }
 
@@ -6206,6 +6549,302 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
    }
 #endif // CENTRAL_CFG
 
+
+#ifdef BLE3_CMD
+    case HCI_EXT_GAP_CONFIG_DEVICE_ADDR:
+    {
+      GAP_Addr_Modes_t addrType = (GAP_Addr_Modes_t)pBuf[0];
+      uint8_t addr[B_ADDR_LEN] = {0};
+
+      // When the device address is ADDRMODE_PUBLIC or ADDRMODE_RANDOM the IRK shall be all 0's
+      if( (addrType == ADDRMODE_PUBLIC) ||
+	   (addrType == ADDRMODE_RANDOM) )
+      {
+        uint8_t tempKey[KEYLEN] = {0};
+        GapConfig_SetParameter(GAP_CONFIG_PARAM_IRK, tempKey);
+      }
+
+      // if address type is random or public set irk to 0 if not 0 already
+      // If own address type is random static or RPA with random static...
+      if( addrType == ADDRMODE_RANDOM
+         || addrType == ADDRMODE_RP_WITH_RANDOM_ID )
+      {
+        osal_memcpy(addr, &pBuf[1], B_ADDR_LEN);
+
+        // Check if the random address is valid
+        // If all bits excluding the 2 MSBs are all 0's...
+        if(((MAP_osal_isbufset(addr, 0x00, B_ADDR_LEN - 1) &&
+           ((addr[B_ADDR_LEN - 1] & 0x3F) == 0)) ||
+            // Or all bites are 1's
+            MAP_osal_isbufset(addr, 0xFF, B_ADDR_LEN)))
+        {
+          return INVALIDPARAMETER;
+        }
+        else if(!(GAP_IS_ADDR_RS(addr)))
+        {
+           // This is an invalid ramdom static address
+           GAP_MAKE_ADDR_RS(addr);
+         }
+         // If valid random static address, put it to the controller
+         stat = HCI_LE_SetRandomAddressCmd(addr);
+      }
+      // Set the internal GAP address mode
+      gapSetDevAddressMode(addrType);
+      break;
+    }
+
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+    case HCI_EXT_GAP_MAKE_DISCOVERABLE:
+    {
+      uint16_t eventProps = 0;
+      GapAdv_advChannels_t chanMap = (GapAdv_advChannels_t)pBuf[8];
+      GAP_Peer_Addr_Types_t addrType = (GAP_Peer_Addr_Types_t)pBuf[1];
+      GapAdv_filterPolicy_t fltPolicy = (GapAdv_filterPolicy_t)pBuf[9];
+
+      // Fix the advertising parameter
+      eventProps = getBLE3ToAgamaEventProp(pBuf[0]);
+
+      if( eventProps & GAP_ADV_PROP_CONNECTABLE )
+      {
+        // This is a connectable advertising
+        // check if we havn't reached the maximum number of connections
+        uint8_t numConns = linkDB_NumActive();
+
+        if( numConns >= MAX_NUM_BLE_CONNS )
+        {
+          maxConnReached = 1;
+          return SUCCESS;
+        }
+      }
+
+      if( advHandleLegacy == 0xFF )
+      {
+        // Sanity check. In BLE3 GAP_UpdateAdvertisingData must be called first
+        GapAdv_params_t advParamLegacy = GAPADV_PARAMS_LEGACY_SCANN_CONN;
+
+        // Update the advertising parameters struct
+        advParamLegacy.eventProps = eventProps;
+        advParamLegacy.peerAddrType = addrType;
+        advParamLegacy.primChanMap = chanMap;
+        advParamLegacy.filterPolicy = fltPolicy;
+
+        // Create Advertisement set and assign handle
+        stat = GapAdv_create(&host_tl_advEvtCallback, &advParamLegacy,
+                             &advHandleLegacy);
+      }
+      else
+      {
+        // Updating the advertising parameters
+        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PROPS, &eventProps);
+        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS_TYPE, &addrType);
+
+        uint8_t addr[B_ADDR_LEN];
+        osal_memcpy(addr, &pBuf[2], B_ADDR_LEN);
+        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS, addr);
+        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PRIMARY_CHANNEL_MAP, &chanMap);
+        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_FILTER_POLICY, &fltPolicy);
+      }
+
+      if( stat != SUCCESS )
+      {
+        return stat;
+      }
+      if( advNotice )
+      {
+        // Set event mask - Adv Notice Events enabled
+        stat = GapAdv_setEventMask(advHandleLegacy,
+                                   GAP_ADV_EVT_MASK_START_AFTER_ENABLE |
+                                   GAP_ADV_EVT_MASK_END_AFTER_DISABLE |
+                                   GAP_ADV_EVT_MASK_END );
+      }
+      else
+      {
+        // Set event mask - Adv Notice Events not enabled
+        stat = GapAdv_setEventMask(advHandleLegacy,
+                                   GAP_ADV_EVT_MASK_START_AFTER_ENABLE |
+                                   GAP_ADV_EVT_MASK_END_AFTER_DISABLE );
+      }
+
+      // To enable adv notice event HCI_EXT_AdvEventNotice should be called before each GAP_MakeDiscoverable
+      advNotice = 0;
+
+      if( stat != SUCCESS )
+      {
+        return stat;
+      }
+
+      if( advDuration == 0 )
+      {
+        // Infinite advertisement
+        stat = GapAdv_enable(advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX , 0);
+      }
+      else
+      {
+        // Time limeted advertising
+        stat = GapAdv_enable(advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_DURATION, advDuration);
+      }
+      break;
+    }
+
+    case HCI_EXT_GAP_END_DISC:
+    {
+      stat = GapAdv_disable(advHandleLegacy);
+      break;
+    }
+
+    case HCI_EXT_GAP_UPDATE_ADV_DATA:
+    {
+      uint8_t dataType = pBuf[0];
+      uint8_t dataLen = pBuf[1];
+
+      if( advHandleLegacy == 0xFF )
+      {
+        GapAdv_params_t advParamLegacy = GAPADV_PARAMS_LEGACY_SCANN_CONN;
+
+        // Create Advertisement set and assign handle
+        stat = GapAdv_create(&host_tl_advEvtCallback, &advParamLegacy,
+                             &advHandleLegacy);
+      }
+
+      if( stat != SUCCESS )
+      {
+        return stat;
+      }
+
+      uint8_t *pData = ICall_malloc(dataLen);
+
+      if( pData == NULL )
+      {
+        return bleMemAllocError;
+      }
+
+      osal_memcpy(pData, &pBuf[2], dataLen);
+      advUpdateApp = 1;
+
+      if( dataType == 1 )
+      {
+        // Advertising Data
+        // Pause advertising and free old buffer if it exists
+        GapAdv_prepareLoadByHandle(advHandleLegacy, GAP_ADV_FREE_OPTION_ADV_DATA);
+        stat = GapAdv_loadByHandle(advHandleLegacy, GAP_ADV_DATA_TYPE_ADV, dataLen, pData);
+      }
+      else
+      {
+        // Scan response Data
+        // Pause advertising and free old buffer if it exists
+        GapAdv_prepareLoadByHandle(advHandleLegacy, GAP_ADV_FREE_OPTION_SCAN_RESP_DATA);
+        stat = GapAdv_loadByHandle(advHandleLegacy, GAP_ADV_DATA_TYPE_SCAN_RSP, dataLen, pData);
+      }
+      break;
+    }
+#endif // ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+
+#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
+    case HCI_EXT_GAP_DEVICE_DISC_REQ:
+    {
+      uint8_t discMode = pBuf[0];
+      uint8_t activeScan = pBuf[1];
+      uint8_t whiteList = pBuf[2];
+      uint16_t scanWin;
+      uint16_t scanInt;
+      GapScan_ScanType_t scanType;
+
+      if (!host_tl_gapScannerInitialized)
+      {
+        stat = GapScan_registerCb(host_tl_scanEvtCallback, 0);
+        if (!stat)
+        {
+          host_tl_gapScannerInitialized = 1;
+        }
+      }
+
+      if( scanNotice )
+      {
+        // With scan notice events
+        GapScan_setEventMask( GAP_EVT_SCAN_DISABLED |
+                              GAP_EVT_SCAN_DUR_ENDED |
+                              GAP_EVT_ADV_REPORT |
+                              GAP_EVT_SCAN_INT_ENDED); // could be  changed to GAP_EVT_SCAN_WND_ENDED
+      }
+      else
+      {
+        GapScan_setEventMask( GAP_EVT_SCAN_DISABLED |
+                              GAP_EVT_SCAN_DUR_ENDED |
+                              GAP_EVT_ADV_REPORT );
+      }
+
+      // To enable scan notice event HCI_EXT_ScanEventNotice should be called before each GAP_DeviceDiscoveryRequest
+      scanNotice = 0;
+
+      // whitelist filter options
+      stat |= GapScan_setParam(SCAN_PARAM_FLT_POLICY, &whiteList);
+
+      // Discovery mode
+      if( discMode == 0x03 )
+      {
+        discMode = SCAN_FLT_DISC_DISABLE;
+      }
+      stat |= GapScan_setParam(SCAN_PARAM_FLT_DISC_MODE, &discMode);
+
+      // Get the phy scanning values
+      stat |= GapScan_getPhyParams(SCAN_PRIM_PHY_1M, &scanType, &scanInt, &scanWin);
+      // Update scan type
+      stat |= GapScan_setPhyParams(SCAN_PRIM_PHY_1M,(GapScan_ScanType_t)activeScan, scanInt, scanWin);
+
+      if( stat != SUCCESS )
+      {
+        stat = FAILURE;
+        return stat;
+      }
+
+      stat = GapScan_enable(0, scanDuration, maxNumReports);
+      if( stat== SUCCESS )
+      {
+        legacyScanFlag = 1;
+      }
+      break;
+    }
+
+    case HCI_EXT_GAP_DEVICE_DISC_CANCEL:
+    {
+      GapScan_disable();
+      break;
+    }
+
+    case HCI_EXT_GAP_EST_LINK_REQ:
+    {
+      // highDutyCycle - not relevant. The scan setting need to be change using GAP_SetParam with the relevant parameters ID
+      uint8_t whiteList = pBuf[1];
+
+      if( whiteList == 1 )
+      {
+        stat = GapInit_connectWl(INIT_PHY_1M, 0);
+      }
+      else if( whiteList == 0 )
+      {
+        GAP_Peer_Addr_Types_t addrType = (GAP_Peer_Addr_Types_t)pBuf[2];
+        uint8_t addr[B_ADDR_LEN] = {0};
+        // Copy the peer's addr
+        osal_memcpy(addr, &pBuf[3], B_ADDR_LEN);
+
+        stat = GapInit_connect(addrType, addr, INIT_PHY_1M, 0);
+      }
+	  else
+	  {
+	  stat = bleIncorrectMode;
+	  }
+
+      if( stat != SUCCESS)
+      {
+        sendEstEvt = 1;
+        stat = SUCCESS;
+      }
+      break;
+    }
+#endif // ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
+
+#endif // BLE3_CMD
+
     default:
       stat = FAILURE;
       break;
@@ -6256,25 +6895,34 @@ static void host_tl_connEvtCallback(Gap_ConnEventRpt_t *pReport)
  */
 static void host_tl_connEvtCallbackProcess(Gap_ConnEventRpt_t *pReport)
 {
+  uint8_t index = 0;
   // Fill up event
+#ifdef BLE3_CMD
+  uint8_t data[16];
+  data[index++] = LO_UINT16(HCI_EXT_GAP_BLE3_CONN_EVT_NOTICE);
+  data[index++] = HI_UINT16(HCI_EXT_GAP_BLE3_CONN_EVT_NOTICE);
+#else
   uint8_t data[17];
-  data[0] = LO_UINT16(HCI_EXT_GAP_CONN_EVT_NOTICE);
-  data[1] = HI_UINT16(HCI_EXT_GAP_CONN_EVT_NOTICE);
-  data[2] = pReport->status;
-  data[3] = LO_UINT16(pReport->handle);
-  data[4] = HI_UINT16(pReport->handle);
-  data[5] = pReport->channel;
-  data[6] = pReport->phy;
-  data[7] = pReport->lastRssi;
-  data[8] = LO_UINT16(pReport->packets);
-  data[9] = HI_UINT16(pReport->packets);
-  data[10] = LO_UINT16(pReport->errors);
-  data[11] = HI_UINT16(pReport->errors);
-  data[12] = pReport->nextTaskType;
-  data[13] = BREAK_UINT32(pReport->nextTaskTime, 0);
-  data[14] = BREAK_UINT32(pReport->nextTaskTime, 1);
-  data[15] = BREAK_UINT32(pReport->nextTaskTime, 2);
-  data[16] = BREAK_UINT32(pReport->nextTaskTime, 3);
+  data[index++] = LO_UINT16(HCI_EXT_GAP_CONN_EVT_NOTICE);
+  data[index++] = HI_UINT16(HCI_EXT_GAP_CONN_EVT_NOTICE);
+#endif
+  data[index++] = pReport->status;
+  data[index++] = LO_UINT16(pReport->handle);
+  data[index++] = HI_UINT16(pReport->handle);
+  data[index++] = pReport->channel;
+#ifndef BLE3_CMD
+  data[index++] = pReport->phy;
+#endif
+  data[index++] = pReport->lastRssi;
+  data[index++] = LO_UINT16(pReport->packets);
+  data[index++] = HI_UINT16(pReport->packets);
+  data[index++] = LO_UINT16(pReport->errors);
+  data[index++] = HI_UINT16(pReport->errors);
+  data[index++] = pReport->nextTaskType;
+  data[index++] = BREAK_UINT32(pReport->nextTaskTime, 0);
+  data[index++] = BREAK_UINT32(pReport->nextTaskTime, 1);
+  data[index++] = BREAK_UINT32(pReport->nextTaskTime, 2);
+  data[index++] = BREAK_UINT32(pReport->nextTaskTime, 3);
 
   // Send Connection Event information over transport layer
   HCI_TL_SendVSEvent(data, sizeof(data));
@@ -6871,13 +7519,44 @@ static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint16_t
 
     case GAP_CONNECTING_CANCELLED_EVENT:
       {
-        gapConnCancelledEvent_t *pPkt = (gapConnCancelledEvent_t *)pMsg;
+#ifdef BLE3_CMD
+        if( !legacyConnCancel )
+        {
+#endif
+          gapConnCancelledEvent_t *pPkt = (gapConnCancelledEvent_t *)pMsg;
 
-        pOutMsg[0]  = LO_UINT16(HCI_EXT_GAP_CONNECTING_CANCELLED_EVENT);
-        pOutMsg[1]  = HI_UINT16(HCI_EXT_GAP_CONNECTING_CANCELLED_EVENT);
-        pOutMsg[2]  = pPkt->hdr.status;
-        pBuf = pOutMsg;
-        msgLen = 3;
+          pOutMsg[0]  = LO_UINT16(HCI_EXT_GAP_CONNECTING_CANCELLED_EVENT);
+          pOutMsg[1]  = HI_UINT16(HCI_EXT_GAP_CONNECTING_CANCELLED_EVENT);
+          pOutMsg[2]  = pPkt->hdr.status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+#ifdef BLE3_CMD
+        }
+        else
+        {
+          // Send Link establish event with status "bleGAPConnNotAcceptable"
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_LINK_ESTABLISHED_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_LINK_ESTABLISHED_EVENT);
+          pOutMsg[2] = bleGAPConnNotAcceptable;
+          pOutMsg[3] = 0;
+          memset(&(pOutMsg[4]), 0, B_ADDR_LEN);
+          pOutMsg[10] = 0;
+          pOutMsg[11] = 0;
+          pOutMsg[12] = GAP_PROFILE_CENTRAL;
+          pOutMsg[13] = 0;
+          pOutMsg[14] = 0;
+          pOutMsg[15] = 0;
+          pOutMsg[16] = 0;
+          pOutMsg[17] = 0;
+          pOutMsg[18] = 0;
+          pOutMsg[19] = 0;
+          pBuf = pOutMsg;
+          msgLen = 20;
+
+          legacyConnCancel = 0;
+        }
+#endif
       }
       break;
 
@@ -6896,211 +7575,237 @@ static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint16_t
       }
       break;
 
-	case GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT:
-	{
-	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+      case GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT:
+      {
+        GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
 
-	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
-	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
-	  pOutMsg[2] = pPkt->status;
-	  pBuf = pOutMsg;
-	  msgLen = 3;
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_PARAMS_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
 
-	  break;
-	}
+        break;
+      }
 
-	case GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT:
-	{
-	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+      case GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT:
+      {
+        GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
 
-	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
-	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
-	  pOutMsg[2] = pPkt->status;
-	  pBuf = pOutMsg;
-	  msgLen = 3;
-	  break;
-	}
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_DATA_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
 
-	case GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT:
-	{
-	  GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
+      case GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT:
+      {
+        GapAdv_periodicAdvEvt_t *pPkt = (GapAdv_periodicAdvEvt_t*)pMsg;
 
-	  pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
-	  pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
-	  pOutMsg[2] = pPkt->status;
-	  pBuf = pOutMsg;
-	  msgLen = 3;
-	  break;
-	}
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_SET_PERIODIC_ADV_ENABLE_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
 
-        case GAP_SCAN_PERIODIC_ADV_SYNC_EST_EVENT:
+      case GAP_SCAN_PERIODIC_ADV_SYNC_EST_EVENT:
+      {
+        GapScan_Evt_PeriodicAdvSyncEst_t *pEvt = (GapScan_Evt_PeriodicAdvSyncEst_t *)pMsg;
+
+        if( pEvt != NULL )
         {
-          GapScan_Evt_PeriodicAdvSyncEst_t *pEvt = (GapScan_Evt_PeriodicAdvSyncEst_t *)pMsg;
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
+          pOutMsg[2] = pEvt->BLEEventCode;
+          pOutMsg[3] = pEvt->status;
+          pOutMsg[4] = LO_UINT16(pEvt->syncHandle);
+          pOutMsg[5] = HI_UINT16(pEvt->syncHandle);
+          pOutMsg[6] = pEvt->advSid;
+          pOutMsg[7] = pEvt->advPhy;
+          pOutMsg[8] = LO_UINT16(pEvt->periodicAdvInt);
+          pOutMsg[9] = HI_UINT16(pEvt->periodicAdvInt);
+          pOutMsg[10] = pEvt->advClockAccuracy;
+          pOutMsg[11] = pEvt->advAddrType;
+          MAP_osal_memcpy(&(pOutMsg[12]), pEvt->advAddress, B_ADDR_LEN);
 
-          if( pEvt != NULL )
-          {
-            pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
-            pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_SYNC_EST_EVENT);
-            pOutMsg[2] = pEvt->BLEEventCode;
-            pOutMsg[3] = pEvt->status;
-            pOutMsg[4] = LO_UINT16(pEvt->syncHandle);
-            pOutMsg[5] = HI_UINT16(pEvt->syncHandle);
-            pOutMsg[6] = pEvt->advSid;
-            pOutMsg[7] = pEvt->advPhy;
-            pOutMsg[8] = LO_UINT16(pEvt->periodicAdvInt);
-            pOutMsg[9] = HI_UINT16(pEvt->periodicAdvInt);
-            pOutMsg[10] = pEvt->advClockAccuracy;
-            pOutMsg[11] = pEvt->advAddrType;
-            MAP_osal_memcpy(&(pOutMsg[12]), pEvt->advAddress, B_ADDR_LEN);
-
-            pBuf = pOutMsg;
-            msgLen = 18;
-          }
-          break;
+          pBuf = pOutMsg;
+          msgLen = 18;
         }
+        break;
+      }
 
-        case GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT:
+      case GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT:
+      {
+        GapScan_PeriodicAdvSyncLostEvt_t *pEvt = (GapScan_PeriodicAdvSyncLostEvt_t *)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
+        pOutMsg[2] = LO_UINT16(pEvt->syncHandle);
+        pOutMsg[3] = HI_UINT16(pEvt->syncHandle);
+
+        pBuf = pOutMsg;
+        msgLen = 4;
+        break;
+      }
+
+      case GAP_SCAN_PERIODIC_ADV_REPORT_EVENT:
+      {
+        GapScan_Evt_PeriodicAdvRpt_t *pEvt = (GapScan_Evt_PeriodicAdvRpt_t*)pMsg;
+        uint8_t dataLen = pEvt->dataLen;
+        uint16_t totalLen = sizeof(GapScan_Evt_PeriodicAdvRpt_t)-sizeof(((GapScan_Evt_PeriodicAdvRpt_t *)0)->pData) + dataLen;
+        pLongMsg = (uint8_t*)MAP_osal_mem_alloc(totalLen);
+
+        if(pLongMsg)
         {
-          GapScan_PeriodicAdvSyncLostEvt_t *pEvt = (GapScan_PeriodicAdvSyncLostEvt_t *)pMsg;
+          pLongMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
+          pLongMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
+          pLongMsg[2] = LO_UINT16(pEvt->syncHandle);
+          pLongMsg[3] = HI_UINT16(pEvt->syncHandle);
+          pLongMsg[4] = pEvt->txPower;
+          pLongMsg[5] = pEvt->rssi;
+          pLongMsg[6] = pEvt->cteType;
+          pLongMsg[7] = pEvt->dataStatus;
+          pLongMsg[8] = pEvt->dataLen;
+          MAP_osal_memcpy(&pLongMsg[9], pEvt->pData, pEvt->dataLen);
 
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_SYNC_LOST_EVENT);
-          pOutMsg[2] = LO_UINT16(pEvt->syncHandle);
-          pOutMsg[3] = HI_UINT16(pEvt->syncHandle);
+          MAP_osal_mem_free(pEvt->pData);
+          pBuf = pLongMsg;
+          msgLen = 9 + pEvt->dataLen;
+        }
+        else
+        {
+          HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
+        }
+        break;
+      }
 
+      case GAP_SCAN_CREATE_SYNC_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_SYNC_CANCEL_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_TERMINATE_SYNC_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_PERIODIC_RECEIVE_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_ADD_DEVICE_ADV_LIST_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_REMOVE_DEVICE_ADV_LIST_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_CLEAR_ADV_LIST_EVENT:
+      {
+        GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pBuf = pOutMsg;
+        msgLen = 3;
+        break;
+      }
+
+      case GAP_SCAN_READ_ADV_LIST_SIZE_EVENT:
+      {
+        GapScan_ReadAdvSizeListEvt_t *pPkt = (GapScan_ReadAdvSizeListEvt_t*)pMsg;
+
+        pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
+        pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
+        pOutMsg[2] = pPkt->status;
+        pOutMsg[3] = pPkt->listSize;
+
+        pBuf = pOutMsg;
+        msgLen = 4;
+        break;
+      }
+
+#ifdef BLE3_CMD
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+      case GAP_ADV_DATA_UPDATE_DONE_EVENT:
+      {
+        msgLen = 0;
+
+        if (advEventCntr == 2)
+        {
+          gapAdvDataUpdateEvent_t *pPkt = (gapAdvDataUpdateEvent_t *)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_DATA_UPDATE_DONE_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_DATA_UPDATE_DONE_EVENT);
+          pOutMsg[2] = pPkt->hdr.status;
+          pOutMsg[3] = pPkt->dataType;
           pBuf = pOutMsg;
           msgLen = 4;
-          break;
         }
-
-        case GAP_SCAN_PERIODIC_ADV_REPORT_EVENT:
+        else
         {
-          GapScan_Evt_PeriodicAdvRpt_t *pEvt = (GapScan_Evt_PeriodicAdvRpt_t*)pMsg;
-          uint8_t dataLen = pEvt->dataLen;
-          uint16_t totalLen = sizeof(GapScan_Evt_PeriodicAdvRpt_t)-sizeof(((GapScan_Evt_PeriodicAdvRpt_t *)0)->pData) + dataLen;
-          pLongMsg = (uint8_t*)MAP_osal_mem_alloc(totalLen);
-
-          if(pLongMsg)
-          {
-            pLongMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
-            pLongMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_PERIODIC_ADV_REPORT_EVENT);
-            pLongMsg[2] = LO_UINT16(pEvt->syncHandle);
-            pLongMsg[3] = HI_UINT16(pEvt->syncHandle);
-            pLongMsg[4] = pEvt->txPower;
-            pLongMsg[5] = pEvt->rssi;
-            pLongMsg[6] = pEvt->cteType;
-            pLongMsg[7] = pEvt->dataStatus;
-            pLongMsg[8] = pEvt->dataLen;
-            MAP_osal_memcpy(&pLongMsg[9], pEvt->pData, pEvt->dataLen);
-
-            MAP_osal_mem_free(pEvt->pData);
-            pBuf = pLongMsg;
-            msgLen = 9 + pEvt->dataLen;
-          }
-          else
-          {
-            HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
-          }
-          break;
+          advEventCntr++;
         }
-
-        case GAP_SCAN_CREATE_SYNC_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_SYNC_CANCEL_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CREATE_SYNC_CANCEL_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_TERMINATE_SYNC_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_TERMINATE_SYNC_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_PERIODIC_RECEIVE_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_RECEIVE_PERIODIC_ADV_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_ADD_DEVICE_ADV_LIST_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_ADD_DEVICE_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_REMOVE_DEVICE_ADV_LIST_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_REMOVE_DEVICE_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_CLEAR_ADV_LIST_EVENT:
-        {
-          GapScan_PeriodicAdvEvt_t *pPkt = (GapScan_PeriodicAdvEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_CLEAR_PERIODIC_ADV_LIST_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pBuf = pOutMsg;
-          msgLen = 3;
-          break;
-        }
-
-        case GAP_SCAN_READ_ADV_LIST_SIZE_EVENT:
-        {
-          GapScan_ReadAdvSizeListEvt_t *pPkt = (GapScan_ReadAdvSizeListEvt_t*)pMsg;
-
-          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
-          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_SCAN_READ_PERIODIC_ADV_LIST_SIZE_EVENT);
-          pOutMsg[2] = pPkt->status;
-          pOutMsg[3] = pPkt->listSize;
-
-          pBuf = pOutMsg;
-          msgLen = 4;
-          break;
-        }
+        break;
+      }
+#endif // HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG)
+#endif // BLE3_CMD
 
     default:
       // Unknown command
@@ -7158,6 +7863,7 @@ static uint8_t *processEventsSM(smEventHdr_t *pMsg, uint8_t *pOutMsg,
           else
           {
             keys->hdr.status = bleMemAllocError;
+            msgLen = 0;
           }
         }
         break;
@@ -7182,6 +7888,7 @@ static uint8_t *processEventsSM(smEventHdr_t *pMsg, uint8_t *pOutMsg,
           else
           {
             dhKey->hdr.status = bleMemAllocError;
+            msgLen = 0;
           }
         }
         break;
@@ -7666,6 +8373,344 @@ static uint8_t *processEventsGATT(gattMsgEvent_t *pPkt, uint8_t *pOutMsg,
   return(pBuf);
 }
 
+#ifdef BLE3_CMD
+/*********************************************************************
+ * @fn      BLE3ToAgama_setParam
+ *
+ * @brief   Translating BLE3 param ID to a set of Agama commands
+ *
+ * @param   id - Parameter ID
+ * @param   value - Parameter value
+ *
+ * @return  SUCCESS, bleInvalidRange, INVALIDPARAMETER.
+ */
+status_t BLE3ToAgama_setParam( uint16_t id, uint16_t value )
+{
+  uint8_t stat = SUCCESS;
+  switch(id)
+  {
+#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
+    // Scan parameters
+    case TGAP_CONN_SCAN_INT:
+    case TGAP_CONN_HIGH_SCAN_INT:
+    case TGAP_CONN_EST_SCAN_INT:
+    {
+      // Update the scan interval for the establish connection scanning
+      stat = GapInit_setPhyParam(SCAN_PRIM_PHY_1M, INIT_PHYPARAM_SCAN_INTERVAL, value);
+      break;
+    }
+
+    case TGAP_GEN_DISC_SCAN_INT:
+    case TGAP_LIM_DISC_SCAN_INT:
+    {
+      uint16_t scanWin;
+      uint16_t scanInt;
+      GapScan_ScanType_t scanType;
+      stat = GapScan_getPhyParams(SCAN_PRIM_PHY_1M, &scanType, &scanInt, &scanWin);
+      if( stat == SUCCESS )
+      {
+        // Scan interval update
+        stat = GapScan_setPhyParams(SCAN_PRIM_PHY_1M, scanType, value, scanWin);
+      }
+      break;
+    }
+
+    case TGAP_CONN_SCAN_WIND:
+    case TGAP_CONN_EST_SCAN_WIND:
+    case TGAP_CONN_HIGH_SCAN_WIND:
+    {
+      // Update the scan window for the establish connection scanning
+      stat = GapInit_setPhyParam(SCAN_PRIM_PHY_1M, INIT_PHYPARAM_SCAN_WINDOW, value);
+      break;
+    }
+
+    case TGAP_GEN_DISC_SCAN_WIND:
+    case TGAP_LIM_DISC_SCAN_WIND:
+    {
+      uint16_t scanWin;
+      uint16_t scanInt;
+      GapScan_ScanType_t scanType;
+      stat = GapScan_getPhyParams(SCAN_PRIM_PHY_1M, &scanType, &scanInt, &scanWin);
+      if( stat == SUCCESS )
+      {
+        // Scan window update
+        stat = GapScan_setPhyParams(SCAN_PRIM_PHY_1M, scanType, scanInt, value);
+      }
+      break;
+    }
+
+    // Scan duration update
+    case TGAP_GEN_DISC_SCAN:
+    case TGAP_LIM_DISC_SCAN:
+    {
+      scanDuration = value/10;
+      break;
+    }
+
+    // Scan channels update
+    case TGAP_SET_SCAN_CHAN:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_SET_SCAN_CHAN, value);
+      break;
+    }
+
+    case TGAP_FILTER_ADV_REPORTS:
+    {
+      uint8_t fltValue = (uint8_t)value;
+      stat = GapScan_setParam(SCAN_PARAM_FLT_DUP, &fltValue);
+      break;
+    }
+
+    case TGAP_SCAN_RSP_RSSI_MIN:
+    {
+      int8_t rssiValue = (int8_t)value;
+      stat = GapScan_setParam(SCAN_PARAM_FLT_MIN_RSSI, &rssiValue);
+      break;
+    }
+
+    case TGAP_CONN_EST_INT_MIN:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_CONN_INT_MIN, value);
+      break;
+    }
+
+    case TGAP_CONN_EST_INT_MAX:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_CONN_INT_MAX, value);
+      break;
+    }
+
+        case TGAP_CONN_EST_SUPERV_TIMEOUT:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_SUP_TIMEOUT, value);
+      break;
+    }
+
+    case TGAP_CONN_EST_LATENCY:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_CONN_LATENCY, value);
+      break;
+    }
+
+    case TGAP_CONN_EST_MIN_CE_LEN:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_MIN_CE_LEN, value);
+      break;
+    }
+
+    case TGAP_CONN_EST_MAX_CE_LEN:
+    {
+      stat = GapInit_setPhyParam(INIT_PHY_1M, INIT_PHYPARAM_MAX_CE_LEN, value);
+      break;
+    }
+#endif
+
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
+    // Advertisement parameters
+    // Update the minimum advertising interval
+    case TGAP_GEN_DISC_ADV_INT_MIN:
+    case TGAP_CONN_ADV_INT_MIN:
+    case TGAP_FAST_INTERVAL_2_INT_MIN:
+    case TGAP_LIM_DISC_ADV_INT_MIN:
+    {
+      if(advHandleLegacy == 0xFF)
+      {
+        GapAdv_params_t advParamLegacy = GAPADV_PARAMS_LEGACY_SCANN_CONN;
+        stat = GapAdv_create(host_tl_advEvtCallback, &advParamLegacy, &advHandleLegacy);
+      }
+
+      if( stat != SUCCESS )
+      {
+        // Failed to create a valid advertising set
+        return stat;
+      }
+
+      // There is a valid advertising set
+      uint32_t advIntMin = (uint32_t)value;
+      stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PRIMARY_INTERVAL_MIN, &advIntMin);
+      break;
+    }
+
+    // Update the maximum advertising interval
+    case TGAP_LIM_DISC_ADV_INT_MAX:
+    case TGAP_GEN_DISC_ADV_INT_MAX:
+    case TGAP_CONN_ADV_INT_MAX:
+    case TGAP_FAST_INTERVAL_2_INT_MAX:
+    {
+      if(advHandleLegacy == 0xFF)
+      {
+        GapAdv_params_t advParamLegacy = GAPADV_PARAMS_LEGACY_SCANN_CONN;
+        stat = GapAdv_create(host_tl_advEvtCallback, &advParamLegacy, &advHandleLegacy);
+      }
+
+      if( stat != SUCCESS )
+      {
+        // Failed to create a valid advertising set
+        return stat;
+      }
+
+      // There is a valid advertising set
+      uint32_t advIntMax = (uint32_t)value;
+      stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PRIMARY_INTERVAL_MAX, &advIntMax);
+      break;
+    }
+
+    case TGAP_GEN_DISC_ADV_MIN:
+    case TGAP_LIM_ADV_TIMEOUT:
+    {
+      advDuration = value;
+      break;
+    }
+#endif
+
+    case TGAP_CONN_PARAM_TIMEOUT:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_CONN_PARAM_TIMEOUT, value);
+      break;
+    }
+
+    case TGAP_REJECT_CONN_PARAMS:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_LINK_UPDATE_DECISION, value);
+      break;
+    }
+
+    case TGAP_PRIVATE_ADDR_INT:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_PRIVATE_ADDR_INT, value);
+      break;
+    }
+
+    case TGAP_SM_TIMEOUT:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_SM_TIMEOUT, value);
+      break;
+    }
+
+    case TGAP_SM_MIN_KEY_LEN:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_SM_MIN_KEY_LEN, value);
+      break;
+    }
+
+    case TGAP_SM_MAX_KEY_LEN:
+    {
+      stat = GAP_SetParamValue(GAP_PARAM_SM_MAX_KEY_LEN, value);
+      break;
+    }
+
+    default:
+      stat = FAILURE;
+      break;
+  }
+
+  return stat;
+}
+
+/*********************************************************************
+ * @fn      getBLE3ToAgamaEventProp
+ *
+ * @brief   Translating BLE3 advertising properties to Agama advertising
+ *          properties
+ *
+ * @param   eventType - BLE3 advertising properties
+ *
+ * @return  0xFFFF if the event properties wasn't found, else Agama
+ *          event properties
+ */
+uint16_t getBLE3ToAgamaEventProp( uint8_t eventType)
+{
+  uint16_t eventProp = 0xFFFF;
+
+  if( eventType == GAP_ADTYPE_ADV_IND )
+  {
+    eventProp = GAP_ADV_PROP_LEGACY | GAP_ADV_PROP_CONNECTABLE | GAP_ADV_PROP_SCANNABLE;
+  }
+
+  if( eventType == GAP_ADTYPE_ADV_HDC_DIRECT_IND )
+  {
+    eventProp = GAP_ADV_PROP_LEGACY | GAP_ADV_PROP_CONNECTABLE | GAP_ADV_PROP_DIRECTED | GAP_ADV_PROP_HDC;
+  }
+
+  if( eventType == GAP_ADTYPE_ADV_SCAN_IND )
+  {
+    eventProp = GAP_ADV_PROP_LEGACY | GAP_ADV_PROP_SCANNABLE;
+  }
+
+  if( eventType == GAP_ADTYPE_ADV_NONCONN_IND )
+  {
+    eventProp = GAP_ADV_PROP_LEGACY;
+  }
+
+  if( eventType == GAP_ADTYPE_ADV_LDC_DIRECT_IND )
+  {
+    eventProp = GAP_ADV_PROP_LEGACY | GAP_ADV_PROP_CONNECTABLE | GAP_ADV_PROP_DIRECTED;
+  }
+
+  return eventProp;
+}
+
+/*********************************************************************
+ * @fn      getAgamaToBLE3EventProp
+ *
+ * @brief   Translating Agama advertising properties to BLE3 advertising
+ *          properties
+ *
+ * @param   eventType - Agama advertising properties
+ *
+ * @return  0xFFFF if the event properties wasn't found, else BLE3
+ *          event properties
+ */
+uint8_t getAgamaToBLE3EventProp( uint8_t eventType )
+{
+  uint8_t eventProp = 0xFF;
+
+  if( eventType == GAP_AGAMA_BLE3_TYPE_ADV_IND )
+  {
+    eventProp = GAP_ADTYPE_ADV_IND;
+  }
+
+  if( eventType == GAP_AGAMA_BLE3_TYPE_ADV_HDC_DIRECT_IND )
+  {
+   eventProp = GAP_ADTYPE_ADV_HDC_DIRECT_IND;
+  }
+
+  if( eventType == GAP_AGAMA_BLE3_TYPE_ADV_SCAN_IND )
+  {
+   eventProp = GAP_ADTYPE_ADV_SCAN_IND;
+  }
+
+  if( eventType == GAP_AGAMA_BLE3_TYPE_ADV_NONCONN_IND )
+  {
+   eventProp = GAP_ADTYPE_ADV_NONCONN_IND;
+  }
+
+  if( eventType == GAP_AGAMA_BLE3_TYPE_ADV_LDC_DIRECT_IND )
+  {
+   eventProp = GAP_ADTYPE_ADV_LDC_DIRECT_IND;
+  }
+
+  return eventProp;
+}
+
+#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
+/*********************************************************************
+ * @fn      HCI_TL_SetLegacyScanFlag
+ *
+ * @brief   Set legacy scan flag
+ *
+ * @param   flag - 1 to enable CC2640 scan report format
+ *
+ * @return  None
+ */
+void HCI_TL_SetLegacyScanFlag( uint8_t flag )
+{
+  legacyScanFlag = flag;
+}
+#endif
+
+#endif // BLE3_CMD
+
 #if !defined(GATT_DB_OFF_CHIP)
 /*********************************************************************
  * @fn      processEventsGATTServ
@@ -7968,8 +9013,6 @@ static const uint8_t *findUUIDRec(uint8_t *pUUID, uint8_t len)
 #endif // GATT_DB_OFF_CHIP
 #endif // HOST_CONFIG
 #endif // #endif /* (defined(HCI_TL_FULL) || defined(PTM_MODE)) */
-
-
 
 /*********************************************************************
 *********************************************************************/

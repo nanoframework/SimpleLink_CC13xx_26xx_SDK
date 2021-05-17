@@ -5,12 +5,11 @@
             "+../../README.md -> README.md",
             "+../../rfDualMode_MissedBlePacket.png -> rfDualMode_MissedBlePacket.png",
             "+../../rfDualMode_MissedPropPacket.png -> rfDualMode_MissedPropPacket.png",
-            "+../../rfDualModeTx.syscfg -> rfDualModeTx.syscfg",
+            "+../rfDualModeTx.syscfg -> rfDualModeTx.syscfg",
             "+../../overview.rov.json -> overview.rov.json",
             "+../main_tirtos.c -> main_tirtos.c",
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
-            "+CC1352R1_LAUNCHXL_TIRTOS.icf -> CC1352R1_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

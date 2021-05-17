@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include <ti/drivers/dpl/DebugP.h>
 
 #include <ti/drivers/cryptoutils/utils/CryptoUtils.h>
 
@@ -114,6 +116,20 @@ bool CryptoUtils_isBufferAllZeros(const void *buffer, size_t bufferByteLength) {
     }
 
     return bufferBits == 0;
+}
+
+/*
+ *  ======== CryptoUtils_memset ========
+ */
+void CryptoUtils_memset(void *dest, size_t destSize, uint8_t val, size_t count) {
+    DebugP_assert(dest);
+    DebugP_assert(count <= destSize);
+
+    volatile uint8_t *p = (volatile uint8_t *)dest;
+
+    while (destSize-- && count--) {
+        *p++ = val;
+    }
 }
 
 /*

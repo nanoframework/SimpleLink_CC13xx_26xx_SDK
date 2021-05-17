@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,10 +55,10 @@
 
 % if(inst.forceVddr){
 // Force VDDR voltage to the factory HH setting (FCFG1..VDDR_TRIM_HH)
-#define CCFG_FORCE_VDDR_HH                              0x1        
+#define CCFG_FORCE_VDDR_HH                              0x1
 % } else {
 // Use default VDDR trim
-#define CCFG_FORCE_VDDR_HH                              0x0        
+#define CCFG_FORCE_VDDR_HH                              0x0
 % }
 
 
@@ -88,7 +88,7 @@
 % if(inst.srcClkLF === 'Derived from HF XOSC') {
 // LF clock derived from High Frequency XOSC
 #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION               0x0
-% } 
+% }
 % else if(inst.srcClkLF === 'External LF clock') {
 % const extclkdiohex = inst.extClkDio.toString(16);
 % const rtcinchex = inst.rtcIncrement.toString(16);
@@ -104,7 +104,7 @@
 % else if(inst.srcClkLF === 'LF XOSC') {
 // LF XOSC
 #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION               0x2
-% } 
+% }
 % else if(inst.srcClkLF === 'LF RCOSC') {
 // LF RCOSC
 #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION               0x3
@@ -113,7 +113,7 @@
 % if(inst.xoscCapArray) {
 % const capArrDelta = inst.xoscCapArrayDelta.toString(16);
 // Apply cap-array delta
-#define SET_CCFG_MODE_CONF_XOSC_CAP_MOD                 0x0 
+#define SET_CCFG_MODE_CONF_XOSC_CAP_MOD                 0x0
 #define SET_CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA          0x`capArrDelta`
 % } else {
 // Don't apply cap-array delta
@@ -126,7 +126,7 @@
 
 % if(inst.srcClkHF === "48 MHz XOSC_HF") {
 // HF source is a 48 MHz xtal
-#define SET_CCFG_MODE_CONF_XOSC_FREQ                    0x2    
+#define SET_CCFG_MODE_CONF_XOSC_FREQ                    0x2
 % } else if(inst.srcClkHF === "Internal High Precision Oscillator"){
 // HF source is HPOSC (BAW) (only valid for CC2652RB)
 #define SET_CCFG_MODE_CONF_XOSC_FREQ                    0x1
@@ -174,6 +174,15 @@
 % } else {
 // Disable ROM boot loader
 #define SET_CCFG_BL_CONFIG_BOOTLOADER_ENABLE            0x00
+% }
+
+% if(inst.setFlashVectorTable) {
+% var vectTabAddr = inst.addressFlashVectorTable.toString(16);
+// Apply address to IMAGE_VALID_CONF register
+#define SET_CCFG_IMAGE_VALID_CONF_IMAGE_VALID           0x`vectTabAddr`
+% } else {
+// Default address in IMAGE_VALID_CONF register
+#define SET_CCFG_IMAGE_VALID_CONF_IMAGE_VALID           0x00000000
 % }
 
 //#####################################
@@ -266,10 +275,10 @@
 #define SET_CCFG_IEEE_BLE_1                             0x`blemac1`
 
 % }
-
 //#####################################
 // Select between cache or GPRAM
 //#####################################
+
 % if(inst.disableCache) {
 // Cache is disabled and GPRAM is available at 0x11000000-0x11001FFF
 #define SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM           0x0
@@ -278,8 +287,93 @@
 #define SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM           0x1
 % }
 
+% const device = system.deviceData.deviceId;
+% if(device.match(/CC(?:13|26).4/)) {
+% if (inst.configureIDAU || inst.disableRamParity) {
+//#####################################
+// Trustzone settings
+//#####################################
 
+% if(inst.configureIDAU) {
+% if(inst.markAllFlashSecure) {
+// Set all of flash to secure-only access, using the special value of 0
+#define SET_CCFG_TRUSTZONE_FLASH_CFG_NSADDR_BOUNDARY    0x0
+% } else {
+% const nsaddr_value = (inst.flashNonsecureBoundary / 0x2000).toString(16);
+// Non-secure access boundary, configured in 8KB steps
+#define SET_CCFG_TRUSTZONE_FLASH_CFG_NSADDR_BOUNDARY    0x`nsaddr_value`
+% }
 
+% const nscaddr_value = (inst.flashNonsecureCallableBoundary / 0x400).toString(16);
+// Non-secure callable access boundary, configured in 1KB steps
+#define SET_CCFG_TRUSTZONE_FLASH_CFG_NSCADDR_BOUNDARY   0x`nscaddr_value`
+
+% const ramnsaddr_value = ((inst.sramNonsecureBoundary - 0x20000000) / 0x400).toString(16);
+// Non-secure access boundary, configured in 1KB steps
+#define SET_CCFG_TRUSTZONE_SRAM_CFG_NSADDR_BOUNDARY     0x`ramnsaddr_value`
+
+% const ramnscaddr_value = ((inst.sramNonsecureCallableBoundary - 0x20000000) / 0x400).toString(16);
+// Non-secure callable access boundary, configured in 1KB steps
+#define SET_CCFG_TRUSTZONE_SRAM_CFG_NSCADDR_BOUNDARY    0x`ramnscaddr_value`
+
+% }
+% if(inst.disableRamParity) {
+// Disable parity (enabled by default)
+#define SET_CCFG_SRAM_CFG_PARITY                        0x0
+
+% }
+
+% }
+//#####################################
+// Bus security settings
+//#####################################
+
+% if(inst.lockNonSecureVectorTableBaseAddress) {
+// Enable lock on non-secure vector table base address
+#define SET_CCFG_CPU_LOCK_CFG_LOCKNSVTOR               0x0
+
+% }
+% if(inst.lockSecureInterruptConfig) {
+// Enable lock on secure interrupt config
+#define SET_CCFG_CPU_LOCK_CFG_LOCKSVTAIRCR             0x0
+
+% }
+% if(inst.lockSAURegions) {
+// Enable lock on SAU regions
+#define SET_CCFG_CPU_LOCK_CFG_LOCKSAU                  0x0
+
+% }
+% if(inst.lockNonSecureMPU) {
+// Enable lock on non-secure MPU
+#define SET_CCFG_CPU_LOCK_CFG_LOCKNSMPU                0x0
+
+% }
+% if(inst.lockSecureMPU) {
+// Enable lock on secure MPU
+#define SET_CCFG_CPU_LOCK_CFG_LOCKSMPU                 0x0
+
+% }
+% if(inst.disableSecureNonInvasiveDebug || inst.disableSecureInvasiveDebug) {
+//#####################################
+// Debug authentication settings
+//#####################################
+
+% if(inst.disableSecureNonInvasiveDebug) {
+// Internal secure non-invasive debug disable
+#define SET_CCFG_DEB_AUTH_CFG_INTSPNIDEN               0x0
+// Internal secure non-invasive debug deselect
+#define SET_CCFG_DEB_AUTH_CFG_SPNIDENSEL               0x0
+
+% }
+% if(inst.disableSecureInvasiveDebug) {
+// Internal secure invasive debug disable
+#define SET_CCFG_DEB_AUTH_CFG_INTSPIDEN                0x0
+// Internal secure invasive debug deselect
+#define SET_CCFG_DEB_AUTH_CFG_SPIDENSEL                0x0
+
+% }
+% }
+% } // End of CC26X4-specific section
 /*
  *  ======== Include Base Settings for device ========
  */

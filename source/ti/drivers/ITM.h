@@ -99,7 +99,6 @@
  *  |---------------|----------------|-----------------|---------------|
  *  | CC32XX        | SWD            | Shared with TDO | N             |
  *  | CC13XX/CC26XX | JTAG/cJTAG     | Any pin         | Y             |
- *  | MSP432E4      | SWD            | Shared with TDO | N             |
  *
  *  Device specific pin muxing is done by the device specific ITM backend
  *  implementation.

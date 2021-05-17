@@ -249,6 +249,7 @@ extern void gapSendBondLostEvent( uint16 connHandle, uint8 *pDevAddr );
  */
 
 extern GAP_Addr_Modes_t gapGetDevAddressMode( void );
+extern void gapSetDevAddressMode( GAP_Addr_Modes_t addrMode );
 extern gapLLParamsStates_t gapGetState( void );
 extern uint32 gapGetSignCounter( void );
 extern uint8 *gapGetSRK( void );

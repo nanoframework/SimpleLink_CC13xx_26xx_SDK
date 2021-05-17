@@ -173,6 +173,11 @@ public class ti_targets_arm_rtsarm
             sb.append("'lib/auto_init.aem4f',\n");
             sb.append("'lib/ti.targets.arm.rtsarm.am4f',\n");
             sb.append("'lib/startup.am4f',\n");
+            sb.append("'lib/ti.targets.arm.rtsarm.aem4',\n");
+            sb.append("'lib/boot.aem4',\n");
+            sb.append("'lib/auto_init.aem4',\n");
+            sb.append("'lib/ti.targets.arm.rtsarm.am4',\n");
+            sb.append("'lib/startup.am4',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ti.targets.arm.rtsarm.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
@@ -180,6 +185,11 @@ public class ti_targets_arm_rtsarm
             sb.append("['lib/auto_init.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/ti.targets.arm.rtsarm.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/startup.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ti.targets.arm.rtsarm.aem4', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/boot.aem4', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/auto_init.aem4', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/ti.targets.arm.rtsarm.am4', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
+            sb.append("['lib/startup.am4', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

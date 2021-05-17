@@ -71,11 +71,6 @@ function makeLibs(name, targets, objects, cOpts)
         profile: "",
         suffix: ".a"
     };
-    /* Legacy attributes to maintain compatibility */
-    var attrs_legacy = {
-        copts: "",
-        profile: ""
-    };
 
     /*
      * Array of build profiles to build libs for. Profile must be supported by
@@ -104,22 +99,11 @@ function makeLibs(name, targets, objects, cOpts)
                  */
                 let libOutput = getLibPath(targetName) + libName;
 
-                /*
-                 * Construct the output path for legacy libraries to maintain
-                 * compatibility
-                 */
-                let libOutput_legacy = "lib/" + libName;
-
                 /* Specify the build profile to use for the target library */
                 attrs.profile = profiles[i];
-                attrs_legacy.profile = profiles[i];
 
                 /* Generate libraries following SimpleLink Library naming */
                 lib = Pkg.addLibrary(libOutput, target, attrs);
-                lib.addObjects(objs);
-
-                /* Generate legacy libraries to maintain compatibility */
-                lib = Pkg.addLibrary(libOutput_legacy, target, attrs_legacy);
                 lib.addObjects(objs);
             }
         }
@@ -196,7 +180,6 @@ function makeLibs(name, targets, objects, cOpts)
         /* Disable asserts & logs for the non-instrumented library */
         attrs.copts = cOpts + gccOpts +
             " -Dxdc_runtime_Log_DISABLE_ALL -Dxdc_runtime_Assert_DISABLE_ALL";
-        attrs_legacy.copts = attrs.copts;
 
         /* Create library instances to generate libraries */
         lib = addLibraryProfiles();
@@ -224,14 +207,6 @@ var cc32xxTargets = [
     "iar.targets.arm.M4",
 ];
 
-var msp432e4Targets = [
-    "ti.targets.arm.clang.M4F",
-    "ti.targets.arm.elf.M4F",
-    "gnu.targets.arm.M4F",
-    "iar.targets.arm.M4F",
-];
-
-var mtxxTargets = [
-    "ti.targets.arm.clang.M33",
+var cc26x4Targets = [
     "ti.targets.arm.clang.M33F",
 ];

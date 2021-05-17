@@ -3,7 +3,7 @@
 *
 *  Description: RF core patch for proprietary radio support ("PROP" API command set) in CC13x2 and CC26x2
 *
-*  Copyright (c) 2015-2020, Texas Instruments Incorporated
+*  Copyright (c) 2015-2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -70,11 +70,11 @@ CPE_PATCH_TYPE patchImageProp[] = {
    0x2100406d,
    0x210040d7,
    0x21004099,
-   0x210040f9,
    0x21004105,
    0x21004111,
-   0x21004129,
-   0x21004141,
+   0x2100411d,
+   0x21004135,
+   0x2100414d,
    0x79654c07,
    0xf809f000,
    0x40697961,
@@ -90,25 +90,28 @@ CPE_PATCH_TYPE patchImageProp[] = {
    0x296cb2e1,
    0x2804d00b,
    0x2806d001,
-   0x490ed107,
+   0x4910d107,
    0x07c97809,
    0x7821d103,
    0xd4000709,
-   0x490b2002,
+   0x490d2002,
    0x210c780a,
    0xd0024211,
-   0x22804909,
+   0x2280490b,
    0xb003600a,
    0xb5f0bdf0,
-   0x4907b083,
-   0x48044708,
-   0x22407801,
-   0x70014391,
-   0x47004804,
+   0x4909b083,
+   0x20004708,
+   0x47884908,
+   0x78014804,
+   0x43912240,
+   0x48067001,
+   0x00004700,
    0x210000c8,
    0x21000133,
    0xe000e200,
    0x00031641,
+   0x000063f7,
    0x00031b23,
    0xf882f000,
    0x47004800,
@@ -192,13 +195,13 @@ CPE_PATCH_TYPE patchImageProp[] = {
    0x210002e0,
    0x21000088,
 };
-#define _NWORD_PATCHIMAGE_PROP 124
+#define _NWORD_PATCHIMAGE_PROP 127
 
 #define _NWORD_PATCHCPEHD_PROP 0
 
 #define _NWORD_PATCHSYS_PROP 0
 
-#define _IRQ_PATCH_0 0x21004165
+#define _IRQ_PATCH_0 0x21004171
 
 
 #ifndef _PROP_SYSRAM_START

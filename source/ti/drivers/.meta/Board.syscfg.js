@@ -75,22 +75,23 @@ function getLibs(mod)
 
     if (family != "") {
         family = family.replace(/^DeviceFamily_/, "").toLowerCase();
-        if (family.indexOf("msp432e") == 0) {
-            family = "msp432e4";
-        }
-        else if (family.indexOf("cc32") == 0) {
+        if (family.indexOf("cc32") == 0) {
             family = "cc32xx";
         }
 
         libs.push(libPath("ti/drivers","drivers_" + family + ".a"));
-        libs.push(libPath("ti/grlib", "grlib.a"));
 
-        if (rtos == "TI-RTOS") {
-            libs.push(libPath("ti/dpl","dpl_" + family + ".a"));
-        }
-        else if (rtos == "NoRTOS") {
-            libs.push("lib/" + getToolchainDir() + "/" + getDeviceIsa() +
-                "/nortos_" + family + ".a");
+        if (!family.match(/cc.*4/)) {
+
+            libs.push(libPath("ti/grlib", "grlib.a"));
+
+            if (rtos == "TI-RTOS") {
+                libs.push(libPath("ti/dpl","dpl_" + family + ".a"));
+            }
+            else if (rtos == "NoRTOS") {
+                libs.push("lib/" + getToolchainDir() + "/" + getDeviceIsa() +
+                    "/nortos_" + family + ".a");
+            }
         }
     }
 
@@ -133,6 +134,13 @@ function modules(mod)
     reqs.push({
         name      : "Driverlib",
         moduleName: "/ti/devices/DriverLib",
+        hidden    : true
+    });
+
+    /* this module is only really needed for BIOS 7.x, a noop for others */
+    reqs.push({
+        name      : "DPL",
+        moduleName: "/ti/dpl/Settings",
         hidden    : true
     });
 

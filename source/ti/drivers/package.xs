@@ -64,9 +64,6 @@ function getLibs()
     else if (Program.cpu.deviceName.match(/CC3220/)) {
         driverString = "_cc32xx";
     }
-    else if (Program.cpu.deviceName.match(/MSP432E4.*/)) {
-        driverString = "_msp432e4";
-    }
     else {
         throw ("Driver not found for this device " + Program.cpu.deviceName +
                " and target " + Program.build.target.suffix);

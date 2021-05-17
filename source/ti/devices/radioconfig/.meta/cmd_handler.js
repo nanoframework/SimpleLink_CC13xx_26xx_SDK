@@ -73,7 +73,8 @@ const TxPowerCache = {
 // Exported functions
 exports = {
     get: get,
-    getUpdatedRfCommands: getUpdatedRfCommands
+    getUpdatedRfCommands: getUpdatedRfCommands,
+    getFrontendSettings: getFrontendSettings
 };
 
 /*!
@@ -114,6 +115,27 @@ function getUpdatedRfCommands(inst, phyGroup) {
 }
 
 /*!
+*  ======== getFrontendSettings ========
+*  Get the current frontend settings.
+*
+*  @phyGroup - BLE, IEEE_15_4, PROP
+*  @param id - front-end identifier (ID, XD, XS_RFP ...)
+*/
+function getFrontendSettings(phyGroup, id) {
+    // Get frontend settings
+    const feFile = DeviceInfo.getFrontEndFile(phyGroup);
+    const feData = system.getScript(feFile);
+
+    let fe = null;
+    _.each(feData.frontends.FrontEnd, (feEntry) => {
+        if (id === feEntry._name) {
+            fe = feEntry;
+        }
+    });
+    return fe;
+}
+
+/*!
  *  ======== create ========
  *  Create a setting specific instance of the command handler
  *
@@ -127,7 +149,8 @@ function create(phyGroup, phyName, first) {
     const devCfg = DeviceInfo.getConfiguration(phyGroup);
     const Config = devCfg.configs;
     const SettingPath = DeviceInfo.getSettingPath(phyGroup);
-    const settingsInfo = _.find(DeviceInfo.getSettingMap(phyGroup), (s) => s.name === phyName);
+    const SettingMap = DeviceInfo.getSettingMap(phyGroup);
+    const settingsInfo = _.find(SettingMap, (s) => s.name === phyName);
     const SettingFileName = settingsInfo.file;
 
     // Command buffers
@@ -264,22 +287,29 @@ function create(phyGroup, phyName, first) {
                     }
                 }
                 else {
-                    // Whole word together
-                    const isPointer = "_type" in field && field._type === "pointer";
-                    const fullName = cmd._name + "." + field._name;
-                    const range = field.ByteIndex.split("..");
-                    const item = {
-                        name: field._name,
-                        isPointer: isPointer,
-                        byteOffset: range[0],
-                        width: calculateWidth(range) * 2,
-                        default: getSettingFieldDefault(fullName)
-                    };
-                    if ("Offset" in field && isPointer) {
-                        item.ptrOffset = field.Offset;
-                        item.default = field.PtrName;
+                    // Check if the word is disabled in code generation
+                    let isEnabled = true;
+                    if ("CodeGen" in field) {
+                        isEnabled = field.CodeGen.Action !== "DISABLE_FIELD";
                     }
-                    cmdBuf.push(item);
+                    // Whole word together
+                    if (isEnabled) {
+                        const isPointer = "_type" in field && field._type === "pointer";
+                        const fullName = cmd._name + "." + field._name;
+                        const range = field.ByteIndex.split("..");
+                        const item = {
+                            name: field._name,
+                            isPointer: isPointer,
+                            byteOffset: range[0],
+                            width: calculateWidth(range) * 2,
+                            default: getSettingFieldDefault(fullName)
+                        };
+                        if ("Offset" in field && isPointer) {
+                            item.ptrOffset = field.Offset;
+                            item.default = field.PtrName;
+                        }
+                        cmdBuf.push(item);
+                    }
                 }
             });
             CmdBuf[cmd._name] = cmdBuf;
@@ -1528,20 +1558,10 @@ function create(phyGroup, phyName, first) {
     *  Update the front-end settings with values fetched from the RF Design module.
     */
     function updateFrontendSettings() {
-        // Get frontend settings
-        const feFile = DeviceInfo.getFrontEndFile(PhyGroup);
-        const feData = system.getScript(feFile);
-
         // Get target settings (index to front-end setting)
         const id = RfDesign.getFrontEnd(getFrequencyBand());
 
-        let fe = null;
-        _.each(feData.frontends.FrontEnd, (feEntry) => {
-            if (id === feEntry._name) {
-                fe = feEntry;
-            }
-        });
-
+        const fe = getFrontendSettings(PhyGroup, id);
         if (fe === null) {
             throw Error("FrontEnd not found[" + id + "]");
         }

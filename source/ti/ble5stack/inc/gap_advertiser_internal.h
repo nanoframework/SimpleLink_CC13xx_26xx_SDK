@@ -162,6 +162,8 @@ extern void      gapAdv_processRemoveSetEvt(uint8_t handle,
  */
 uint8_t gapAdv_periodicAdvCmdCompleteCBs( hciEvt_CmdComplete_t *pMsg );
 
+uint8_t gapAdv_handleAdvHciCmdComplete( hciEvt_CmdComplete_t *pMsg );
+
 /*********************************************************************
 *********************************************************************/
 

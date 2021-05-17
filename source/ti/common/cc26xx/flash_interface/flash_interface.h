@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2017-2020, Texas Instruments Incorporated
+ Copyright (c) 2017-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -164,7 +164,11 @@ extern "C"
     #define FLASH_PAGE(addr)                (addr >> 13)
     #define INTFLASH_PAGE_MASK              0xFFFFE000
     #define INTFLASH_PAGE_SIZE              0x2000
+#if defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7)
+    #define MAX_ONCHIP_FLASH_PAGES          88
+#else
     #define MAX_ONCHIP_FLASH_PAGES          44
+#endif
     #define MAX_OFFCHIP_METADATA_PAGES      MAX_ONCHIP_FLASH_PAGES
 #else
     #error

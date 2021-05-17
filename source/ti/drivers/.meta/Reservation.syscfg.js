@@ -112,7 +112,6 @@ function getTimerInstParams(timerId)
     };
 
     switch (family) {
-        case "MSP432E4":
         case "CC32XX": {
             timerArgs.resourceType = "Timer";
             timerArgs.resourceName = "Timer";

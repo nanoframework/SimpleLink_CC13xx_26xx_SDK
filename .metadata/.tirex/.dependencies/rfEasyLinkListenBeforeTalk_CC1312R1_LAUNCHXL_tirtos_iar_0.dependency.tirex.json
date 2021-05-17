@@ -4,12 +4,11 @@
             "+../../easylink/EasyLink.h -> EasyLink.h",
             "+../../easylink/EasyLink.c -> EasyLink.c",
             "+../../README.md -> README.md",
-            "+../../rfEasyLinkListenBeforeTalk.syscfg -> rfEasyLinkListenBeforeTalk.syscfg",
+            "+../rfEasyLinkListenBeforeTalk.syscfg -> rfEasyLinkListenBeforeTalk.syscfg",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../rfEasylinkListenBeforeTalk.c -> rfEasylinkListenBeforeTalk.c",
             "+../../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
-            "+CC1312R1_LAUNCHXL_TIRTOS.icf -> CC1312R1_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

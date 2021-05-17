@@ -51,9 +51,12 @@ const Prefix = "fb";
 // Mapping official names to internal SmartRF Studio names (where these are not equal)
 const LaunchPadMap = {
     "LAUNCHXL-CC1352P1": "LAUNCHXL-CC1352P",
-    "LAUNCHXL-CC1352P-2": "LAUNCHXL-CC1352P-2_4GHZ",
-    "LAUNCHXL-CC2652RB": "LAUNCHXL-CC26X2RB"
+    "LAUNCHXL-CC1352P-2": "LAUNCHXL-CC1352P-2_4GHZ"
 };
+
+// Targets with 10 dBm High PA
+const TargetPA10 = ["LAUNCHXL-CC1352P-4", "LP_CC2652PSIP", "LP_CC1352P7-4",
+    "LP_CC2651P", "LP_CC2651P3"];
 
 // Load board info
 let TiBoard = Common.getBoardName();
@@ -91,7 +94,7 @@ else {
 }
 
 // Determine if board supports 10 dBm high PA
-let Has10dBmPA = TargetName === "LAUNCHXL-CC1352P-4" || TargetName === "LP_CC2652PSIP";
+let Has10dBmPA = TargetPA10.includes(TargetName);
 
 // Create list of frequency bands that are supported by the current device
 const FreqBands = getFrequencyBands();
@@ -135,7 +138,7 @@ const config = [
             if (!(name in DesignData)) {
                 throw new Error("RF Design does not exists: " + name);
             }
-            Has10dBmPA = TargetName === "LAUNCHXL-CC1352P-4" || TargetName === "LP_CC2652PSIP";
+            Has10dBmPA = TargetPA10.includes(TargetName);
             const rfDesign169 = name.includes("XS169");
 
             // Update front-end settings
@@ -282,7 +285,7 @@ function onPaChange(inst) {
     if (inst.pa20 !== "none") {
         const devName = DeviceInfo.getDeviceName();
 
-        if (name === "LAUNCHXL-CC1352P-4" && devName === "cc1352p") {
+        if (name === "LAUNCHXL-CC1352P-4" && (devName === "cc1352p" || devName === "cc2672p")) {
             name = "LAUNCHXL-CC1352P-2_4GHZ";
         }
 
@@ -703,7 +706,13 @@ function getPaTable(freq, highPA) {
     if (fb === null) {
         return null;
     }
-    return highPA ? fb.paTableHi : fb.paTable;
+    if (highPA) {
+        if (Has10dBmPA && fb.paTable10) {
+            return fb.paTable10;
+        }
+        return fb.paTableHi;
+    }
+    return fb.paTable;
 }
 
 /*!
@@ -811,7 +820,8 @@ function loadTargetInfo() {
                                 max: parseInt(fr.Max),
                                 hiPa: highPaTarget
                             };
-                            const name = fr.Min + "-" + fr.Max + paSuffix;
+                            // const name = fr.Min + "-" + fr.Max + paSuffix;
+                            const name = fr.Min + paSuffix;
 
                             // Workaround: do not show 2.4 GHz for CC1312
                             if (!(onlySub1G && (range.min === 2400 || range.min === 2360))) {
@@ -859,7 +869,8 @@ function getFrequencyBands() {
             max: 0,
             highPA: false,
             paTable: null,
-            paTableHi: null
+            paTableHi: null,
+            paTable10: null
         };
 
         // Each virtual target
@@ -872,7 +883,7 @@ function getFrequencyBands() {
                 tmp.max = data.max;
                 tmp.highPA = data.hiPa;
                 insertTaTable(tmp, data);
-                const frName = fr.replace("P", "");
+                const frName = fr.replace("P", "").replace("2360", "2400");
 
                 if (frName in freqBands) {
                     insertTaTable(freqBands[frName], data);
@@ -886,7 +897,12 @@ function getFrequencyBands() {
 
     function insertTaTable(dest, data) {
         if (data.hiPa) {
-            dest.paTableHi = data.paTable;
+            if (data.paTable[0]._text === "10") {
+                dest.paTable10 = data.paTable;
+            }
+            else {
+                dest.paTableHi = data.paTable;
+            }
             dest.highPA = true;
         }
         else {
@@ -937,7 +953,7 @@ function getDesignData() {
     // Add dropdown options
     const options = [];
     for (const td in rfDesign) {
-        if (!(td.includes("HIGH-PA") || td.includes("CC1352R1-2_4GHZ"))) {
+        if (!(td.includes("HIGH-PA") || td.includes("CC1352R1-2_4GHZ") || td.match("CC1352P7.*-2_4GHZ"))) {
             const map = _.invert(LaunchPadMap);
             let name;
             if (td in map) {
@@ -1003,20 +1019,21 @@ function getFrequencyBandByFreq(freq, highPA) {
     for (const fr in FreqBands) {
         const fb = FreqBands[fr];
         if (lFreq >= fb.min && lFreq <= fb.max) {
+            const noPA = fb.paTableHi === null && fb.paTable10 === null;
             // In frequency band but no high PA support, try next band
-            if (fb.paTableHi === null && highPA) {
+            if (noPA && highPA) {
                 // eslint-disable-next-line no-continue
                 continue;
             }
             // Devices without PA
-            if (fb.paTableHi === null || !highPA) {
+            if (noPA || !highPA) {
                 return fb;
             }
             // Devices with PA
-            if (Has10dBmPA && fb.paTableHi[0]._text === "10") {
+            if (Has10dBmPA && fb.paTable10) {
                 return fb;
             }
-            else if (fb.paTableHi[0]._text === "20") {
+            else if (fb.paTableHi) {
                 return fb;
             }
         }
@@ -1122,14 +1139,14 @@ function generateTxPowerCode(inst, target, nTable) {
                 code += "\n// " + info.description + "\n";
                 code += typeName + info.symTxPower
                     + "[" + info.symTxPowerSize + "] =\n{\n";
-                code += generatePaTableCode(target.paTableHi, false);
+                code += generatePaTableCode(info.paTable, false);
                 code += tableTerminate;
             }
             if (paExport.combined > 0) {
                 // Combined PA table
                 const infoStd = getPaTableInfo(target, false);
                 const infoHiPa = getPaTableInfo(target, true);
-                const paTable = combinePaTable(target.paTable, target.paTableHi);
+                const paTable = combinePaTable(target.paTable, infoHiPa.paTable);
                 const codeComb = generatePaTableCode(paTable, true);
 
                 info = mergePaTableInfo(infoStd, infoHiPa);
@@ -1184,7 +1201,7 @@ function generateTxPowerHeader(inst, target) {
                 // Combined PA table
                 const infoStd = getPaTableInfo(target, false);
                 const infoHiPa = getPaTableInfo(target, true);
-                const paList = combinePaTable(target.paTable, target.paTableHi);
+                const paList = combinePaTable(target.paTable, infoHiPa.paTable);
 
                 info = mergePaTableInfo(infoStd, infoHiPa);
                 codeSz += "#define " + info.symTxPowerSize + " " + (paList.length + 1)
@@ -1253,20 +1270,20 @@ function isHighPaSupported(inst, freq) {
  *  @param highPa - if generating symbols for High PA
 */
 function getPaTableInfo(target, highPa) {
-    // Get the first (highest) entry of the PA table, this determines which PA table name we generate
-    const fbName = getFreqBandShortName(target.min);
-    const paTable = highPa ? target.paTableHi : target.paTable;
-
+    const paTable = getPaTable(target.max, highPa);
     if (paTable === null) {
         return null;
     }
 
+    // Get the first (highest) entry of the PA table, this determines which PA table name we generate
     const paDefault = paTable[0];
     let pa = paDefault._text;
 
     if (pa > 12 && pa < 15) {
         pa = "13";
     }
+
+    const fbName = getFreqBandShortName(target.min);
     const ret = {
         paTable: paTable,
         pa: pa,
@@ -1352,13 +1369,7 @@ function modifyPaName(paOrig) {
  */
 function getTxPowerValueByDbm(freqStr, highPA, dbm) {
     const freq = parseFloat(freqStr);
-
-    // Pick settings according to PA
-    const fb = getFrequencyBandByFreq(freq, highPA);
-    if (fb === null) {
-        return null;
-    }
-    const paList = highPA ? fb.paTableHi : fb.paTable;
+    const paList = getPaTable(freq, highPA);
 
     for (const i in paList) {
         const pa = paList[i];
@@ -1416,8 +1427,7 @@ function getTxPowerValueDefault(freqStr, highPA) {
     let ret;
 
     // Pick settings according to PA
-    const fb = getFrequencyBandByFreq(freq, highPA);
-    const paList = highPA ? fb.paTableHi : fb.paTable;
+    const paList = getPaTable(freq, highPA);
     const pa = paList[0];
 
     if ("TxHighPa" in pa) {
@@ -1501,6 +1511,7 @@ const module = {
     longDescription: Docs.rfDesignDescription,
     moduleStatic: moduleStatic,
     prefix: Prefix,
+    has10dBmPA: () => Has10dBmPA,
     isFreqBandSelected: isFreqBandSelected,
     getFreqBandShortName: getFreqBandShortName,
     getTargetInfo: getTargetInfo,

@@ -21,7 +21,11 @@
             "options": [
                 {
                     "name": "2gfsk100kbps",
-                    "displayName": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (FPGA)"
+                    "displayName": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (Pre-silicon settings)"
+                },
+                {
+                    "name": "2gfsk250kbps",
+                    "displayName": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth (Pre-silicon settings)"
                 },
                 {
                     "name": "custom2400",
@@ -261,6 +265,20 @@
                     "description": "TX Power",
                     "default": "14",
                     "longDescription": ""
+                },
+                {
+                    "name": "txPowerHi",
+                    "displayName": "TX Power (dBm)",
+                    "description": "TX Power",
+                    "default": "20",
+                    "hidden": true
+                },
+                {
+                    "name": "highPA",
+                    "displayName": "High PA",
+                    "description": "Select if the High Power Amplifier on the device should be used",
+                    "default": false,
+                    "hidden": false
                 },
                 {
                     "name": "txPower2400",
@@ -667,7 +685,14 @@
             {
                 "file": "setting_tc900.json",
                 "name": "2gfsk100kbps",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (FPGA)"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (Pre-silicon settings)",
+                "options": "disable_high_pa"
+            },
+            {
+                "file": "setting_tc901.json",
+                "name": "2gfsk250kbps",
+                "description": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth (Pre-silicon settings)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc900_custom.json",

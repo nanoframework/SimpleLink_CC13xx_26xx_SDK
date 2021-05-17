@@ -20,6 +20,10 @@
         <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/package/package_ti.sysbios.rts.gnu.om4fg.dep" src="package/package_ti.sysbios.rts.gnu.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/ReentSupport.om4fg.dep" src="ReentSupport.c"/>
         <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/SemiHostSupport.om4fg.dep" src="SemiHostSupport.c"/>
+        <srcFile name="lib/debug/ti.sysbios.rts.gnu.am4g.mak" src="package.bld"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/package/package_ti.sysbios.rts.gnu.om4g.dep" src="package/package_ti.sysbios.rts.gnu.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/ReentSupport.om4g.dep" src="ReentSupport.c"/>
+        <srcFile name="package/lib/lib/debug/ti.sysbios.rts.gnu/SemiHostSupport.om4g.dep" src="SemiHostSupport.c"/>
         <srcFile name="package/rel/ti_sysbios_rts_gnu.tar.dep" src="package/rel/ti_sysbios_rts_gnu.xdc.inc"/>
     </makefiles>
     <targets>
@@ -36,12 +40,29 @@
                 codeModel="thumb2"
                 dataModel="undefined"/>
         </target>
+        <target name="gnu.targets.arm.M4"
+            version="gnu.targets.arm.M4{1,0,9.2,1"
+            rawVersion="9.2.1"
+            platform="ti.platforms.tiva:TM4C1294NCPDT"
+            isa="v7M4"
+            suffix="m4g"
+            rootDir="/scratch/xlibrary/.conan/data/arm-none-eabi-gcc/9.2019.q4.major-0/library-msp/ga/package/44fcf6b9a7fb86b2586303e3db40189d3b511830"
+            os="undefined"
+            rts="gnu.targets.arm.rtsv7M">
+            <model endian="little"
+                codeModel="thumb2"
+                dataModel="undefined"/>
+        </target>
     </targets>
     <libraries>
     <library name="lib/debug/ti.sysbios.rts.gnu"
         pname="lib/debug/ti.sysbios.rts.gnu.am4fg"
         profile="debug"
         target="gnu.targets.arm.M4F"/>
+    <library name="lib/debug/ti.sysbios.rts.gnu"
+        pname="lib/debug/ti.sysbios.rts.gnu.am4g"
+        profile="debug"
+        target="gnu.targets.arm.M4"/>
     </libraries>
     <configurations>
     </configurations>
@@ -65,6 +86,7 @@
         <file name="package/package_ti.sysbios.rts.gnu.c"/>
         <file name="ReentSupport.c"/>
         <file name="SemiHostSupport.c"/>
+        <file name="lib/debug/ti.sysbios.rts.gnu.am4g"/>
     </release>
     </releases>
     <repositories>

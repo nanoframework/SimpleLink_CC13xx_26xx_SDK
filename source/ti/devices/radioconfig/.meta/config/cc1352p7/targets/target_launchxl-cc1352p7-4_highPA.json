@@ -7,7 +7,7 @@
         "DevicePackage": "VQFN 7x7",
         "FrontEnd": "XD",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC1352PEM-XD7793-XD24-PA24",
+        "RfDesign": "CC1352PEM-XD4251-XD24-PA24_10dBm",
         "DefaultCategory": "Settings for Bluetooth Low Energy",
         "IoSettings": {
             "_name": "RF Switch",
@@ -17,7 +17,7 @@
                     "ControlFunction": "Input\/Output",
                     "Idle": "Input tristate (Default)",
                     "Tx": "Output low",
-                    "Rx": "Output low"
+                    "Rx": "Output high"
                 },
                 {
                     "_name": "DIO29",
@@ -31,7 +31,7 @@
                     "ControlFunction": "Input\/Output",
                     "Idle": "Input tristate (Default)",
                     "Tx": "Output low",
-                    "Rx": "Output high"
+                    "Rx": "Output low"
                 }
             ]
         }

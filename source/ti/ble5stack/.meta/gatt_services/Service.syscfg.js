@@ -82,47 +82,65 @@ function validate(inst, vo)
 			}
 		}
 	}
-
-    //check for duplicate CB name- in the same service
-    let counterWriteCB = 0;
-    let counterReadCB = 0;
-
-    if(inst.userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() && inst.userReadCBfunc != "")
-    {
+	
+	//check for duplicate CB name- in the same service
+	let counterWriteCB = 0;
+	let counterReadCB = 0;
+	let counterAuthoCB = 0;
+	if(inst.userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() && inst.userReadCBfunc != "")
+	{
         counterReadCB++;
         counterWriteCB++;
+	}	
+    if(inst.userReadCBfunc.toLowerCase() == inst.userAuthorizationCBfunc.toLowerCase() && inst.userAuthorizationCBfunc != "")
+    {
+        counterReadCB++;
+        counterAuthoCB++;
     }
+    if(inst.userWriteCBfunc.toLowerCase()  == inst.userAuthorizationCBfunc.toLowerCase() && inst.userWriteCBfunc != "")
+    {
+        counterWriteCB++;
+        counterAuthoCB++;
+    }
+    if(counterAuthoCB > 0){ vo["userAuthorizationCBfunc"].errors.push("This function is already in use in another callback."); }
     if(counterReadCB > 0){ vo["userReadCBfunc"].errors.push("This function is already in use in another callback."); }
     if(counterWriteCB > 0){ vo["userWriteCBfunc"].errors.push("This function is already in use in another callback."); }
 
-    //check duplicate CB function between other service
-    for (let i = 0; i < serviceMod.$instances.length; i++)
-    {
+
+	//check duplicate CB function between other service
+    for (let i = 0; i < serviceMod.$instances.length; i++) {
         if(!(inst === serviceMod.$instances[i]) && inst.userReadCBfunc != "" &&
-          (serviceMod.$instances[i].userWriteCBfunc.toLowerCase() == inst.userReadCBfunc.toLowerCase() ))
-        {
-            vo["userReadCBfunc"].errors.push("This function is already in use by another service.");
-            break;
+          (serviceMod.$instances[i].userWriteCBfunc.toLowerCase() == inst.userReadCBfunc.toLowerCase() ||
+           serviceMod.$instances[i].userAuthorizationCBfunc.toLowerCase() == inst.userReadCBfunc.toLowerCase())){
+                vo["userReadCBfunc"].errors.push("This function is already in use by another service.");
+                break;
         }
     }
 
-    for (let i = 0; i < serviceMod.$instances.length; i++)
-    {
-        if(!(inst === serviceMod.$instances[i]) && inst.userWriteCBfunc != "" &&
-          (serviceMod.$instances[i].userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() ))
-        {
-            vo["userWriteCBfunc"].errors.push("This function is already in use by another service.");
-            break;
+    for (let i = 0; i < serviceMod.$instances.length; i++) {
+        if(!(inst === serviceMod.$instances[i]) && inst.userWriteCBfunc != "" && 
+          (serviceMod.$instances[i].userReadCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase() ||
+           serviceMod.$instances[i].userAuthorizationCBfunc.toLowerCase() == inst.userWriteCBfunc.toLowerCase())){
+                vo["userWriteCBfunc"].errors.push("This function is already in use by another service.");
+                break;
         }
     }
 
-	//check for duplicate service name
-	counter = 0;
+    for (let i = 0; i < serviceMod.$instances.length; i++) {
+        if(!(inst === serviceMod.$instances[i]) && inst.userAuthorizationCBfunc != "" && 
+          (serviceMod.$instances[i].userReadCBfunc.toLowerCase() == inst.userAuthorizationCBfunc.toLowerCase() ||
+           serviceMod.$instances[i].userWriteCBfunc.toLowerCase() == inst.userAuthorizationCBfunc.toLowerCase())){
+                vo["userAuthorizationCBfunc"].errors.push("This function is already in use by another service.");
+                break;
+        }
+    }
+
+    //check for duplicate service name
+    counter = 0;
     for (let i = 0; i < serviceMod.$instances.length; i++) {
         if(serviceMod.$instances[i].name.toLowerCase() == inst.name.toLowerCase()){
             counter ++;
-            if(counter > 1)
-            {
+            if(counter > 1){
                 vo["name"].errors.push("This name is taken by another service/characteristic.");
                 break;
             }
@@ -131,8 +149,7 @@ function validate(inst, vo)
         for (let cidx = 0; cidx < serviceMod.$instances[i].characteristics.length; ++ cidx) {
             if(serviceMod.$instances[i].characteristics[cidx].name.toLowerCase() == inst.name.toLowerCase()) {
                 counter ++;
-                if(counter > 1)
-                {
+                if(counter > 1) {
                     vo["name"].errors.push("This name is taken by another service/characteristic.");
                     break;
                 }
@@ -204,7 +221,13 @@ let config = [
         displayName  : 'Read Attribute CB Function',
         default      : '',
         placeholder : "Optional- Enter a function name to enable",
-    }
+    },
+    {
+        name         : 'userAuthorizationCBfunc',
+        displayName  : 'Authorization CB Function',
+        default      : '',
+        placeholder : "Optional- Enter a function name to enable",
+    },
 ];
 
 function updateNumOfServices(inst,ui)

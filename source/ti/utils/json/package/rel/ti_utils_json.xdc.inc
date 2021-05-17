@@ -20,3 +20,11 @@ lib/gcc/m4f/json_debug.a
 lib/gcc/m4f/json_release.a
 lib/iar/m4f/json_debug.a
 lib/iar/m4f/json_release.a
+lib/ccs/m4/json_debug.a
+lib/ccs/m4/json_release.a
+lib/ticlang/m4/json_debug.a
+lib/ticlang/m4/json_release.a
+lib/gcc/m4/json_debug.a
+lib/gcc/m4/json_release.a
+lib/iar/m4/json_debug.a
+lib/iar/m4/json_release.a

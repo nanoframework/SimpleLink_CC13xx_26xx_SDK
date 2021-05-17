@@ -367,6 +367,7 @@ extern void smSendSMMsg(void);
 extern void smpInitiatorProcessPairingRsp(void);
 extern void smpInitiatorProcessPairingRsp_sPatch(void);
 extern void smpInitiatorProcessPairingPubKey(void);
+extern void smpInitiatorProcessPairingPubKey_sPatch(void);
 extern void smpInitiatorProcessPairingDHKeyCheck(void);
 extern void smpInitiatorProcessPairingConfirm(void);
 extern void smpInitiatorProcessPairingRandom(void);
@@ -379,6 +380,7 @@ extern void smInitiatorAuthStageTwo(void);
 extern void setupInitiatorKeys(void);
 extern void smInitiatorSendNextKeyInfo(void);
 extern void smpResponderProcessIncoming(void);
+extern void smpResponderProcessIncoming_sPatch(void);
 extern void smResponderSendNextKeyInfo(void);
 extern void smpResponderSendPairRspEvent(void);
 extern void smResponderProcessLTKReq(void);
@@ -568,7 +570,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)LE_ReadTxPowerCmd,                                 // ROM_JT_OFFSET[97]
   (uint32)LE_RemoveAdvSet,                                   // ROM_JT_OFFSET[98]
 #if ( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
-  (uint32)LE_SetExtAdvData,                                  // ROM_JT_OFFSET[99]
+  (uint32)LE_SetExtAdvData_hook,                             // ROM_JT_OFFSET[99]
   (uint32)LE_SetExtAdvEnable,                                // ROM_JT_OFFSET[100]
   (uint32)LE_SetExtAdvParams,                                // ROM_JT_OFFSET[101]
 #else // !( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
@@ -583,7 +585,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)ROM_Spinlock,
   (uint32)ROM_Spinlock,
 #endif // ( CTRL_CONFIG & (SCAN_CFG | INIT_CFG) )
-  (uint32)LE_SetExtScanRspData,                              // ROM_JT_OFFSET[104]
+  (uint32)LE_SetExtScanRspData_hook,                         // ROM_JT_OFFSET[104]
   (uint32)LE_WriteRfPathCompCmd,                             // ROM_JT_OFFSET[105]
   (uint32)LL_AE_RegCBack,                                    // ROM_JT_OFFSET[106]
   (uint32)LL_AddWhiteListDevice,                             // ROM_JT_OFFSET[107]
@@ -1459,7 +1461,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smpParseSigningInfo,                               // ROM_JT_OFFSET[822]
   (uint32)smSendSMMsg,                                       // ROM_JT_OFFSET[823]
   (uint32)smpInitiatorProcessPairingRsp_sPatch,              // ROM_JT_OFFSET[824]
-  (uint32)smpInitiatorProcessPairingPubKey,                  // ROM_JT_OFFSET[825]
+  (uint32)smpInitiatorProcessPairingPubKey_sPatch,           // ROM_JT_OFFSET[825]
   (uint32)smpInitiatorProcessPairingDHKeyCheck,              // ROM_JT_OFFSET[826]
   (uint32)smpInitiatorProcessPairingConfirm,                 // ROM_JT_OFFSET[827]
 #if ( HOST_CONFIG & CENTRAL_CFG )
@@ -1475,7 +1477,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smInitiatorAuthStageTwo,                           // ROM_JT_OFFSET[834]
   (uint32)setupInitiatorKeys,                                // ROM_JT_OFFSET[835]
   (uint32)smInitiatorSendNextKeyInfo,                        // ROM_JT_OFFSET[836]
-  (uint32)smpResponderProcessIncoming,                       // ROM_JT_OFFSET[837]
+  (uint32)smpResponderProcessIncoming_sPatch,                // ROM_JT_OFFSET[837]
   (uint32)smResponderSendNextKeyInfo,                        // ROM_JT_OFFSET[838]
   (uint32)smpResponderSendPairRspEvent,                      // ROM_JT_OFFSET[839]
 #if ( HOST_CONFIG & PERIPHERAL_CFG )
@@ -2249,6 +2251,13 @@ uint8 MAP_LL_EnhancedCteRxTest( uint8 rxChan,
 #endif
 }
 
+void MAP_llSetRfReportAodPackets( void )
+{
+#ifdef RTLS_CTE_TEST
+  llSetRfReportAodPackets();
+#endif
+}
+
 uint8 MAP_llGetCteInfo( uint8 id, void *ptr )
 {
 #ifdef USE_RTLS
@@ -2318,7 +2327,7 @@ uint8 MAP_LL_ReadAntennaInformation( uint8 *sampleRates, uint8 *maxNumOfAntennas
 
 void MAP_llUpdateCteState( void *connPtr )
 {
-#ifdef USE_DMM
+#ifdef USE_RTLS
   llUpdateCteState(connPtr);
 #endif
 }
@@ -2445,6 +2454,15 @@ uint32_t MAP_LL_AbortedCback( uint8 preempted )
 #else
   return LL_AbortedCback(preempted);
 #endif
+}
+
+uint8 MAP_llSetStarvationMode(uint16 connId, uint8 setOnOffValue)
+{
+//#ifdef USE_DMM
+  return LL_INACTIVE_CONNECTIONS;
+//#else
+//  return llSetStarvationMode(connId, setOnOffValue);
+//#endif
 }
 
 /*******************************************************************************
@@ -2824,6 +2842,40 @@ void MAP_llUpdateExtScanAcceptSyncInfo( void )
   llUpdateExtScanAcceptSyncInfo();
 #endif
 }
+
+/**
+* These hooks created to change the call to the relevant HCI command
+* instead of calling the controller directly.
+* This is needed to support the relevant command complete events
+* that are passed to the application when using BLE3_CMD
+* compilation flag
+*/
+uint8_t LE_SetExtAdvData_hook( void * pMsg )
+{
+#ifdef BLE3_CMD
+  return HCI_LE_SetExtAdvData(pMsg);
+#else
+  return LE_SetExtAdvData(pMsg);
+#endif
+}
+uint8_t LE_SetExtScanRspData_hook( void * pMsg)
+{
+#ifdef BLE3_CMD
+  return HCI_LE_SetExtScanRspData(pMsg);
+#else
+  return LE_SetExtScanRspData(pMsg);
+#endif
+}
+
+uint8 MAP_gapAdv_handleAdvHciCmdComplete( void *pMsg )
+{
+#ifdef BLE3_CMD
+  return gapAdv_handleAdvHciCmdComplete(pMsg);
+#else
+  return TRUE;
+#endif
+}
+
 
 /*******************************************************************************
  */

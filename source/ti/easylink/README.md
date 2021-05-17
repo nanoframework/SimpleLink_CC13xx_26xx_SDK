@@ -180,3 +180,7 @@ Changelog
 ### Version 3.30.00
 
 - Added support for limited migration between devices/boards in SysConfig
+
+### Version 4.10.00
+
+- Added TI Clang compiler support for all examples

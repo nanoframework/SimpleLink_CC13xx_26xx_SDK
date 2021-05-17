@@ -901,10 +901,6 @@ typedef struct
     ((void (*)(const uint8_t *nonce, uint32_t nonceLength)) \
     ROM_API_AES_TABLE[7])
 
-#define ROM_AESWriteToKeyStore \
-    ((uint32_t (*)(const uint8_t *aesKey, uint32_t aesKeyLength, uint32_t keyStoreArea)) \
-    ROM_API_AES_TABLE[8])
-
 
 // PKA FUNCTIONS
 #define ROM_PKABigNumAddGetResult \

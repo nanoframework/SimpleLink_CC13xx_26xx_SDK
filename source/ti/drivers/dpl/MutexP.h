@@ -67,8 +67,9 @@ extern "C" {
  *  @brief    Number of bytes greater than or equal to the size of any RTOS
  *            MutexP object.
  *
- *  nortos:   12
- *  SysBIOS:  40
+ *  NoRTOS:   12
+ *  BIOS 6.x: 40
+ *  BIOS 7.x: 40
  *  FreeRTOS: 80
  */
 #define MutexP_STRUCT_SIZE   (80)

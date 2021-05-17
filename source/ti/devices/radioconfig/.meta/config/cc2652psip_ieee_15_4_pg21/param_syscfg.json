@@ -150,7 +150,8 @@
             {
                 "file": "setting_ieee_802_15_4_10_dbm.json",
                 "name": "ieee154p10",
-                "description": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8, 10 dBm (Preview)"
+                "description": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8, 10 dBm (Preview)",
+                "options": "10dBm"
             }
         ]
     }

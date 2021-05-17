@@ -196,6 +196,16 @@ __Rage__: A valid \`gapBondEccKeys_t\` structure \n
 For more information, refer to the [BLE Stack API Reference](/ble5stack/ble_user_guide/\
 doxygen/ble/html/group___g_a_p_bond_mgr___params.html).\n`
 
+// Long description for the allowDebugKeys configuration parameter
+const allowDebugKeysLongDescription = `Allow or reject debug keys during public keys exchange.\n
+Only applicable for Secure Connections. Allows the application to specify if the device should \
+reject debug keys or accept them from the peer during public keys exchange.\n
+If \`FALSE\`, reject debug keys .\n
+If \`TRUE\`, accept debug keys .\n
+__Default__: True (checked)\n
+For more information, refer to the [BLE Stack API Reference](/ble5stack/ble_user_guide/\
+doxygen/ble/html/group___g_a_p_bond_mgr___params.html).\n`
+
 // Long description for the eraseBondWhileInConn configuration parameter
 const eraseBondWhileInConnLongDescription = `Allows to erase a bond even if there \
 are active connections.\n
@@ -224,5 +234,6 @@ ble-stack-5.x/gapbondmngr-cc13x2_26x2.html#gapbondmgr-and-snv)\n`
     bondFailActionLongDescription: bondFailActionLongDescription,
     keyDistListLongDescription: keyDistListLongDescription,
     eccDebugKeysLongDescription: eccDebugKeysLongDescription,
+	allowDebugKeysLongDescription: allowDebugKeysLongDescription,
     eraseBondWhileInConnLongDescription: eraseBondWhileInConnLongDescription
 };

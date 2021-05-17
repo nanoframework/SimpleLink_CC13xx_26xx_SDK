@@ -5,7 +5,8 @@
             "_name": "LP_CC1352P7-4",
             "Target": [
                 "..\/..\/cc1352p7\/targets\/target_launchxl-cc1352p7-4.json",
-                "..\/..\/cc1352p7\/targets\/target_launchxl-cc1352p7-4_highPA.json"
+                "..\/..\/cc1352p7\/targets\/target_launchxl-cc1352p7-4_highPA.json",
+                "..\/..\/cc1352p7\/targets\/target_launchxl-cc1352p7-4_2_4_ghz.json"
             ]
         }
     }

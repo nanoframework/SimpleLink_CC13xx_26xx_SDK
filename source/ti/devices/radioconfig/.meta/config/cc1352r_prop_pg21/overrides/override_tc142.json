@@ -33,11 +33,6 @@
             },
             {
                 "_type": "ELEMENT",
-                "_comment": "Set LNA IB offset to 0xF",
-                "$": "0x000F8883"
-            },
-            {
-                "_type": "ELEMENT",
                 "_comment": "Synth: Set dTxM value factor to -50",
                 "$": "0x00CE87E3"
             },
@@ -64,7 +59,7 @@
             {
                 "_type": "HW_REG_OVERRIDE",
                 "_comment": "Rx: Set AGC reference level to 0x16 (default: 0x2E)",
-                "$": "0x609C,0x0016"
+                "$": "0x609C,0x001A"
             },
             {
                 "_type": "ELEMENT",
@@ -75,6 +70,11 @@
                 "_type": "ADI_HALFREG_OVERRIDE",
                 "_comment": "Rx: Set anti-aliasing filter bandwidth to 0xB (in ADI0, set IFAMPCTL3[7:4]=0xB)",
                 "$": "0,61,0xF,0xB"
+            },
+            {
+                "_type": "ADI_HALFREG_OVERRIDE",
+                "_comment": "Set LNA IB boost to 2",
+                "$": "0,5,0xF,0x2"
             }
         ]
     }

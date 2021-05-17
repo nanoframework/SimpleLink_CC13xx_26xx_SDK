@@ -235,6 +235,8 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define HCI_LE_SetConnectionlessCteTransmitParamsCmd(...) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessCteTransmitParamsCmd , ##__VA_ARGS__))
 #define HCI_LE_SetConnectionlessCteTransmitEnableCmd(...) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessCteTransmitEnableCmd , ##__VA_ARGS__))
 #define HCI_LE_SetConnectionlessIqSamplingEnableCmd(...)  (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd , ##__VA_ARGS__))
+#define HCI_LE_SetExtScanRspData(...)                     (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetExtScanRspData , ##__VA_ARGS__))
+#define HCI_LE_SetExtAdvData(...)                         (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetExtAdvData , ##__VA_ARGS__))
 
 /* HCI Extented API */
 /********************/

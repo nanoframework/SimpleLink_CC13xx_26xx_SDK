@@ -8,8 +8,7 @@
             "+../../overview.rov.json -> overview.rov.json",
             "+../bigtime.cfg -> bigtime.cfg",
             "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
-            "+CC26X2R1_LAUNCHXL_TIRTOS.lds -> CC26X2R1_LAUNCHXL_TIRTOS.lds",
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds",
             "+../makefile.defs -> makefile.defs"
         ]
     }

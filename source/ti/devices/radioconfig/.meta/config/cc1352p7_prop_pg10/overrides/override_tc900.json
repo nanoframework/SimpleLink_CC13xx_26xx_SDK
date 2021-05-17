@@ -20,6 +20,21 @@
                 "_type": "ADI_HALFREG_OVERRIDE",
                 "_comment": "Rx: Set anti-aliasing filter bandwidth to 0x9 (in ADI0, set IFAMPCTL3[7:4]=0x9)",
                 "$": "0,61,0xF,0x9"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Synth: Increase mid code calibration time to 5 us",
+                "$": "0x00058683"
+            },
+            {
+                "_type": "HW32_ARRAY_OVERRIDE",
+                "_comment": "Synth: Increase mid code calibration time to 5 us",
+                "$": "0x4004,1"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Synth: Increase mid code calibration time to 5 us",
+                "$": "0x38183C30"
             }
         ]
     }

@@ -78,7 +78,7 @@ extern uint8_t * pRandomAddress;
 // The maximum ATT_MTU is MAX_PDU_SIZE - 4.
 #define MAX_PDU_SIZE                  		    `ble.maxPDUSize`
 
-% if (ble.deviceRole != "BROADCASTER_CFG" && ble.deviceRole != "OBSERVER_CFG" && ble.bondManager == true){
+% if (ble.deviceRole != "BROADCASTER_CFG" && ble.deviceRole != "OBSERVER_CFG" && ble.deviceRole != "BROADCASTER_CFG+OBSERVER_CFG" && ble.bondManager == true){
 /*********************************************************************
  * Bond Manager Configuration
  */
@@ -105,6 +105,7 @@ extern uint8_t bondFailAction;
 % }
 extern uint8_t KeyDistList;
 extern uint8_t eccDebugKeys;
+extern uint8_t allowDebugKeys;
 extern uint8_t eraseBondWhileInConn;
 
 extern void setBondManagerParameters();

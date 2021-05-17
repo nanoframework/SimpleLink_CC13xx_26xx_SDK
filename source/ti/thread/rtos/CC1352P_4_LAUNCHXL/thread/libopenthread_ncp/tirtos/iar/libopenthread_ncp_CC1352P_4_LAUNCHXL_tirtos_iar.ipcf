@@ -27,9 +27,9 @@
         <define>_BSD_SOURCE=1</define>
         <define>_DEFAULT_SOURCE=1</define>
         <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h"</define>
-        <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h"</define>
         <define>OPENTHREAD_FTD=1</define>
         <define>OPENTHREAD_CONFIG_FILE="openthread-config-cc1352-iar-ncp.h"</define>
+        <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc1352-config-ide.h"</define>
     </defines>
 
     <extraOptions>
@@ -40,7 +40,6 @@
             <arg>--aeabi</arg>
             <arg>--thumb</arg>
             <arg>--diag_suppress=Pa050</arg>
-            <arg>--c++</arg>
         </args>
     </extraOptions>
 

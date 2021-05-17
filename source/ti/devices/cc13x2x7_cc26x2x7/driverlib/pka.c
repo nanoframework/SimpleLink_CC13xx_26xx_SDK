@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       pka.c
-*  Revised:        2020-09-14 11:11:23 +0200 (Mon, 14 Sep 2020)
-*  Revision:       58613
+*  Revised:        2021-02-03 05:40:36 +0100 (Wed, 03 Feb 2021)
+*  Revision:       60277
 *
 *  Description:    Driver for the PKA module
 *
@@ -71,6 +71,10 @@
     #define PKABigNumInvModStart            NOROM_PKABigNumInvModStart
     #undef  PKABigNumInvModGetResult
     #define PKABigNumInvModGetResult        NOROM_PKABigNumInvModGetResult
+    #undef  PKABigNumExpModStart
+    #define PKABigNumExpModStart            NOROM_PKABigNumExpModStart
+    #undef  PKABigNumExpModGetResult
+    #define PKABigNumExpModGetResult        NOROM_PKABigNumExpModGetResult
     #undef  PKABigNumMultiplyStart
     #define PKABigNumMultiplyStart          NOROM_PKABigNumMultiplyStart
     #undef  PKABigNumMultGetResult
@@ -1132,6 +1136,57 @@ uint32_t PKABigNumInvModStart(const uint8_t *bigNum, uint32_t bigNumLength, cons
 //
 //*****************************************************************************
 uint32_t PKABigNumInvModGetResult(uint8_t *resultBuf, uint32_t length, uint32_t resultPKAMemAddr)
+{
+    // Zero-out array in case modulo result is shorter than length
+    PKAZeroOutArray(resultBuf, length);
+
+    return PKAGetBigNumResult(resultBuf, &length, resultPKAMemAddr);
+}
+
+//*****************************************************************************
+//
+// Start the big number modular exponentiation operation.
+//
+//*****************************************************************************
+uint32_t PKABigNumExpModStart(const uint8_t *base, uint32_t baseLength, const uint8_t *exponent, uint32_t exponentLength, const uint8_t *modulus, uint32_t modulusLength, uint32_t *resultPKAMemAddr)
+{
+    uint32_t offset = 0;
+
+    // Check the arguments.
+    ASSERT(base);
+    ASSERT(exponent);
+    ASSERT(modulus);
+    ASSERT(resultPKAMemAddr);
+
+    // Make sure no operation is in progress.
+    if (HWREG(PKA_BASE + PKA_O_FUNCTION) & PKA_FUNCTION_RUN) {
+        return PKA_STATUS_OPERATION_BUSY;
+    }
+
+    offset = PKAWritePkaParam(exponent, exponentLength, offset, PKA_O_APTR);
+
+    offset = PKAWritePkaParamExtraOffset(modulus, modulusLength, offset, PKA_O_BPTR);
+
+    offset = PKAWritePkaParam(base, baseLength, offset, PKA_O_CPTR);
+
+    // Copy the result vector address location.
+    *resultPKAMemAddr = PKA_RAM_BASE + offset;
+
+    // Load D pointer with the result location in PKA RAM.
+    HWREG(PKA_BASE + PKA_O_DPTR) = offset >> 2;
+
+    // set the PKA function to ExpMod operation and the start the operation.
+    HWREG(PKA_BASE + PKA_O_FUNCTION) = PKA_FUNCTION_RUN_M | (0x04 << PKA_FUNCTION_SEQUENCER_OPERATIONS_S);
+
+    return PKA_STATUS_SUCCESS;
+}
+
+//*****************************************************************************
+//
+// Get the result of the big number inverse modulo operation.
+//
+//*****************************************************************************
+uint32_t PKABigNumExpModGetResult(uint8_t *resultBuf, uint32_t length, uint32_t resultPKAMemAddr)
 {
     // Zero-out array in case modulo result is shorter than length
     PKAZeroOutArray(resultBuf, length);

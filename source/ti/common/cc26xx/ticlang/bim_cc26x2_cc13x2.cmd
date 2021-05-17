@@ -16,7 +16,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2012-2020, Texas Instruments Incorporated
+ Copyright (c) 2012-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@
 /* Retain interrupt vector table variable                                    */
 --retain=g_pfnVectors
 /* Override default entry point.                                             */
---entry_point resetISR
+--entry_point ResetISR
 /* Suppress warnings and errors:                                             */
 /* - 10063: Warning about entry point not being _c_int00                     */
 /* - 16011, 16012: 8-byte alignment errors. Observed when linking in object  */

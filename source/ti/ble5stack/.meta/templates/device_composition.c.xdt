@@ -104,10 +104,8 @@ struct bt_mesh_cfg_srv cfg_srv = {
      %if(ble.default_ttl){
     .default_ttl = `ble.default_ttl`,
     %}
-    %if(ble.net_transmit_count && ble.net_transmit_int_ms){
-    /* `ble.net_transmit_count` transmissions with `ble.net_transmit_int_ms`ms interval */
+    /* `ble.net_transmit_count` re-transmissions with `ble.net_transmit_int_ms`ms interval */
     .net_transmit = BT_MESH_TRANSMIT(`ble.net_transmit_count`, `ble.net_transmit_int_ms`),
-    %}
     %if(ble.relay){
     %if(ble.relay_retransmit_count && ble.relay_retransmit_int_ms){
     /* `ble.relay_retransmit_count` transmissions with `ble.relay_retransmit_int_ms`ms interval */

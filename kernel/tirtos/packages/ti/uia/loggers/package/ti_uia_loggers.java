@@ -1076,12 +1076,20 @@ public class ti_uia_loggers
             sb.append("'lib/release/ti.uia.loggers.am4f',\n");
             sb.append("'lib/release/ti.uia.loggers.am4fg',\n");
             sb.append("'lib/release/ti.uia.loggers.arm4f',\n");
+            sb.append("'lib/release/ti.uia.loggers.aem4',\n");
+            sb.append("'lib/release/ti.uia.loggers.am4',\n");
+            sb.append("'lib/release/ti.uia.loggers.am4g',\n");
+            sb.append("'lib/release/ti.uia.loggers.arm4',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/release/ti.uia.loggers.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/release/ti.uia.loggers.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/release/ti.uia.loggers.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/release/ti.uia.loggers.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/release/ti.uia.loggers.aem4', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/release/ti.uia.loggers.am4', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
+            sb.append("['lib/release/ti.uia.loggers.am4g', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
+            sb.append("['lib/release/ti.uia.loggers.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

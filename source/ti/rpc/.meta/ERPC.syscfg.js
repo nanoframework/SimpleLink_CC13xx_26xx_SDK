@@ -85,12 +85,63 @@ let config = [
         name: "transport",
         displayName: "Transport",
         default: "uart",
+        onChange: transport_onChange,
+        getDisabledOptions: transport_disabledOptions,
         options: [
-//          { name: "pcl",  displayName: "PCL"  },
-            { name: "uart", displayName: "UART" }
+//          { name: "pcl",      displayName: "PCL"  },
+            { name: "serial",   displayName: "Serial" },
+            { name: "uart",     displayName: "UART" }
         ]
+    },
+    {
+        name: "sdev",
+        displayName: "Device Pathname",
+        default: "",
+        hidden: true
     }
 ];
+
+/*
+ *  ======== transport_onChange ========
+ */
+function transport_onChange(inst, ui)
+{
+    if (inst.transport == "serial") {
+        ui.sdev.hidden = false
+    }
+    else {
+        ui.sdev.hidden = true
+    }
+}
+
+/*
+ *  ======== transport_disabledOptions ========
+ */
+function transport_disabledOptions(inst)
+{
+    let rtos = system.modules["/ti/utils/RTOS"];
+    let dopts = new Array();
+
+    /* this function is irrelevant if rtos not loaded */
+    if (rtos == undefined) {
+        return (dopts);
+    }
+
+    if (rtos.$static.name == "Linux") {
+        dopts.push({
+            name: "uart",
+            reason: "Not available for current RTOS selection"
+        });
+    }
+    else {
+        dopts.push({
+            name: "serial",
+            reason: "Not available for current RTOS selection"
+        });
+    }
+
+    return (dopts);
+}
 
 /*
  *  ======== moduleInstances ========
@@ -239,15 +290,63 @@ function moduleInstances(inst)
             }
         }
     }
-    else { /* transport == uart */
-        modules.push({
-            name: "uart",
-            displayName: "UART transport",
-            moduleName: "/ti/drivers/UART"
-        });
+    else if (inst.transport == "uart") {
+        /*  When running on Linux, UART driver is not available. Until
+         *  SysConfig supports platform specific default values, make
+         *  sure that uart is available before expressing a requirement
+         *  for it. Otherwise, on Linux this default will cause SysConfig
+         *  to crash. PMUX-2407
+         */
+        try {
+            let uart = system.getScript("/ti/drivers/UART.syscfg.js");
+            if (uart != undefined) {
+                modules.push({
+                    name: "uart",
+                    displayName: "UART transport",
+                    moduleName: "/ti/drivers/UART"
+                });
+            }
+        }
+        catch (e) {
+            /* use validation to raise conflict */
+        }
+    }
+    else if (inst.transport == "serial") {
+    }
+    else {
+        throw Error("unsupported transport selected");
     }
 
     return (modules);
+}
+
+/*
+ *  ======== moduleValidate ========
+ */
+function moduleValidate(inst, vo)
+{
+    let rtos = system.modules["/ti/utils/RTOS"];
+
+    if (rtos.$static.name == "Linux") {
+        if (inst.transport != "serial") {
+            vo["transport"].errors.push("Invalid transport for current RTOS selection");
+        }
+        if (inst.sdev == "") {
+            vo["sdev"].errors.push("Invalid device pathname");
+        }
+    }
+    else {
+        if (inst.transport != "uart") {
+            vo["transport"].errors.push("Invalid transport for current RTOS selection");
+        }
+        /*  If uart instance is missing, then assume Linux distribution and raise
+         *  conflict. This can be re-worked once SysConfig supports configurable
+         *  defaults. PMUX-2407
+         */
+        else if ((inst.transport == "uart") && (inst.uart == undefined)) {
+            vo["transport"].errors.push("Transport not supported. Check RTOS selection.");
+        }
+    }
 }
 
 /*
@@ -366,7 +465,11 @@ function moduleStatic_modules(moduleStatic)
     let modules = new Array();
 
     modules.push({
-        name: "getlibs",
+        displayName: "RTOS",
+        moduleName: "/ti/utils/RTOS"
+    });
+
+    modules.push({
         displayName: "GetLibs",
         moduleName: "/ti/rpc/GetLibs"
     });
@@ -437,9 +540,10 @@ let base = {
     displayName: "EmbeddedRPC",
     description: "Embedded Remote Procedure Call configuration",
     config: config,
-    defaultInstanceName: "CONFIG_ti_rpc_ERPC_",
+    defaultInstanceName: "ti_rpc_ERPC_",
     longDescription: moduleDescription,
     moduleInstances: moduleInstances,
+    validate: moduleValidate,
     moduleStatic: {
         moduleInstances: moduleStatic_instances,
         modules: moduleStatic_modules,

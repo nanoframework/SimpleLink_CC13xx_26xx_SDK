@@ -58,11 +58,11 @@
                 },
                 {
                     "_name": "pktConf.bCrcIncHdr",
-                    "$": "0"
+                    "$": "1"
                 },
                 {
                     "_name": "numHdrBits",
-                    "$": "16"
+                    "$": "0x18"
                 },
                 {
                     "_name": "pktLen",

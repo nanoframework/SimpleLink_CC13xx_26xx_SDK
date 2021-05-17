@@ -49,13 +49,11 @@ function moduleStatic_modules(inst)
         moduleName: "/ti/drivers/RTOS"
     });
 
-//  Cannot require GenLibs yet, still experimental
-//
-//  modules.push({
-//      name: "genlibs",
-//      displayName: "GenLibs",
-//      moduleName: "/ti/utils/build/GenLibs"
-//  });
+    modules.push({
+        name: "genlibs",
+        displayName: "GenLibs",
+        moduleName: "/ti/utils/build/GenLibs"
+    });
 
     return (modules);
 }
@@ -90,6 +88,9 @@ function getLibs(mod)
         }
     }
 
+    let rtos_drv = system.modules["/ti/drivers/RTOS"];
+    let rtos_utl = system.modules["/ti/utils/RTOS"];
+
     switch (devId) {
         case "CC2652R1FRGZ":
         case "MSP432E":
@@ -97,12 +98,11 @@ function getLibs(mod)
         case "MSP432P4111":
             isa = "m4f";
 
-            let rtos = system.modules["/ti/drivers/RTOS"];
-            if (rtos.$static.name == "TI-RTOS") {
+            if (rtos_drv.$static.name == "TI-RTOS") {
                 kernel = "_tirtos";
             }
-            else if (rtos.$static.name == "FreeRTOS") {
-                kernel = "_freertos";
+            else if (rtos_drv.$static.name == "FreeRTOS") {
+                kernel = "NONE"; /* erpc runtime built in CCS */
             }
             deps.push("/ti/drivers");
             break;
@@ -127,14 +127,23 @@ function getLibs(mod)
             }
             break;
 
+        case "Other": /* pseudo device for Linux user-mode */
+            if (rtos_utl.$static.name == "Linux") {
+                kernel = "_linux";
+            }
+            isa = "av7f";
+            break;
+
         default:
             isa = devId;
             break;
     }
 
     /* compute library path name, relative to repository */
-    libs.push("third_party/erpc/ti/lib/" + toolchain + "/" + isa +
-        "/erpc" + kernel + profile + ".a");
+    if (rtos_drv.$static.name != "FreeRTOS") {
+        libs.push("third_party/erpc/ti/lib/" + toolchain + "/" + isa +
+            "/erpc" + kernel + profile + ".a");
+    }
 
     /* link dependency */
     if (mod.transport == "pcl") {

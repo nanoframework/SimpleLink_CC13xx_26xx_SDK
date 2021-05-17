@@ -46,58 +46,79 @@ const stackRole = system.getScript("/ti/dmm/dmm_stack_role.js");
 *  Protocol stack configuration settings for specific DMM policy table entries
 */
 
-/**
- *  ======== generateStateConfig ========
- *  Generates the Applied Activity for the given role
+
+ /**
+ *  ======== generateAppliedActivityDropDown ========
+ *  Generates a drop down allowing customers to use activities. Both predefined
+ *  and custom.
  *
  *  @param stack  - String of the protocol identifier
- *  @returns      - An multi-value enumeration configurable of the stack states
+ *  @returns - A drop down configurable containing options for all applied
+ *  activities
  */
-function generateAppliedActivityConfig(stack)
+function generateAppliedActivityDropDown(stack)
 {
-    const appliedActivities = stackRole.getInfo(stack).appliedActivity;
-    const options = [{
-        name: "DMMPOLICY_APPLIED_ACTIVITY_NONE"
-    }];
-
-    for(let i = 0; i < appliedActivities.length; i++)
-    {
-        options.push({
-            name: appliedActivities[i]
-        });
-    }
-
-    options.push({
-        name: "DMMPOLICY_APPLIED_ACTIVITY_ALL"
-    });
 
     return({
         name: "appliedActivity",
-        displayName: "Applied Activity",
+        options: (inst) =>
+        {
+            const appliedActivities = stackRole.getInfo(stack).appliedActivity;
+            const dmmModule = system.modules["/ti/dmm/dmm"].$static;
+            const dropDownOptions =  [{
+                name: "DMMPOLICY_APPLIED_ACTIVITY_NONE"
+            }];
+
+            for(let i = 0; i < appliedActivities.length; i++)
+            {
+                dropDownOptions.push({
+                    name: appliedActivities[i]
+                });
+            }
+
+            for(let i = 0; i < dmmModule.numCustomActivities; i++)
+            {
+                dropDownOptions.push({
+                    name: "customActivity" + i,
+                    displayName: dmmModule["customActivity" + i]
+                });
+            }
+
+            dropDownOptions.push({
+                name: "DMMPOLICY_APPLIED_ACTIVITY_ALL"
+            });
+
+            const configurable = dropDownOptions;
+
+            const currentOptions = configurable.slice(0,
+                appliedActivities.length +
+                dmmModule.numCustomActivities +
+                2); // two for the 'none' and 'all' options book casing the list
+            return currentOptions;
+        },
+
         description: docs.appliedActivity.description,
         longDescription: docs.appliedActivity.longDescription,
-        options: options,
+        displayName: "Applied Activity",
         default: ["DMMPOLICY_APPLIED_ACTIVITY_NONE"],
-        hidden: false,
-        minSelections: 1
     });
 }
 
 /**
- *  ======== generateAppStatesConfig ========
+ *  ======== generateAppStatesDropDown ========
  *  Generates a drop down allowing customers to use application states
  *
  *  @returns - A drop down configurable containing options for all app states
  */
 function generateAppStatesDropDown()
 {
-    const dmmModule = system.modules["/ti/dmm/dmm"].$static;
-
     return({
         name: "applicationStates",
         options: (inst) =>
         {
+            const dmmModule = system.modules["/ti/dmm/dmm"].$static;
             const dropDownOptions = [];
+
             for(let i = 0; i < dmmModule.numApplicationStates; i++)
             {
                 dropDownOptions.push({
@@ -154,7 +175,7 @@ function generateModule(stack)
                 hidden: false
             },
             generateAppStatesDropDown(),
-            generateAppliedActivityConfig(stack)
+            generateAppliedActivityDropDown(stack)
         ],
         validate: validate
     };
@@ -181,13 +202,13 @@ function validate(inst, validation)
         if(inst.appliedActivity.includes("DMMPOLICY_APPLIED_ACTIVITY_NONE"))
         {
             validation.logWarning("DMMPOLICY_APPLIED_ACTIVITY_NONE selected,"
-            + " other activies should be unselected", inst,
+            + " other activities should be unselected", inst,
             "appliedActivity");
         }
         else if(inst.appliedActivity.includes("DMMPOLICY_APPLIED_ACTIVITY_ALL"))
         {
             validation.logInfo("DMMPOLICY_APPLIED_ACTIVITY_ALL selected,"
-            + " other activies do not need to be selected", inst,
+            + " other activities do not need to be selected", inst,
             "appliedActivity");
         }
     }
@@ -228,7 +249,7 @@ function validate(inst, validation)
     {
         if(!inst.applicationStates[i].includes("applicationState"))
         {
-            validation.logError("Only applicaiton states can be selected",
+            validation.logError("Only application states can be selected",
                 inst, "applicationStates");
         }
     }
@@ -238,7 +259,7 @@ function validate(inst, validation)
     {
         if(inst.applicationStates.includes("applicationState0"))
         {
-            validation.logInfo("Bitmask Any selected, other application states"
+            validation.logInfo("Bitmask `Any` selected, other application states"
                 + " do not need to be selected", inst, "applicationStates");
         }
 
@@ -255,8 +276,28 @@ function validate(inst, validation)
     }
     else if(inst.applicationStates.length === 0)
     {
-        validation.logError("Atleast one application state must be selected",
+        validation.logError("At least one application state must be selected",
             inst, "applicationStates");
+    }
+
+    // Check if custom activities are selected appropriately
+    if(inst.appliedActivity.length > 1)
+    {
+        for(let i = 0; i < inst.appliedActivity.length; i++)
+        {
+            if(inst.appliedActivity[i].replace(/^\D+/g, "")
+                >= module.numCustomActivities)
+            {
+                validation.logWarning("Deleted Custom Activities are selected"
+                    + ", they will be ignored", inst, "appliedActivity");
+                break;
+            }
+        }
+    }
+    else if(inst.appliedActivity.length === 0)
+    {
+        validation.logError("At least one applied activity must be selected",
+            inst, "appliedActivity");
     }
 }
 

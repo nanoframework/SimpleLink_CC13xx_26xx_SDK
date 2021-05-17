@@ -8,8 +8,7 @@
             "+../main_tirtos.c -> main_tirtos.c",
             "+../empty.syscfg -> empty.syscfg",
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
-            "+CC1352R1_LAUNCHXL_TIRTOS.icf -> CC1352R1_LAUNCHXL_TIRTOS.icf"
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
         ]
     }
 ]

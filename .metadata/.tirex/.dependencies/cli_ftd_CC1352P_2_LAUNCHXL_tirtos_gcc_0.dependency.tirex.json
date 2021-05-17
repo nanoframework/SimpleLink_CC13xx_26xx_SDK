@@ -35,8 +35,7 @@
             "+../../otsupport/otinstance.h -> otsupport/otinstance.h",
             "+../../release.cfg -> release.cfg",
             "+../../cli.c -> cli.c",
-            "+../../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
-            "+CC1352P_2_LAUNCHXL_TIRTOS.lds -> CC1352P_2_LAUNCHXL_TIRTOS.lds",
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds",
             "+../../missing/cxxhelpers.c -> missing/cxxhelpers.c",
             "+../makefile.defs -> makefile.defs"
         ]

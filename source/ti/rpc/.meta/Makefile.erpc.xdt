@@ -72,11 +72,15 @@
         if (inst.$ownedBy) {
             desc.ifs = findInterfaceInstances(inst.$ownedBy);
         }
-        else if (inst.$sharedBy) {
+        else if (inst.$sharedBy.length > 0) {
             for (let j = 0; j < inst.$sharedBy.length; j++) {
                 let p = inst.$sharedBy[j];
                 desc.ifs = desc.ifs.concat(findInterfaceInstances(p));
             }
+        }
+        else {
+            /* this instance is neither shared nor owned */
+            desc.ifs = findInterfaceInstances(inst);
         }
     }
 

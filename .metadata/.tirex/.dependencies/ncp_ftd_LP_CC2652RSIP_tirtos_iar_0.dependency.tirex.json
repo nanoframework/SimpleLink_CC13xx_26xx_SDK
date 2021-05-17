@@ -1,0 +1,43 @@
+[
+    {
+        "files": [
+            "+../../otsupport/otrtosapi.h -> otrtosapi.h",
+            "+../../otsupport/otrtosapi.c -> otrtosapi.c",
+            "+../../otsupport/otinstance.h -> otinstance.h",
+            "+../../platform/alarm.c -> alarm.c",
+            "+../../platform/alarm_micro.c -> alarm_micro.c",
+            "+../../platform/radio.h -> radio.h",
+            "+../../platform/diag.c -> diag.c",
+            "+../../platform/DIAG.md -> DIAG.md",
+            "+../../platform/entropy.c -> entropy.c",
+            "+../../platform/misc.c -> misc.c",
+            "+../../platform/settings.c -> settings.c",
+            "+../../platform/system.c -> system.c",
+            "+../../platform/system.h -> system.h",
+            "+../../platform/radio.c -> radio.c",
+            "+../../platform/uart.c -> uart.c",
+            "+../../platform/debug_uart.c -> debug_uart.c",
+            "+../../platform/spi_slave.c -> spi_slave.c",
+            "+../../platform/crypto/aes_alt.c -> aes_alt.c",
+            "+../../platform/crypto/sha256_alt.c -> sha256_alt.c",
+            "+../../platform/crypto/ecjpake_alt.c -> ecjpake_alt.c",
+            "+../../platform/crypto/crypto_misc.c -> crypto_misc.c",
+            "+../../platform/nv/crc.c -> crc.c",
+            "+../../platform/nv/crc.h -> crc.h",
+            "+../../platform/nv/nvocmp.c -> nvocmp.c",
+            "+../../platform/nv/nvocmp.h -> nvocmp.h",
+            "+../../platform/nv/nvintf.h -> nvintf.h",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../ncp_ftd.syscfg -> ncp_ftd.syscfg",
+            "+../../main.c -> main.c",
+            "+../../task_config.h -> task_config.h",
+            "+../../otstack.c -> otstack.c",
+            "+../../otstack.h -> otstack.h",
+            "+../../release.cfg -> release.cfg",
+            "+../../ncp.c -> ncp.c",
+            "+../../../../../../../source/ti/boards/LP_CC2652RSIP/Board.html -> Board.html",
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
+        ]
+    }
+]

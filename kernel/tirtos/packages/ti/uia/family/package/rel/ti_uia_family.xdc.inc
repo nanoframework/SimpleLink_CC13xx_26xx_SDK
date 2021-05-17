@@ -8,3 +8,7 @@ package/package_ti.uia.family.c
 lib/release/ti.uia.family.am4f
 lib/release/ti.uia.family.am4fg
 lib/release/ti.uia.family.arm4f
+lib/release/ti.uia.family.aem4
+lib/release/ti.uia.family.am4
+lib/release/ti.uia.family.am4g
+lib/release/ti.uia.family.arm4

@@ -436,7 +436,7 @@ bStatus_t RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *p
       pEvt->status = pEvtData[0];
 
       // Send the event status to the application
-      return (RTLSSrv_callAppCb(RTLSSRV_CL_CTE_EVT, sizeof(rtlsSrv_ClCmdCompleteEvt_t), (uint8 *)pEvt));
+      safeToDealloc = RTLSSrv_callAppCb(RTLSSRV_CL_CTE_EVT, sizeof(rtlsSrv_ClCmdCompleteEvt_t), (uint8 *)pEvt);
     }
     break;
 

@@ -54,7 +54,7 @@ int sched_get_priority_min(int policy)
  */
 int sched_get_priority_max(int policy)
 {
-    return (ti_sysbios_knl_Task_numPriorities - 1);
+    return (Task_numPriorities - 1);
 }
 
 /*

@@ -44,12 +44,10 @@
             "+../../RTLSCtrl/rtls_aoa.c -> rtls_aoa.c",
             "+../../../../../../../source/ti/ble5stack/boards/urfc.c -> urfc.c",
             "+../../../../../../../source/ti/ble5stack/boards/urfc.h -> urfc.h",
-            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
             "+../../Startup/main.c -> main.c",
             "+../../Tools/ble_debug.xscfg -> ble_debug.xscfg",
             "+../../Tools/ble_release.xscfg -> ble_release.xscfg",
             "+../../Tools/Defines/rtls_passive_app.opt -> rtls_passive_app.opt",
-            "+../../Tools/Defines/config_def.opt -> config_def.opt",
             "+../../../../../../../source/ti/ble5stack/microstack/port.c -> port.c",
             "+../../../../../../../source/ti/ble5stack/inc/port.h -> port.h",
             "+../../../../../../../source/ti/ble5stack/microstack/uble.c -> uble.c",
@@ -60,11 +58,11 @@
             "+../../../../../../../source/ti/ble5stack/inc/ull.h -> ull.h",
             "+../../../../../../../source/ti/ble5stack/microstack/urfi.c -> urfi.c",
             "+../../../../../../../source/ti/ble5stack/inc/urfi.h -> urfi.h",
+            "+../../build_config.opt -> build_config.opt",
             "+../../Tools/rtls_passive_app.cfg -> rtls_passive_app.cfg",
             "+../../rtls_passive.syscfg -> rtls_passive.syscfg",
-            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf",
-            "+../../build_config.opt -> build_config.opt",
-            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html"
+            "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
+            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf"
         ]
     }
 ]

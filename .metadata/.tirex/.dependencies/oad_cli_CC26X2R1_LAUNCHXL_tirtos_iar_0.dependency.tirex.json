@@ -39,10 +39,9 @@
             "+../../release_oad.cfg -> release_oad.cfg",
             "+../../cli.c -> cli.c",
             "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
             "+../../bim_oad_debug_image_bin.h -> bim_oad_debug_image_bin.h",
             "+../../bim_oad_debug_image_bin.c -> bim_oad_debug_image_bin.c",
-            "+CC26X2R1_LAUNCHXL_TIRTOS_OAD.icf -> CC26X2R1_LAUNCHXL_TIRTOS_OAD.icf"
+            "+cc13x2_cc26x2_tirtos_oad.icf -> cc13x2_cc26x2_tirtos_oad.icf"
         ]
     }
 ]

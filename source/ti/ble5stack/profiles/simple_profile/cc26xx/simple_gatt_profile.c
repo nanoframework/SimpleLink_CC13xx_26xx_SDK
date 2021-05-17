@@ -60,7 +60,7 @@
 #include "ti_ble_config.h"
 
 #ifdef USE_GATT_BUILDER
-#include "ble_gatt_service.h"
+#include "ti_ble_gatt_service.h"
 #endif
 
 #endif

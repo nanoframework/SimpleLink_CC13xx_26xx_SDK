@@ -23,6 +23,7 @@ Hwi_asm_switch.sv7M
 Timer.c
 TimestampProvider.c
 Power.c
+lib/debug/ti.sysbios.family.arm.m3.aem4
 lib/debug/ti.sysbios.family.arm.m3.am4f
 Clobber_asm_gnu.sv7M
 IntrinsicsSupport_asm_gnu.sv7M
@@ -30,9 +31,12 @@ TaskSupport_asm_gnu.sv7M
 Hwi_asm_gnu.sv7M
 Hwi_asm_switch_gnu.sv7M
 lib/debug/ti.sysbios.family.arm.m3.am4fg
+lib/debug/ti.sysbios.family.arm.m3.am4
+lib/debug/ti.sysbios.family.arm.m3.am4g
 lib/debug/ti.sysbios.family.arm.m3.arm4f
 Clobber_asm_iar.sv7M
 IntrinsicsSupport_asm_iar.sv7M
 TaskSupport_asm_iar.sv7M
 Hwi_asm_iar.sv7M
 Hwi_asm_switch_iar.sv7M
+lib/debug/ti.sysbios.family.arm.m3.arm4

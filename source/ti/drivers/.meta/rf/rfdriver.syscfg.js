@@ -955,7 +955,7 @@ function pinmuxRequirements(inst) {
     /* Requirements for antenna pins */
     const hardware = inst.$hardware;
     const hasHardware = hardware !== null;
-    const dioHardwarePins = hasHardware ? Object.values(hardware.signals).map(s => s.devicePin.description) : [];
+    const signalTypes = hasHardware ? Object.values(hardware.signals).map(s => s.type) : [];
     
     const nPins = inst.pinSelectionAntenna;
     for(let i = 0; i < nPins; i++) {
@@ -963,11 +963,10 @@ function pinmuxRequirements(inst) {
             name: "rfAntennaPin" + i,
             displayName: "RF Antenna Pin " + i,
             hidden: false,
-            interfaceName: "GPIO",
-            signalTypes: ["RF"]
+            interfaceName: "GPIO"
         };
         if(hasHardware) {
-            pinReq.filter = (pin) => pin.designSignalName === dioHardwarePins[i];
+            pinReq.signalTypes = signalTypes[i];
         }
         rfArray.push(pinReq);
     }
@@ -1083,20 +1082,26 @@ function modules(inst) {
 function getLibs(mod) {
     /* Toolchain specific information */
     const GenLibs = system.getScript("/ti/utils/build/GenLibs");
+    const DriverLib = system.getScript("/ti/devices/DriverLib");
     const isa = GenLibs.getDeviceIsa();
     const toolchain = GenLibs.getToolchainDir();
+
+    /* get device information from DriverLib */
     const deviceId = system.deviceData.deviceId;
+    let family = DriverLib.getAttrs(deviceId).deviceDefine;
+    if (family != "") {
+        family = family.replace(/^DeviceFamily_/, "").replace(/X2X7/, "X2").toLowerCase();
+    }
 
     /* Determine lib name */
     const prefix = "rf_multiMode_"
-    const deviceFamily = !!(deviceId.match(/CC26.2/i)) ? "cc26x2" : "cc13x2";
     const suffix = Common.getLibSuffix(isa, toolchain);
-    
+
     /* Create a GenLibs input argument */
     return {
         name: mod.$name,
         libs: [
-            `ti/drivers/rf/lib/${prefix}${deviceFamily}${suffix}`
+            `ti/drivers/rf/lib/${prefix}${family}${suffix}`
         ],
         deps: [
             "/ti/drivers"

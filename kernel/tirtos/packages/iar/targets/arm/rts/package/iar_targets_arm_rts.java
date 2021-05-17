@@ -230,6 +230,18 @@ public class iar_targets_arm_rts
             sb.append("'lib/release_full/iar.targets.arm.rts.arm4f',\n");
             sb.append("'lib/release_full/boot.arm4f',\n");
             sb.append("'lib/release_full/iar_vectortable.arm4f',\n");
+            sb.append("'lib/debug/iar.targets.arm.rts.arm4',\n");
+            sb.append("'lib/debug/boot.arm4',\n");
+            sb.append("'lib/debug/iar_vectortable.arm4',\n");
+            sb.append("'lib/release/iar.targets.arm.rts.arm4',\n");
+            sb.append("'lib/release/boot.arm4',\n");
+            sb.append("'lib/release/iar_vectortable.arm4',\n");
+            sb.append("'lib/debug_full/iar.targets.arm.rts.arm4',\n");
+            sb.append("'lib/debug_full/boot.arm4',\n");
+            sb.append("'lib/debug_full/iar_vectortable.arm4',\n");
+            sb.append("'lib/release_full/iar.targets.arm.rts.arm4',\n");
+            sb.append("'lib/release_full/boot.arm4',\n");
+            sb.append("'lib/release_full/iar_vectortable.arm4',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/debug/iar.targets.arm.rts.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
@@ -244,6 +256,18 @@ public class iar_targets_arm_rts
             sb.append("['lib/release_full/iar.targets.arm.rts.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
             sb.append("['lib/release_full/boot.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
             sb.append("['lib/release_full/iar_vectortable.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/iar.targets.arm.rts.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/debug/boot.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/debug/iar_vectortable.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release/iar.targets.arm.rts.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release/boot.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release/iar_vectortable.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/debug_full/iar.targets.arm.rts.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/debug_full/boot.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/debug_full/iar_vectortable.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release_full/iar.targets.arm.rts.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release_full/boot.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/release_full/iar_vectortable.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

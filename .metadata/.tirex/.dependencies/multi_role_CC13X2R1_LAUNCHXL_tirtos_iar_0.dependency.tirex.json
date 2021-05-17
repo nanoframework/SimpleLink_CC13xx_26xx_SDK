@@ -15,6 +15,7 @@
             "+../../../../../../../source/ti/common/nv/crc.h -> crc.h",
             "+../../../../../../../source/ti/common/nv/nvocmp.c -> nvocmp.c",
             "+../../../../../../../source/ti/common/nv/nvocmp.h -> nvocmp.h",
+            "+../../../../../../../source/ti/common/nv/nvintf.h -> nvintf.h",
             "+../../../../../../../source/ti/ble5stack/inc/gap.h -> gap.h",
             "+../../../../../../../source/ti/ble5stack/inc/gapbondmgr.h -> gapbondmgr.h",
             "+../../../../../../../source/ti/ble5stack/inc/gapgattserver.h -> gapgattserver.h",
@@ -30,13 +31,11 @@
             "+../../../../../../../source/ti/ble5stack/profiles/simple_profile/cc26xx/simple_gatt_profile.c -> simple_gatt_profile.c",
             "+../../../../../../../source/ti/ble5stack/profiles/simple_profile/simple_gatt_profile.h -> simple_gatt_profile.h",
             "+../../Startup/osal_icall_ble.c -> osal_icall_ble.c",
-            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> rom_init.c",
             "+../../Startup/ble_user_config_stack.c -> ble_user_config_stack.c",
             "+../../Startup/main.c -> main.c",
             "+../../Tools/ble_Debug.xscfg -> ble_Debug.xscfg",
             "+../../Tools/ble_Release.xscfg -> ble_Release.xscfg",
-            "+../../Tools/Defines/config_def.opt -> config_def.opt",
             "+../../../../../../../source/ti/ble5stack/icall/src/icall.c -> icall.c",
             "+../../../../../../../source/ti/ble5stack/icall/src/inc/icall.h -> icall.h",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_addrs.h -> icall_addrs.h",
@@ -49,8 +48,8 @@
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_ble_apimsg.h -> icall_ble_apimsg.h",
             "+../../Tools/multi_role_app.cfg -> multi_role_app.cfg",
             "+../../multi_role.syscfg -> multi_role.syscfg",
-            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf",
-            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html"
+            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
+            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf"
         ]
     }
 ]

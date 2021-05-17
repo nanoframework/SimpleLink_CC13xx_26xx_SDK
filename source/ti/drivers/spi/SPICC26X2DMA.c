@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -1289,7 +1289,8 @@ static bool initIO(SPI_Handle handle) {
     }
     else {
       spiPinTable[i++] = hwAttrs->mosiPin | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW |
-                         PIN_PUSHPULL | PIN_INPUT_DIS | PIN_DRVSTR_MED;
+                         PIN_PUSHPULL | PIN_INPUT_DIS | PIN_DRVSTR_MED |
+                         PIN_PULLDOWN;
       spiPinTable[i++] = hwAttrs->misoPin | PIN_INPUT_EN | PIN_PULLDOWN;
 
       /* Output low signal on SCLK until SPI module drives signal if clock

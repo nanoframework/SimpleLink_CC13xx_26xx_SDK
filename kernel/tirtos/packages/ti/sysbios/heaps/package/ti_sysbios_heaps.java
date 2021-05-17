@@ -1805,12 +1805,20 @@ public class ti_sysbios_heaps
             sb.append("'lib/debug/ti.sysbios.heaps.am4f',\n");
             sb.append("'lib/debug/ti.sysbios.heaps.am4fg',\n");
             sb.append("'lib/debug/ti.sysbios.heaps.arm4f',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.aem4',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.am4',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.am4g',\n");
+            sb.append("'lib/debug/ti.sysbios.heaps.arm4',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/debug/ti.sysbios.heaps.aem4f', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/debug/ti.sysbios.heaps.am4f', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
             sb.append("['lib/debug/ti.sysbios.heaps.am4fg', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/debug/ti.sysbios.heaps.arm4f', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.aem4', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.am4', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.am4g', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
+            sb.append("['lib/debug/ti.sysbios.heaps.arm4', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

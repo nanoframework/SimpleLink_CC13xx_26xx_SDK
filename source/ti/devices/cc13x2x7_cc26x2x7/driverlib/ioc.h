@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       ioc.h
-*  Revised:        2020-07-16 14:41:29 +0200 (Thu, 16 Jul 2020)
-*  Revision:       58010
+*  Revised:        2020-11-05 14:33:43 +0100 (Thu, 05 Nov 2020)
+*  Revision:       59279
 *
 *  Description:    Defines and prototypes for the IO Controller.
 *
@@ -274,7 +274,6 @@ extern "C"
 #define IOC_IOPULL_UP           0x00004000  // Pull up
 #define IOC_IOPULL_DOWN         0x00002000  // Pull down
 #define IOC_IOPULL_M            0x00006000  // Pull config mask
-#define IOC_IOPULL_M            0x00006000
 
 //*****************************************************************************
 //

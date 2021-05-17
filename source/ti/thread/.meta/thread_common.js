@@ -66,7 +66,7 @@ const deviceToBoard = {
     CC1352R: "CC1352R1_LAUNCHXL",
     CC1352P: "CC1352P1_LAUNCHXL",
     CC2652R1: "CC26X2R1_LAUNCHXL",
-    CC2652RB: "CC2652RB_LAUNCHXL"
+    CC2652RB: "LP_CC2652RB"
 };
 
 /*!
@@ -219,6 +219,35 @@ function isMigrationValid(currentTarget, migrationTarget)
     return(migrationSupported);
 }
 
+/*
+* ======== migrate ========
+* Perform stack specific changes to the SysConfig env POST migration
+*
+* @param currTarget - Board/device being migrated FROM
+* @param migrationTarget - Board/device being migrated TO
+* @param env - SysConfig environment providing access to all configurables
+* @param projectName - Optional name of the project being migrated
+*
+* @returns boolean - true when migration is supported and succesful, false when
+*                    migration is not supported and/or unsuccesful
+*/
+function migrate(currTarget, migrationTarget, env, projectName=null)
+{
+    const migrationInfo= isMigrationValid(currTarget, migrationTarget);
+    let migrationValid = true;
+
+    if (migrationInfo.disable)
+    {
+        migrationValid = false;
+    }
+
+    if (migrationValid)
+    {
+        // disabled
+    }
+
+    return(migrationValid);
+}
 
 /*
  * ======== getMigrationMarkdown ========
@@ -256,7 +285,7 @@ const threadCCFGSettings = {
     },
     CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {
     },
-    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
+    LP_CC2652RB_CCFG_SETTINGS: {
     },
     LP_CC2652PSIP_CCFG_SETTINGS: {
     },
@@ -280,5 +309,6 @@ exports = {
     getDeviceOrLaunchPadName: getDeviceOrLaunchPadName,
     ccfgSettings: ccfgSettings,
     isMigrationValid: isMigrationValid,
+    migrate: migrate,
     getMigrationMarkdown: getMigrationMarkdown
 };

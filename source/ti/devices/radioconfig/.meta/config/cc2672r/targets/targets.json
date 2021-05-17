@@ -1,0 +1,9 @@
+{
+    "targets": {
+        "Default": "..\/..\/cc1352r\/targets\/target_launchxl-cc1352r1.json:LAUNCHXL-CC1352R1",
+        "VirtualTarget": {
+            "_name": "LAUNCHXL-CC1352R1",
+            "Target": "..\/..\/cc1352r\/targets\/target_launchxl-cc1352r1.json"
+        }
+    }
+}

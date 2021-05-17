@@ -2818,7 +2818,7 @@ uint8_t ZDMatchSendState( uint8_t reason, uint8_t status, uint8_t TransSeq )
     dstAddr.addr.shortAddr = ed->srcAddr;
 
     // Save off the transaction sequence number
-    matchED->transSeq = ZDP_TransID;
+    matchED->transSeq = ZDP_SeqNum;
 
     destinationAddr.addrMode = Addr64Bit;
     osal_cpyExtAddr( destinationAddr.addr.extAddr, dstIEEEAddr );

@@ -1,0 +1,36 @@
+{
+    "overridebuffer": {
+        "Element32b": [
+            {
+                "_type": "ELEMENT",
+                "_comment": "Thor FPGA: Set the DCDC ctrl for RX",
+                "$": "0x000088c3"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Thor FPGA: Set the DCDC ctrl for TX",
+                "$": "0x000088d3"
+            },
+            {
+                "_type": "HW_REG_OVERRIDE",
+                "_comment": "Enable demodulator wired input",
+                "$": "0x51E4,0x0001"
+            },
+            {
+                "_type": "HW_REG_OVERRIDE",
+                "_comment": "Output digital baseband signal on RFC_GPO0",
+                "$": "0x1110,0x0004"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Disable digital transmitter",
+                "$": "0x00000083"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Disable synth programming",
+                "$": "0x00800403"
+            }
+        ]
+    }
+}

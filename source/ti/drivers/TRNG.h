@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated
+ * Copyright (c) 2018-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,9 +36,9 @@
  *
  *  @anchor ti_drivers_TRNG_Overview
  *  # Overview #
- *  The True Random Number Generator (TRNG) module generates numbers of variable
+ *  The True Random Number Generator (TRNG) module generates random data of variable
  *  lengths from a source of entropy. The output is suitable for applications
- *  requiring cryptographically random numbers such as keying material for
+ *  requiring cryptographically random data such as keying material for
  *  private or symmetric keys.
  *
  *  @anchor ti_drivers_TRNG_Usage
@@ -51,25 +51,29 @@
  *      - Call TRNG_Params_init() to initialize the TRNG_Params to default values.
  *      - Modify the TRNG_Params as desired.
  *      - Call TRNG_open() to open an instance of the driver.
- *      - Initialize a blank CryptoKey. These opaque datastructures are representations
+ *      - Option 1: Use TRNG_generateKey() that writes random bytes to a CryptoKey. <br>
+ *        Initialize a blank CryptoKey. These opaque data structures are representations
  *        of keying material and its storage. Depending on how the keying material
  *        is stored (RAM or flash, key store, key blob), the CryptoKey must be
  *        initialized differently. The TRNG API can handle all types of CryptoKey.
- *        However, not all device-specific implementions support all types of CryptoKey.
+ *        However, not all device-specific implementations support all types of CryptoKey.
  *        Devices without a key store will not support CryptoKeys with keying material
  *        stored in a key store for example.
  *        All devices support plaintext CryptoKeys.
+ *      - Option 2: Use TRNG_getRandomBytes() that writes random bytes to a buffer. <br>
+ *        Allocate memory sufficient to hold the number of bytes of random data requested.
  *
  *  ## TRNG operations #
  *
- *  TRNG_generateEntropy() provides the most basic functionality. Use it to
- *  generate random numbers of a specified width without further restrictions.
- *  An example use-case would be generating a symmetric key for AES encryption
- *  and / or authentication.
+ *  TRNG_generateKey() provides the most basic functionality. Use it to
+ *  generate key-material of a specified size. An example use-case would be generating
+ *  a symmetric key for AES encryption and / or authentication. If entropy data is needed
+ *  for anything other than a key-material, use TRNG_getRandomBytes() that
+ *  writes random bytes from the entropy source to a buffer/array.
  *
  *  To generate an ECC private key, you should use rejection sampling to ensure
  *  that the keying material is in the interval [1, n - 1]. The ECDH public key
- *  genreation APIs will reject private keys that are outside of this interval.
+ *  generation APIs will reject private keys that are outside of this interval.
  *  This information may be used to generate keying material until a suitable
  *  key is generated. For most curves, it is improbable to generate a random number
  *  outside of this interval because n is a large number close to the maximum
@@ -100,7 +104,7 @@
  *
  *  CryptoKeyPlaintext_initBlankKey(&entropyKey, entropyBuffer, KEY_LENGTH_BYTES);
  *
- *  result = TRNG_generateEntropy(handle, &entropyKey);
+ *  result = TRNG_generateKey(handle, &entropyKey);
  *
  *  TRNG_close(handle);
  *
@@ -110,6 +114,7 @@
  *  ## Examples
  *
  *  ### Generate symmetric encryption key #
+ *
  *  @code
  *
  *  #include <ti/drivers/TRNG.h>
@@ -121,7 +126,7 @@
  *  int_fast16_t result;
  *
  *  CryptoKey entropyKey;
- *  uint8_t entropyBuffer[KEY_LENGTH_BYTES];
+ *  uint8_t entropyBuffer[KEY_LENGTH_BYTES] = {0};
  *
  *  handle = TRNG_open(0, NULL);
  *
@@ -132,7 +137,7 @@
  *
  *  CryptoKeyPlaintext_initBlankKey(&entropyKey, entropyBuffer, KEY_LENGTH_BYTES);
  *
- *  result = TRNG_generateEntropy(handle, &entropyKey);
+ *  result = TRNG_generateKey(handle, &entropyKey);
  *
  *  if (result != TRNG_STATUS_SUCCESS) {
  *      // Handle error
@@ -144,6 +149,7 @@
  *  @endcode
  *
  *  ### Generate ECC private and public key using rejection sampling #
+ *
  *  @code
  *
  *  #include <ti/drivers/TRNG.h>
@@ -183,7 +189,7 @@
  *      CryptoKeyPlaintext_initBlankKey(&privateKey, privateKeyingMaterial, ECCParams_NISTP256.length);
  *      CryptoKeyPlaintext_initBlankKey(&publicKey, publicKeyingMaterial, 2 * ECCParams_NISTP256.length);
  *
- *      trngResult = TRNG_generateEntropy(trngHandle, &privateKey);
+ *      trngResult = TRNG_generateKey(trngHandle, &privateKey);
  *
  *      if (trngResult != TRNG_STATUS_SUCCESS) {
  *          while(1);
@@ -200,6 +206,37 @@
  *
  *  TRNG_close(trngHandle);
  *  ECDH_close(ecdhHandle);
+ *
+ *  @endcode
+ *
+ *  ### Generate random bytes to a user provided buffer #
+ *
+ *  @code
+ *
+ *  #include <ti/drivers/TRNG.h>
+ *
+ *  #define RANDOM_BYTES_SIZE 16
+ *
+ *  TRNG_Handle handle;
+ *  int_fast16_t result;
+ *
+ *  uint8_t randomBytesArray[RANDOM_BYTES_SIZE] = {0};
+ *
+ *  handle = TRNG_open(0, NULL);
+ *
+ *  if (!handle) {
+ *      // Handle error
+ *      while(1);
+ *  }
+ *
+ *  result = TRNG_getRandomBytes(handle, randomBytesArray, RANDOM_BYTES_SIZE);
+ *
+ *  if (result != TRNG_STATUS_SUCCESS) {
+ *      // Handle error
+ *      while(1);
+ *  }
+ *
+ *  TRNG_close(handle);
  *
  *  @endcode
  */
@@ -258,6 +295,18 @@ extern "C" {
 #define TRNG_STATUS_RESOURCE_UNAVAILABLE (-2)
 
 /*!
+* @brief   Operation failed due to invalid inputs.
+*
+* Functions return TRNG_STATUS_INVALID_INPUTS if input validation fails.
+*/
+#define TRNG_STATUS_INVALID_INPUTS       (-3)
+
+/*!
+* @brief  The ongoing operation was canceled.
+*/
+#define TRNG_STATUS_CANCELED             (-4)
+
+/*!
  *  @brief TRNG Global configuration
  *
  *  The TRNG_Config structure contains a set of pointers used to characterize
@@ -285,9 +334,9 @@ typedef TRNG_Config  *TRNG_Handle;
  * @brief   The way in which TRNG function calls return after generating
  *          the requested entropy.
  *
- * Not all TRNG operations exhibit the specified return behavor. Functions that do not
+ * Not all TRNG operations exhibit the specified return behavior. Functions that do not
  * require significant computation and cannot offload that computation to a background thread
- * behave like regular functions. Which functions exhibit the specfied return behavior is not
+ * behave like regular functions. Which functions exhibit the specified return behavior is not
  * implementation dependent. Specifically, a software-backed implementation run on the same
  * CPU as the application will emulate the return behavior while not actually offloading
  * the computation to the background thread.
@@ -321,7 +370,9 @@ typedef enum {
 
 /*!
  *  @brief  The definition of a callback function used by the TRNG driver
- *          when used in ::TRNG_RETURN_BEHAVIOR_CALLBACK
+ *          when TRNG_generateKey() is called with ::TRNG_RETURN_BEHAVIOR_CALLBACK
+ *
+ *  @attention This will replace #TRNG_CallbackFxn, which is currently deprecated.
  *
  *  @param  handle  Handle of the client that started the TRNG operation.
  *
@@ -330,9 +381,36 @@ typedef enum {
  *  @param  entropy     The CryptoKey that describes the location the generated
  *                      entropy will be copied to.
  */
-typedef void (*TRNG_CallbackFxn) (TRNG_Handle handle,
-                                  int_fast16_t returnValue,
-                                  CryptoKey *entropy);
+typedef void (*TRNG_CryptoKeyCallbackFxn) (TRNG_Handle handle,
+                                           int_fast16_t returnValue,
+                                           CryptoKey *entropy);
+
+/*!
+ *  @brief  The definition of a callback function used by the TRNG driver
+ *          when TRNG_generateKey() is called with ::TRNG_RETURN_BEHAVIOR_CALLBACK
+ *
+ *  @param  handle  Handle of the client that started the TRNG operation.
+ *
+ *  @param  returnValue Return status code describing the outcome of the operation.
+ *
+ *  @param  randomBytes Pointer to an array that stores the random bytes
+ *                      output by this function.
+ *
+ *  @param  randomBytesSize The size of the random data required.
+ */
+typedef void (*TRNG_RandomBytesCallbackFxn) (TRNG_Handle handle,
+                                             int_fast16_t returnValue,
+                                             uint8_t *randomBytes,
+                                             size_t randomBytesSize);
+
+/*!
+ *  @brief  The definition of a callback function used by the TRNG driver
+ *          when used in ::TRNG_RETURN_BEHAVIOR_CALLBACK
+ *
+ *  @deprecated #TRNG_CallbackFxn will be replaced by #TRNG_CryptoKeyCallbackFxn
+ */
+typedef TRNG_CryptoKeyCallbackFxn TRNG_CallbackFxn;
+
 
 /*!
  *  @brief  TRNG Parameters
@@ -340,17 +418,24 @@ typedef void (*TRNG_CallbackFxn) (TRNG_Handle handle,
  *  TRNG Parameters are used to with the TRNG_open() call. Default values for
  *  these parameters are set using TRNG_Params_init().
  *
+ *  @attention When using the driver in #TRNG_RETURN_BEHAVIOR_CALLBACK,
+ *             set the appropriate callback function field to point to a
+ *             valid callback function and set the other one to NULL.
+ *
  *  @sa     TRNG_Params_init()
  */
 typedef struct {
-    TRNG_ReturnBehavior     returnBehavior;             /*!< Blocking, callback, or polling return behavior */
-    TRNG_CallbackFxn        callbackFxn;                /*!< Callback function pointer */
-    uint32_t                timeout;                    /*!< Timeout before the driver returns an error in
+    TRNG_ReturnBehavior         returnBehavior;         /*!< Blocking, callback, or polling return behavior */
+    TRNG_CryptoKeyCallbackFxn   cryptoKeyCallbackFxn;   /*!< Callback function to use with TRNG_generateKey().
+                                                         *  Set randomBytesCallbackFxn to NULL if using this.
+                                                         */
+    TRNG_RandomBytesCallbackFxn randomBytesCallbackFxn; /*!< Callback function to use with TRNG_getRandomBytes()
+                                                         *  Set cryptoKeyCallbackFxn to NULL if using this.
+                                                         */
+    uint32_t                    timeout;                /*!< Timeout before the driver returns an error in
                                                          *   ::TRNG_RETURN_BEHAVIOR_BLOCKING
                                                          */
-    void                   *custom;                     /*!< Custom argument used by driver
-                                                         *   implementation
-                                                         */
+    void                        *custom;                /*!< Custom argument used by driver implementation */
 } TRNG_Params;
 
 /*!
@@ -376,11 +461,11 @@ void TRNG_init(void);
  *  @param  params      An pointer to TRNG_Params structure for
  *                      initialization
  *
- *  Defaults values are:
- *      returnBehavior              = TRNG_RETURN_BEHAVIOR_BLOCKING
- *      callbackFxn                 = NULL
- *      timeout                     = SemaphoreP_WAIT_FOREVER
- *      custom                      = NULL
+ *  Default values are:    <br>
+ *      returnBehavior              = TRNG_RETURN_BEHAVIOR_BLOCKING <br>
+ *      callbackFxn                 = NULL                          <br>
+ *      timeout                     = SemaphoreP_WAIT_FOREVER       <br>
+ *      custom                      = NULL                          <br>
  */
 void TRNG_Params_init(TRNG_Params *params);
 
@@ -415,25 +500,87 @@ TRNG_Handle TRNG_open(uint_least8_t index, TRNG_Params *params);
 void TRNG_close(TRNG_Handle handle);
 
 /*!
- *  @brief  Generate a random number
+ *  @brief  Generate random bytes and output to the given \c CryptoKey object.
  *
  *  Generates a random bitstream of the size defined in the \c entropy
  *  CryptoKey in the range 0 <= \c entropy buffer < 2 ^ (entropy length * 8).
  *  The entropy will be generated and stored according to the storage requirements
  *  defined in the CryptoKey.
  *
+ *  @deprecated This function has been replaced by a pair of new functions.
+ *              See #TRNG_generateKey() and #TRNG_getRandomBytes().
+ *
  *  @pre    TRNG_open() has to be called first.
  *
  *  @param  handle A TRNG handle returned from TRNG_open().
  *
- *  @param  entropy A blank, initialized CryptoKey describing the target location
- *                  the entropy shall be stored in.
+ *  @param  entropy Pointer to a \c CryptoKey object that should already be initialized
+ *                  to hold a plaintext key, provided with the length and the address
+ *                  of the plaintext key-material where the generated entropy will be populated.
  *
  *  @retval #TRNG_STATUS_SUCCESS               The operation succeeded.
  *  @retval #TRNG_STATUS_ERROR                 The operation failed.
  *  @retval #TRNG_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
+ *  @retval #TRNG_STATUS_INVALID_INPUTS        Inputs provided are not valid.
  */
 int_fast16_t TRNG_generateEntropy(TRNG_Handle handle, CryptoKey *entropy);
+
+/*!
+ *  @brief  Generate random bytes and output to the given \c CryptoKey object.
+ *
+ *  Generates a random bitstream of the size defined in the \c entropy
+ *  CryptoKey in the range 0 <= \c entropy buffer < 2 ^ (entropy length * 8).
+ *  The entropy will be generated and stored according to the storage requirements
+ *  defined in the CryptoKey.
+ *
+ *  @note This function replaces #TRNG_generateEntropy().
+ *        See #TRNG_getRandomBytes() to output random bytes to an array instead.
+ *
+ *  @attention When called with ::TRNG_RETURN_BEHAVIOR_CALLBACK, provide a callback
+ *              function of type #TRNG_CryptoKeyCallbackFxn.
+ *
+ *  @pre    TRNG_open() has to be called first.
+ *
+ *  @param  handle A TRNG handle returned from TRNG_open().
+ *
+ *  @param  entropy Pointer to a \c CryptoKey object that should already be initialized
+ *                  to hold a plaintext key, provided with the length and the address
+ *                  of the plaintext key-material where the generated entropy will be populated.
+ *
+ *  @retval #TRNG_STATUS_SUCCESS               The operation succeeded.
+ *  @retval #TRNG_STATUS_ERROR                 The operation failed.
+ *  @retval #TRNG_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
+ *  @retval #TRNG_STATUS_INVALID_INPUTS        Inputs provided are not valid.
+*/
+int_fast16_t TRNG_generateKey(TRNG_Handle handle, CryptoKey *entropy);
+
+/*!
+ *  @brief  Generate random bytes and output to the given array.
+ *
+ *  Generates random bytes of size given by \c randomBytesSize and stores it
+ *  in the array pointed at by \c randomBytes. The user shall be responsible for allocating
+ *  \c randomBytesSize long memory starting at the address pointed at by \c randomBytes.
+ *
+ *  @attention When called with ::TRNG_RETURN_BEHAVIOR_CALLBACK, provide a callback
+ *              function of type #TRNG_RandomBytesCallbackFxn.
+ *
+ *  @note See #TRNG_generateKey() to output random bytes to a \c CryptoKey instead.
+ *
+ *  @pre    TRNG_open() has to be called first.
+ *
+ *  @param  handle A TRNG handle returned from TRNG_open().
+ *
+ *  @param  randomBytes Pointer to an array that stores the random bytes
+ *                      output by this function.
+ *
+ *  @param  randomBytesSize The size of the random data required.
+ *
+ *  @retval #TRNG_STATUS_SUCCESS               The operation succeeded.
+ *  @retval #TRNG_STATUS_ERROR                 The operation failed.
+ *  @retval #TRNG_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
+ *  @retval #TRNG_STATUS_INVALID_INPUTS        Inputs provided are not valid.
+ */
+int_fast16_t TRNG_getRandomBytes(TRNG_Handle handle, void *randomBytes, size_t randomBytesSize);
 
 /**
  *  @brief  Constructs a new TRNG object
@@ -460,6 +607,19 @@ int_fast16_t TRNG_generateEntropy(TRNG_Handle handle, CryptoKey *entropy);
  */
 TRNG_Handle TRNG_construct(TRNG_Config *config, const TRNG_Params *params);
 
+/*!
+ *  @brief Aborts an ongoing TRNG operation and clears internal buffers.
+ *
+ *  Aborts an operation to generate random bytes/entropy. The operation will
+ *  terminate as though an error occurred and the status code of the operation will be
+ *  #TRNG_STATUS_CANCELED in this case.
+ *
+ *  @param  handle      A #TRNG_Handle returned from #TRNG_open()
+ *
+ *  @retval #TRNG_STATUS_SUCCESS    The operation was canceled or there was no
+ *                                  operation in progress to be canceled.
+ */
+int_fast16_t TRNG_cancelOperation(TRNG_Handle handle);
 
 #ifdef __cplusplus
 }

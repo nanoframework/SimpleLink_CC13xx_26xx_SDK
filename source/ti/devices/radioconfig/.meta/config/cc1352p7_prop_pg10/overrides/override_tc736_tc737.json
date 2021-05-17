@@ -38,8 +38,8 @@
             },
             {
                 "_type": "HW_REG_OVERRIDE",
-                "_comment": "Rx: Set AGC reference level to 0x17 (default: 0x2E)",
-                "$": "0x609C,0x0017"
+                "_comment": "Rx: Set AGC reference level to 0x1A (default: 0x2E)",
+                "$": "0x609C,0x001A"
             },
             {
                 "_type": "ELEMENT",

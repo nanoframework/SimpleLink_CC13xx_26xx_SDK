@@ -1,6 +1,6 @@
 {
     "setting": {
-        "Name": "Wi-SUN, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)",
+        "Name": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)",
         "Description": "100 kbps, 2-GFSK, 50 kHz deviation WiSUN PHY.",
         "Frequency": "915",
         "Patch": {

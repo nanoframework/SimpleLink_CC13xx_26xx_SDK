@@ -55,12 +55,12 @@ typedef struct {
      *  A readlock can be obtained if there is already a read lock
      *  acquired, or by acquiring this semaphore.
      */
-    ti_sysbios_knl_Semaphore_Struct sem;
+    Semaphore_Struct sem;
 
     /*  This semaphore is used to block readers when sem is in use
      *  by a write lock.
      */
-    ti_sysbios_knl_Semaphore_Struct readSem;
+    Semaphore_Struct readSem;
 
     int activeReaderCnt;   /* number of read locks acquired */
     int blockedReaderCnt;  /* number of readers blocked on readSem */

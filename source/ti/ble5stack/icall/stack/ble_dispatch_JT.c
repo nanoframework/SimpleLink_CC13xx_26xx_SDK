@@ -383,16 +383,8 @@ const uint32_t bleAPItable[] =
 #else // !(...)
   (uint32)icall_liteErrorFunction,
 #endif // (...)
-#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
   (uint32)HCI_EXT_SetQOSParameters,                          // JT_INDEX[132]
-#else // !(...)
-  (uint32)icall_liteErrorFunction,
-#endif // (...)
-#if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
   (uint32)HCI_EXT_SetQOSDefaultParameters,                   // JT_INDEX[133]
-#else // !(...)
-  (uint32)icall_liteErrorFunction,
-#endif // (...)
 #ifdef LL_TEST_MODE
   (uint32)HCI_EXT_LLTestModeCmd,                             // JT_INDEX[134]
 #else // !(...)

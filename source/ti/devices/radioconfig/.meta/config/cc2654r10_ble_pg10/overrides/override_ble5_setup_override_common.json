@@ -1,0 +1,9 @@
+{
+    "overridebuffer": {
+        "Element32b": {
+            "_type": "ELEMENT",
+            "_comment": "Bluetooth 5: Compensate syncTimeAdjust for wired mode",
+            "$": "0x02CF02A3"
+        }
+    }
+}

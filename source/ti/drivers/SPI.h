@@ -650,8 +650,6 @@ typedef struct {
      *  Maximum bit rates supported by hardware:
      *  Device Family | Slave Max (MHz)    | Master Max (MHz) |
      *  ------------- | ------------------ | ---------------- |
-     *  MSP432P4      | 16 MHz             | 24 MHz           |
-     *  MSP432E4      | 10 MHz             | 60 MHz           |
      *  CC13XX/CC26XX | 4  MHz             | 12 MHz           |
      *  CC32XX        | 20 MHz             | 20 MHz           |
      *

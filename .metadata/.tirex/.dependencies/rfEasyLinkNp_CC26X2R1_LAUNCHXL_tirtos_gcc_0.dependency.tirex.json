@@ -18,10 +18,9 @@
             "+../../at/platform/tirtos/AtTerm.c -> at/platform/tirtos/AtTerm.c",
             "+../../at/platform/tirtos/DbgPrint.h -> at/platform/tirtos/DbgPrint.h",
             "+../../at/platform/tirtos/PlatformTypes.h -> at/platform/tirtos/PlatformTypes.h",
-            "+../../rfEasyLinkNp.syscfg -> rfEasyLinkNp.syscfg",
+            "+../rfEasyLinkNp.syscfg -> rfEasyLinkNp.syscfg",
             "+../../../../../../../source/ti/boards/CC26X2R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC26X2R1_LAUNCHXL_fxns.c -> CC26X2R1_LAUNCHXL_fxns.c",
-            "+CC26X2R1_LAUNCHXL_TIRTOS.lds -> CC26X2R1_LAUNCHXL_TIRTOS.lds"
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds"
         ]
     }
 ]

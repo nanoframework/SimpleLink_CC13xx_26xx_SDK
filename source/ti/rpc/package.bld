@@ -106,7 +106,8 @@ var scfiles = [
     ".meta/erpc.js.xdt",
     ".meta/model.gv.xdt",
     ".meta/rpc.gv.xdt",
-    ".meta/rpc.component.js"
+    ".meta/rpc.component.js",
+    "product-linux.json"
 ];
 Pkg.otherFiles = scfiles;
 

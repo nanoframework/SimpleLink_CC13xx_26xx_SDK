@@ -41,7 +41,7 @@
             },
             {
                 "_file": "param_definition.json",
-                "$": ".\/..\/config\/cc2652r_ble_pg21"
+                "$": ".\/..\/config\/cc2652rsip_ble_pg21"
             },
             {
                 "_file": "param_definition.json",

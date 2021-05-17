@@ -1188,12 +1188,6 @@ static int readTaskBlocking(UART_Handle handle)
                     HwiP_restore(key);
                     break;
                 }
-
-                /* If some data has been read, return */
-                if (object->readCount < object->readSize) {
-                    HwiP_restore(key);
-                    break;
-                }
             }
 
             if (object->state.bufTimeout || (object->status != 0)) {
@@ -1285,10 +1279,8 @@ static int readTaskCallback(UART_Handle handle)
     if ((object->status & UARTCC26X2_RXERROR) && (object->readCount != 0)) {
         /* An error occurred, readIsr() will cancel the read */
     }
-    else if ((object->readRetPartial &&
-                     (object->readCount < object->readSize)) ||
-            (object->readCount == 0) ||
-            makeCallback) {
+    else if ((object->readRetPartial && (object->status == READTIMEDOUT)) ||
+            (object->readCount == 0) || makeCallback) {
         SwiP_post(&(object->readSwi));
     }
     else {

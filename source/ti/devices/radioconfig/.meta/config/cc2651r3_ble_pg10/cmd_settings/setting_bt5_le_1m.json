@@ -1,11 +1,11 @@
 {
     "setting": {
-        "Name": "BLE, 1 Mbps, LE 1M (FPGA)",
-        "Description": "Bluetooth 5, LE 1M PHY (1 Msym\/s GFSK, 1 Mbps data rate) for the 2.4 GHz ISM band.",
+        "Name": "BLE, 1 Mbps, LE 1M (Pre-silicon settings)",
+        "Description": "Bluetooth 5, LE 1M PHY (1 Msym\/s GFSK, 1 Mbps data rate) for the 2.4 GHz ISM band. (Pre-silicon settings)",
         "Frequency": "2440",
         "Patch": {
             "Define": "RF_MODE_AUTO",
-            "Cpe": "rf_patch_cpe_bt5",
+            "Cpe": "rf_patch_cpe_multi_protocol",
             "Mce": [],
             "Rfe": []
         },
@@ -71,7 +71,7 @@
                     },
                     {
                         "_name": "config.biasMode",
-                        "$": "1"
+                        "$": "0"
                     },
                     {
                         "_name": "config.analogCfgMode",
@@ -107,20 +107,29 @@
                         "_name": "pRegOverrideCommon",
                         "Block": [
                             "override_ble5_setup_override_common.json",
-                            "override_fpga_ble5.json"
+                            "override_ble5_coex.json"
                         ]
                     },
                     {
                         "_name": "pRegOverride1Mbps",
-                        "Block": "override_ble5_setup_override_1mbps.json"
+                        "Block": [
+                            "override_ble5_setup_override_1mbps_coex.json",
+                            "override_ble5_setup_override_1mbps.json"
+                        ]
                     },
                     {
                         "_name": "pRegOverride2Mbps",
-                        "Block": "override_ble5_setup_override_2mbps.json"
+                        "Block": [
+                            "override_ble5_setup_override_2mbps_coex.json",
+                            "override_ble5_setup_override_2mbps.json"
+                        ]
                     },
                     {
                         "_name": "pRegOverrideCoded",
-                        "Block": "override_ble5_setup_override_coded.json"
+                        "Block": [
+                            "override_ble5_setup_override_coded_coex.json",
+                            "override_ble5_setup_override_coded.json"
+                        ]
                     }
                 ]
             },

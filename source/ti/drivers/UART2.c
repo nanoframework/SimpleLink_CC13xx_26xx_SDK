@@ -180,8 +180,6 @@ int_fast16_t __attribute__((weak)) UART2_readTimeout(UART2_Handle handle,
     object->state.rxCancelled = false;
     object->state.readTimedOut = false;
 
-    HwiP_restore(key);
-
     /* Save the data to be read and restore interrupts. */
     object->readBuf = (unsigned char *)buffer;
     object->readSize = size;
@@ -189,6 +187,7 @@ int_fast16_t __attribute__((weak)) UART2_readTimeout(UART2_Handle handle,
     object->bytesRead = 0;    /* Number of bytes read */
     object->rxStatus = 0;     /* Clear receive errors */
 
+    HwiP_restore(key);
     UART2_rxEnable(handle);
 
     // TODO: case for !HwiP_interruptsEnabled()?
@@ -281,19 +280,20 @@ int_fast16_t __attribute__((weak)) UART2_readTimeout(UART2_Handle handle,
                     object->readCount = 0;
                     object->readInUse = false;
 
-                    HwiP_restore(key);
-
                     /*
                      *  Safely call the callback function in case UART2_read()
                      *  is called from within the callback, to avoid recursion.
                      */
                     object->state.readCallbackPending = true;
+                    HwiP_restore(key);
 
                     /* If we're not inside the read callback function... */
                     if (object->state.inReadCallback == false) {
                         while (object->state.readCallbackPending) {
+                            key = HwiP_disable();
                             object->state.readCallbackPending = false;
                             object->state.inReadCallback = true;
+                            HwiP_restore(key);
 
                             object->readCallback(handle,
                                     (void *)object->readBuf,
@@ -467,6 +467,7 @@ int_fast16_t __attribute__((weak)) UART2_writeTimeout(UART2_Handle handle,
         return (UART2_STATUS_EINUSE);
     }
 
+    object->state.txCancelled = false;
     object->writeInUse = true;
 
     /* Save the data to be written and restore interrupts. */
@@ -642,7 +643,7 @@ void __attribute__((weak)) UART2_writeCancel(UART2_Handle handle)
 
     key = HwiP_disable();
 
-    if (!object->state.txCancelled) {
+    if (object->writeInUse && !object->state.txCancelled) {
         object->state.txCancelled = true;
         SemaphoreP_post(&object->writeSem);
 

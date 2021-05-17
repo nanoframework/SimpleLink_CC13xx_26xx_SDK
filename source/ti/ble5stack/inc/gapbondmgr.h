@@ -338,6 +338,25 @@ extern "C"
 #define GAPBOND_ERASE_BOND_IN_CONN     0x415
 
 /**
+ * Allows to receive debug keys during pairing, in the public keys exchange phase.
+ *
+ * If TRUE,  receiving debug keys is allowed.
+ * If FALSE, receiving debug keys is not allowed, pairing will fail with invalid
+ *           paramters code.
+ *
+ * @note if both devices are allowing it, and both are sending debug keys, it
+ *       will fail due to mirror attack suspicion
+ *
+ * size: uint8_t
+ *
+ * default: TRUE
+ *
+ * range: TRUE (allow receiving debug keys).
+ *        FALSE(reject debug keys).
+ */
+#define GAPBOND_ALLOW_DEBUG_KEYS       0x416
+
+/**
  * Enable / Disable LRU Bond Replacement Scheme (Read/Write)
  *
  * Whether to enable the least recently used bond scheme so that, when a  newly

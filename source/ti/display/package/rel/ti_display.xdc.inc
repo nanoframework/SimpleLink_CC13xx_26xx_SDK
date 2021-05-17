@@ -26,10 +26,10 @@ lcd/SharpGrLib.c
 DisplayDogm1286.c
 lcd/LCDDogm1286.c
 lcd/LCDDogm1286_util.c
-lib/display.aem4f
 lib/ticlang/m4f/display.a
-lib/display.am4f
 lib/gcc/m4f/display.a
-lib/display.am4fg
 lib/iar/m4f/display.a
-lib/display.arm4f
+lib/ccs/m4/display.a
+lib/ticlang/m4/display.a
+lib/gcc/m4/display.a
+lib/iar/m4/display.a

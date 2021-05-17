@@ -11,11 +11,11 @@
             },
             {
                 "_file": "io_register_definition.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352r"
             },
             {
                 "_file": "ui_translation.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352r"
             },
             {
                 "_file": "targets.json",
@@ -27,27 +27,27 @@
             },
             {
                 "_file": "io_pin_definition.json",
-                "$": ".\/..\/config\/cc1311p3\/targets"
+                "$": ".\/..\/config\/cc1352p\/targets"
             },
             {
                 "_file": "param_definition.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352p_prop_pg21"
             },
             {
                 "_file": "param_cmd_mapping.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352p_prop_pg21"
             },
             {
                 "_file": "codegen.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352p_prop_pg21"
             },
             {
                 "_file": "radio_par_definitions.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352r_prop_pg21"
             },
             {
                 "_file": "rf_command_definitions.json",
-                "$": ".\/..\/config\/cc1311p3"
+                "$": ".\/..\/config\/cc1352p_prop_pg21"
             },
             {
                 "_file": "categories.json",
@@ -55,7 +55,7 @@
             },
             {
                 "_file": "frontend_settings.json",
-                "$": ".\/..\/config\/cc1311p3\/cmd_settings"
+                "$": ".\/..\/config\/cc1352p_prop_pg21\/cmd_settings"
             },
             {
                 "_file": "dummy_file_overrides.json",

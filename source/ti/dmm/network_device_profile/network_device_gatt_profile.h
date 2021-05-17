@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2010-2020, Texas Instruments Incorporated
+ Copyright (c) 2010-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -107,10 +107,10 @@ typedef struct
   networkDeviceProfileChange_t        pfnNetworkDeviceProfileChange;  // Called when characteristic value changes
 } networkDeviceProfileCBs_t;
 
-    
+
 
 /*********************************************************************
- * API FUNCTIONS 
+ * API FUNCTIONS
  */
 
 
@@ -138,19 +138,19 @@ extern bStatus_t NetworkDeviceProfile_RegisterAppCBs( networkDeviceProfileCBs_t 
  *    param - Profile parameter ID
  *    len - length of data to right
  *    value - pointer to data to write.  This is dependent on
- *          the parameter ID and WILL be cast to the appropriate 
- *          data type (example: data type of uint16 will be cast to 
+ *          the parameter ID and WILL be cast to the appropriate
+ *          data type (example: data type of uint16 will be cast to
  *          uint16 pointer).
  */
 extern bStatus_t NetworkDeviceProfile_SetParameter( uint8 param, uint8 len, void *value );
-  
+
 /*
  * NetworkDeviceProfile_GetParameter - Get a Remote Display GATT Profile parameter.
  *
  *    param - Profile parameter ID
  *    value - pointer to data to write.  This is dependent on
- *          the parameter ID and WILL be cast to the appropriate 
- *          data type (example: data type of uint16 will be cast to 
+ *          the parameter ID and WILL be cast to the appropriate
+ *          data type (example: data type of uint16 will be cast to
  *          uint16 pointer).
  */
 extern bStatus_t NetworkDeviceProfile_GetParameter( uint8 param, void *value );

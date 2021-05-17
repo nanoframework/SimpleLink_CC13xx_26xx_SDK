@@ -88,7 +88,10 @@
                 ],
                 "OverrideField": {
                     "_name": "pRegOverride",
-                    "Block": "override_ieee_802_15_4.json"
+                    "Block": [
+                        "override_ieee_802_15_4.json",
+                        "override_hposc.json"
+                    ]
                 }
             },
             {

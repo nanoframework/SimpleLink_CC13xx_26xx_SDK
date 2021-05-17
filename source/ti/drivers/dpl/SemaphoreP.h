@@ -68,8 +68,9 @@ extern "C" {
  *  @brief    Number of bytes greater than or equal to the size of any RTOS
  *            SemaphoreP object.
  *
- *  nortos:   16
- *  SysBIOS:  28
+ *  NoRTOS:   16
+ *  BIOS 6.x: 28
+ *  BIOS 7.x: 28
  *  FreeRTOS: 80
  */
 #define SemaphoreP_STRUCT_SIZE   (80)

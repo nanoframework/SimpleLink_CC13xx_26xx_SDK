@@ -6,10 +6,9 @@
             "+../README.md -> README.md",
             "+../rfEasyLinkRx_nortos.c -> rfEasyLinkRx_nortos.c",
             "+../main_nortos.c -> main_nortos.c",
-            "+../rfEasyLinkRx_nortos.syscfg -> rfEasyLinkRx_nortos.syscfg",
+            "+../rfEasyLinkRx_gptimer.syscfg -> rfEasyLinkRx_gptimer.syscfg",
             "+../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
-            "+../CC1352P_2_LAUNCHXL_fxns.c -> CC1352P_2_LAUNCHXL_fxns.c",
-            "+CC1352P_2_LAUNCHXL_NoRTOS.icf -> CC1352P_2_LAUNCHXL_NoRTOS.icf"
+            "+cc13x2_cc26x2_nortos.icf -> cc13x2_cc26x2_nortos.icf"
         ]
     }
 ]

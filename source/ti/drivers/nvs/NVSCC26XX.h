@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -336,19 +336,38 @@ typedef struct
  */
 
 extern void         NVSCC26XX_close(NVS_Handle handle);
-extern int_fast16_t NVSCC26XX_control(NVS_Handle handle, uint_fast16_t cmd,
-                        uintptr_t arg);
-extern int_fast16_t NVSCC26XX_erase(NVS_Handle handle, size_t offset,
-                        size_t size);
-extern void         NVSCC26XX_getAttrs(NVS_Handle handle, NVS_Attrs *attrs);
+
+extern int_fast16_t NVSCC26XX_control(NVS_Handle handle,
+                                      uint_fast16_t cmd,
+                                      uintptr_t arg);
+
+extern int_fast16_t NVSCC26XX_erase(NVS_Handle handle,
+                                    size_t offset,
+                                    size_t size);
+
+extern void         NVSCC26XX_getAttrs(NVS_Handle handle,
+                                       NVS_Attrs *attrs);
+
 extern void         NVSCC26XX_init();
-extern int_fast16_t NVSCC26XX_lock(NVS_Handle handle, uint32_t timeout);
-extern NVS_Handle   NVSCC26XX_open(uint_least8_t index, NVS_Params *params);
-extern int_fast16_t NVSCC26XX_read(NVS_Handle handle, size_t offset,
-                        void *buffer, size_t bufferSize);
+
+extern int_fast16_t NVSCC26XX_lock(NVS_Handle handle,
+                                   uint32_t timeout);
+
+extern NVS_Handle   NVSCC26XX_open(uint_least8_t index,
+                                   NVS_Params *params);
+
+extern int_fast16_t NVSCC26XX_read(NVS_Handle handle,
+                                  size_t offset,
+                                  void *buffer,
+                                  size_t bufferSize);
+
 extern void         NVSCC26XX_unlock(NVS_Handle handle);
-extern int_fast16_t NVSCC26XX_write(NVS_Handle handle, size_t offset,
-                        void *buffer, size_t bufferSize, uint_fast16_t flags);
+
+extern int_fast16_t NVSCC26XX_write(NVS_Handle handle,
+                                    size_t offset,
+                                    void *buffer,
+                                    size_t bufferSize,
+                                    uint_fast16_t flags);
 /*! @endcond */
 
 #if defined (__cplusplus)

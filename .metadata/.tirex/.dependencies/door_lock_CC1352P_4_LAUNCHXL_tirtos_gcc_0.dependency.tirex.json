@@ -45,8 +45,7 @@
             "+../../tiop_app_defs.h -> tiop_app_defs.h",
             "+../../disp_utils.c -> disp_utils.c",
             "+../../disp_utils.h -> disp_utils.h",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS.lds -> CC1352P_4_LAUNCHXL_TIRTOS.lds",
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds",
             "+../../missing/cxxhelpers.c -> missing/cxxhelpers.c",
             "+../makefile.defs -> makefile.defs"
         ]

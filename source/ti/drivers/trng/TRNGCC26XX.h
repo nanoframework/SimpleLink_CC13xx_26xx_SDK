@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/** ============================================================================
+/*!****************************************************************************
  *  @file       TRNGCC26XX.h
  *
  *  @brief      TRNG driver implementation for the CC26XX family
@@ -59,6 +59,15 @@
  *
  *  After the request queue is emptied, the driver will start an asynchronous
  *  operation in the background to refill the depleted entropy pool.
+ *
+ *  # Samples Per Cycle
+ *
+ *  The EIP-75t HW takes 240,000 clock cycles in the default setting to generate
+ *  one round of output (i.e. 64 bits). This comes to 5ms on a 48MHz clock. The
+ *  clock cycles per round can be configured to be as low as 2^8 (256) to as high
+ *  as 2^24 (16,777,216).
+ *  Entropy re-generation time can be tailored in a trade-off between speed of
+ *  random number generation and amount of entropy in each of those random numbers.
  */
 
 #ifndef ti_drivers_TRNG_TRNGCC26XX__include
@@ -86,22 +95,24 @@ extern "C" {
 #define TRNGCC26XX_SAMPLES_PER_CYCLE_DEFAULT    240000
 /*! @brief Maximum random samples for each entropy generation call */
 #define TRNGCC26XX_SAMPLES_PER_CYCLE_MAX        16777216
+
 /*! @brief Minimum number of bytes provided by the TRNG hardware in one go.
  *
  *  Smaller amounts can by requested in driver
  *  calls but the full number will always be generated.
  *  Part of the generated entropy will simply not be copied
  *  back to the target buffer if the requested length is not
- *  a multiple of TRNGCC26XX_MIN_BYTES_PER_ISR.
+ *  a multiple of TRNGCC26XX_MIN_BYTES_PER_ITERATION.
  */
 #define TRNGCC26XX_MIN_BYTES_PER_ITERATION      (2 * sizeof(uint32_t))
+
 
 /*! @brief Default TRNGCC26XX entropy pool size in 64-bit elements
  *
  *  By default, the entropy pool is sized to immediately fulfill a 256-bit
  *  entropy generation request. If we assume that the TRNG is used infrequently,
  *  this should greatly decrease the latency of <= 256-bit requests.
- *  This value may be overriden by defining it at the project level and
+ *  This value may be overridden by defining it at the project level and
  *  recompiling the driver.
  */
 #ifndef TRNGCC26XX_ENTROPY_POOL_SIZE
@@ -154,7 +165,8 @@ typedef struct {
                                                          * to TRNGCC26XX_Object pointers.
                                                          */
     TRNG_Handle                     handle;
-    TRNG_CallbackFxn                callbackFxn;
+    TRNG_CryptoKeyCallbackFxn       cryptoKeyCallbackFxn;
+    TRNG_RandomBytesCallbackFxn     randomBytesCallbackFxn;
     uint32_t                        samplesPerCycle;
     CryptoKey                       *entropyKey;
     uint8_t                         *entropyBuffer;
@@ -164,6 +176,7 @@ typedef struct {
     int_fast16_t                    returnStatus;
     TRNG_ReturnBehavior             returnBehavior;
     bool                            isOpen;
+    bool                            isEnqueued;
     SemaphoreP_Struct               operationSemaphore;
 } TRNGCC26XX_Object;
 

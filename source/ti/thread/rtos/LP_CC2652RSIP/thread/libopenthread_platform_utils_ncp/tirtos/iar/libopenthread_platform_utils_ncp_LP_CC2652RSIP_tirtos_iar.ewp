@@ -187,7 +187,7 @@
             <name>ICCARM</name>
             <archiveVersion>2</archiveVersion>
             <data>
-                <version>31</version>
+                <version>36</version>
                 <wantNonLocal>1</wantNonLocal>
                 <debug>0</debug>
                 <option>
@@ -288,10 +288,6 @@
                     <state>0</state>
                 </option>
                 <option>
-                    <name>CCMultibyteSupport</name>
-                    <state>0</state>
-                </option>
-                <option>
                     <name>CCDiagWarnAreErr</name>
                     <state>0</state>
                 </option>
@@ -332,10 +328,6 @@
                     <state>.text</state>
                 </option>
                 <option>
-                    <name>IInterwork2</name>
-                    <state>0</state>
-                </option>
-                <option>
                     <name>IProcessorMode2</name>
                     <state>1</state>
                 </option>
@@ -346,11 +338,11 @@
                 <option>
                     <name>CCOptStrategy</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>1</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -376,7 +368,7 @@
                 </option>
                 <option>
                     <name>IccLang</name>
-                    <state>0</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>IccCDialect</name>
@@ -384,18 +376,6 @@
                 </option>
                 <option>
                     <name>IccAllowVLA</name>
-                    <state>0</state>
-                </option>
-                <option>
-                    <name>IccCppDialect</name>
-                    <state>1</state>
-                </option>
-                <option>
-                    <name>IccExceptions</name>
-                    <state>1</state>
-                </option>
-                <option>
-                    <name>IccRTTI</name>
                     <state>1</state>
                 </option>
                 <option>
@@ -429,6 +409,14 @@
                 </option>
                 <option>
                     <name>CCGuardCalls</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccExceptions2</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccRTTI2</name>
                     <state>1</state>
                 </option>
             </data>

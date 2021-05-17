@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ const numPins = 48;
 const device = system.deviceData.deviceId;
 const isBAW = device.match(/CC2652RB/) !== null;
 const isSIP = device.match(/CC2652.*SIP/) !== null;
+const isM33 = device.match(/CC(?:13|26).4/) !== null;
 
 const templateModule = [{
     name: "ccfgTemplate",
@@ -209,7 +210,7 @@ const config = [
         name: "enableXoscHfComp",
         displayName: "RF Temperature Compensation",
         description: "Compensate XOSC_HF frequency for temperature during radio transmissions.",
-        longDescription: "Compensate XOSC_HF frequency for temperature during radio transmissions. This improves the accuracy of the XOSC_HF over temperature. This should only be enabled if the selected XOSC_HF source is not accurate enough for a selected stack. It is primarily needed when using HPOSC or when the IO Link Wireless stack with a regular 48 MHz crystal that does not fullfil the PPM requirements of the IOLW stack over the entire temperature range.",
+        longDescription: "Compensate XOSC_HF frequency for temperature during radio transmissions. This improves the accuracy of the XOSC_HF over temperature. This should only be enabled if the selected XOSC_HF source is not accurate enough for the selected stack. It is primarily needed when using HPOSC or when running a stack that requires the XOSC_HF to be compensated for temperature",
         readOnly: isBAW,
         hidden: false,
         default: isBAW ? true : false,
@@ -357,6 +358,184 @@ const config = [
         hidden: false,
         default: false
     },
+    //Alternative address of vector table of the Flash Image
+    {
+        name: "setFlashVectorTable",
+        displayName: "Set Address Of Flash Vector Table",
+        description: "Set the address value of the flash vector table to enable the boot "
+            + "FW in ROM to transfer control to a flash image.",
+        longDescription: "On reset, the software in the ROM of the device will execute "
+            + "basic startup routines, and then jump to the location pointed to by this field. "
+            + "Most standard Flash images will have the vector table located at address 0x00000000. \n\n"
+            + "NOTE: Any illegal vector table start address value will force the boot FW in ROM "
+            + "to transfer control to the serial boot loader in ROM. ",
+        readOnly: false,
+        hidden: false,
+        default: false,
+        onChange: (inst, ui) => {
+            ui.addressFlashVectorTable.hidden = (inst.setFlashVectorTable === false);
+        }
+    },
+    {
+        name: "addressFlashVectorTable",
+        displayName: "Address of Flash Vector Table",
+        description: "Set the address of the vector table of the flash image ",
+        readOnly: false,
+        hidden: true,
+        displayFormat: {radix: "hex", bitSize: 32},
+        default: 0x00000000
+    },
+    /////////////////////////////////////
+    // This section contains settings for for M33 cores with TrustZone
+    {
+        name: "disableRamParity",
+        displayName: "Disable RAM Parity",
+        description: "Enables or disables parity checking on SRAM.",
+        hidden: !isM33,
+        default: false
+    },
+    {
+        displayName: "Security boundary configuration",
+        description: "Flash and SRAM",
+
+        config: [
+            {
+                name: "configureIDAU",
+                displayName: "Configure Non-secure Memory Boundaries",
+                description: "Enables boot-time configuration of the IDAU for non-secure memory access.",
+                longDescription: `With this option disabled, all SRAM and flash will be marked for access only by
+            secure masters and as callable by non-secure masters.`,
+                hidden: !isM33,
+                default: true,
+                onChange: (inst, ui) => {
+                    ui.sramNonsecureBoundary.hidden = !inst.configureIDAU;
+                    ui.sramNonsecureCallableBoundary.hidden = !inst.configureIDAU;
+                    ui.markAllFlashSecure.hidden = !inst.configureIDAU;
+                    ui.flashNonsecureBoundary.hidden = !inst.configureIDAU;
+                    ui.flashNonsecureCallableBoundary.hidden = !inst.configureIDAU;
+                }
+            },
+            {
+                name: "sramNonsecureBoundary",
+                displayName: "SRAM Non-secure Access Boundary",
+                description: "The lower boundary address for Non-secure SRAM accesses.",
+                longDescription: `The default value (the start of SRAM) marks all of SRAM valid for Non-secure access.
+        The CPU always makes accesses in Secure mode, but other bus masters like the radio and DMA make Non-secure accesses.
+        If you configure this boundary, you must also ensure those peripherals do not target any data in the Secure-only region.
+        This value can only be configured in 1KB steps.`,
+                hidden: !isM33,
+                default: 0x20000000,
+                displayFormat: {radix: "hex", bitSize: 32}
+            },
+            {
+                name: "sramNonsecureCallableBoundary",
+                displayName: "SRAM Non-secure Callable Boundary",
+                description: "The lower boundary address for calling into SRAM from non-secure masters.",
+                longDescription: `The default value (the start of SRAM) marks all of SRAM valid for non-secure calls.
+        The CPU always makes accesses in Secure mode, but other bus masters like the radio and DMA make Non-secure accesses.
+        If you configure this boundary, you must also ensure those peripherals do not target any data in the Secure-only region.
+        This value can only be configured in 1KB steps.`,
+                hidden: !isM33,
+                default: 0x20000000,
+                displayFormat: {radix: "hex", bitSize: 32}
+            },
+            {
+                name: "markAllFlashSecure",
+                displayName: "Mark All Flash Secure-only",
+                description: "Configure all of flash for secure-only access.",
+                longDescription: `Configuring all of flash to secure-only requires a special configuration value, tick
+        this box to enable it.`,
+                hidden: !isM33,
+                default: false,
+                onChange: (inst, ui) => {
+                    ui.flashNonsecureBoundary.hidden = inst.markAllFlashSecure;
+                }
+            },
+            {
+                name: "flashNonsecureBoundary",
+                displayName: "Flash Non-secure Access Boundary",
+                description: "The lower boundary address for Non-secure flash accesses.",
+                longDescription: `The default value of 0x2000 marks all of flash except the lowest 8KB valid for Non-secure access.
+        The CPU always makes accesses in Secure mode, but other bus masters like the radio and DMA make Non-secure accesses.
+        If you configure this boundary, you must also ensure those peripherals do not target any data in the Secure-only region.
+        This value can only be configured in 8KB steps with an 8KB minimum.`,
+                hidden: !isM33,
+                default: 0x2000,
+                displayFormat: {radix: "hex", bitSize: 32}
+            },
+            {
+                name: "flashNonsecureCallableBoundary",
+                displayName: "Flash Non Secure Callable Boundary",
+                description: "The lower boundary address for calls from Non-secure masters into flash.",
+                longDescription: `The default value marks all of flash valid for calls from Non-secure masters.
+        This value can only be configured in 1KB steps up to 0x0FFC00. The top 1KB of flash is always non-secure callable.`,
+                hidden: !isM33,
+                default: 0x0,
+                displayFormat: {radix: "hex", bitSize: 32}
+            }
+        ]
+    },
+    {
+        displayName: "Bus Security",
+        description: "Access Locks",
+
+        config: [
+            {
+                name: "lockNonSecureVectorTableBaseAddress",
+                displayName: "Lock Non-secure Vector Table Address",
+                description: "Disables write access to non-secure vector table base address.",
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "lockSecureInterruptConfig",
+                displayName: "Lock Secure Interrupt Configuration",
+                description: "Disables write access to the secure interrupt configuration.",
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "lockSAURegions",
+                displayName: "Lock Security Attrrbution Unit (SAU) Regions",
+                description: "Disables write access to the SAU region configuration.",
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "lockNonSecureMPU",
+                displayName: "Lock Non-secure MPU",
+                description: "Disables write access to the non-secure memory protection unit.",
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "lockSecureMPU",
+                displayName: "Lock Secure MPU",
+                description: "Disables write access to the secure memory protection unit.",
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "disableSecureNonInvasiveDebug",
+                displayName: "Disable invasive debugging of non-secure masters",
+                description: `Disables debug actions that involve stopping execution, modifying registers, or
+reading from and writing to memory using the core.`,
+                hidden: !isM33,
+                default: false
+            },
+            {
+                name: "disableSecureInvasiveDebug",
+                displayName: "Disable invasive debugging of secure masters",
+                description: `Disables debug actions that involve stopping execution, modifying registers, or
+reading from and writing to memory using the core.`,
+                hidden: !isM33,
+                default: false
+            }
+        ]
+    },
+    // End of M33 with Trustzone section
+    /////////////////////////////////////
+
     // Debug access
     {
         displayName: "Debug Access",
@@ -493,6 +672,48 @@ function validate(inst, validation) {
         Common.logError(validation, inst, "tcxoMaxStartup",
             "Valid range: 0 to 0xFF");
     }
+
+    // Flash Vector table address check
+    if (inst.addressFlashVectorTable < 0 || inst.addressFlashVectorTable > 0xFFFFFFFF) {
+        Common.logError(validation, inst, "addressFlashVectorTable",
+            "Valid range: 0 to 0xFFFFFFFF");
+    }
+
+    // Flash non-secure boundary has a 128kB minimum
+    if (inst.flashNonsecureBoundary < 0x2000 || inst.flashNonsecureBoundary > 0xFFFFF) {
+        Common.logError(validation, inst, "flashNonsecureBoundary",
+            "Valid range: 0x2000 to 0xFFFFF. To configure all of flash as secure, use the dedicated control.");
+    }
+
+    // Flash non-secure boundary must be 8kb-aligned
+    if (inst.flashNonsecureBoundary % 0x2000 != 0) {
+        Common.logError(validation, inst, "flashNonsecureBoundary",
+            "This value must be 8KB-aligned (multiples of 0x2000)");
+    }
+
+    // Flash non-secure callable boundary has no minimum, and a maximum of 1KB less than the top of flash
+    if (inst.flashNonsecureCallableBoundary < 0x0 || inst.flashNonsecureCallableBoundary > 0x0FFC00) {
+        Common.logError(validation, inst, "flashNonsecureCallableBoundary",
+            "Valid range: 0x0 to 0x0FFC00");
+    }
+
+    // SRAM non-secure boundary must be 1kb-aligned
+    if (inst.flashNonsecureCallableBoundary % 0x400 != 0) {
+        Common.logError(validation, inst, "flashNonsecureCallableBoundary",
+            "This value must be 1KB-aligned (multiples of 0x400)");
+    }
+
+    // SRAM non-secure boundary must be in SRAM
+    if (inst.sramNonsecureBoundary < 0x20000000 || inst.sramNonsecureBoundary > 0xFFFFFFFF) {
+        Common.logError(validation, inst, "sramNonsecureBoundary",
+            "Valid range: 0x20000000 to 0xFFFFFFFF");
+    }
+
+    // SRAM non-secure boundary must be 1kb-aligned
+    if (inst.sramNonsecureBoundary % 0x400 != 0) {
+        Common.logError(validation, inst, "sramNonsecureBoundary",
+            "This value must be 1KB-aligned (multiples of 0x400)");
+    }
 }
 
 /*
@@ -503,8 +724,13 @@ function modules(inst) {
 
     // If SCLK_LF derived from HPOSC, tell the power driver it needs to
     // include the Temperature driver and setup the RTC compensation
-    if ((inst.srcClkHF === "Internal High Precision Oscillator") &&
-        (inst.srcClkLF === "Derived from HF XOSC")) {
+    // Alternatively, if RF temperature compensation is enabled, always
+    // include temperature regardless of SCLK_LF source.
+    // This is done to avoid unconditional inclusion of temperature in the RF
+    // module, see https://jira.itg.ti.com/browse/RFDRIVER-474
+    if (((inst.srcClkHF === "Internal High Precision Oscillator") &&
+         (inst.srcClkLF === "Derived from HF XOSC")) ||
+         (inst.enableXoscHfComp === true)) {
 
         tmpModules.push({
                             name: "Temperature",

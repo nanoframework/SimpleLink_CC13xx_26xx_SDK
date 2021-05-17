@@ -502,7 +502,7 @@ static void macInit(macUserCfg_t *pUserCfg)
 #endif /* USE_DMM */
 
 #ifdef FEATURE_MAC_SECURITY
-#if !defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC26X2)
+#if !defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC26X2) && !defined(DeviceFamily_CC13X2X7) && !defined(DeviceFamily_CC26X2X7) && !defined(DeviceFamily_CC13X1) && !defined(DeviceFamily_CC26X1)
   CryptoCC26XX_Params CryptoCC26XXParams;
 #elif !defined(BLE_START)
   AESCCM_Params AESCCMParams;
@@ -556,7 +556,7 @@ static void macInit(macUserCfg_t *pUserCfg)
 #endif /* USE_DMM */
 
 #ifdef FEATURE_MAC_SECURITY
-#if !defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC26X2)
+#if !defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC26X2) && !defined(DeviceFamily_CC13X2X7) && !defined(DeviceFamily_CC26X2X7) && !defined(DeviceFamily_CC13X1) && !defined(DeviceFamily_CC26X1)
   extern CryptoCC26XX_Handle Crypto_handle;
 
   CryptoCC26XX_init();

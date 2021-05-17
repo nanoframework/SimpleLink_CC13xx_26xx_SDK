@@ -43,15 +43,7 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Task.h>
 
-/*  The maximum number of ticks before the tick count rolls over. We use
- *  0xFFFFFFFF instead of 0x100000000 to avoid 64-bit math.
- */
-#define MAX_TICKS 0xFFFFFFFFL
-#define TICKS_PER_SEC (1000000L / Clock_tickPeriod)
-
-/* integral number of seconds in a period of MAX_TICKS */
-#define MAX_SECONDS (MAX_TICKS / TICKS_PER_SEC)
-
+#include "pthread_util.h"
 
 /*
  *  ======== nanosleep ========

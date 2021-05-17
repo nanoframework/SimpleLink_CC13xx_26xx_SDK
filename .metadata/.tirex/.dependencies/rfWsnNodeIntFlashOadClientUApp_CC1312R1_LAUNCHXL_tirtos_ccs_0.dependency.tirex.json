@@ -36,14 +36,13 @@
             "+../../sce/scif_framework.h -> sce/scif_framework.h",
             "+../../sce/scif_osal_tirtos.c -> sce/scif_osal_tirtos.c",
             "+../../sce/scif_osal_tirtos.h -> sce/scif_osal_tirtos.h",
-            "+../../rfWsnNodeIntFlashOadClientUApp.cfg -> rfWsnNodeIntFlashOadClientUApp.cfg",
-            "+../../rfWsnNodeIntFlashOadClient.syscfg -> rfWsnNodeIntFlashOadClient.syscfg",
+            "+../rfWsnNodeIntFlashOadClient.syscfg -> rfWsnNodeIntFlashOadClient.syscfg",
             "+../../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
             "+../../sce/adc_sample.scp -> sce/adc_sample.scp",
             "+../../sce/scif.c -> sce/scif.c",
             "+../../sce/scif.h -> sce/scif.h",
-            "+CC1312R1_LAUNCHXL_TIRTOS_OAD.cmd -> CC1312R1_LAUNCHXL_TIRTOS_OAD.cmd",
+            "+../../rfWsnNodeIntFlashOadClient.cfg -> rfWsnNodeIntFlashOadClient.cfg",
+            "+CC13X2_CC26X2_TIRTOS_OAD.cmd -> CC13X2_CC26X2_TIRTOS_OAD.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

@@ -49,6 +49,7 @@ let config = [
             { name: "TI-RTOS" },
 //          { name: "SYS/BIOS 7" },
             { name: "FreeRTOS" }
+//          { name: "Linux", displayName: "Linux (embedded)" }
         ],
         description: "Select the RTOS being used"
     }

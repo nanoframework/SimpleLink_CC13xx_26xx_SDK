@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -192,20 +192,29 @@ extern const ECCParams_CurveParams ECCParams_BrainpoolP384R1;
  */
 extern const ECCParams_CurveParams ECCParams_BrainpoolP512R1;
 
-
+/*!
+ *  @brief A short Weierstrass equivalent representation of Ed25519.
+ */
+extern const ECCParams_CurveParams ECCParams_Wei25519;
 
 /* Montgomery curves */
 
 /*!
- *
  *  @brief The Curve25519 curve in Montgomery form.
- *
  */
 extern const ECCParams_CurveParams ECCParams_Curve25519;
 
-
-
 /* Edwards curves */
+
+/*!
+ *  @brief The Ed25519 curve in Edwards form.
+ */
+extern const ECCParams_CurveParams ECCParams_Ed25519;
+
+/*!
+ *  @brief Length of Curve25519 parameters in bytes.
+ */
+#define ECCPARAMS_CURVE25519_LENGTH 32u
 
 /* Utility functions */
 

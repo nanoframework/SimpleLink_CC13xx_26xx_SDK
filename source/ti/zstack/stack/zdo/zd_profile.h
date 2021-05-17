@@ -288,7 +288,7 @@ typedef struct
  * GLOBAL VARIABLES
  */
 
-extern byte ZDP_TransID;
+extern byte ZDP_SeqNum;
 extern byte ZDP_TxOptions;
 
 /*********************************************************************
@@ -413,7 +413,7 @@ extern afStatus_t ZDP_SendData( uint8_t *transSeq, zAddrType_t *dstAddr, uint16_
  *
  */
 #define ZDP_MgmtLqiReq( dstAddr, StartIndex, SecurityEnable ) \
-          ZDP_SendData( &ZDP_TransID, dstAddr, Mgmt_Lqi_req, 1, &StartIndex, SecurityEnable )
+          ZDP_SendData( &ZDP_SeqNum, dstAddr, Mgmt_Lqi_req, 1, &StartIndex, SecurityEnable )
 
 /*
  * ZDP_MgmtRtgReq - Send a Management Routing Table Request
@@ -424,7 +424,7 @@ extern afStatus_t ZDP_SendData( uint8_t *transSeq, zAddrType_t *dstAddr, uint16_
  *
  */
 #define ZDP_MgmtRtgReq( dstAddr, StartIndex, SecurityEnable ) \
-          ZDP_SendData( &ZDP_TransID, dstAddr, Mgmt_Rtg_req, 1, &StartIndex, SecurityEnable )
+          ZDP_SendData( &ZDP_SeqNum, dstAddr, Mgmt_Rtg_req, 1, &StartIndex, SecurityEnable )
 
 /*
  * ZDP_MgmtBindReq - Send a Management Binding Table Request
@@ -435,13 +435,13 @@ extern afStatus_t ZDP_SendData( uint8_t *transSeq, zAddrType_t *dstAddr, uint16_
  *
  */
 #define ZDP_MgmtBindReq( dstAddr, StartIndex, SecurityEnable ) \
-         ZDP_SendData( &ZDP_TransID, dstAddr, Mgmt_Bind_req, 1, &StartIndex, SecurityEnable )
+         ZDP_SendData( &ZDP_SeqNum, dstAddr, Mgmt_Bind_req, 1, &StartIndex, SecurityEnable )
 
 /*
  * ZDP_ParentAnnceReq - Send a ParentAnnce Request
  */
 #define ZDP_ParentAnnceReq( dstAddr, numberOfChildren, childInfo, SecurityEnable ) \
-           ZDP_ParentAnnce( &ZDP_TransID, &dstAddr, numberOfChildren, childInfo, \
+           ZDP_ParentAnnce( &ZDP_SeqNum, &dstAddr, numberOfChildren, childInfo, \
                             Parent_annce, SecurityEnable )
 
 /*

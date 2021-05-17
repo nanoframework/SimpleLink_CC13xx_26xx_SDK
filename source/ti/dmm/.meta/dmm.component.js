@@ -43,7 +43,7 @@ let topModules = [];
 let templates = [];
 
 // Export module for only supported devices
-if(system.deviceData.deviceId.match(/CC26.2|CC13.2(R|P)1/))
+if(system.deviceData.deviceId.match(/CC26.2|CC13.2(R|P)(1|7)|CC2652(R|P)7/))
 {
     topModules = [
         {
@@ -61,6 +61,10 @@ if(system.deviceData.deviceId.match(/CC26.2|CC13.2(R|P)1/))
         {
             name: "/ti/dmm/templates/ti_dmm_application_policy.h.xdt",
             outputPath: "ti_dmm_application_policy.h"
+        },
+        {
+            name: "/ti/dmm/templates/ti_dmm_custom_activities.h.xdt",
+            outputPath: "ti_dmm_custom_activities.h"
         }
     ];
 }

@@ -77,13 +77,13 @@
     /* CONFIG_XXXCOUNT string, derived from defaultInstanceName */
     let countDef = ADCBuf.defaultInstanceName + "COUNT";
 
-     /* localize the object names with this device ID */
-     let devId = system.deviceData.deviceId;
-     let driver = "CC26XX";
+    /* localize the object names with this device ID */
+    let devId = system.deviceData.deviceId;
+    let driver = "CC26X2";
 
-     if (devId.match(/CC13.2/) || devId.match(/CC26.2/)) {
-         driver = 'CC26X2';
-     }
+    if (/CC(?:13|26).0/.test(devId)) {
+        driver = 'CC26XX';
+    }
 %%}
 /*
  *  =============================== ADCBuf ===============================

@@ -1,8 +1,9 @@
-package.xdc
-package.bld
-package.xs
-libmap.xs
 makefile
+package.xdc
+libmap.xs
+package.xs
+product-linux.json
+package.bld
 package/package.bld.xml
 package/build.cfg
 package/package.xdc.inc
@@ -22,6 +23,7 @@ package/package.xdc.inc
 .meta/model.gv.xdt
 .meta/rpc.gv.xdt
 .meta/rpc.component.js
+product-linux.json
 package/package.cfg.xdc.inc
 lib/gcc/m4f/rpc_debug.a
 lib/gcc/m4f/rpc_release.a

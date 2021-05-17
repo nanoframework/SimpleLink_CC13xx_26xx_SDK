@@ -188,12 +188,12 @@ const config = {
                             longDescription: Docs.maxNumOfSegMsgTXLongDescription
                         },
                         {
-                            name: "maxNumSegInMsg",
+                            name: "maxNumSegInMsgTX",
                             displayName: "Max Num of Segments in Message",
-                            default: 8,
+                            default: 15,
                             hidden: true,
                             description: "Maximum number of segments in outgoing messages",
-                            longDescription: Docs.maxNumSegInMsgLongDescription
+                            longDescription: Docs.maxNumSegInMsgTXLongDescription
                         }
                     ]
                 },
@@ -208,6 +208,14 @@ const config = {
                             hidden: true,
                             description: "Maximum number of simultaneous incoming segmented messages",
                             longDescription: Docs.maxNumSegMsgRXLongDescription
+                        },
+                        {
+                            name: "maxNumSegInMsgRX",
+                            displayName: "Max Num of Segments in Message",
+                            default: 15,
+                            hidden: true,
+                            description: "Maximum number of segments in incoming messages",
+                            longDescription: Docs.maxNumSegInMsgRXLongDescription
                         },
                         {
                             name: "maxSizeRXSdu",
@@ -295,10 +303,10 @@ function onGattBearerChange(inst,ui)
     system.utils.hideGroupConfig("gattBearerConfiguration", inst, ui);
     // Change the device role according to the proxy value
     // When Proxy is used, the central role should be enables as well
-    inst.proxy || inst.gattBearer ?
-    inst.deviceRole = "PERIPHERAL_CFG+CENTRAL_CFG" :
-    inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG";
-
+    inst.proxy || inst.gattBearer || inst.meshApp != "meshOnly" ?
+    inst.deviceRole = "PERIPHERAL_CFG+OBSERVER_CFG" :
+    inst.deviceRole = "BROADCASTER_CFG+OBSERVER_CFG";
+    meshFeaturesScript.changeGroupsStateMesh(inst,ui);
 }
 
 /*
@@ -372,9 +380,13 @@ function validate(inst, validation)
     {
         validation.logError("Num of advertising buffers range is 6 to 256", inst, "numAdvBuf");
     }
-    if(inst.maxNumSegInMsg < 2 || inst.maxNumSegInMsg > 32)
+    if(inst.maxNumSegInMsgTX < 2 || inst.maxNumSegInMsgTX > 32)
     {
-        validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsg");
+        validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgTX");
+    }
+    if(inst.maxNumSegInMsgRX < 2 || inst.maxNumSegInMsgRX > 32)
+    {
+        validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgRX");
     }
     if(inst.maxNumSegMsgRX < 1 || inst.maxNumSegMsgRX > 255)
     {

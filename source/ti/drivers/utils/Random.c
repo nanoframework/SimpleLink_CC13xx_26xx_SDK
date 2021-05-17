@@ -43,18 +43,13 @@
 
 #include <ti/devices/DeviceFamily.h>
 
-#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 ||\
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 ||\
      DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
 
     #include <ti/drivers/TRNG.h>
     #include <ti/drivers/trng/TRNGCC26XX.h>
     #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
-
-#elif (DeviceFamily_ID == DeviceFamily_ID_MSP432E401Y || \
-       DeviceFamily_ID == DeviceFamily_ID_MSP432E411Y)
-
-    #include DeviceFamily_constructPath(driverlib/inc/hw_sysctl.h)
-    #include DeviceFamily_constructPath(driverlib/types.h)
 
 #endif
 
@@ -68,6 +63,7 @@ static uint32_t state[STATE_SIZE_IN_WORDS];
 int_fast16_t Random_seedAutomatic(void) {
 
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 || \
      DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
 
     TRNGCC26XX_Object object = {0};
@@ -113,17 +109,6 @@ int_fast16_t Random_seedAutomatic(void) {
     if (status != TRNG_STATUS_SUCCESS) {
         return Random_STATUS_ERROR;
     }
-
-    return Random_STATUS_SUCCESS;
-#elif (DeviceFamily_ID == DeviceFamily_ID_MSP432E401Y || \
-       DeviceFamily_ID == DeviceFamily_ID_MSP432E411Y)
-
-    /* MSP432E4 has a 128-bit unique device ID that we can use */
-    state[0] = HWREG(SYSCTL_UNIQUEID0);
-    state[1] = HWREG(SYSCTL_UNIQUEID1);
-    state[2] = HWREG(SYSCTL_UNIQUEID2);
-    state[3] = HWREG(SYSCTL_UNIQUEID3);
-    state[4] = 0x00000001;
 
     return Random_STATUS_SUCCESS;
 #else

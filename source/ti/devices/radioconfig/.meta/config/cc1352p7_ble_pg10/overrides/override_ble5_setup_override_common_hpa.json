@@ -43,13 +43,28 @@
             },
             {
                 "_type": "ELEMENT",
+                "_comment": "Bluetooth 5: Set DTX gain -5% for 1 Mbps",
+                "$": "0x00E787E3"
+            },
+            {
+                "_type": "ELEMENT",
                 "_comment": "Bluetooth 5: Set DTX threshold 1 Mbps",
                 "$": "0x00950803"
             },
             {
                 "_type": "ELEMENT",
+                "_comment": "Bluetooth 5: Set DTX gain -2.5% for 2 Mbps",
+                "$": "0x00F487F3"
+            },
+            {
+                "_type": "ELEMENT",
                 "_comment": "Bluetooth 5: Set DTX threshold 2 Mbps",
                 "$": "0x012A0823"
+            },
+            {
+                "_type": "ELEMENT",
+                "_comment": "Bluetooth 5: Set enhanced TX shape",
+                "$": "0x000D8C73"
             },
             {
                 "_type": "HW32_ARRAY_OVERRIDE",

@@ -9,3 +9,4 @@ lib/debug/ti.sysbios.rts.gnu.am4fg
 package/package_ti.sysbios.rts.gnu.c
 ReentSupport.c
 SemiHostSupport.c
+lib/debug/ti.sysbios.rts.gnu.am4g

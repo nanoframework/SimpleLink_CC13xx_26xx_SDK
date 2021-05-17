@@ -1,6 +1,6 @@
 {
     "setting": {
-        "Name": "wBMS, 2M PHY (2 Msym\/s GFSK, 2 Mbps data rate)",
+        "Name": "wBMS, 2 mbps, GFSK",
         "Description": "wBMS, LE 2M PHY (2 Msym\/s GFSK, 2 Mbps data rate) for the 2.4 GHz ISM band.",
         "Frequency": "2440",
         "Patch": {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -329,12 +329,13 @@ function device2Family(device, mod)
     let DEV2FAMILY = [
         {prefix: "CC13.2",   family: "CC26X2"},
         {prefix: "CC26.2",   family: "CC26X2"},
+        {prefix: "CC13.4",   family: "CC26X2"},
+        {prefix: "CC26.4",   family: "CC26X2"},
         {prefix: "CC13.1",   family: "CC26X1"},
         {prefix: "CC26.1",   family: "CC26X1"},
         {prefix: "CC13",     family: "CC26XX"},
         {prefix: "CC26",     family: "CC26XX"},
-        {prefix: "CC32",     family: "CC32XX"},
-        {prefix: "MSP432E",  family: "MSP432E4"}
+        {prefix: "CC32",     family: "CC32XX"}
     ];
 
     /* CC26X2 and CC26X2R7 specific module delegates */
@@ -342,6 +343,7 @@ function device2Family(device, mod)
         "ECDH" :        "CC26X2",
         "ECDSA" :       "CC26X2",
         "ECJPAKE" :     "CC26X2",
+        "EDDSA" :       "CC26X2",
         "SHA2" :        "CC26X2",
         "Temperature" : "CC26X2"
     };

@@ -31,16 +31,14 @@
             "+../../../../../../../source/ti/ble5stack/inc/gatt.h -> Include/gatt.h",
             "+../../../../../../../source/ti/ble5stack/inc/hci.h -> Include/hci.h",
             "+../../../../../../../source/ti/ble5stack/osal/src/inc/osal_snv.h -> Include/osal_snv.h",
-            "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/CC1352P1_LAUNCHXL_fxns.c -> Startup/CC1352P1_LAUNCHXL_fxns.c",
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/cc26xx/devinfoservice.c -> Profiles/devinfoservice.c",
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/devinfoservice.h -> Profiles/devinfoservice.h",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> Startup/rom_init.c",
             "+../../Startup/ble_user_config_stack.c -> Startup/ble_user_config_stack.c",
-            "+../../Tools/Defines/config_def.opt -> Tools/Defines/config_def.opt",
             "+../../simple_broadcaster.syscfg -> simple_broadcaster.syscfg",
-            "+../main.c -> tirtos/main.c",
-            "+cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
+            "+../../Startup/main.c -> Startup/main.c",
             "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
+            "+cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

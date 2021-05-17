@@ -23,3 +23,7 @@ GateSpinlock.c
 lib/debug/ti.sysbios.gates.am4f
 lib/debug/ti.sysbios.gates.am4fg
 lib/debug/ti.sysbios.gates.arm4f
+lib/debug/ti.sysbios.gates.aem4
+lib/debug/ti.sysbios.gates.am4
+lib/debug/ti.sysbios.gates.am4g
+lib/debug/ti.sysbios.gates.arm4

@@ -20,12 +20,11 @@
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/cc26xx/devinfoservice.c -> devinfoservice.c",
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/devinfoservice.h -> devinfoservice.h",
             "+../../Startup/osal_icall_ble.c -> osal_icall_ble.c",
-            "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/CC1352P1_LAUNCHXL_fxns.c -> CC1352P1_LAUNCHXL_fxns.c",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> rom_init.c",
             "+../../Startup/ble_user_config_stack.c -> ble_user_config_stack.c",
+            "+../../Startup/main.c -> main.c",
             "+../../Tools/ble_Debug.xscfg -> ble_Debug.xscfg",
             "+../../Tools/ble_Release.xscfg -> ble_Release.xscfg",
-            "+../../Tools/Defines/config_def.opt -> config_def.opt",
             "+../../../../../../../source/ti/ble5stack/icall/src/icall.c -> icall.c",
             "+../../../../../../../source/ti/ble5stack/icall/src/inc/icall.h -> icall.h",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_addrs.h -> icall_addrs.h",
@@ -36,11 +35,10 @@
             "+../../../../../../../source/ti/ble5stack/icall/inc/ble_user_config.h -> ble_user_config.h",
             "+../../../../../../../source/ti/ble5stack/icall/app/icall_api_lite.c -> icall_api_lite.c",
             "+../../../../../../../source/ti/ble5stack/icall/inc/icall_ble_apimsg.h -> icall_ble_apimsg.h",
-            "+../main.c -> main.c",
             "+../../Tools/simple_broadcaster_app.cfg -> simple_broadcaster_app.cfg",
             "+../../simple_broadcaster.syscfg -> simple_broadcaster.syscfg",
-            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf",
-            "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html"
+            "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
+            "+cc26xx_app_and_stack_agama.icf -> cc26xx_app_and_stack_agama.icf"
         ]
     }
 ]

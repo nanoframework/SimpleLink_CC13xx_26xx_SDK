@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ do not initialize { section .stack, section .noinit};
 define exported symbol STACK_TOP = RAM_end__ + 1;
 
 /* Primary Heap configuration */
-define symbol HEAPSIZE = 16384;
+define symbol HEAPSIZE = 8192;
 define block HEAP with alignment = 8, size = HEAPSIZE { };
 
 /* Place heap just before CSTACK */

@@ -267,6 +267,7 @@ static uint8_t gapBond_MITM = FALSE;
 static uint8_t gapBond_IOCap = GAPBOND_IO_CAP_DISPLAY_ONLY;
 static uint8_t gapBond_Bonding = FALSE;
 static uint8_t gapBond_sc_host_debug = FALSE;
+static uint8_t gapBond_allow_debug_keys = TRUE;
 static uint8_t gapBond_maxBonds = GAP_BONDINGS_MAX;
 static uint8_t gapBond_maxCharCfg = 4;
 static uint8_t gapBond_gatt_no_client = 0;
@@ -299,7 +300,7 @@ static uint8_t gapBond_secureConnection = GAPBOND_SECURE_CONNECTION_ALLOW;
 
 static uint8_t gapBond_authenPairingOnly = FALSE;
 
-// These are the "Debug Mode" keys as defined in
+// These are the "Debug Mode" keys as defined in Vol 3, Part H, section 2.3.5.6.1 of the BLE 5.2 Core spec
 static gapBondEccKeys_t gapBond_eccKeys_sc_host_debug =
 {
   { 0xBD, 0x1A, 0x3C, 0xCD, 0xA6, 0xB8, 0x99, 0x58, 0x99, 0xB7, 0x40, 0xEB,
@@ -597,6 +598,14 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
         ret = bleInvalidRange;
       }
 
+      break;
+
+    case GAPBOND_ALLOW_DEBUG_KEYS:
+      if((len == sizeof(uint8_t)) && (*((uint8_t *)pValue) <= TRUE))
+      {
+        gapBond_allow_debug_keys = *((uint8_t *)pValue);
+        SM_SetAllowDebugKeysMode(gapBond_allow_debug_keys);
+      }
       break;
 
     case GAPBOND_ERASE_BOND_IN_CONN:
@@ -1001,6 +1010,10 @@ bStatus_t GAPBondMgr_GetParameter(uint16_t param, void *pValue)
 
     case GAPBOND_ECC_KEYS:
       VOID MAP_osal_memcpy(pValue, &gapBond_eccKeys, sizeof(gapBondEccKeys_t));
+      break;
+
+    case GAPBOND_ALLOW_DEBUG_KEYS:
+      *((uint8_t *)pValue) = gapBond_allow_debug_keys;
       break;
 
     case GAPBOND_ERASE_BOND_IN_CONN:
@@ -4010,7 +4023,6 @@ static bStatus_t gapBondStateStartSecurity(uint16_t connHandle,
                                            gapPairingReq_t *pPairReq)
 {
   uint8_t ret = SUCCESS;
-  gapBondStateNode_t *pNewNode;
   uint8_t isHandleExist = FALSE;
   // check if connHandle already in the queue
   gapBondStateNodePtr_t qNode = gapBondStateNodeHead;
@@ -4028,19 +4040,20 @@ static bStatus_t gapBondStateStartSecurity(uint16_t connHandle,
   if(isHandleExist == FALSE)
   {
     // Enqueue
-    pNewNode = gapBondMgrQueuePairing(connHandle, addrType, pPairReq);
-    if(pNewNode == NULL)
+    qNode = gapBondMgrQueuePairing(connHandle, addrType, pPairReq);
+    if(qNode == NULL)
     {
       return(bleNoResources);
     }
-    // Set the state.
-    gapBondStateSetState(pNewNode, GBM_STATE_IS_PAIRING);
   }
 
   if(GAP_isPairing())
   {
 	return ret;
   }
+
+  // Set the state.
+  gapBondStateSetState(qNode, GBM_STATE_IS_PAIRING);
 
   // Start Pairing.
   ret = gapBondMgrAuthenticate(connHandle, addrType, pPairReq);

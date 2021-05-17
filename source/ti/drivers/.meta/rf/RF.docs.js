@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2020 - 2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -95,11 +95,12 @@ Coex slave              Coex master
 \`\`\`
 
 Resources:
-* __Coexistence__ chapter of the [TI BLE5-Stack User's Guide][UG]
+* [Coexistence chapter][COEX] of the [TI BLE5-Stack User's Guide][UG]
 * SimpleLink Academy [BLE Coexistence Configuration][SLA]
 
-[UG]: http://dev.ti.com/tirex/explore/node?node=AOimuSWjap.4RuDbcp7OqA__pTTHBmu__LATEST
-[SLA]: http://dev.ti.com/tirex/explore/node?node=AN3jFkz8RvbfdF-eMjQx0A__pTTHBmu__LATEST
+[COEX]: /ble5stack/ble_user_guide/html/coexistence/coexistence.html
+[UG]:   /ble5stack/ble_user_guide/ble5stack-users-guide.html
+[SLA]:  https://dev.ti.com/tirex/explore/node?node=AN3jFkz8RvbfdF-eMjQx0A__pTTHBmu__LATEST
 `
     },
     configGroup: {
@@ -180,6 +181,17 @@ __Coex Mode__ description for more information on what this signal is used for.
 If this option is _disabled_, the BLE device is configured to not assert the
 REQUEST signal (and subsequently disregard any of the other coex signals)
 when the scheduled RF activity is an RX command.
+
+Note: If an RX command is chained with a TX command, the REQUEST signal
+will be asserted in time for the TX activity and will _remain asserted_
+until the end of the command chain, even if the following command is an RX. 
+
+\`\`\`
+              _______________
+REQ  ________|               |__
+        ____    ____    ____   
+RF   __| rx |__| tx |__| rx |___
+\`\`\`
 `
     },
     useCaseConfigGroup: {

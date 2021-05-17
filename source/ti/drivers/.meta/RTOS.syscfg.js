@@ -49,8 +49,8 @@
 "use strict";
 
 /* get /ti/drivers family name from device object */
-let Common = system.getScript("/ti/drivers/Common.js");
-let family = Common.device2Family(system.deviceData, "RTOS");
+//let Common = system.getScript("/ti/drivers/Common.js");
+//let family = Common.device2Family(system.deviceData, "RTOS");
 
 /*
  *  ======== rtosConfig ========
@@ -160,17 +160,9 @@ function updateConfigs(inst, ui)
  *  ------   ----        ------     --------  ----------
  *  LPRF     RTC         RTC           -      GP Timers
  *  CC32XX   SysTick     SysTick    SysTick   GP Timers
- *  MSP432E  GP Timer(*) Systick    SysTick   GP Timers
  */
 function _timerConflict(rtosName)
 {
-    /* if MPS432E */
-    if (family == "MSP432E4") {
-        if (rtosName == "TI-RTOS") {
-            return (true);
-        }
-    }
-
     return (false);
 }
 

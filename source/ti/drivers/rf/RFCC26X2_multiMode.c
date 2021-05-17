@@ -3156,6 +3156,13 @@ static void RF_fsmSetupState(RF_Object *pObj, RF_FsmEvent e)
             }
         }
 
+#if defined(DeviceFamily_PARENT) && (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
+        /* Trim directly the radio register values based on the ID of setup command. */
+        rfTrim_t rfTrim;
+        RFCRfTrimRead((rfc_radioOp_t *)pRadioSetup, &rfTrim);
+        RFCRfTrimSet(&rfTrim);
+#endif
+
         /* Make sure system bus request is done by now */
         RF_dbellSyncOnAck();
 
@@ -3450,6 +3457,13 @@ static void RF_fsmActiveState(RF_Object *pObj, RF_FsmEvent e)
                     tmp->condition.rule              = COND_ALWAYS;
                 }
             }
+
+#if defined(DeviceFamily_PARENT) && (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
+            /* Trim directly the radio register values based on the ID of setup command. */
+            rfTrim_t rfTrim;
+            RFCRfTrimRead((rfc_radioOp_t *)pRadioSetup, &rfTrim);
+            RFCRfTrimSet(&rfTrim);
+#endif
 
             /* Send the command chain */
             RF_dbellSubmitCmdAsync((uint32_t)pRadioSetup);
@@ -4104,8 +4118,11 @@ static void RF_detachOverrides(uint32_t* baseOverride, uint32_t* newOverride)
  */
 static bool RF_decodeOverridePointers(RF_RadioSetup* radioSetup, uint16_t** pTxPower, uint32_t** pRegOverride, uint32_t** pRegOverrideTxStd, uint32_t** pRegOverrideTx20)
 {
-    /* Decode if High Gain PA is even available. */
-    bool tx20FeatureAvailable = (ChipInfo_GetChipType() == CHIP_TYPE_CC1352P) || (ChipInfo_GetChipType() == CHIP_TYPE_CC2652P);
+    /* Read available RF modes from the PRCM register */
+    uint32_t availableRfModes = HWREG(PRCM_BASE + PRCM_O_RFCMODEHWOPT);
+
+    /* Decode if High Gain PA is even available. Bit 6 tells us PA availability. */
+    bool tx20FeatureAvailable = availableRfModes & PRCM_RFCMODEHWOPT_AVAIL_MODE6;
 
     /* Only decode the offset of those fields which exist on this device. */
     if (tx20FeatureAvailable)

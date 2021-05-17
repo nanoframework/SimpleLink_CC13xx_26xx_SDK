@@ -1,27 +1,20 @@
-# BOARDNAME below selects the board the kernel is built for. By default,
-# '*' is selected as the board name so the kernel is built for all boards.
+# KERNEL_BUILD below selects a specific kernel to build. By default,
+# '*' is selected so all kernels are built.
 #
-# List of board names supported (choose only one for BOARDNAME):
+# KERNEL_BUILD options supported match directory names contained within the
+# builds/ (choose only one for KERNEL_BUILD):
 #
-# coresdk_cc13xx_cc26xx_<version>:
-# CC1310_LAUNCHXL CC1310DK_7XD CC1350_LAUNCHXL CC1350STK CC2640R2_LAUNCHXL
-# CC2650_LAUNCHXL CC2650DK_4XS CC2650DK_5XD CC2650DK_7ID CC2650STK
-#
-# coresdk_cc32xx_<version>:
-# CC3220S_LAUNCHXL CC3220SF_LAUNCHXL
-#
-# coresdk_msp432_<version>:
-# MSP_EXP432P401R MSP_EXP432P4111
-#
-BOARDNAME ?= *
+KERNEL_BUILD ?= *
 
 # Find subdirectories
-RELEASE-CCS-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/ccs/.)
-RELEASE-GCC-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/gcc/.)
-RELEASE-IAR-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/iar/.)
-DEBUG-CCS-SUBDIRS     = $(wildcard builds/$(BOARDNAME)/debug/ccs/.)
-DEBUG-GCC-SUBDIRS     = $(wildcard builds/$(BOARDNAME)/debug/gcc/.)
-DEBUG-IAR-SUBDIRS     = $(wildcard builds/$(BOARDNAME)/debug/iar/.)
+RELEASE-CCS-SUBDIRS   = $(wildcard builds/$(KERNEL_BUILD)/release/ccs/.)
+RELEASE-GCC-SUBDIRS   = $(wildcard builds/$(KERNEL_BUILD)/release/gcc/.)
+RELEASE-IAR-SUBDIRS   = $(wildcard builds/$(KERNEL_BUILD)/release/iar/.)
+RELEASE-TICLANG-SUBDIRS   = $(wildcard builds/$(KERNEL_BUILD)/release/ticlang/.)
+DEBUG-CCS-SUBDIRS     = $(wildcard builds/$(KERNEL_BUILD)/debug/ccs/.)
+DEBUG-GCC-SUBDIRS     = $(wildcard builds/$(KERNEL_BUILD)/debug/gcc/.)
+DEBUG-IAR-SUBDIRS     = $(wildcard builds/$(KERNEL_BUILD)/debug/iar/.)
+DEBUG-TICLANG-SUBDIRS     = $(wildcard builds/$(KERNEL_BUILD)/debug/ticlang/.)
 
 include ../../imports.mak
 
@@ -38,6 +31,10 @@ endif
 ifneq ($(IAR_ARMCOMPILER),)
 	RELEASE-SUBDIRS += $(RELEASE-IAR-SUBDIRS)
 	DEBUG-SUBDIRS += $(DEBUG-IAR-SUBDIRS)
+endif
+ifneq ($(TICLANG_ARMCOMPILER),)
+	RELEASE-SUBDIRS += $(RELEASE-TICLANG-SUBDIRS)
+	DEBUG-SUBDIRS += $(DEBUG-TICLANG-SUBDIRS)
 endif
 
 .PHONY: release debug $(RELEASE-SUBDIRS) $(DEBUG-SUBDIRS)

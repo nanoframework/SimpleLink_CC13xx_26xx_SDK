@@ -20,7 +20,7 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 
 %%}
 
-% if(!ble.disableDisplayModule)
+% if(!ble.disableDisplayModule && !ble.nwpMode)
 % {
 /******************************************************************************
 * Mesh App
@@ -119,7 +119,7 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
  * bytes is used for the Transport Layer MIC). For example, 5 segments means
  * the maximum SDU size is 60 bytes, which leaves 56 bytes for application
  * layer data using a 4-byte MIC and 52 bytes using an 8-byte MIC. */
-#define CONFIG_BT_MESH_TX_SEG_MAX `ble.maxNumSegInMsg`
+#define CONFIG_BT_MESH_TX_SEG_MAX `ble.maxNumSegInMsgTX`
 
 // ------------------
 // Transport Layer RX
@@ -130,6 +130,14 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 
 /* Maximum size for Transport layer RX SDUs */
 #define CONFIG_BT_MESH_RX_SDU_MAX `ble.maxSizeRXSdu`
+
+/* Maximum incoming Upper Transport Access PDU length. This determines also
+* how many segments incoming segmented messages can have. Each segment can
+* contain 12 bytes, so this value should be set to a multiple of 12 to avoid
+* wasted memory. The minimum requirement is 2 segments (24 bytes) whereas
+* the maximum supported by the Mesh specification is 32 segments (384 bytes). */
+#define CONFIG_BT_MESH_RX_SEG_MAX `ble.maxNumSegInMsgRX`
+
 /* ------------------------------------------------------------------------- */
 
 
@@ -221,8 +229,10 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 #define CONFIG_BT_MESH_NODE_ID_TIMEOUT  `ble.nodeIdTimeout`
 % }
 
-/* Maximum number of simultaneous Bluetooth connections supported. */
-#define CONFIG_BT_MAX_CONN 1
+/* Maximum number of simultaneous Bluetooth connections supported.
+ * This parameter is aligned with MAX_NUM_BLE_CONNS
+ */
+#define CONFIG_BT_MAX_CONN `ble.maxConnNum`
 
 %if(!ble.proxy)
 % {

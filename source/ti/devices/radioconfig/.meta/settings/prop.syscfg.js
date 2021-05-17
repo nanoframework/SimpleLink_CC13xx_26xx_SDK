@@ -117,37 +117,12 @@ function freqBandOnChange(inst, ui) {
         ui.highPA.hidden = prop24 || !c169hidden;
     }
 
-    let phyType;
-    if (inst.freqBand === "868") {
-        phyType = getDefaultValue("phyType868");
-        inst.phyType868 = phyType;
-    }
-    else if (inst.freqBand === "433") {
-        phyType = getDefaultValue("phyType433");
-        inst.phyType433 = phyType;
-    }
-    else if (inst.freqBand === "169") {
-        phyType = getDefaultValue("phyType169");
-        inst.phyType169 = phyType;
-    }
-    else {
-        phyType = getDefaultValue("phyType2400");
-        inst.phyType2400 = phyType;
-    }
+    // Get the PHY type for the current frequency band
+    const phyType = Common.getPhyType(inst);
 
-    /* Refresh the view */
-    RFBase.reloadInstanceFromPhy(inst, ui, phyType, PHY_GROUP, ["txPowerHi"]);
+    // Refresh the instance from PHY setting
+    RFBase.reloadInstanceFromPhy(inst, ui, phyType, PHY_GROUP, configPreserve);
     updateVisibility(inst, ui);
-
-    function getDefaultValue(cfgName) {
-        const configs = inst.$module.config;
-        for (const i in configs) {
-            if (cfgName === configs[i].name) {
-                return configs[i].default;
-            }
-        }
-        return null;
-    }
 }
 
 /*
@@ -156,10 +131,10 @@ function freqBandOnChange(inst, ui) {
  *
  */
 function phyTypeOnChange(inst, ui) {
-    /* Change to new PHY setting */
+    // Change to new PHY setting
     const phyType = Common.getPhyType(inst);
 
-    /* Refresh the instance from PHY setting */
+    // Refresh the instance from PHY setting
     RFBase.reloadInstanceFromPhy(inst, ui, phyType, PHY_GROUP, configPreserve);
     updateVisibility(inst, ui);
 
@@ -224,12 +199,10 @@ function createRxFilterBwOptions(rawOptions) {
  *  @param configurables - configurables to act on
  */
 function initConfigurables(configurables) {
-    const dev = DevInfo.getDeviceName();
     const device24Only = Common.is24gOnlyDevice();
 
     let cfgPacketLengthConfig = null;
     let cfgFixedPacketLength = null;
-    let phyType24gIndex = -1;
 
     function processConfigurable(item) {
         if ("onChange" in item) {
@@ -243,10 +216,6 @@ function initConfigurables(configurables) {
             break;
         case "freqBand":
             item.onChange = freqBandOnChange;
-            if (dev === "cc1312r") {
-                // Remove 2.4 GHz option
-                item.options.pop();
-            }
             break;
         case "phyType868":
             item.onChange = phyTypeOnChange;
@@ -258,13 +227,7 @@ function initConfigurables(configurables) {
             item.onChange = phyTypeOnChange;
             break;
         case "phyType2400":
-            if (dev === "cc1312r") {
-                // Remove for sub 1G only device
-                phyType24gIndex = configurables.indexOf(item);
-            }
-            else {
-                item.onChange = phyTypeOnChange;
-            }
+            item.onChange = phyTypeOnChange;
             break;
         case "addressMode":
             item.onChange = updateVisibility;
@@ -312,11 +275,6 @@ function initConfigurables(configurables) {
             processConfigurable(item);
         }
     });
-
-    if (phyType24gIndex !== -1) {
-        // Remove PHY type for 2.4 GHz if device does not support it
-        configurables.splice(phyType24gIndex, 1);
-    }
 
     // Default visibility
     cfgFixedPacketLength.hidden = cfgPacketLengthConfig.default === "Variable";
@@ -558,6 +516,9 @@ function validate(inst, validation) {
 
     // Validation common to all PHY groups
     Common.validateBasic(inst, validation);
+
+    // Validate front-end
+    RFBase.validateFrontendSettings(inst, validation, PHY_GROUP);
 
     // Validate frequency ranges
     let status = validateFrequency(inst);

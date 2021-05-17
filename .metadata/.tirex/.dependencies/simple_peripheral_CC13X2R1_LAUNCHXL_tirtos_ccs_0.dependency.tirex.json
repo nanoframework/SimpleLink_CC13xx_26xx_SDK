@@ -52,13 +52,11 @@
             "+../../../../../../../source/ti/ble5stack/profiles/simple_profile/cc26xx/simple_gatt_profile.c -> Profiles/simple_gatt_profile.c",
             "+../../../../../../../source/ti/ble5stack/profiles/simple_profile/simple_gatt_profile.h -> Profiles/simple_gatt_profile.h",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> Startup/rom_init.c",
-            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/CC1352R1_LAUNCHXL_fxns.c -> Startup/CC1352R1_LAUNCHXL_fxns.c",
             "+../../Startup/ble_user_config_stack.c -> Startup/ble_user_config_stack.c",
-            "+../../Tools/Defines/config_def.opt -> Tools/Defines/config_def.opt",
             "+../../simple_peripheral.syscfg -> simple_peripheral.syscfg",
             "+../../Startup/main.c -> Startup/main.c",
-            "+cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
+            "+cc13x2_cc26x2_app.cmd -> cc13x2_cc26x2_app.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

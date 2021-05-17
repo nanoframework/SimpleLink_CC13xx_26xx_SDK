@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Pre-silicon settings)",
-        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Pre-silicon settings)",
+        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Preview settings)",
+        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Preview settings)",
         "Frequency": "2405",
         "Patch": {
             "Define": "RF_MODE_AUTO",

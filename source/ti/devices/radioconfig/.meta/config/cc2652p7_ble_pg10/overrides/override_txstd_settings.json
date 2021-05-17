@@ -18,6 +18,11 @@
             },
             {
                 "_type": "ELEMENT",
+                "_comment": "Bluetooth 5: Set IPEAK = 3 and DCDC dither off for TX",
+                "$": "0x00F388D3"
+            },
+            {
+                "_type": "ELEMENT",
                 "_comment": "Bluetooth 5: Set DTX gain -5% for 1 Mbps",
                 "$": "0x00E787E3"
             },

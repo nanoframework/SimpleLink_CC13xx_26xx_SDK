@@ -685,12 +685,14 @@
             {
                 "file": "setting_tc900.json",
                 "name": "2gfsk100kbps",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (Preview)"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (Preview)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc901.json",
                 "name": "2gfsk250kbps",
-                "description": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth (Preview)"
+                "description": "250 kpbs, 125 kHz Deviation, 2-GFSK, 471 kHz RX Bandwidth (Preview)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc900_custom.json",

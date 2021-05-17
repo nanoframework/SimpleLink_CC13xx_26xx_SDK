@@ -6,14 +6,16 @@
                 "_name": "LP_CC1352P7-1",
                 "Target": [
                     "target_launchxl-cc1352p7-1.json",
-                    "target_launchxl-cc1352p7-1_highPA.json"
+                    "target_launchxl-cc1352p7-1_highPA.json",
+                    "target_launchxl-cc1352p7-1_2_4_ghz.json"
                 ]
             },
             {
                 "_name": "LP_CC1352P7-4",
                 "Target": [
                     "target_launchxl-cc1352p7-4.json",
-                    "target_launchxl-cc1352p7-4_highPA.json"
+                    "target_launchxl-cc1352p7-4_highPA.json",
+                    "target_launchxl-cc1352p7-4_2_4_ghz.json"
                 ]
             }
         ]

@@ -288,6 +288,13 @@ void UART2_close(UART2_Handle handle)
             UART_INT_RT | UART_INT_OE | UART_INT_BE | UART_INT_PE |
             UART_INT_FE | UART_INT_CTS);
 
+    if (object->writeInUse) {
+        UART2_writeCancel(handle);
+    }
+    if (object->readInUse) {
+        UART2_readCancel(handle);
+    }
+
     /* Releases Power constraint if rx is enabled. */
     UART2_rxDisable(handle);
 

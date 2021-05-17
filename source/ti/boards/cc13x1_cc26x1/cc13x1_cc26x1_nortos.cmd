@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 
 --stack_size=1024   /* C stack is also used for ISR stack */
 
---heap_size=16384
+--heap_size=8192
 
 /* Retain interrupt vector table variable                                    */
 --retain=g_pfnVectors

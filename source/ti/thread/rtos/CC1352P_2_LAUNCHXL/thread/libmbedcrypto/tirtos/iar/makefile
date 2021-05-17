@@ -10,6 +10,7 @@ OBJECTS = third_party_mbedtls_repo_library_aes.obj third_party_mbedtls_repo_libr
 NAME = libmbedcrypto
 
 CFLAGS = -I../.. \
+    -Ohz \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/examples/platforms \
     -I$SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source \
     -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls \
@@ -25,7 +26,8 @@ CFLAGS = -I../.. \
     --thumb \
     --diag_suppress=Pa050 \
     -DMBEDTLS_CONFIG_FILE="mbedtls-config-cc1352-iar.h" \
-    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_2_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config
+    -I$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/rtos/CC1352P_2_LAUNCHXL/thread/libmbedcrypto/tirtos/iar/config \
+    --vla
 
 
 all: $(NAME).a

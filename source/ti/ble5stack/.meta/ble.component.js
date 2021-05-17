@@ -40,7 +40,7 @@ const displayName = "BLE";
 const categoryName = "RF Stacks";
 let topModules;
 
-if(deviceId.match(/SIP|CC26.2R1|CC2652RB|CC1352/))
+if(deviceId.match(/SIP|CC26.2R1|CC2652R7|CC2652RB|CC1352/))
 {
     topModules = [
         {
@@ -78,11 +78,11 @@ const templates = [
     },
     {
         name: "/ti/ble5stack/templates/ble_gatt_service.h.xdt",
-        outputPath: "ble_gatt_service.h"
+        outputPath: "ti_ble_gatt_service.h"
     },
     {
         name: "/ti/ble5stack/templates/ble_gatt_service.c.xdt",
-        outputPath: "ble_gatt_service.c"
+        outputPath: "ti_ble_gatt_service.c"
     },
     {
         name: "/ti/ble5stack/templates/device_composition.c.xdt",
@@ -94,8 +94,17 @@ const templates = [
     }
 ];
 
+const views = [
+    {
+      "name": "ti/ble5stack/templates/dynamicMarkdown.xdt",
+      "displayName": "Gatt Builder Dynamic Markdown",
+      "viewType": "markdown"
+    },
+];
+
 exports = {
     displayName: displayName,
     topModules: topModules,
-    templates: templates
+    templates: templates,
+    views: views
 };

@@ -95,15 +95,7 @@ via simple and portable APIs.
     _getPinResources: _getPinResources
 };
 
-/* Get family-specific PWM module. Some PWM drivers are based on a timer
- * peripheral while others are based on dedicated PWM peripherals.
- */
-let devicePWM;
-if (family.match("MSP432E4")) {
-    devicePWM = system.getScript("/ti/drivers/pwm/PWM" + family);
-}
-else {
-    devicePWM = system.getScript("/ti/drivers/pwm/PWMTimer" + family);
-}
+/* Get family-specific PWM module. */
+let devicePWM = system.getScript("/ti/drivers/pwm/PWMTimer" + family);
 
 exports = devicePWM.extend(base);

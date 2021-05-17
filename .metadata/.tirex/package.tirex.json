@@ -2,30 +2,39 @@
     "metadataVersion": "3.0.0",
     "id": "com.ti.SIMPLELINK_CC13X2_26X2_SDK",
     "name": "SimpleLink CC13x2 26x2 SDK",
-    "version": "4.20.01.04",
+    "version": "5.10.00.48",
     "type": "software",
     "devices": [
-        "CC2652R1F",
-        "CC1312R1F3",
-        "CC1352R1F3"
+        "CC13x2",
+        "CC26x2"
     ],
     "allowPartialDownload": "false",
-    "license": "../../license_simplelink_cc13x2_26x2_sdk_4_20_01_04.txt",
+    "license": "../../license_simplelink_cc13x2_26x2_sdk_5_10_00_48.txt",
     "image": "./cc13x2_26x2-tirex.png",
     "dependencies": [
         {
             "packageId": "xdctools",
-            "version": "3.61.01.25",
+            "version": "3.62.00.08",
             "require": "optional"
         },
         {
             "packageId": "sysconfig",
-            "version": "1.4.0",
+            "version": "1.8.0",
+            "require": "mandatory"
+        },
+        {
+            "packageId": "arm.ti",
+            "version": "20.2",
+            "require": "mandatory"
+        },
+        {
+            "packageId": "ti_cgt_tiarmclang",
+            "version": "1.02.01",
             "require": "optional"
         },
         {
             "packageId": "arm.gnu",
-            "version": "9.2.1",
+            "version": "9.2",
             "require": "optional"
         }
     ],

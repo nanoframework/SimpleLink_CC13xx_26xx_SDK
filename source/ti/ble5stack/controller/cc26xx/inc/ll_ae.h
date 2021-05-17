@@ -1336,6 +1336,12 @@ struct advSet_t
 
   // extended adv rf commands for the primary channels
   ble5OpCmd_t     extAdvPrimaryRfCmd[2];          // exist 1 rf command so we need 2 to complete the max primary channels.
+
+  bleOpCmd_t      advHdcCmd;                      // high duty cycle first rf command
+  uint32          durationExpireTime;             // duration end time in RF ticks
+
+  // Extended advertise Priority
+  uint8           priority;                       // Extended Advertise Priority.
 };
 
 typedef struct sortedAdv_t sortedAdv_t;
@@ -1367,6 +1373,9 @@ typedef struct
   // Host Extended Scanner Parameters
   aeSetScanParamCmd_t *pScanParam;            // ptr to Host provided params
   aeEnableScanCmd_t   *pEnable;               // ptr to Host provided enable params
+  //
+  // Extended Scan Priority
+  uint8                priority;              // Extended Scan Priority as a Secondary Task.
 } extScanInfo_t;
 
 // Extended Initiator Event Information
@@ -1383,6 +1392,9 @@ typedef struct
   //
   // Host Extended Initiator Parameters
   aeCreateConnCmd_t *pCreateConn;             // ptr to Host provided enable params
+  //
+  // Extender Initiator Priority
+  uint8             priority;                // Extender Initiator Priority as a Secondary Task.
 } extInitInfo_t;
 
 // Callback Table
@@ -1496,9 +1508,10 @@ typedef struct llPeriodicAdvSet_t
   uint8                             phy;                   // phy used in periodic train
   uint8                             pendingDisable;        // disable periodic adv flag
   uint8                             pendingChanUpdate;     // flag to indicate channel map update is pending
-  uint8                             priority;              // priority scale to use in periodic adv selection procedure
+  uint8                             intPriority;           // internal priority: priority scale to use in periodic adv selection procedure
   uint8                             extHdrSize;            // periodic adv extended header size
   uint8                             extHdr[PERIODIC_ADV_HDR_TOTAL_BUF_SIZE]; // buffer for periodic header
+  uint8                             priority;              // priority as a secondary task.
 
 } llPeriodicAdvSet_t;
 
@@ -1560,6 +1573,7 @@ typedef struct llPeriodicScanSet_t
   uint16                            eventCounter;          // incremental counter for each periodic event
   uint16                            numMissed;             // number of consecutive missed periodic events
   uint16                            chanMapUpdateEvent;    // channel map update instant
+  int16                             driftFactor;           // drift time in RAT ticks per event (negative or positive value depends on the drift direction)
   uint8                             state;                 // periodic advertising scanner status
   uint8                             phy;                   // advertiser phy
   uint8                             reportEnable;          // send scan report to host flag
@@ -1567,7 +1581,9 @@ typedef struct llPeriodicScanSet_t
   uint8                             ownAddrType;           // periodic scanner address type (public or random)
   uint8                             rxCount;               // number of received packets in current periodic event
   uint8                             cteRssiAntenna;        // first antenna which rssi was measured on while CTE sampling.
-  uint8                             priority;              // priority scale to use in periodic scan selection procedure
+  uint8                             intPriority;           // internal priority: priority scale to use in periodic scan selection procedure
+  uint8                             driftLearnCounter;     // counts number of valid events used for drift calculation (range 0 to PERIODIC_SCAN_DRIFT_LEARNING_MAX_NUM)
+  uint8                             priority;              // priority as a secondary task.
 
 } llPeriodicScanSet_t;
 
@@ -1681,6 +1697,7 @@ extern llPeriodicScanSet_t *llGetCurrentPeriodicScan( uint8 state );
 extern uint8         llGetPeriodicScanCteTasks( void );
 extern void          llClearPeriodicAdvSets( void );
 extern void          llClearPeriodicScanSets( void );
+extern void          llSetRfCmdPreemptionStartTime( uint32 );
 
 /*******************************************************************************
  * LL Internal API
@@ -1698,6 +1715,7 @@ extern llStatus_t    llGetFirstExtScanChannelIndex( void );
 extern llStatus_t    llSetupExtScan( void );
 extern llStatus_t    llSetupExtScan_sPatch( void );
 extern void          llSetupExtInit( uint8 );
+extern void          llSetupExtInit_sPatch( uint8 );
 extern void          llSetupExtData( advSet_t * );
 extern void          llSetupExtHdr( advSet_t *, uint8, uint16 );
 extern uint8         llGetExtHdrLen( uint8 );
@@ -1717,6 +1735,7 @@ extern llStatus_t    llSetupPeriodicScan( llPeriodicScanSet_t * );
 extern llStatus_t    llTrigPeriodicScan( llPeriodicScanSet_t * );
 extern void          llEndPeriodicScanTask( llPeriodicScanSet_t * );
 extern void          llSetPeriodicChanMap( llPeriodicChanMap_t *, uint8 * );
+extern uint8         llCompareSecondaryPrimaryTasksQoSParam( uint8 , taskInfo_t *, llConnState_t * );
 // RF Post Processing
 extern void          llExtAdv_PostProcess( void );
 extern void          llPeriodicAdv_PostProcess( void );

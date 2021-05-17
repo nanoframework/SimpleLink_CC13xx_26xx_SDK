@@ -209,6 +209,8 @@
 #define IDX_HCI_LE_SetConnectionlessCteTransmitParamsCmd HCI_LE_SetConnectionlessCteTransmitParamsCmd
 #define IDX_HCI_LE_SetConnectionlessCteTransmitEnableCmd HCI_LE_SetConnectionlessCteTransmitEnableCmd
 #define IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd HCI_LE_SetConnectionlessIqSamplingEnableCmd
+#define IDX_HCI_LE_SetExtScanRspData                    HCI_LE_SetExtScanRspData
+#define IDX_HCI_LE_SetExtAdvData                        HCI_LE_SetExtAdvData
 
 /* HCI Extended API */
 /********************/

@@ -131,6 +131,26 @@ const applicationState = {
     description: "User defined application state"
 };
 
+const customActivities = {
+    description: "Configure custom activities"
+};
+
+const numCustomActivities = {
+    description: "The number of custom activities",
+    longDescription: `
+In the event you wish to use a custom stack you may also want to define your \
+own custom activities used in the stack.
+
+Specified stack activities of which priority is/are adjusted by weight. All \
+stack activities and their default weights are defined in the global priority \
+table (GPT) in dmm_priority_{stacks}.h. Activities are defined as flags \
+and OR’ed together, meaning selecting multiple will modify the priority of \
+all activities selected.
+`
+};
+
+
+
 /*
  *  ======== Policy Table ========
  */
@@ -291,6 +311,8 @@ exports = {
     stackRoles: stackRoles,
     applicationStates: applicationStates,
     numApplicationStates: numApplicationStates,
+    customActivities: customActivities,
+    numCustomActivities: numCustomActivities,
     applicationState: applicationState,
     applicationStateDropDown: applicationStateDropDown,
     policyTable: policyTable,

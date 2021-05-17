@@ -89,6 +89,7 @@ function validate(inst, validation) {
     if (inst.paramVisibility && !hasWBMS) {
         RFBase.validateRfParams(inst, validation, phyType, PHY_GROUP);
     }
+    RFBase.validateFrontendSettings(inst, validation, PHY_GROUP);
 
     // Check if a wBMS setting is included
     const instances = inst.$module.$instances;

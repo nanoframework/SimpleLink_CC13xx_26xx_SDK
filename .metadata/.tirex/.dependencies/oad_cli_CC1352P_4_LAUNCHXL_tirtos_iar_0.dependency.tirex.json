@@ -38,10 +38,9 @@
             "+../../otstack.h -> otstack.h",
             "+../../release_oad.cfg -> release_oad.cfg",
             "+../../cli.c -> cli.c",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
             "+../../bim_oad_debug_image_bin.h -> bim_oad_debug_image_bin.h",
             "+../../bim_oad_debug_image_bin.c -> bim_oad_debug_image_bin.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS_OAD.icf -> CC1352P_4_LAUNCHXL_TIRTOS_OAD.icf"
+            "+cc13x2_cc26x2_tirtos_oad.icf -> cc13x2_cc26x2_tirtos_oad.icf"
         ]
     }
 ]

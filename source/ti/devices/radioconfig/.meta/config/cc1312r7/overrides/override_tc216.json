@@ -1,0 +1,9 @@
+{
+    "overridebuffer": {
+        "Element32b": {
+            "_type": "HW_REG_OVERRIDE",
+            "_comment": "Transmit C\/T-packet",
+            "$": "0x5328,0x4000"
+        }
+    }
+}

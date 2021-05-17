@@ -87,11 +87,10 @@
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c -> rcosc_calibration.c",
             "+../../../../../../../source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.h -> rcosc_calibration.h",
             "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_oad_release.cfg -> ble_oad_release.cfg",
-            "+../../dmm_app_and_stack_oad_agama.icf -> dmm_app_and_stack_oad_agama.icf",
-            "+../../cc26xx_app_and_stack_agama_oad.icf -> cc26xx_app_and_stack_agama_oad.icf",
+            "+../../../../../../../source/ti/dmm/apps/common/tirtos/iar/dmm_app_and_stack_oad_agama.icf -> dmm_app_and_stack_oad_agama.icf",
+            "+../../../../../../../source/ti/dmm/apps/common/tirtos/iar/cc26xx_app_and_stack_agama_oad.icf -> cc26xx_app_and_stack_agama_oad.icf",
             "+../../README.html -> README.html",
-            "+../../dmm_wsnnode_remote_display.syscfg -> dmm_wsnnode_remote_display.syscfg",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c"
+            "+../../dmm_wsnnode_remote_display.syscfg -> dmm_wsnnode_remote_display.syscfg"
         ]
     }
 ]

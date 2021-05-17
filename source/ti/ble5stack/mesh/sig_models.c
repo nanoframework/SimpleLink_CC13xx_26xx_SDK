@@ -120,16 +120,16 @@ static void start_onoff_transition_clock(struct bt_mesh_model *model);
 static void start_level_transition_clock(struct bt_mesh_model *model);
 
 #ifdef CONFIG_BT_SETTINGS
-int generic_power_onoff_settings_cb(struct bt_mesh_model *model,
+int generic_power_onoff_settings_cb(struct bt_mesh_model *model, const char *name,
                                     size_t len_rd, settings_read_cb read_cb,
                                     void *cb_arg);
-int generic_default_transition_time_settings_cb(struct bt_mesh_model *model,
+int generic_default_transition_time_settings_cb(struct bt_mesh_model *model, const char *name,
                                     size_t len_rd, settings_read_cb read_cb,
                                     void *cb_arg);
-int generic_OnOff_settings_cb(struct bt_mesh_model *model,
+int generic_OnOff_settings_cb(struct bt_mesh_model *model, const char *name,
                               size_t len_rd, settings_read_cb read_cb,
                               void *cb_arg);
-int store_data(struct bt_mesh_model * model, uint8_t data);
+int store_data(struct bt_mesh_model * model, const char *name, uint8_t data);
 #endif
 
 extern Clock_Handle Util_constructClock(Clock_Struct *pClock,
@@ -284,7 +284,7 @@ const struct bt_mesh_model_cb generic_power_onoff_srv_cb = {
 };
 
 #ifdef CONFIG_BT_SETTINGS
-int generic_OnOff_settings_cb(struct bt_mesh_model *model,
+int generic_OnOff_settings_cb(struct bt_mesh_model *model, const char *name,
                               size_t len_rd, settings_read_cb read_cb,
                               void *cb_arg)
 {
@@ -297,7 +297,7 @@ int generic_OnOff_settings_cb(struct bt_mesh_model *model,
     return 0;
 }
 
-int generic_default_transition_time_settings_cb(struct bt_mesh_model *model,
+int generic_default_transition_time_settings_cb(struct bt_mesh_model *model, const char *name,
                                     size_t len_rd, settings_read_cb read_cb,
                                     void *cb_arg)
 {
@@ -310,7 +310,7 @@ int generic_default_transition_time_settings_cb(struct bt_mesh_model *model,
     return 0;
 }
 
-int generic_power_onoff_settings_cb(struct bt_mesh_model *model,
+int generic_power_onoff_settings_cb(struct bt_mesh_model *model, const char *name,
                                     size_t len_rd, settings_read_cb read_cb,
                                     void *cb_arg)
 {
@@ -323,9 +323,9 @@ int generic_power_onoff_settings_cb(struct bt_mesh_model *model,
     return 0;
 }
 
-int store_data(struct bt_mesh_model * model, uint8_t data)
+int store_data(struct bt_mesh_model * model, const char *name, uint8_t data)
 {
-    return bt_mesh_model_data_store(model, false, &data, sizeof(data));
+    return bt_mesh_model_data_store(model, false, name, &data, sizeof(data));
 }
 #endif
 
@@ -380,10 +380,10 @@ void gen_OnOff_set_unack(struct bt_mesh_model *model,
                 struct bt_mesh_msg_ctx *ctx,
                 struct net_buf_simple *buf)
 {
-    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
-
     uint8_t tid, onoff, tt, delay;
     int64_t now;
+
+    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
 
     onoff = net_buf_simple_pull_u8(buf);
     tid = net_buf_simple_pull_u8(buf);
@@ -439,7 +439,7 @@ void gen_OnOff_set_unack(struct bt_mesh_model *model,
 
 #ifdef CONFIG_BT_SETTINGS
     /* Save OnOff state to NV */
-    store_data(model, pData->state_prop->target);
+    store_data(model, NULL, pData->state_prop->target);
 #endif
 
     /* For Instantaneous Transition */
@@ -461,10 +461,10 @@ void gen_OnOff_set(struct bt_mesh_model *model,
               struct bt_mesh_msg_ctx *ctx,
               struct net_buf_simple *buf)
 {
-    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
-
     uint8_t tid, onoff, tt, delay;
     int64_t now;
+
+    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
 
     onoff = net_buf_simple_pull_u8(buf);
     tid = net_buf_simple_pull_u8(buf);
@@ -522,7 +522,7 @@ void gen_OnOff_set(struct bt_mesh_model *model,
 
 #ifdef CONFIG_BT_SETTINGS
     /* Save OnOff state to NV */
-    store_data(model, pData->state_prop->target);
+    store_data(model, NULL, pData->state_prop->target);
 #endif
 
     /* For Instantaneous Transition */
@@ -1165,9 +1165,9 @@ void gen_Default_Transition_Time_set_unack(struct bt_mesh_model *model,
                      struct bt_mesh_msg_ctx *ctx,
                      struct net_buf_simple *buf)
 {
-    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
-
     uint8_t tt;
+
+    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
 
     tt = net_buf_simple_pull_u8(buf);
 
@@ -1182,7 +1182,7 @@ void gen_Default_Transition_Time_set_unack(struct bt_mesh_model *model,
 
 
 #ifdef CONFIG_BT_SETTINGS
-        store_data(model, pData->default_trans_time);
+        store_data(model, NULL, pData->default_trans_time);
 #endif
 
         gen_def_trans_time_publish(model);
@@ -1193,9 +1193,9 @@ void gen_Default_Transition_Time_set(struct bt_mesh_model *model,
                    struct bt_mesh_msg_ctx *ctx,
                    struct net_buf_simple *buf)
 {
-    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
-
     uint8_t tt;
+
+    struct ctl_state_t *pData = (struct ctl_state_t *)model->user_data;
 
     tt = net_buf_simple_pull_u8(buf);
     Display_printf(dispHandle, SMN_ROW_MESH_CB, 0, "MESH CBK: gen_Default_Transition_Time_set callback, TransTime=0x%02x",
@@ -1209,7 +1209,7 @@ void gen_Default_Transition_Time_set(struct bt_mesh_model *model,
         generic_state.default_trans_time = tt;
 
 #ifdef CONFIG_BT_SETTINGS
-        store_data(model, pData->default_trans_time);
+        store_data(model, NULL, pData->default_trans_time);
 #endif
 
         gen_Default_Transition_Time_get(model, ctx, buf);
@@ -1657,8 +1657,9 @@ void gen_OnPowerUp_set_unack(struct bt_mesh_model *model,
                     struct bt_mesh_msg_ctx *ctx,
                     struct net_buf_simple *buf)
 {
-    struct genOnPowerUpState_t *data = (struct genOnPowerUpState_t *)model->user_data;
     uint8_t onPowerUp;
+
+    struct genOnPowerUpState_t *data = (struct genOnPowerUpState_t *)model->user_data;
 
     Display_printf(dispHandle, SMN_ROW_MESH_CB, 0, "MESH CBK: gen_OnPowerUp_Set_Unack callback from addr=0x%x", ctx->addr);
     onPowerUp = net_buf_simple_pull_u8(buf);
@@ -1670,7 +1671,7 @@ void gen_OnPowerUp_set_unack(struct bt_mesh_model *model,
     if (data->onPowerUp != onPowerUp) {
         data->onPowerUp = onPowerUp;
 #ifdef CONFIG_BT_SETTINGS
-        store_data(model, data->onPowerUp);
+        store_data(model, NULL, data->onPowerUp);
 #endif
         gen_onpowerup_publish(model);
     }
@@ -1680,8 +1681,9 @@ void gen_OnPowerUp_set(struct bt_mesh_model *model,
                   struct bt_mesh_msg_ctx *ctx,
                   struct net_buf_simple *buf)
 {
-    struct genOnPowerUpState_t *data = (struct genOnPowerUpState_t *)model->user_data;
     uint8_t onPowerUp;
+
+    struct genOnPowerUpState_t *data = (struct genOnPowerUpState_t *)model->user_data;
 
     Display_printf(dispHandle, SMN_ROW_MESH_CB, 0, "MESH CBK: gen_OnPowerUp_Set callback from addr=0x%x", ctx->addr);
     onPowerUp = net_buf_simple_pull_u8(buf);
@@ -1693,7 +1695,7 @@ void gen_OnPowerUp_set(struct bt_mesh_model *model,
     if (data->onPowerUp != onPowerUp) {
         data->onPowerUp = onPowerUp;
 #ifdef CONFIG_BT_SETTINGS
-        store_data(model, data->onPowerUp);
+        store_data(model, NULL, data->onPowerUp);
 #endif
         gen_OnPowerUp_get(model, ctx, buf);
         gen_onpowerup_publish(model);

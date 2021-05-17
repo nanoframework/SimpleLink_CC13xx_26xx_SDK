@@ -67,6 +67,88 @@ extern "C"
 #define HCI_LEGACY_CMD_STATUS_BT4                  1
 #define HCI_LEGACY_CMD_STATUS_BT5                  2
 
+#ifdef BLE3_CMD
+// Advertising event types
+#define GAP_ADTYPE_ADV_IND                0x00  //!< Connectable undirected advertisement
+#define GAP_ADTYPE_ADV_HDC_DIRECT_IND     0x01  //!< Connectable high duty cycle directed advertisement
+#define GAP_ADTYPE_ADV_SCAN_IND           0x02  //!< Scannable undirected advertisement
+#define GAP_ADTYPE_ADV_NONCONN_IND        0x03  //!< Non-Connectable undirected advertisement
+#define GAP_ADTYPE_ADV_LDC_DIRECT_IND     0x04  //!< Connectable low duty cycle directed advertisement
+
+#define GAP_AGAMA_BLE3_TYPE_ADV_IND            0x13
+#define GAP_AGAMA_BLE3_TYPE_ADV_HDC_DIRECT_IND 0x1D
+#define GAP_AGAMA_BLE3_TYPE_ADV_SCAN_IND       0x12
+#define GAP_AGAMA_BLE3_TYPE_ADV_NONCONN_IND    0x10
+#define GAP_AGAMA_BLE3_TYPE_ADV_LDC_DIRECT_IND 0x15
+
+//Notice events
+#define HCI_EXT_GAP_BLE3_CONN_EVT_NOTICE       0x0613
+#define HCI_EXT_ADV_EVENT_NOTICE               0xFC17
+#define HCI_EXT_ADV_EVENT_NOTICE_EVENT         0x0417
+#define HCI_EXT_SCAN_EVENT_NOTICE              0xFC22
+#define HCI_EXT_SCAN_EVENT_NOTICE_EVENT        0x0422
+
+/**
+ * BLE3 GAP_setParam - Param Ids
+ */
+#define TGAP_GEN_DISC_ADV_MIN          0
+#define TGAP_LIM_ADV_TIMEOUT           1
+#define TGAP_GEN_DISC_SCAN             2
+#define TGAP_LIM_DISC_SCAN             3
+#define TGAP_CONN_EST_ADV_TIMEOUT      4
+#define TGAP_CONN_PARAM_TIMEOUT        5
+#define TGAP_LIM_DISC_ADV_INT_MIN      6
+#define TGAP_LIM_DISC_ADV_INT_MAX      7
+#define TGAP_GEN_DISC_ADV_INT_MIN      8
+#define TGAP_GEN_DISC_ADV_INT_MAX      9
+#define TGAP_CONN_ADV_INT_MIN         10
+#define TGAP_CONN_ADV_INT_MAX         11
+#define TGAP_CONN_SCAN_INT            12
+#define TGAP_CONN_SCAN_WIND           13
+#define TGAP_CONN_HIGH_SCAN_INT       14
+#define TGAP_CONN_HIGH_SCAN_WIND      15
+#define TGAP_GEN_DISC_SCAN_INT        16
+#define TGAP_GEN_DISC_SCAN_WIND       17
+#define TGAP_LIM_DISC_SCAN_INT        18
+#define TGAP_LIM_DISC_SCAN_WIND       19
+#define TGAP_CONN_EST_ADV             20
+#define TGAP_CONN_EST_INT_MIN         21
+#define TGAP_CONN_EST_INT_MAX         22
+#define TGAP_CONN_EST_SCAN_INT        23
+#define TGAP_CONN_EST_SCAN_WIND       24
+#define TGAP_CONN_EST_SUPERV_TIMEOUT  25
+#define TGAP_CONN_EST_LATENCY         26
+#define TGAP_CONN_EST_MIN_CE_LEN      27
+#define TGAP_CONN_EST_MAX_CE_LEN      28
+#define TGAP_PRIVATE_ADDR_INT         29
+#define TGAP_CONN_PAUSE_CENTRAL       30
+#define TGAP_CONN_PAUSE_PERIPHERAL    31
+#define TGAP_SM_TIMEOUT               32
+#define TGAP_SM_MIN_KEY_LEN           33
+#define TGAP_SM_MAX_KEY_LEN           34
+#define TGAP_FILTER_ADV_REPORTS       35
+#define TGAP_SCAN_RSP_RSSI_MIN        36
+#define TGAP_REJECT_CONN_PARAMS       37
+#define TGAP_AUTH_TASK_ID             38
+#define TGAP_VERIFY_CAR               39
+#define TGAP_FAST_INTERVAL_2_INT_MIN  40
+#define TGAP_FAST_INTERVAL_2_INT_MAX  41
+#define TGAP_SET_SCAN_CHAN            44
+#define TGAP_PARAMID_MAX              45  //!< ID MAX-valid Parameter ID
+#endif// BLE3_CMD
+
+/*********************************************************************
+ * TYPEDEFS
+ */
+ #ifdef BLE3_CMD
+typedef struct
+{
+  uint8_t evtType;
+  uint8_t addrType;
+  uint8_t addr[B_ADDR_LEN];
+} deviceInfo_t;
+#endif
+
 /*********************************************************************
  * MACROS
  */
@@ -163,6 +245,14 @@ extern void HCI_TL_SendToStack(uint8_t *msgToParse);
  * @return  TRUE to deallocate pEvt message, False otherwise.
  */
 extern uint8_t HCI_TL_processStructuredEvent(ICall_Hdr *pEvt);
+
+#ifdef BLE3_CMD
+status_t BLE3ToAgama_setParam( uint16_t id, uint16_t value );
+uint16_t getBLE3ToAgamaEventProp( uint8_t eventType);
+uint8_t getAgamaToBLE3EventProp( uint8_t eventType );
+void HCI_TL_SetLegacyScanFlag( uint8_t flag );
+
+#endif
 
 /*********************************************************************
 *********************************************************************/

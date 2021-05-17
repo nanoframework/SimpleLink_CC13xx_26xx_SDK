@@ -414,14 +414,13 @@ void GAP_DeviceInit_per_role(uint8_t profileRole)
       // Set IRK GAP Parameter
       MAP_gap_PrivacyInit(MAP_GAP_GetIRK());
 
+#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
       if ((profileRole & GAP_PROFILE_CENTRAL) || (profileRole & GAP_PROFILE_OBSERVER))
-      //#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
       {
         // Initialize GAP Scanner module
         VOID MAP_gapScan_init();
-
+#if ( HOST_CONFIG & CENTRAL_CFG )
         if (profileRole & GAP_PROFILE_CENTRAL)
-        //#if ( HOST_CONFIG & CENTRAL_CFG )
         {
           // Register GAP Central Connection processing functions
           MAP_gap_CentConnRegister();
@@ -429,18 +428,17 @@ void GAP_DeviceInit_per_role(uint8_t profileRole)
           // Initialize SM Initiator
           VOID MAP_SM_InitiatorInit();
         }
-        //#endif
+#endif
       }
-      //#endif
+#endif
 
+#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
       if ((profileRole & GAP_PROFILE_PERIPHERAL) || (profileRole & GAP_PROFILE_BROADCASTER))
-      //#if ( HOST_CONFIG & ( PERIPHERAL_CFG | BROADCASTER_CFG ) )
       {
         // Initialize GAP Advertiser module
         VOID MAP_gapAdv_init();
-
+#if ( HOST_CONFIG & PERIPHERAL_CFG )
         if (profileRole & GAP_PROFILE_PERIPHERAL)
-        //#if ( HOST_CONFIG & PERIPHERAL_CFG )
         {
           // Register GAP Peripheral Connection processing functions
           MAP_gap_PeriConnRegister();
@@ -448,9 +446,9 @@ void GAP_DeviceInit_per_role(uint8_t profileRole)
           // Initialize SM Responder
           VOID MAP_SM_ResponderInit();
         }
-        //#endif
+#endif
       }
-      //#endif
+#endif
 }
 /*********************************************************************
  * Public function defined in gap.h.

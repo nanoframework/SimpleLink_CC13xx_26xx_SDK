@@ -17,7 +17,7 @@
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/third_party/mbedtls/repo/include</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/include</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libmbedcrypto/config</path>
-        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/config</path>
+        <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/ti/thread/cc13x2_26x2/libopenthread_mtd/lib/iar/m4f/config</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src/core</path>
         <path>$COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR$/source/third_party/openthread/src</path>
     </includePath>
@@ -29,6 +29,7 @@
         <define>MBEDTLS_CONFIG_FILE="mbedtls-config-cc13x2_26x2.h"</define>
         <define>OPENTHREAD_MTD=1</define>
         <define>OPENTHREAD_CONFIG_FILE="openthread-config-cc13x2_26x2-iar-mtd.h"</define>
+        <define>OPENTHREAD_PROJECT_CORE_CONFIG_FILE="openthread-core-cc13x2_26x2-config.h"</define>
     </defines>
 
     <extraOptions>
@@ -39,7 +40,6 @@
             <arg>--aeabi</arg>
             <arg>--thumb</arg>
             <arg>--diag_suppress=Pa050</arg>
-            <arg>--c++</arg>
         </args>
     </extraOptions>
 

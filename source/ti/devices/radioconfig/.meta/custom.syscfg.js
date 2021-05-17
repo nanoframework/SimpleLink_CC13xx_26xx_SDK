@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@
 const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
 
 // Other dependencies
+const RfDesign = Common.getScript("rfdesign");
 const DeviceInfo = Common.getScript("device_info.js");
 const CmdHandler = Common.getScript("cmd_handler.js");
 const Docs = Common.getScript("radioconfig_docs.js");
@@ -124,12 +125,20 @@ if (hasProp) {
 
 if (hasBle) {
     const configs = DeviceInfo.getConfiguration(Common.PHY_BLE).configs;
-    PhyInfo.ble.settings = configs[0].options;
+    const options = configs[0].options;
+    const settings = getSettingsOptions(options);
+    PhyInfo.ble.settings5dbm = settings.pa5;
+    PhyInfo.ble.settings10dbm = settings.pa10;
+    PhyInfo.ble.settings = settings.pa5.concat(settings.pa10);
 }
 
 if (hasIeee) {
     const configs = DeviceInfo.getConfiguration(Common.PHY_IEEE_15_4).configs;
-    PhyInfo.ieee.settings = configs[0].options;
+    const options = configs[0].options;
+    const settings = getSettingsOptions(options);
+    PhyInfo.ieee.settings5dbm = settings.pa5;
+    PhyInfo.ieee.settings10dbm = settings.pa10;
+    PhyInfo.ieee.settings = settings.pa5.concat(settings.pa10);
 }
 
 // Create configurables with checkbox options list
@@ -145,11 +154,68 @@ _.each(PhyInfo, (pi, key) => {
             description: "Select PHY settings to be included in the generated code",
             placeholder: "No " + pi.displayName + " PHY selected",
             minSelections: 0,
-            options: pi.settings,
+            options: opts,
+            getDisabledOptions: generateDisabledOptions(key),
             default: []
         });
     }
 });
+
+/*
+ *  ======== generateDisabledOptions ========
+ *  Determine what settings are to be disabled for the current board
+ *
+ *  @param category - PHY category (frequency band/protocol)
+ *
+ *  @returns - Array containing settings to be disabled
+ */
+function generateDisabledOptions(category) {
+    return (inst) => {
+        const pi = PhyInfo[category];
+        const opts = [];
+        if ("settings10dbm" in pi && !RfDesign.has10dBmPA()) {
+            pi.settings10dbm.forEach((opt) => {
+                opts.push({
+                    name: opt.name,
+                    reason: "Setting valid for 10 dBm PA only"
+                });
+            });
+        }
+        else if ("settings5dbm" in pi && RfDesign.has10dBmPA()) {
+            pi.settings5dbm.forEach((opt) => {
+                opts.push({
+                    name: opt.name,
+                    reason: "Setting not valid for 10 dBm PA"
+                });
+            });
+        }
+        return opts;
+    };
+}
+
+/*
+ *  ======== getSettingsOptions ========
+ *  Get a list of 5 dBm and 10 dBm settings
+ *
+ *  @param config - list of PHY settings
+ *
+ *  @returns - PHY options grouped by PA
+ */
+function getSettingsOptions(options) {
+    const ret = {
+        pa5: [],
+        pa10: []
+    };
+    options.forEach((opt) => {
+        if (opt.name.includes("p10")) {
+            ret.pa10.push(opt);
+        }
+        else {
+            ret.pa5.push(opt);
+        }
+    });
+    return ret;
+}
 
 /*
  *  ======== addRfSettingDependency ========

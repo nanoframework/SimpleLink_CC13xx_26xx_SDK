@@ -4,9 +4,9 @@
             "+../../../../../../../source/ti/zstack/apps/gpd_temperaturesensor/gpd_temperaturesensor.c -> gpd_temperaturesensor.c",
             "+../../../../../../../source/ti/zstack/apps/gpd_temperaturesensor/gpd_temperaturesensor.h -> gpd_temperaturesensor.h",
             "+../../../../../../../source/ti/zstack/apps/gpd_temperaturesensor/gpd_temperaturesensor_data.c -> gpd_temperaturesensor_data.c",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/macTask.c -> macTask.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/macTask.c -> macTask.c",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/macTask.h -> macTask.h",
-            "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.c -> api_mac.c",
+            "+../../../../../../../source/ti/ti154stack/common/osal_port/osal_port_tirtos/api_mac.c -> api_mac.c",
             "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.h -> api_mac.h",
             "+../../../../../../../source/ti/common/nv/nvintf.h -> nvintf.h",
             "+../../../../../../../source/ti/common/nv/crc.c -> crc.c",
@@ -73,7 +73,7 @@
             "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
             "+../../../../../../../source/ti/zstack/boards/CC1352R1_LAUNCHXL/CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
             "+../../../../../../../source/ti/zstack/rtos/app.cfg -> app.cfg",
-            "+../../../../../../../source/ti/zstack/boards/CC1352R1_LAUNCHXL/cc13x2lp.icf -> cc13x2lp.icf",
+            "+../../../../../../../source/ti/zstack/boards/cc13x2_cc26x2/cc13x2_cc26x2.icf -> cc13x2_cc26x2.icf",
             "+../../gpd_temperaturesensor.syscfg -> gpd_temperaturesensor.syscfg"
         ]
     }

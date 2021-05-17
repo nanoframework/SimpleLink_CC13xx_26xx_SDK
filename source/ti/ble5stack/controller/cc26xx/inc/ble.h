@@ -264,6 +264,7 @@
 #define RAT_TICKS_IN_900US             3600      // Additional Rx Synch overhead for Coded S8
 #define RAT_TICKS_IN_1MS               4000      // Multiple of Adv Random Delay
 #define RAT_TICKS_IN_1_006MS           4024      // AUX_CONNECT_REQ in Coded S2
+#define RAT_TICKS_IN_1_225MS           4900      // Adv HDC offset time from rf count command in case ch.39 excluded
 #define RAT_TICKS_IN_1_25MS            5000      // Fundamental BLE Time Unit
 #define RAT_TICKS_IN_1_875MS           7500      // DTM Packet Interval
 #define RAT_TICKS_IN_2MS               8000      // Max time in 1M phy for fragments periodic adv
@@ -1206,6 +1207,7 @@ extern void          llProcessMasterControlPacket( llConnState_t *, uint8 * );
 extern void          llMoveTempTxDataEntries( llConnState_t * );
 extern uint8         HOOK_llProcessSlaveControlPacket( llConnState_t *, uint8 * );
 extern uint8         HOOK_llProcessMasterControlPacket( llConnState_t *, uint8 * );
+extern void          llSetRfReportAodPackets( void );
 
 /*******************************************************************************
  */

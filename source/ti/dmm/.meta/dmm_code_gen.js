@@ -85,6 +85,19 @@ class Project
         return states;
     }
 
+    // Returns the list of custom activity C identifiers
+    get customActivities()
+    {
+        const customActivities = [];
+
+        for(let i = 0; i < this.module.numCustomActivities; i++)
+        {
+            customActivities.push(this.module["customActivity" + i]);
+        }
+
+        return customActivities;
+    }
+
     // Returns the number of policies currently chosen
     get numPolicies()
     {
@@ -151,8 +164,8 @@ class Project
                         policyRole.applicationStates),
                     weight: policyRole.weight,
                     pause: policyRole.pause,
-                    appliedActivity: formatAppliedActivityStr(policyRole
-                        .appliedActivity)
+                    appliedActivity: formatAppliedActivityStr(this.module,
+                        policyRole.appliedActivity)
                 };
             }
 
@@ -255,23 +268,36 @@ function formatAppStatesStr(module, appStates)
  *  @param appliedActivities      - List of applied activites selected
  *  @returns         - A string of the bit flag of applied activities
  */
-function formatAppliedActivityStr(appliedActivities)
+function formatAppliedActivityStr(module, appliedActivities)
 {
     let returnStr = (appliedActivities.length) > 1 ? "(" : "";
 
     for(let i = 0; i < appliedActivities.length; i++)
     {
-        returnStr += appliedActivities[i];
+        // If a custom activity was chosen, use the custom name instead of the
+        //  default name
+        const customActivity = appliedActivities[i].match(/(\d+)$/);
+        if(customActivity)
+        {
+            if(customActivity[0] < module.numCustomActivities)
+            {
+                if((appliedActivities.length) > 1 && i > 0)
+                {
+                    returnStr += " | ";
+                }
+                returnStr += module[appliedActivities[i]];
+            }
+        }
+        else
+        {
+            returnStr += appliedActivities[i];
+        }
 
-        if((i + 1) === (appliedActivities.length)
-            && (appliedActivities.length) > 1)
-        {
-            returnStr += ")";
-        }
-        else if((appliedActivities.length) > 1)
-        {
-            returnStr += " | ";
-        }
+    }
+
+    if(appliedActivities.length > 1)
+    {
+        returnStr += ")";
     }
 
     if(returnStr.includes("DMMPOLICY_APPLIED_ACTIVITY_ALL"))

@@ -39,11 +39,10 @@
             "+../../RadioProtocol.h -> RadioProtocol.h",
             "+../../SceAdc.c -> SceAdc.c",
             "+../../SceAdc.h -> SceAdc.h",
-            "+../../rfWsnNodeIntFlashOadClientPApp.cfg -> rfWsnNodeIntFlashOadClientPApp.cfg",
-            "+../../rfWsnNodeIntFlashOadClient.syscfg -> rfWsnNodeIntFlashOadClient.syscfg",
+            "+../rfWsnNodeIntFlashOadClient.syscfg -> rfWsnNodeIntFlashOadClient.syscfg",
             "+../../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
-            "+CC1312R1_LAUNCHXL_TIRTOS_OAD.icf -> CC1312R1_LAUNCHXL_TIRTOS_OAD.icf"
+            "+../../rfWsnNodeIntFlashOadClient.cfg -> rfWsnNodeIntFlashOadClient.cfg",
+            "+CC13X2_CC26X2_TIRTOS_OAD.icf -> CC13X2_CC26X2_TIRTOS_OAD.icf"
         ]
     }
 ]

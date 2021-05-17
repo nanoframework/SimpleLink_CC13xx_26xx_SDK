@@ -358,6 +358,20 @@ extern void SM_GenerateRandBuf( uint8 *random, uint8 len );
 extern void SM_SetAuthenPairingOnlyMode( uint8 state );
 
 /**
+* @fn          SM_SetAllowDebugKeysMode
+*
+* @brief       Set the device policy for allowance of receiving the debug keys
+*              defined in the spec. If not allowed, the pairing will be rejected
+*              with code of invalid parameters. If allowed, pairing will
+*              conttinue noramlly.
+*
+* @param       state - set TRUE to allow debug keys as peer public keys
+*                      set FALSE to disallow
+*
+* @return      none
+*/
+extern void SM_SetAllowDebugKeysMode( uint8 state );
+/**
 * @fn          SM_GetAuthenPairingOnlyMode
 *
 * @brief       Get the device into Authenticated Pairing Only Mode.
@@ -372,7 +386,20 @@ extern void SM_SetAuthenPairingOnlyMode( uint8 state );
 *                      FALSE when disabled
 */
 extern uint8 SM_GetAuthenPairingOnlyMode( void );
-
+/**
+* @fn          SM_GetAllowDebugKeysMode
+*
+* @brief       Get the device debug keys allownce policy.
+*              If not allowed, the pairing will be rejected
+*              with code of invalid parameters. If allowed, pairing will
+*              continue noramlly.
+*
+* @param       none
+*
+* @return      state - TRUE debug keys as peer public keys are allowed
+*                      FALSE when disallowed
+*/
+extern uint8 SM_GetAllowDebugKeysMode( void );
 /*-------------------------------------------------------------------
  * FUNCTIONS - MASTER API - Only use these in a master device
  */

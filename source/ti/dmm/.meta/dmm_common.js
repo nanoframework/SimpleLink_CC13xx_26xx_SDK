@@ -47,6 +47,9 @@ const maxAppStatesSupported = 32;
 // not be used in general
 const maxDMMPoliciesSupported = 32;
 
+// Max number of Custom Activities
+const maxCustomActivitiesSupported = 32;
+
 // Max number of stack roles
 const maxStackRoles = 2;
 
@@ -79,7 +82,11 @@ const dmmCCFGSettings = {
     CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {},
     CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {},
     CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {},
-    CC2652RB_LAUNCHXL_CCFG_SETTINGS: {}
+    LP_CC2652RB_CCFG_SETTINGS: {},
+    LP_CC1352P7_1_CCFG_SETTINGS: {},
+    LP_CC1352P7_4_CCFG_SETTINGS: {},
+    LP_CC1312R7_CCFG_SETTINGS: {},
+    LP_CC2652R7_CCFG_SETTINGS: {}
 };
 
 const currBoardName = easylinkUtil.getDeviceOrLaunchPadName(true);
@@ -95,10 +102,20 @@ const supportedMigrations = {
     CC1352P_4_LAUNCHXL: {},
     CC1352P1F3RGZ: {},
     /* Represents RSIP board and device */
-    "CC26.2R.*SIP": {},
+    "CC26.2R.*SIP": {
+        CC2652R1FSIP: {},
+        LP_CC2652RSIP: {},
+        CC2652R1FRGZ: {},
+        CC26X2R1_LAUNCHXL: {}
+    },
     /* Represents 26X2R1 board and device */
-    "CC26.2R1": {},
-    CC2652RB: {}
+    "CC26.2R1": {
+        CC2652R1FRGZ: {},
+        CC26X2R1_LAUNCHXL: {},
+        CC2652R1FSIP: {},
+        LP_CC2652RSIP: {},
+        CC2652RB: {}
+    },
 };
 
 /**
@@ -156,13 +173,54 @@ function stackRoles(isHidden)
         {
             name: "zigbeeCoordinator",
             displayName: stackDisplayNames.zigbeeCoordinator
-        }]
+        }],
+        onChange: stackRoleOnChange
     });
 }
 
+/**
+ *  ======== stackRoleOnChange ========
+ *  If either custom stackRole is selected, provide the ability to add custom
+ *   activities for use in the GPT policy.
+ *
+ *  @param inst - Module instance containing the config that changed
+ *  @param ui   - The User Interface object
+ */
+function stackRoleOnChange(inst, ui)
+{
+    if(inst.stackRoles != undefined)
+    {
+        if (inst.stackRoles.includes("custom1") || inst.stackRoles.includes("custom2"))
+        {
+            if (ui.numCustomActivities != undefined)
+            {
+                if (inst.numCustomActivities == 0)
+                {
+                    inst.numCustomActivities = 1;
+                }
 
+                ui.numCustomActivities.hidden = false;
 
+                for(let i = 0; i < inst.numCustomActivities; i++)
+                {
+                    ui["customActivity" + i].hidden = false;
+                }
+            }
+        }
+        else
+        {
+            if (ui.numCustomActivities != undefined)
+            {
+                ui["numCustomActivities"].hidden = true;
 
+                for(let i = 0; i < inst.numCustomActivities; i++)
+                {
+                    ui["customActivity" + i].hidden = true;
+                }
+            }
+        }
+    }
+}
 /*
 * ======== getMigrationMarkdown ========
 * Returns text in markdown format that customers can use to aid in migrating a
@@ -178,8 +236,6 @@ function getMigrationMarkdown(currTarget)
 
     // May need to add guidelines when other boards are supported
     let migrationText = "";
-
-    migrationText = "* DMM does not support ANY migrations at this time."
 
     return(migrationText);
 }
@@ -204,8 +260,27 @@ function isMigrationValid(currentTarget, migrationTarget)
 {
     let migRegex = null;
 
-    let migSupported;
-    migSupported = {disable: "This migration is not currently supported"};
+    const defaultDisableText = "Consider starting from an example in "
+    + " <SDK_INSTALL_DIR>/examples/ that is closer to the desired migration "
+    + "target";
+
+    let migSupported = {};
+
+    for(migRegex in supportedMigrations)
+    {
+        if(currentTarget.match(new RegExp(migRegex))
+            && supportedMigrations[migRegex][migrationTarget])
+        {
+            migSupported = supportedMigrations[migRegex][migrationTarget];
+
+            // If function exists then migration support is conditional
+            if(_.isFunction(migSupported))
+            {
+                migSupported = migSupported(migrationTarget);
+            }
+            break;
+        }
+    }
 
     return(migSupported);
 }
@@ -225,8 +300,17 @@ function isMigrationValid(currentTarget, migrationTarget)
 function migrate(currTarget, migrationTarget, env, projectName = null)
 {
     const migrationInfo = isMigrationValid(currTarget, migrationTarget);
-    let migrationValid = false;
+    let migrationValid = true;
 
+    if(migrationInfo.disable || migrationInfo.warn)
+    {
+        migrationValid = false;
+    }
+
+    if(migrationValid)
+    {
+        // Currently no dmm specific sysconfig changes required POST migration.
+    }
 
     return(migrationValid);
 }
@@ -242,6 +326,7 @@ exports = {
     stackDisplayNames: stackDisplayNames,
     ccfgSettings: ccfgSettings,
     maxAppStatesSupported: maxAppStatesSupported,
+    maxCustomActivitiesSupported: maxCustomActivitiesSupported,
     maxStackRoles: maxStackRoles,
     maxDMMPoliciesSupported: maxDMMPoliciesSupported,
     getMigrationMarkdown: getMigrationMarkdown,

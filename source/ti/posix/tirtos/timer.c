@@ -344,4 +344,9 @@ static Void *timerThreadFxn(Void *arg)
         Semaphore_pend(timer->sem, BIOS_WAIT_FOREVER);
         (timer->sigev_notify_function)(timer->val);
     }
+
+    /* NOTREACHED */
+
+    /* will never get here, but suppress missing return warning */
+    return (NULL);
 }

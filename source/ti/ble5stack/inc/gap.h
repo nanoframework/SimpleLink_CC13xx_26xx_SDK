@@ -137,6 +137,11 @@ extern "C"
  */
 #define GAP_DEVICE_INIT_DONE_EVENT            0x00
 /**
+ * Sent when the Advertising Data or SCAN_RSP Data has been updated. This event
+ * is sent as an OSAL message defined as @ref gapAdvDataUpdateEvent_t.
+ */
+#define GAP_ADV_DATA_UPDATE_DONE_EVENT        0x02
+/**
  * Sent after a link has been established as  @ref gapEstLinkReqEvent_t.
  */
 #define GAP_LINK_ESTABLISHED_EVENT            0x05

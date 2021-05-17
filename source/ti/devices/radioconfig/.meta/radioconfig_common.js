@@ -42,9 +42,9 @@ const Device = system.deviceData.deviceId;
 const BasePath = "/ti/devices/radioconfig/";
 
 // Manage protocol support
-const hasProp = Device.match(/CC13|CC265[12][RP][137]|CC2642R/);
-const hasBle = Device.match(/CC..[45][12]/);
-const hasIeee = Device.match(/CC..5[12][RP][137B]/);
+const hasProp = Device.match(/CC13|CC26[57][124][RP][137]|CC2642R/);
+const hasBle = Device.match(/CC..[457][124]/);
+const hasIeee = Device.match(/CC..[57][124][RP][137B]/);
 const has24gProp = hasProp && !Device.includes("CC131");
 
 // Exported from this module
@@ -60,9 +60,11 @@ exports = {
     HAS_24G: hasBle,
     HAS_IEEE_15_4: hasIeee,
     HAS_24G_PROP: has24gProp,
-    isSub1gDevice: () => Device.includes("CC13"),
-    isSub1gOnlyDevice: () => Device.includes("CC1312"),
-    is24gOnlyDevice: () => Device.includes("CC26"),
+    isSub1gDevice: () => Device.includes("CC13") || Device.includes("CC267"),
+    isSub1gOnlyDevice: () => Device.includes("CC131"),
+    is24gOnlyDevice: () => Device.match(/CC26[45]/),
+    isDeviceClass3: () => Device.match(/1[PR]3R/) !== null,
+    isDeviceClass10: () => Device.match(/[15]4[RP]10/) !== null,
     FreqLower169: 169.4,
     FreqHigher169: 169.475,
     FreqLower433: 420,

@@ -280,8 +280,8 @@ bStatus_t mesh_portingLayer_convertZephAdvParam(const struct bt_le_adv_param *in
 bStatus_t mesh_portingLayer_convertZephScanParam(const struct bt_le_scan_param *inParam,
                                                               uint8_t          *type,
                                                               uint8_t          *filter_dup,
-                                                              uint8_t          *interval,
-                                                              uint8_t          *window)
+                                                              uint16_t          *interval,
+                                                              uint16_t          *window)
 {
   if (inParam == NULL)
   {
@@ -299,19 +299,18 @@ bStatus_t mesh_portingLayer_convertZephScanParam(const struct bt_le_scan_param *
     (*type) = inParam->type;
   }
 
-	// Check validity of scan duplicate filter
-  if ((inParam->filter_dup != BT_HCI_LE_SCAN_FILTER_DUP_DISABLE) &&
-      (inParam->filter_dup != BT_HCI_LE_SCAN_FILTER_DUP_ENABLE))
+  // Set scan duplicate filter
+  if((inParam->options & BT_LE_SCAN_OPT_FILTER_DUPLICATE))
   {
-    return EINVAL;
+    (*filter_dup) = BT_HCI_LE_SCAN_FILTER_DUP_ENABLE;
   }
   else
   {
-    (*filter_dup) = inParam->filter_dup;
+    (*filter_dup) = BT_HCI_LE_SCAN_FILTER_DUP_DISABLE;
   }
 
-	// Check validity of scan interval
-	if ((inParam->interval < LL_SCAN_INTERVAL_MIN) ||
+  // Check validity of scan interval
+  if ((inParam->interval < LL_SCAN_INTERVAL_MIN) ||
       (inParam->interval > LL_SCAN_INTERVAL_MAX))
   {
     return EINVAL;
@@ -321,7 +320,7 @@ bStatus_t mesh_portingLayer_convertZephScanParam(const struct bt_le_scan_param *
     (*interval) = inParam->interval;
   }
 
-	// Check validity of scan window
+  // Check validity of scan window
   if ((inParam->window < LL_SCAN_WINDOW_MIN) ||
       (inParam->window > LL_SCAN_WINDOW_MAX))
   {

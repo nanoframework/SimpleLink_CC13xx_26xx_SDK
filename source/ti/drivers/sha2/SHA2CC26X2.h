@@ -39,15 +39,15 @@
  *
  *  The CC26X2 family has a dedicated hardware crypto accelerator. It is capable
  *  of multiple AES block cipher modes of operation as well as SHA2 operations.
- *  Only one operation can be carried out on the accerator at a time. Mutual
+ *  Only one operation can be carried out on the accelerator at a time. Mutual
  *  exclusion is implemented at the driver level and coordinated between all
- *  drivers relying onthe accelerator. It is transparent to the application
+ *  drivers relying on the accelerator. It is transparent to the application
  *  and only noted ensure sensible access timeouts are set.
  *
  *  The driver implementation does not perform runtime checks for most input
  *  parameters.
  *  Only values that are likely to have a stochastic element to them are
- *  checked (such as whether a driver is already open). Higher input paramter
+ *  checked (such as whether a driver is already open). Higher input parameter
  *  validation coverage is achieved by turning on assertions when compiling
  *  the driver.
  *
@@ -96,10 +96,10 @@ typedef struct {
 #define SHA2CC26X2_MAX_BLOCK_SIZE_BYTES    (SHA2_BLOCK_SIZE_BYTES_512)
 #define SHA2CC26X2_MAX_DIGEST_LENGTH_BYTES (SHA2_DIGEST_LENGTH_BYTES_512)
 
-/*
- *  SHACC26XX Object
+/*!
+ *  @brief SHACC26XX Object
  *
- *  The application must not access any member variables of this structure!
+ *  \note The application must not access any member variables of this structure!
  */
 typedef struct {
     bool                            isOpen;

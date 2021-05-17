@@ -18,3 +18,7 @@ LoggerIdle.c
 lib/release/ti.uia.sysbios.am4f
 lib/release/ti.uia.sysbios.am4fg
 lib/release/ti.uia.sysbios.arm4f
+lib/release/ti.uia.sysbios.aem4
+lib/release/ti.uia.sysbios.am4
+lib/release/ti.uia.sysbios.am4g
+lib/release/ti.uia.sysbios.arm4

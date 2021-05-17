@@ -23,6 +23,10 @@ XDCARGS= \
     ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
     gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
     iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
+    ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
+    ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
+    gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
+    iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\" \
     TIPOSIX_REPO=\"$(CORESDK_INSTALL_DIR)/source\" \
     CC26XXWARE=$(CORESDK_INSTALL_DIR)
 

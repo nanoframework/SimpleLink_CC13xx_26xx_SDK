@@ -8,8 +8,7 @@
             "+../rfWakeOnRadioRx_nortos.c -> rfWakeOnRadioRx_nortos.c",
             "+../main_nortos.c -> main_nortos.c",
             "+../../../../../../source/ti/boards/CC1312R1_LAUNCHXL/Board.html -> Board.html",
-            "+../CC1312R1_LAUNCHXL_fxns.c -> CC1312R1_LAUNCHXL_fxns.c",
-            "+CC1312R1_LAUNCHXL_NoRTOS.lds -> CC1312R1_LAUNCHXL_NoRTOS.lds"
+            "+cc13x2_cc26x2_nortos.lds -> cc13x2_cc26x2_nortos.lds"
         ]
     }
 ]

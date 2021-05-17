@@ -638,7 +638,11 @@ extern "C"
 // Define task Types for Qos parameters
 #define LL_QOS_CONN_TASK_TYPE                          0
 #define LL_QOS_ADV_TASK_TYPE                           1
-#define LL_QOS_MAX_NUM_TASK_TYPE                       2    //Add a new task type before this define and update it's number
+#define LL_QOS_SCN_TASK_TYPE                           2
+#define LL_QOS_INIT_TASK_TYPE                          3
+#define LL_QOS_PERIODIC_ADV_TASK_TYPE                  4
+#define LL_QOS_PERIODIC_SCN_TASK_TYPE                  5
+#define LL_QOS_MAX_NUM_TASK_TYPE                       6    // Add a new task type before this define and update it's number
 
 // Define General Qos parameters
 #define LL_QOS_TYPE_PRIORITY                           0
@@ -662,6 +666,11 @@ extern "C"
 #define LL_TOTAL_MARGIN_TIME_FOR_MIN_CONN_RAT_TICKS             (LL_MARGIN_TIME_FOR_MIN_TIME_RF_PROCESSING_RAT_TICKS + LL_MARGIN_TIME_FOR_MIN_CONN_ESTIMATE_RAT_TICKS)
 #define LL_MAX_COLLISION_COMPRISON                              5
 #define LL_MIN_MAX_CONN_TIME_LENGTH_MASK                        0x7FFFFFFF
+#define LL_MAX_SLAVE_NUM_LSTO_RETRIES                           5
+#define LL_MAX_MASTER_NUM_LSTO_RETRIES                          1
+#define LL_MIN_NUM_EVENTS_LEFT_LSTO_MARGIN                      3
+#define LL_SET_STARVATION_MODE_OFF                              0
+#define LL_SET_STARVATION_MODE_ON                               1
 /*******************************************************************************
  * TYPEDEFS
  */
@@ -3912,14 +3921,20 @@ extern llStatus_t LL_EXT_SetExtScanChannels( uint8 extScanChanMapVal );
  *              according to the entered parameter type.
  *
  * @design      /ref did_361975877
+ * @design      /ref did_408769671
  *
  * input parameters
  *
  * @param       taskType  - The type of task.
- *                          For connections: LL_QOS_CONN_TASK_TYPE.
+ *                          For Connections task type:        LL_QOS_CONN_TASK_TYPE.
+ *                          For Advertise task type:          LL_QOS_ADV_TASK_TYPE.
+ *                          For Scan task type:               LL_QOS_SCN_TASK_TYPE.
+ *                          For Initiator task type:          LL_QOS_INIT_TASK_TYPE.
+ *                          For Periodic Advertise task type: LL_QOS_PERIODIC_ADV_TASK_TYPE.
+ *                          For Periodic Scan task type:      LL_QOS_PERIODIC_SCN_TASK_TYPE.
  *
  * @param       paramType  - The type of parameter.
- *                           General: LL_QOS_TYPE_PRIORITY
+ *                           General: LL_QOS_TYPE_PRIORITY.
  *                           For connections: LL_QOS_TYPE_CONN_MIN_LENGTH /
  *                                            LL_QOS_TYPE_CONN_MAX_LENGTH.
  *
@@ -3929,7 +3944,7 @@ extern llStatus_t LL_EXT_SetExtScanChannels( uint8 extScanChanMapVal );
  *                                                                 LL_QOS_MEDIUM_PRIORITY,
  *                                                                 LL_QOS_HIGH_PRIORITY.
  *                                                                 Range [0-2].
- *                           For connections:
+ *                           For connections only:
  *                           LL_QOS_TYPE_CONN_MIN_LENGTH optional values: Time in [us].
  *                                                                        for coded connection   Range [LL_MIN_LINK_DATA_TIME_CODED (2704 us) - LL_MAX_LINK_DATA_TIME_CODED (17040 us)].
  *                                                                        for uncoded connection Range [LL_MIN_LINK_DATA_TIME (328 us) - LL_MAX_LINK_DATA_TIME_UNCODED (2120 us)].
@@ -3942,6 +3957,8 @@ extern llStatus_t LL_EXT_SetExtScanChannels( uint8 extScanChanMapVal );
  *
  *
  * @param       taskHandle  - The Task Handle of which we want to update it's parameters.
+ *                            This variable is not relevent for LL_QOS_SCN_TASK_TYPE / LL_QOS_INIT_TASK_TYPE because
+ *                            There is only 1 set for scanner or initiator.
  *
  * output parameters
  *
@@ -3960,19 +3977,38 @@ extern llStatus_t LL_EXT_SetQOSParameters( uint8  taskType,
  * @brief       This API is used to set the Default QOS Parameters Values.
  *
  * @design      /ref did_361975877
+ * @design      /ref did_408769671
  *
  * input parameters
  *
- * @param       defaultParamConnPriorityValue       - The default value for connection's priority.
- *                                                    Options: LL_QOS_LOW_PRIORITY /  LL_QOS_MEDIUM_PRIORITY / LL_QOS_HIGH_PRIORITY.
- *                                                    Range [0-2].
+ * @param       paramDefaultVal   - The default value of this qos type.
+ *                                  For LL_QOS_TYPE_PRIORITY optional values: LL_QOS_LOW_PRIORITY,
+ *                                                                            LL_QOS_MEDIUM_PRIORITY,
+ *                                                                            LL_QOS_HIGH_PRIORITY.
+ *                                                                            Range [0-2].
+ *
+ * @param       paramType         - The type of parameter.
+ *                                  General: LL_QOS_TYPE_PRIORITY.
+ *                                  For connections: LL_QOS_TYPE_CONN_MIN_LENGTH /
+ *                                                   LL_QOS_TYPE_CONN_MAX_LENGTH.
+ *
+ * @param       taskType          - The type of task we would like to change it's default value.
+ *                                  For Connections task type:        LL_QOS_CONN_TASK_TYPE.
+ *                                  For Advertise task type:          LL_QOS_ADV_TASK_TYPE.
+ *                                  For Scan task type:               LL_QOS_SCN_TASK_TYPE.
+ *                                  For Initiator task type:          LL_QOS_INIT_TASK_TYPE.
+ *                                  For Periodic Advertise task type: LL_QOS_PERIODIC_ADV_TASK_TYPE.
+ *                                  For Periodic Scan task type:      LL_QOS_PERIODIC_SCN_TASK_TYPE.
+ *
  * output parameters
  *
  * @param       None.
  *
  * @return      LL_STATUS_SUCCESS / LL_STATUS_ERROR_INVALID_PARAMS.
  */
-extern llStatus_t LL_EXT_SetQOSDefaultParameters( uint8  defaultParamConnPriorityValue);
+extern llStatus_t LL_EXT_SetQOSDefaultParameters(uint32 paramDefaultVal,
+                                                 uint8  paramType,
+                                                 uint8  taskType);
 
 /*******************************************************************************
  * @fn          LL_EXT_SetMaxDataLen API

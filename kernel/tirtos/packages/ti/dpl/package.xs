@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,11 +63,10 @@ function getLibs()
     else if (Program.cpu.deviceName.match(/CC3220/)) {
         libName = "_cc32xx";
     }
-    else if (Program.cpu.deviceName.match(/MSP432E4.*/)) {
-        libName = "_msp432e4";
-    }
-    else if (Program.cpu.deviceName.match(/MTL1_CORE/)) {
-        libName = "_mtxx";
+    else if (Program.cpu.deviceName.match(/CC26.4/) ||
+             Program.cpu.deviceName.match(/CC13.4/)) {
+        /* Hack for BIOS7 only devices that don't have a DPL library */
+        return libName;
     }
     else {
         throw ("DPL not found for this device " + Program.cpu.deviceName +

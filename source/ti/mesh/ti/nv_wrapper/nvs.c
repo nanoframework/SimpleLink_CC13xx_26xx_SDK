@@ -66,7 +66,7 @@ extern struct k_mutex settings_lock;
 // Local variables
 //*****************************************************************************
  NVINTF_nvFuncts_t nvFps;
-static u8_t nvInitialized = 0;
+static uint8_t nvInitialized = 0;
 
 /*********************************************************************
  * @fn      nvs_init
@@ -82,7 +82,7 @@ static u8_t nvInitialized = 0;
  */
 int nvs_init(struct nvs_fs *fs, const char *dev_name)
 {
-  u8_t rc;
+  uint8_t rc;
   (void)fs;
   (void)dev_name;
 
@@ -119,7 +119,7 @@ int nvs_init(struct nvs_fs *fs, const char *dev_name)
  */
 int nvs_clear(struct nvs_fs *fs)
 {
-  u8_t rc;
+  uint8_t rc;
 
   rc = nvFps.eraseNV();
 
@@ -146,9 +146,9 @@ int nvs_clear(struct nvs_fs *fs)
  *
  * @return  len when success or 0 when fail.
  */
-ssize_t nvs_write(struct nvs_fs *fs, u16_t id, const void *data, size_t len)
+ssize_t nvs_write(struct nvs_fs *fs, uint16_t id, const void *data, size_t len)
 {
-  u8_t rc;
+  uint8_t rc;
 
   NVINTF_itemID_t itemId;
   itemId.systemID = NVINTF_SYSID_BMESH;
@@ -180,9 +180,9 @@ ssize_t nvs_write(struct nvs_fs *fs, u16_t id, const void *data, size_t len)
  *
  * @return  len when success or -EFAULT when fail.
  */
-int nvs_delete(struct nvs_fs *fs, u16_t id)
+int nvs_delete(struct nvs_fs *fs, uint16_t id)
 {
-  u8_t rc;
+  uint8_t rc;
   NVINTF_itemID_t itemId;
 
   itemId.systemID = NVINTF_SYSID_BMESH;
@@ -214,10 +214,10 @@ int nvs_delete(struct nvs_fs *fs, u16_t id)
  *
  * @return  len when success or other error code in errno.h when fail.
  */
-ssize_t nvs_read_hist(struct nvs_fs *fs, u16_t id, void *data, size_t len,
-		      u16_t cnt)
+ssize_t nvs_read_hist(struct nvs_fs *fs, uint16_t id, void *data, size_t len,
+		      uint16_t cnt)
 {
-  u8_t rc;
+  uint8_t rc;
   NVINTF_itemID_t itemId;
 
   itemId.systemID = NVINTF_SYSID_BMESH;
@@ -265,7 +265,7 @@ ssize_t nvs_read_hist(struct nvs_fs *fs, u16_t id, void *data, size_t len,
  *
  * @return  len when success or other error code in errno.h when fail.
  */
-ssize_t nvs_read(struct nvs_fs *fs, u16_t id, void *data, size_t len)
+ssize_t nvs_read(struct nvs_fs *fs, uint16_t id, void *data, size_t len)
 {
 	return nvs_read_hist(fs, id, data, len, 0);;
 }
@@ -282,7 +282,7 @@ ssize_t nvs_read(struct nvs_fs *fs, u16_t id, void *data, size_t len)
  */
 ssize_t nvs_calc_free_space(struct nvs_fs *fs)
 {
-  u16_t freespace;
+  uint16_t freespace;
 
   freespace = nvFps.getFreeNV();
 

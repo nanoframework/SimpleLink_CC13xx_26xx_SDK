@@ -23,7 +23,11 @@ XDCARGS= \
     ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
     ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
     gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\"
+    iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
+    ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
+    ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
+    gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
+    iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\"
 
 #
 # Set XDCPATH to contain necessary repositories.

@@ -465,6 +465,8 @@ extern "C"
 /// @cond NODOC
 #if defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC13X2)
 #define BIM_START                           0x56000
+#elif defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7)
+#define BIM_START                           0xAE000
 #else
 #define BIM_START                           0x1F000
 #endif

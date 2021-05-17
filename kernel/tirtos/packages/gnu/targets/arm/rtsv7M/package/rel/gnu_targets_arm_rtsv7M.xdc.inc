@@ -7,3 +7,5 @@ package.bld
 package/package.cfg.xdc.inc
 lib/gnu.targets.arm.rtsv7M.am4fg
 lib/boot.am4fg
+lib/gnu.targets.arm.rtsv7M.am4g
+lib/boot.am4g

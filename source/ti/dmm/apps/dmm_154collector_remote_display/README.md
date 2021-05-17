@@ -16,6 +16,7 @@
   * [Disabling Common User Interface](#DisableCUI)
 * [DMM Collector Reboot and Reset](#DMMCollectorRebootAndReset)
 * [DMM Limitations](#DmmLimitations)
+* [5.10.xx Release Notes](#5_xx_ReleaseNotes)
 
 ## <a name="Introduction"></a>Introduction
 
@@ -694,3 +695,11 @@ initial connection interval of the BLE central devices.
 - Only 1 BLE connection is supported. The number of concurrent BLE connections
   is set in the application .opt file, located in the project workspace under
   the TOOLS folder.
+
+
+## <a name="5_xx_ReleaseNotes"></a>5.10.xx Release Notes
+*FEATURE_FREQ_HOP_MODE* has been added as a pre-defined symbol to the DMM
+15.4 Collector & Sensor Sub-1 GHz examples for the CC1352 devices. This symbol
+is added to keep the capability of the Frequency Hopping mode, which is still
+required to be turned on through SysConfig.  It is recommended that developers
+do not remove or modify this symbol.

@@ -65,6 +65,10 @@
                         "rfCommand": "CMD_PROP_TX_ADV"
                     },
                     {
+                        "_names": "packetLengthRx",
+                        "rfCommand": "CMD_PROP_RX_ADV"
+                    },
+                    {
                         "_names": "syncWord",
                         "rfCommand": [
                             "CMD_PROP_TX_ADV",

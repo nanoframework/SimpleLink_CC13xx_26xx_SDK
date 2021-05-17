@@ -11,3 +11,7 @@ Rta.c
 lib/release/ti.uia.services.am4f
 lib/release/ti.uia.services.am4fg
 lib/release/ti.uia.services.arm4f
+lib/release/ti.uia.services.aem4
+lib/release/ti.uia.services.am4
+lib/release/ti.uia.services.am4g
+lib/release/ti.uia.services.arm4

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated
+ * Copyright (c) 2018-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,8 @@ extern const uint_least8_t TRNG_count;
 
 const TRNG_Params TRNG_defaultParams = {
     .returnBehavior = TRNG_RETURN_BEHAVIOR_BLOCKING,
-    .callbackFxn = NULL,
+    .cryptoKeyCallbackFxn = NULL,
+    .randomBytesCallbackFxn = NULL,
     .timeout = SemaphoreP_WAIT_FOREVER,
     .custom = NULL,
 };

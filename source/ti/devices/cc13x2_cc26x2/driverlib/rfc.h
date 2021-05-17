@@ -67,6 +67,7 @@ extern "C"
 #include DeviceFamily_constructPath(inc/hw_fcfg1.h)
 #include DeviceFamily_constructPath(inc/hw_adi_3_refsys.h)
 #include DeviceFamily_constructPath(inc/hw_adi.h)
+#include DeviceFamily_constructPath(inc/hw_prcm.h)
 #include "rf_common_cmd.h"
 #include "rf_prop_cmd.h"
 #include "rf_ble_cmd.h"
@@ -396,6 +397,17 @@ RFCGetPaGain(void)
     return (HWREG(RFC_PA_GAIN_ADDRESS) & RFC_PA_GAIN_MASK);
 }
 
+//*****************************************************************************
+//
+//! Get the power domain status of the radio core
+//
+//*****************************************************************************
+__STATIC_INLINE uint32_t
+RFCGetPowerDomainStatus(void)
+{
+    return (HWREG(PRCM_BASE + PRCM_O_PDCTL1RFC) |
+            HWREG(PRCM_BASE + PRCM_O_PDSTAT0RFC));
+}
 
 //*****************************************************************************
 //

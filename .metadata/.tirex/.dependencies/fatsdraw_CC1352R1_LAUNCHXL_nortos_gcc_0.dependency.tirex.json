@@ -7,8 +7,7 @@
             "+../main_nortos.c -> main_nortos.c",
             "+../fatsdraw.syscfg -> fatsdraw.syscfg",
             "+../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
-            "+../CC1352R1_LAUNCHXL_fxns.c -> CC1352R1_LAUNCHXL_fxns.c",
-            "+CC1352R1_LAUNCHXL_NoRTOS.lds -> CC1352R1_LAUNCHXL_NoRTOS.lds"
+            "+cc13x2_cc26x2_nortos.lds -> cc13x2_cc26x2_nortos.lds"
         ]
     }
 ]

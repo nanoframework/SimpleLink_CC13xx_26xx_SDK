@@ -9,13 +9,13 @@
             "+../../tx.c -> tx.c",
             "+../../RFQueue.h -> RFQueue.h",
             "+../../RFQueue.c -> RFQueue.c",
-            "+../../rfPacketErrorRate.syscfg -> rfPacketErrorRate.syscfg",
             "+../../menu.c -> menu.c",
             "+../../rfPacketErrorRate.c -> rfPacketErrorRate.c",
+            "+../main_tirtos.c -> main_tirtos.c",
             "+../../overview.rov.json -> overview.rov.json",
+            "+../rfPacketErrorRate.syscfg -> rfPacketErrorRate.syscfg",
             "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
-            "+../../CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
-            "+CC1352P_4_LAUNCHXL_TIRTOS.lds -> CC1352P_4_LAUNCHXL_TIRTOS.lds"
+            "+cc13x2_cc26x2_tirtos.lds -> cc13x2_cc26x2_tirtos.lds"
         ]
     }
 ]

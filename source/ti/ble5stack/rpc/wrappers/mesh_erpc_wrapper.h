@@ -141,10 +141,10 @@ typedef void 		(*BLEmesh_unprovisioned_beacon)(uint8_t uuid[16],
 typedef void        (*BLEmesh_link_open)(bt_mesh_prov_bearer bearer);
 typedef void        (*BLEmesh_link_close)(bt_mesh_prov_bearer bearer);
 typedef void        (*BLEmesh_complete)(uint16_t net_idx, uint16_t addr);
-typedef void        (*BLEmesh_node_added)(uint16_t net_idx, uint16_t addr, uint8_t num_elem);
+typedef void        (*BLEmesh_node_added)(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem);
 typedef void        (*BLEmesh_reset)(void);
 typedef void        (*BLEmesh_cb)(uint16_t friend_addr, bool established);
-typedef void        (*BLEmesh_settings_commit_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
+typedef void        (*BLEmesh_start_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_init_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_reset_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_update)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
@@ -188,7 +188,7 @@ struct bt_mesh_prov_raw {
     void        (*link_open)(bt_mesh_prov_bearer bearer);
     void        (*link_close)(bt_mesh_prov_bearer bearer);
     void        (*complete)(uint16_t net_idx, uint16_t addr);
-    void        (*node_added)(uint16_t net_idx, uint16_t addr, uint8_t num_elem);
+    void        (*node_added)(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem);
     void        (*reset)(void);
 
     uint8_t uuid_len;
@@ -334,7 +334,7 @@ struct bt_mesh_model_op_raw {
 
 struct bt_mesh_model_cb_raw {
 //    uint32_t settings_set_placeholder;
-    void (*settings_commit)(uint16_t elem_idx, uint8_t is_vnd,
+    void (*start)(uint16_t elem_idx, uint8_t is_vnd,
             uint16_t model_index);
     void (*init)(uint16_t elem_idx, uint8_t is_vnd,
             uint16_t model_index);
@@ -516,10 +516,10 @@ void unprovisioned_beacon_cb(uint8_t uuid[16],
 void link_open_cb(bt_mesh_prov_bearer bearer);
 void link_close_cb(bt_mesh_prov_bearer bearer);
 void complete_cb(uint16_t net_idx, uint16_t addr);
-void node_added_cb(uint16_t net_idx, uint16_t addr, uint8_t num_elem);
+void node_added_cb(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem);
 void reset_prov_cb(void);
 void lpn_set_cb(uint16_t friend_addr, bool established);
-void settings_commit_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
+void start_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void init_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void reset_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void update_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);

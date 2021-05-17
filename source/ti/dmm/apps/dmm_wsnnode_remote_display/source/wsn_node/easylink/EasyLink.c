@@ -69,7 +69,8 @@
 
 union setupCmd_t{
 #if ((defined LAUNCHXL_CC1352P1) || (defined LAUNCHXL_CC1352P_2) || \
-     (defined LAUNCHXL_CC1352P_4))
+     (defined LAUNCHXL_CC1352P_4)|| (defined LP_CC1352P7_1)      || \
+	 (defined LP_CC1352P7_4))
     rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t divSetup;
 #else
     rfc_CMD_PROP_RADIO_DIV_SETUP_t divSetup;
@@ -454,6 +455,15 @@ static void ccaDoneCallback(RF_Handle h, RF_CmdHandle ch, RF_EventMask e)
                 {
                     asyncCmdHndl = RF_postCmd(h, (RF_Op*)&EasyLink_cmdPropCs,
                         RF_PriorityHigh, ccaDoneCallback, EASYLINK_RF_EVENT_MASK);
+                }
+
+                if(EasyLink_CmdHandle_isValid(asyncCmdHndl) == false)
+                {
+                    //Release now so user callback can call EasyLink API's
+                    Semaphore_post(busyMutex);
+
+                    // Reset the number of retries
+                    be = EASYLINK_MIN_CCA_BACKOFF_WINDOW;
                 }
             }
         }
@@ -857,7 +867,7 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
 
         case EasyLink_Phy_625bpsLrm:
             if(!(ChipInfo_ChipFamilyIs_CC26x0()) && !(ChipInfo_ChipFamilyIs_CC26x0R2())
-                && !(ChipInfo_ChipFamilyIs_CC13x2_CC26x2()))
+                && !(ChipInfo_ChipFamilyIs_CC13x2_CC26x2()) && !(ChipInfo_ChipFamilyIs_CC13x2x7_CC26x2x7()))
             {
                 useDivRadioSetup= true;
                 rfConfigOk = true;
@@ -871,6 +881,11 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
                 rfConfigOk = true;
             }
             else if((ChipInfo_ChipFamilyIs_CC13x2_CC26x2()) && (ChipInfo_GetChipType() != CHIP_TYPE_CC1312))
+            {
+                useDivRadioSetup= true;
+                rfConfigOk = true;
+            }
+            else if((ChipInfo_ChipFamilyIs_CC13x2x7_CC26x2x7()) && (ChipInfo_GetChipType() != CHIP_TYPE_CC1312R7))
             {
                 useDivRadioSetup= true;
                 rfConfigOk = true;
@@ -896,6 +911,12 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
                 useDivRadioSetup= true;
                 rfConfigOk = true;
             }
+            else if((ChipInfo_ChipFamilyIs_CC13x2x7_CC26x2x7()) && (ChipInfo_GetChipType() != CHIP_TYPE_CC1312R7))
+            {
+                useDivRadioSetup= true;
+                rfConfigOk = true;
+            }
+
         break;
 
         case EasyLink_Phy_5kbpsSlLr:
@@ -903,7 +924,7 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
             {
                 useDivRadioSetup= true;
                 rfConfigOk = true;
-#if (defined LAUNCHXL_CC1352P_4)
+#if (defined LAUNCHXL_CC1352P_4) || (defined LP_CC1352P7_4)
                 // CC1352P-4 SLR operates at 433.92 MHz
                 EasyLink_cmdFs.frequency = 0x01B1;
                 EasyLink_cmdFs.fractFreq = 0xEB9A;
@@ -913,9 +934,9 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
 
         case EasyLink_Phy_200kbps2gfsk:
             if((ChipInfo_GetChipType() == CHIP_TYPE_CC1312) || (ChipInfo_GetChipType() == CHIP_TYPE_CC1352) ||
-               (ChipInfo_GetChipType() == CHIP_TYPE_CC1352P))
+               (ChipInfo_GetChipType() == CHIP_TYPE_CC1352P) || (ChipInfo_GetChipType() == CHIP_TYPE_CC1312R7))
             {
-#if !defined(LAUNCHXL_CC1352P_4)
+#if !defined(LAUNCHXL_CC1352P_4) && !defined(LP_CC1352P7_4)
                 // This mode is not supported in the 433 MHz band
                 useDivRadioSetup= true;
                 rfConfigOk = true;
@@ -976,7 +997,8 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
     if(useDivRadioSetup)
     {
 #if ((defined LAUNCHXL_CC1352P1) || (defined LAUNCHXL_CC1352P_2) || \
-     (defined LAUNCHXL_CC1352P_4))
+     (defined LAUNCHXL_CC1352P_4)|| (defined LP_CC1352P7_1)      || \
+	 (defined LP_CC1352P7_4))
         memcpy(&EasyLink_cmdPropRadioSetup.divSetup, (rfSetting->RF_uCmdPropRadio.RF_pCmdPropRadioDivSetup), sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t));
 #else
         memcpy(&EasyLink_cmdPropRadioSetup.divSetup, (rfSetting->RF_uCmdPropRadio.RF_pCmdPropRadioDivSetup), sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_t));
@@ -1248,11 +1270,15 @@ EasyLink_Status EasyLink_setRfPower(int8_t i8TxPowerDbm)
 
 #if (defined CONFIG_CC1352R1F3RGZ)     || (defined CONFIG_CC1312R1F3RGZ)     || \
     (defined CONFIG_CC2652R1FRGZ)      || (defined CONFIG_CC2652R1FSIP)      || \
-    (defined CONFIG_CC2652P1FSIP)      || (defined CONFIG_CC1312R1_LAUNCHXL) || \
-    (defined CONFIG_CC1352R1_LAUNCHXL) || (defined CONFIG_CC26X2R1_LAUNCHXL) || \
-    (defined LAUNCHXL_CC1352P1)        || (defined LAUNCHXL_CC1352P_2)       || \
-    (defined LAUNCHXL_CC1352P_4)       || (defined CONFIG_LP_CC2652RSIP)     || \
-    (defined CONFIG_LP_CC2652PSIP)
+    (defined CONFIG_CC2652P1FSIP)      || (defined CONFIG_CC2652R7RGZ)       || \
+	(defined CONFIG_CC1312R7RGZ)       || (defined CONFIG_CC1352P7RGZ)       || \
+	(defined CONFIG_CC1312R1_LAUNCHXL) || (defined CONFIG_CC1352R1_LAUNCHXL) || \
+    (defined LAUNCHXL_CC1352P1)        || (defined CONFIG_CC26X2R1_LAUNCHXL) || \
+    (defined LAUNCHXL_CC1352P_4)       || (defined LAUNCHXL_CC1352P_2)       || \
+    (defined CONFIG_LP_CC2652PSIP)     || (defined CONFIG_LP_CC2652RSIP)     || \
+    (defined CONFIG_LP_CC1312R7)       || (defined LP_CC1352P7_4)            || \
+	(defined LP_CC1352P7_1)            || (defined CONFIG_LP_CC2652R7)
+	
 
     RF_TxPowerTable_Entry *rfPowerTable = NULL;
     RF_TxPowerTable_Value newValue;
@@ -1274,10 +1300,12 @@ EasyLink_Status EasyLink_setRfPower(int8_t i8TxPowerDbm)
     }
 
     //if max power is requested then the CCFG_FORCE_VDDR_HH must be set in
-    //the ccfg; this does not apply to 2.4GHz proprietary modes either
+    //the ccfg; this does not apply to 2.4GHz proprietary modes
 #if (CCFG_FORCE_VDDR_HH != 0x1)
     if((newValue.paType == RF_TxPowerTable_DefaultPA) &&
-       (i8TxPowerDbm == rfPowerTable[rfPowerTableSize-2].power))
+       (i8TxPowerDbm == rfPowerTable[rfPowerTableSize-2].power) &&
+       (EasyLink_params.ui32ModType != EasyLink_Phy_2_4_100kbps2gfsk) &&
+       (EasyLink_params.ui32ModType != EasyLink_Phy_2_4_250kbps2gfsk))
     {
         //Release the busyMutex
         Semaphore_post(busyMutex);
@@ -1375,11 +1403,16 @@ EasyLink_Status EasyLink_getRfPower(int8_t *pi8TxPowerDbm)
 
 #if (defined CONFIG_CC1352R1F3RGZ)     || (defined CONFIG_CC1312R1F3RGZ)     || \
     (defined CONFIG_CC2652R1FRGZ)      || (defined CONFIG_CC2652R1FSIP)      || \
-    (defined CONFIG_CC2652P1FSIP)      || (defined CONFIG_CC1312R1_LAUNCHXL) || \
-    (defined CONFIG_CC1352R1_LAUNCHXL) || (defined CONFIG_CC26X2R1_LAUNCHXL) || \
-    (defined LAUNCHXL_CC1352P1)        || (defined LAUNCHXL_CC1352P_2)       || \
-    (defined LAUNCHXL_CC1352P_4)       || (defined CONFIG_LP_CC2652RSIP)     || \
-    (defined CONFIG_LP_CC2652PSIP)
+    (defined CONFIG_CC2652P1FSIP)      || (defined CONFIG_CC1312R7RGZ)       || \
+	(defined CONFIG_CC1352P7RGZ)       || (defined CONFIG_CC2652R7RGZ)       || \
+	(defined CONFIG_CC1312R1_LAUNCHXL) || (defined CONFIG_CC1352R1_LAUNCHXL) || \
+    (defined LAUNCHXL_CC1352P1)        || (defined CONFIG_CC26X2R1_LAUNCHXL) || \
+    (defined LAUNCHXL_CC1352P_4)       || (defined LAUNCHXL_CC1352P_2)       || \
+    (defined CONFIG_LP_CC2652PSIP)     || (defined CONFIG_LP_CC2652RSIP)     || \
+    (defined CONFIG_LP_CC1312R7)       || (defined LP_CC1352P7_4)            || \
+	(defined LP_CC1352P7_1)            || (defined CONFIG_LP_CC2652R7)      
+	
+	
 
     uint8_t rfPowerTableSize = 0;
     RF_TxPowerTable_Entry *rfPowerTable = NULL;
@@ -1397,10 +1430,12 @@ EasyLink_Status EasyLink_getRfPower(int8_t *pi8TxPowerDbm)
         txPowerDbm = RF_TxPowerTable_findPowerLevel(rfPowerTable, currValue);
 
         //if CCFG_FORCE_VDDR_HH is not set max power cannot be achieved; this
-        //does not apply to 2.4GHz proprietary modes either
+        //does not apply to 2.4GHz proprietary modes
 #if (CCFG_FORCE_VDDR_HH != 0x1)
         if((currValue.paType == RF_TxPowerTable_DefaultPA) &&
-           (txPowerDbm == rfPowerTable[rfPowerTableSize-2].power))
+           (txPowerDbm == rfPowerTable[rfPowerTableSize-2].power) &&
+           (EasyLink_params.ui32ModType != EasyLink_Phy_2_4_100kbps2gfsk) &&
+           (EasyLink_params.ui32ModType != EasyLink_Phy_2_4_250kbps2gfsk))
         {
             txPowerDbm = rfPowerTable[rfPowerTableSize-3].power;
         }
@@ -1677,6 +1712,11 @@ EasyLink_Status EasyLink_transmitAsync(EasyLink_TxPacket *txPacket, EasyLink_TxD
     {
         status = EasyLink_Status_Success;
     }
+    else
+    {
+        // Error occurred. Callback will not be called, release busyMutex.
+        Semaphore_post(busyMutex);
+    }
 
     //busyMutex will be released by the callback
 
@@ -1793,6 +1833,11 @@ EasyLink_Status EasyLink_transmitCcaAsync(EasyLink_TxPacket *txPacket, EasyLink_
     if (EasyLink_CmdHandle_isValid(asyncCmdHndl))
     {
         status = EasyLink_Status_Success;
+    }
+    else
+    {
+        // Error occurred. Callback will not be called, release busyMutex.
+        Semaphore_post(busyMutex);
     }
 
     //busyMutex will be released by the callback

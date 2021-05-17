@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2010-2020, Texas Instruments Incorporated
+ Copyright (c) 2010-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@
  */
 // Remote Display GATT Profile Service UUID
 CONST uint8 remoteDisplayProfileServUUID[ATT_UUID_SIZE] =
-{ 
+{
   RDPROFILE_SERV_UUID_BASE128(RDPROFILE_SERV_UUID)
 };
 
@@ -86,7 +86,7 @@ CONST uint8 remoteDisplayProfileNodeDataCharUUID[ATT_UUID_SIZE] =
 
 // Node Report Interval Characteristic UUID
 CONST uint8 remoteDisplayProfileNodeReportIntervalCharUUID[ATT_UUID_SIZE] =
-{ 
+{
   RDPROFILE_CHAR_UUID_BASE128(RDPROFILE_NODE_REPORT_INTERVAL_CHAR_UUID)
 };
 
@@ -98,7 +98,7 @@ CONST uint8 remoteDisplayProfileConcLedCharUUID[ATT_UUID_SIZE] =
 
 // Node Address Characteristic UUID
 CONST uint8 remoteDisplayProfilecNodeAddrCharUUID[ATT_UUID_SIZE] =
-{ 
+{
   RDPROFILE_CHAR_UUID_BASE128(RDPROFILE_NODE_ADDR_CHAR_UUID)
 };
 
@@ -172,7 +172,7 @@ static uint8 remoteDisplayProfileNodeAddrCharUserDesp[17] = "Node Address";
 static gattAttribute_t remoteDisplayProfileAttrTbl[] =
 {
   // Remote Display Profile Service
-  { 
+  {
     { ATT_BT_UUID_SIZE, primaryServiceUUID }, /* type */
     GATT_PERMIT_READ,                         /* permissions */
     0,                                        /* handle */
@@ -211,28 +211,28 @@ static gattAttribute_t remoteDisplayProfileAttrTbl[] =
         },
 
     // Node Report Interval Characteristic 1 Declaration
-    { 
+    {
       { ATT_BT_UUID_SIZE, characterUUID },
-      GATT_PERMIT_READ, 
+      GATT_PERMIT_READ,
       0,
       &remoteDisplayProfileNodeReportIntervalCharProps
     },
 
       // Node Report Interval Characteristic Value
-      { 
+      {
         { ATT_UUID_SIZE, remoteDisplayProfileNodeReportIntervalCharUUID },
-        GATT_PERMIT_READ | GATT_PERMIT_WRITE, 
-        0, 
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE,
+        0,
         &remoteDisplayProfileNodeReportIntervalCharVal
       },
 
       // Node Report Interval Characteristic User Description
-      { 
+      {
         { ATT_BT_UUID_SIZE, charUserDescUUID },
-        GATT_PERMIT_READ, 
-        0, 
+        GATT_PERMIT_READ,
+        0,
         remoteDisplayProfileNodeReportIntervalUserDesp
-      },      
+      },
 
     // Conc LED Toggle Characteristic 1 Declaration
     {
@@ -259,7 +259,7 @@ static gattAttribute_t remoteDisplayProfileAttrTbl[] =
       },
 
     // Node Address Characteristic Declaration
-    { 
+    {
       { ATT_BT_UUID_SIZE, characterUUID },
       GATT_PERMIT_READ | GATT_PERMIT_WRITE,
       0,
@@ -267,18 +267,18 @@ static gattAttribute_t remoteDisplayProfileAttrTbl[] =
     },
 
       // Node Address Characteristic Value
-      { 
+      {
         { ATT_UUID_SIZE, remoteDisplayProfilecNodeAddrCharUUID },
         GATT_PERMIT_AUTHEN_READ | GATT_PERMIT_AUTHEN_WRITE,
-        0, 
+        0,
         remoteDisplayProfileNodeAddrCharVal
       },
 
       // Node Address Characteristic User Description
-      { 
+      {
         { ATT_BT_UUID_SIZE, charUserDescUUID },
         GATT_PERMIT_READ |GATT_PERMIT_WRITE,
-        0, 
+        0,
         remoteDisplayProfileNodeAddrCharUserDesp
       },
 };
@@ -287,7 +287,7 @@ static gattAttribute_t remoteDisplayProfileAttrTbl[] =
  * LOCAL FUNCTIONS
  */
 static bStatus_t remoteDisplayProfile_ReadAttrCB(uint16_t connHandle,
-                                          gattAttribute_t *pAttr, 
+                                          gattAttribute_t *pAttr,
                                           uint8_t *pValue, uint16_t *pLen,
                                           uint16_t offset, uint16_t maxLen,
                                           uint8_t method);
@@ -301,12 +301,12 @@ static bStatus_t remoteDisplayProfile_WriteAttrCB(uint16_t connHandle,
  */
 
 // Remote Display Profile Service Callbacks
-// Note: When an operation on a characteristic requires authorization and 
-// pfnAuthorizeAttrCB is not defined for that characteristic's service, the 
-// Stack will report a status of ATT_ERR_UNLIKELY to the client.  When an 
-// operation on a characteristic requires authorization the Stack will call 
+// Note: When an operation on a characteristic requires authorization and
+// pfnAuthorizeAttrCB is not defined for that characteristic's service, the
+// Stack will report a status of ATT_ERR_UNLIKELY to the client.  When an
+// operation on a characteristic requires authorization the Stack will call
 // pfnAuthorizeAttrCB to check a client's authorization prior to calling
-// pfnReadAttrCB or pfnWriteAttrCB, so no checks for authorization need to be 
+// pfnReadAttrCB or pfnWriteAttrCB, so no checks for authorization need to be
 // made within these functions.
 CONST gattServiceCBs_t remoteDisplayProfileCBs =
 {
@@ -338,17 +338,17 @@ bStatus_t RemoteDisplay_AddService( uint32 services )
   remoteDisplayProfileNodeDataConfig = (gattCharCfg_t *)ICall_malloc( sizeof(gattCharCfg_t) *
                                                             MAX_NUM_BLE_CONNS );
   if ( remoteDisplayProfileNodeDataConfig == NULL )
-  {     
+  {
     return ( bleMemAllocError );
   }
-  
+
   // Initialize Client Characteristic Configuration attributes
   GATTServApp_InitCharCfg( LL_CONNHANDLE_INVALID, remoteDisplayProfileNodeDataConfig );
-  
+
   if ( services & RDPROFILE_SERVICE )
   {
     // Register GATT attribute list and CBs with GATT Server App
-    status = GATTServApp_RegisterService( remoteDisplayProfileAttrTbl, 
+    status = GATTServApp_RegisterService( remoteDisplayProfileAttrTbl,
                                           GATT_NUM_ATTRS( remoteDisplayProfileAttrTbl ),
                                           GATT_MAX_ENCRYPT_KEY_SIZE,
                                           &remoteDisplayProfileCBs );
@@ -364,7 +364,7 @@ bStatus_t RemoteDisplay_AddService( uint32 services )
 /*********************************************************************
  * @fn      SimpleProfile_RegisterAppCBs
  *
- * @brief   Registers the application callback function. Only call 
+ * @brief   Registers the application callback function. Only call
  *          this function once.
  *
  * @param   callbacks - pointer to application callbacks.
@@ -376,7 +376,7 @@ bStatus_t RemoteDisplay_RegisterAppCBs( remoteDisplayProfileCBs_t *appCallbacks 
   if ( appCallbacks )
   {
     remoteDisplayProfile_AppCBs = appCallbacks;
-    
+
     return ( SUCCESS );
   }
   else
@@ -393,8 +393,8 @@ bStatus_t RemoteDisplay_RegisterAppCBs( remoteDisplayProfileCBs_t *appCallbacks 
  * @param   param - Profile parameter ID
  * @param   len - length of data to write
  * @param   value - pointer to data to write.  This is dependent on
- *          the parameter ID and WILL be cast to the appropriate 
- *          data type (example: data type of uint16 will be cast to 
+ *          the parameter ID and WILL be cast to the appropriate
+ *          data type (example: data type of uint16 will be cast to
  *          uint16 pointer).
  *
  * @return  bStatus_t
@@ -443,7 +443,7 @@ bStatus_t RemoteDisplay_SetParameter( uint8 param, uint8 len, void *value )
       break;
 
     case RDPROFILE_NODE_ADDR_CHAR:
-      if ( len == RDPROFILE_NODE_ADDR_CHAR_LEN ) 
+      if ( len == RDPROFILE_NODE_ADDR_CHAR_LEN )
       {
         VOID memcpy( remoteDisplayProfileNodeAddrCharVal, value, RDPROFILE_NODE_ADDR_CHAR_LEN );
       }
@@ -452,12 +452,12 @@ bStatus_t RemoteDisplay_SetParameter( uint8 param, uint8 len, void *value )
         ret = bleInvalidRange;
       }
       break;
-      
+
     default:
       ret = INVALIDPARAMETER;
       break;
   }
-  
+
   return ( ret );
 }
 
@@ -468,8 +468,8 @@ bStatus_t RemoteDisplay_SetParameter( uint8 param, uint8 len, void *value )
  *
  * @param   param - Profile parameter ID
  * @param   value - pointer to data to put.  This is dependent on
- *          the parameter ID and WILL be cast to the appropriate 
- *          data type (example: data type of uint16 will be cast to 
+ *          the parameter ID and WILL be cast to the appropriate
+ *          data type (example: data type of uint16 will be cast to
  *          uint16 pointer).
  *
  * @return  bStatus_t
@@ -491,13 +491,13 @@ bStatus_t RemoteDisplay_GetParameter( uint8 param, void *value )
 
     case RDPROFILE_NODE_ADDR_CHAR:
       VOID memcpy( value, remoteDisplayProfileNodeAddrCharVal, RDPROFILE_NODE_ADDR_CHAR_LEN );
-      break;      
-      
+      break;
+
     default:
       ret = INVALIDPARAMETER;
       break;
   }
-  
+
   return ( ret );
 }
 
@@ -523,13 +523,13 @@ static bStatus_t remoteDisplayProfile_ReadAttrCB(uint16_t connHandle,
                                           uint8_t method)
 {
   bStatus_t status = SUCCESS;
-  
+
   // Make sure it's not a blob operation (no attributes in the profile are long)
   if ( offset > 0 )
   {
     return ( ATT_ERR_ATTR_NOT_LONG );
   }
- 
+
   if ( pAttr->type.len == ATT_UUID_SIZE )
   {
     if(!memcmp(pAttr->type.uuid, remoteDisplayProfileNodeReportIntervalCharUUID, pAttr->type.len) ||
@@ -588,7 +588,7 @@ static bStatus_t remoteDisplayProfile_WriteAttrCB(uint16_t connHandle,
 {
   bStatus_t status = SUCCESS;
   uint8 notifyApp = 0xFF;
-  
+
   if ( pAttr->type.len == ATT_UUID_SIZE )
   {
     if(!memcmp(pAttr->type.uuid, remoteDisplayProfileNodeReportIntervalCharUUID, pAttr->type.len))
@@ -688,9 +688,9 @@ static bStatus_t remoteDisplayProfile_WriteAttrCB(uint16_t connHandle,
   // If a characteristic value changed then callback function to notify application of change
   if ( (notifyApp != 0xFF ) && remoteDisplayProfile_AppCBs && remoteDisplayProfile_AppCBs->pfnRemoteDispalyProfileChange )
   {
-    remoteDisplayProfile_AppCBs->pfnRemoteDispalyProfileChange( notifyApp );  
+    remoteDisplayProfile_AppCBs->pfnRemoteDispalyProfileChange( notifyApp );
   }
-  
+
   return ( status );
 }
 

@@ -1,0 +1,16 @@
+{
+    "target": {
+        "Name": "LP_CC2654R10",
+        "Revision": [],
+        "Description": "CC2654R10 LP. Internal bias, differential output. 2.4 GHz frequency band.",
+        "DeviceName": "CC2654R10",
+        "DevicePackage": "VQFN 7x7",
+        "FrontEnd": "ID",
+        "PaSettings": "pasettings.json",
+        "RfDesign": "CC2642EM-7ID",
+        "DefaultCategory": "Settings",
+        "IoSettingsIdle": [],
+        "IoSettingsRx": [],
+        "IoSettingsTx": []
+    }
+}

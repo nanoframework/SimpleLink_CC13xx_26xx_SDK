@@ -64,7 +64,7 @@ ECDHCC26X1_Object ecdhCC26X1Objects[`countDef`];
  */
 const ECDHCC26X1_HWAttrs ecdhCC26X1HWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
-    {},
+    {0},
 % }
 };
 

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2020, Texas Instruments Incorporated
+ Copyright (c) 2015-2021, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -234,13 +234,13 @@ static bool extFlashPowerStandby(void)
 
     if (success)
     {
-        uint16_t i = 200;
+        volatile uint16_t i = 400;
 
         // Waking up of the device is manufacturer dependent.
         // for a Winond chip-set, once the request to wake up the flash has been
         // send, CS needs to stay high at least 3us (for Winbond part)
         // for chip-set like Macronix, it can take up to 35us.
-        while(i--);
+        for (i; i > 0; i--);
 
         if (extFlashWaitReady() != 0)
         {

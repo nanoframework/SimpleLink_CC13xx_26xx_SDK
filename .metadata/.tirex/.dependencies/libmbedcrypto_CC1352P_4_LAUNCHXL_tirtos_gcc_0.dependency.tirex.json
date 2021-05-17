@@ -3,7 +3,6 @@
         "files": [
             "+../../config/aes_alt.h -> config/aes_alt.h",
             "+../../config/ecjpake_alt.h -> config/ecjpake_alt.h",
-            "+../../config/mbedtls-config-cc1352-gcc.h -> config/mbedtls-config-cc1352-gcc.h",
             "+../../config/sha256_alt.h -> config/sha256_alt.h",
             "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/aes.c -> third_party/mbedtls/repo/library/aes.c",
             "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/aesni.c -> third_party/mbedtls/repo/library/aesni.c",
@@ -83,7 +82,8 @@
             "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/x509_csr.c -> third_party/mbedtls/repo/library/x509_csr.c",
             "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/x509write_crt.c -> third_party/mbedtls/repo/library/x509write_crt.c",
             "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/x509write_csr.c -> third_party/mbedtls/repo/library/x509write_csr.c",
-            "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/xtea.c -> third_party/mbedtls/repo/library/xtea.c"
+            "+../../../../../../../../third_party/openthread/third_party/mbedtls/repo/library/xtea.c -> third_party/mbedtls/repo/library/xtea.c",
+            "+../../config/mbedtls-config-cc1352-gcc.h -> config/mbedtls-config-cc1352-gcc.h"
         ]
     }
 ]

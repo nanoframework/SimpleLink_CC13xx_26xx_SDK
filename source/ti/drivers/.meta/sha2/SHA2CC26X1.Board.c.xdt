@@ -65,7 +65,7 @@ SHA2CC26X1_Object sha2CC26X1Objects[`countDef`];
  */
 const SHA2CC26X1_HWAttrs sha2CC26X1HWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
-    {},
+    {0},
 % }
 };
 

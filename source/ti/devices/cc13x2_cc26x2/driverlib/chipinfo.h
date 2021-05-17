@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       chipinfo.h
-*  Revised:        2020-10-22 14:03:07 +0200 (Thu, 22 Oct 2020)
-*  Revision:       59146
+*  Revised:        2020-11-30 13:49:16 +0100 (Mon, 30 Nov 2020)
+*  Revision:       59663
 *
 *  Description:    Collection of functions returning chip information.
 *
@@ -348,12 +348,19 @@ typedef enum {
    CHIP_TYPE_CC2652P       =  15,   //!< 15 means that this is a CC2652P chip.
    CHIP_TYPE_CC2652RB      =  16,   //!< 16 means that this is a CC2652RB chip.
    CHIP_TYPE_CC2652PB      =  17,   //!< 17 means that this is a CC2652PB chip.
+   CHIP_TYPE_CC1311R3      =  18,   //!< 18 means that this is a CC1311R3 chip.
+   CHIP_TYPE_CC1311P3      =  19,   //!< 19 means that this is a CC1311P3 chip.
+   CHIP_TYPE_CC2651R3      =  20,   //!< 20 means that this is a CC2651R3 chip.
+   CHIP_TYPE_CC2651P3      =  21,   //!< 21 means that this is a CC2651P3 chip.
+   CHIP_TYPE_CC2641R3      =  22,   //!< 22 means that this is a CC2641R3 chip.
    CHIP_TYPE_CC1312R7      =  23,   //!< 23 means that this is a CC1312R7 chip.
    CHIP_TYPE_unused1       =  24,   //!< 24 unused value
    CHIP_TYPE_CC1352R7      =  25,   //!< 25 means that this is a CC1352R7 chip.
    CHIP_TYPE_CC1352P7      =  26,   //!< 26 means that this is a CC1352P7 chip.
    CHIP_TYPE_CC2652R7      =  27,   //!< 27 means that this is a CC2652R7 chip.
    CHIP_TYPE_CC2652P7      =  28,   //!< 28 means that this is a CC2652P7 chip.
+   CHIP_TYPE_CC2672R3      =  37,   //!< 37 means that this is a CC2672R3 chip.
+   CHIP_TYPE_CC2672P3      =  38,   //!< 38 means that this is a CC2672P3 chip.
 } ChipType_t;
 
 //*****************************************************************************

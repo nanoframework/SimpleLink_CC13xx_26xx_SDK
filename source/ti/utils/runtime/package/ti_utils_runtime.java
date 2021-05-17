@@ -99,6 +99,14 @@ public class ti_utils_runtime
             sb.append("'lib/gcc/m4f/runtime_release.a',\n");
             sb.append("'lib/iar/m4f/runtime_debug.a',\n");
             sb.append("'lib/iar/m4f/runtime_release.a',\n");
+            sb.append("'lib/ccs/m4/runtime_debug.a',\n");
+            sb.append("'lib/ccs/m4/runtime_release.a',\n");
+            sb.append("'lib/ticlang/m4/runtime_debug.a',\n");
+            sb.append("'lib/ticlang/m4/runtime_release.a',\n");
+            sb.append("'lib/gcc/m4/runtime_debug.a',\n");
+            sb.append("'lib/gcc/m4/runtime_release.a',\n");
+            sb.append("'lib/iar/m4/runtime_debug.a',\n");
+            sb.append("'lib/iar/m4/runtime_release.a',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ccs/m4f/runtime_debug.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
@@ -109,6 +117,14 @@ public class ti_utils_runtime
             sb.append("['lib/gcc/m4f/runtime_release.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/iar/m4f/runtime_debug.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
             sb.append("['lib/iar/m4f/runtime_release.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/ccs/m4/runtime_debug.a', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/ccs/m4/runtime_release.a', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
+            sb.append("['lib/ticlang/m4/runtime_debug.a', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
+            sb.append("['lib/ticlang/m4/runtime_release.a', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
+            sb.append("['lib/gcc/m4/runtime_debug.a', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
+            sb.append("['lib/gcc/m4/runtime_release.a', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
+            sb.append("['lib/iar/m4/runtime_debug.a', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/iar/m4/runtime_release.a', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

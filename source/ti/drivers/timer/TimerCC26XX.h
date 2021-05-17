@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Texas Instruments Incorporated
+ * Copyright (c) 2019-2020, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,8 +74,6 @@ typedef enum {
     TimerCC26XX_timer32  = 0x0003,    /*!< Full width timer   */
 } TimerCC26XX_SubTimer;
 
-extern const Timer_FxnTable TimerCC26XX_fxnTable;
-
 /*!
  *  @brief TimerCC26XX Hardware Attributes
  *
@@ -102,6 +100,8 @@ extern const Timer_FxnTable TimerCC26XX_fxnTable;
  *  @endcode
  */
 typedef struct {
+    TIMER_BASE_HWATTRS
+
     /*! #GPTimerCC26XX_Config unit index (0A, 0B, 1A..) */
     uint8_t              gpTimerUnit;
 
@@ -116,14 +116,14 @@ typedef struct {
  *  The application must not access any member variables of this structure!
  */
 typedef struct {
+    TIMER_BASE_OBJECT
+
+    /* GPTimer handle used by Timer interface */
     GPTimerCC26XX_Handle   gptHandle;
-    SemaphoreP_Struct      semStruct;
-    SemaphoreP_Handle      semHandle;
-    Timer_CallBackFxn      callBack;
-    Timer_Mode             mode;
-    uint32_t               period;
-    bool                   isRunning;
+
+    /* Flag to show GPTimer is open */
     bool                   isOpen;
+
 } TimerCC26XX_Object;
 
 #ifdef __cplusplus

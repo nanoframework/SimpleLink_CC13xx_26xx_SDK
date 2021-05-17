@@ -376,7 +376,7 @@
                pFwTaskExecuteFuncTable:
 00a0 ---- 00b8                         dw          #adcSample/execute
                pFwTaskTerminateFuncTable:
-00a1 ---- 00f0                         dw          #adcSample/terminate
+00a1 ---- 00f2                         dw          #adcSample/terminate
 
                ; Run-time logging log requests and masks, one bit for each struct, one word for each task
                pRtlTaskLogReqTable:
@@ -432,7 +432,7 @@
                ;? // A3 corresponds to DIO26
                ;? adcSelectGpioInput(AUXIO_A_ADC_INPUT);
 00b3 ---- 7017                         ld          R7, #23
-00b4 ---- 14f1                         jsr         AdccompbSelectGpioInput
+00b4 ---- 14f3                         jsr         AdccompbSelectGpioInput
                ;?
                ;? // Schedule the first task
                ;? fwScheduleTask(1);
@@ -465,64 +465,66 @@
 00c7 ---- 0003                         ld          R0, #(ADI16_ADC_EN | ADI16_ADC_RESET_N)
 00c8 ---- 8b9e                         out         R0, [#IOP_ADISET_ADC]
 00c9 ---- 8b9e                         out         R0, [#IOP_ADISET_ADC]
+00ca ---- 8b9e                         out         R0, [#IOP_ADISET_ADC]
+00cb ---- 8b9e                         out         R0, [#IOP_ADISET_ADC]
                ;?
                ;? // Sample ADC
                ;? S16 adcValue;
                ;? adcGenManualTrigger();
-00ca ---- 6491                         iobset      #0, [#IOP_ANAIF_ADCTRIG]
+00cc ---- 6491                         iobset      #0, [#IOP_ANAIF_ADCTRIG]
                ;? adcReadFifo(adcValue);
-00cb ---- edb1                         wev1        #WEVSEL_ADC_FIFO_NOT_EMPTY
-00cc ---- 8990                         in          R0, [#IOP_ANAIF_ADCFIFO]
+00cd ---- edb1                         wev1        #WEVSEL_ADC_FIFO_NOT_EMPTY
+00ce ---- 8990                         in          R0, [#IOP_ANAIF_ADCFIFO]
                ;? output.adcValue = adcValue;
-00cd ---- 0cb0                         st          R0, [#adcSample/output/adcValue]
+00cf ---- 0cb0                         st          R0, [#adcSample/output/adcValue]
                ;?
                ;? //Disable ADC
                ;? adcDisable();
-00ce ---- 14fc                         jsr         AdcDisable
+00d0 ---- 14fe                         jsr         AdcDisable
                ;?
                ;? //Alert the driver if outside of the change mask
                ;? U16 adcMaskedBits = adcValue & cfg.changeMask;
-00cf ---- fd40                         ld          R7, R0
-00d0 ---- 18ae                         ld          R1, [#adcSample/cfg/changeMask]
-00d1 ---- fd01                         and         R7, R1
+00d1 ---- fd40                         ld          R7, R0
+00d2 ---- 18ae                         ld          R1, [#adcSample/cfg/changeMask]
+00d3 ---- fd01                         and         R7, R1
                ;? if (adcMaskedBits != state.oldAdcMaskedBits) {
-00d2 ---- 18b1                         ld          R1, [#adcSample/state/oldAdcMaskedBits]
-00d3 ---- fd29                         cmp         R7, R1
-00d4 ---- b606                         beq         /id0115
+00d4 ---- 18b1                         ld          R1, [#adcSample/state/oldAdcMaskedBits]
+00d5 ---- fd29                         cmp         R7, R1
+00d6 ---- b606                         beq         /id0115
                ;?     fwGenAlertInterrupt();
-00d5 ---- 18a4                             ld          R1, [#fwCtrlInt/bvTaskIoAlert]
-00d6 ---- 9201                             or          R1, #(1 << 0)
-00d7 ---- 1ca4                             st          R1, [#fwCtrlInt/bvTaskIoAlert]
+00d7 ---- 18a4                             ld          R1, [#fwCtrlInt/bvTaskIoAlert]
+00d8 ---- 9201                             or          R1, #(1 << 0)
+00d9 ---- 1ca4                             st          R1, [#fwCtrlInt/bvTaskIoAlert]
                ;?     state.samplesSinceLastReport = 0;
-00d8 ---- 1000                             ld          R1, #0
-00d9 ---- 1cb2                             st          R1, [#adcSample/state/samplesSinceLastReport]
+00da ---- 1000                             ld          R1, #0
+00db ---- 1cb2                             st          R1, [#adcSample/state/samplesSinceLastReport]
                ;? } else {
-00da ---- 04de                         jmp         /id0118
+00dc ---- 04e0                         jmp         /id0118
                /id0115:
                ;?     state.samplesSinceLastReport = state.samplesSinceLastReport + 1;
-00db ---- 18b2                             ld          R1, [#adcSample/state/samplesSinceLastReport]
-00dc ---- 9801                             add         R1, #1
-00dd ---- 1cb2                             st          R1, [#adcSample/state/samplesSinceLastReport]
+00dd ---- 18b2                             ld          R1, [#adcSample/state/samplesSinceLastReport]
+00de ---- 9801                             add         R1, #1
+00df ---- 1cb2                             st          R1, [#adcSample/state/samplesSinceLastReport]
                ;? }
                /id0118:
                ;?
                ;? // Alert driver if minimum report interval has expired
                ;? if(cfg.minReportInterval != 0){
-00de ---- 18af                         ld          R1, [#adcSample/cfg/minReportInterval]
-00df ---- 9a00                         cmp         R1, #0
-00e0 ---- b609                         beq         /id0122
+00e0 ---- 18af                         ld          R1, [#adcSample/cfg/minReportInterval]
+00e1 ---- 9a00                         cmp         R1, #0
+00e2 ---- b609                         beq         /id0122
                ;?     if(state.samplesSinceLastReport >= cfg.minReportInterval){
-00e1 ---- 18b2                             ld          R1, [#adcSample/state/samplesSinceLastReport]
-00e2 ---- 78af                             ld          R7, [#adcSample/cfg/minReportInterval]
-00e3 ---- 9d2f                             cmp         R1, R7
-00e4 ---- ae05                             bltu        /id0124
+00e3 ---- 18b2                             ld          R1, [#adcSample/state/samplesSinceLastReport]
+00e4 ---- 78af                             ld          R7, [#adcSample/cfg/minReportInterval]
+00e5 ---- 9d2f                             cmp         R1, R7
+00e6 ---- ae05                             bltu        /id0124
                ;?         fwGenAlertInterrupt();
-00e5 ---- 18a4                                 ld          R1, [#fwCtrlInt/bvTaskIoAlert]
-00e6 ---- 9201                                 or          R1, #(1 << 0)
-00e7 ---- 1ca4                                 st          R1, [#fwCtrlInt/bvTaskIoAlert]
+00e7 ---- 18a4                                 ld          R1, [#fwCtrlInt/bvTaskIoAlert]
+00e8 ---- 9201                                 or          R1, #(1 << 0)
+00e9 ---- 1ca4                                 st          R1, [#fwCtrlInt/bvTaskIoAlert]
                ;?         state.samplesSinceLastReport = 0;
-00e8 ---- 1000                                 ld          R1, #0
-00e9 ---- 1cb2                                 st          R1, [#adcSample/state/samplesSinceLastReport]
+00ea ---- 1000                                 ld          R1, #0
+00eb ---- 1cb2                                 st          R1, [#adcSample/state/samplesSinceLastReport]
                ;?     }
                /id0124:
                ;? }
@@ -530,16 +532,16 @@
                ;?
                ;? //Save old masked ADC value
                ;? state.oldAdcMaskedBits = adcValue & cfg.changeMask;
-00ea ---- 18ae                         ld          R1, [#adcSample/cfg/changeMask]
-00eb ---- 8d01                         and         R0, R1
-00ec ---- 0cb1                         st          R0, [#adcSample/state/oldAdcMaskedBits]
+00ec ---- 18ae                         ld          R1, [#adcSample/cfg/changeMask]
+00ed ---- 8d01                         and         R0, R1
+00ee ---- 0cb1                         st          R0, [#adcSample/state/oldAdcMaskedBits]
                ;?
                ;? //Schedule the next execution
                ;? fwScheduleTask(1);
-00ed ---- 0001                         ld          R0, #1
-00ee ---- 0c9e                         st          R0, [#(pFwTaskExecuteScheduleTable + 0)]
+00ef ---- 0001                         ld          R0, #1
+00f0 ---- 0c9e                         st          R0, [#(pFwTaskExecuteScheduleTable + 0)]
                adcSample/executeDone:
-00ef ---- adb7                         rts
+00f1 ---- adb7                         rts
 
 
 
@@ -547,7 +549,7 @@
                adcSample/terminate:
                ;?
                adcSample/terminateDone:
-00f0 ---- adb7                         rts
+00f2 ---- adb7                         rts
                .segment end "Task: ADC Sample"
 
 
@@ -559,22 +561,22 @@
                ;     R6, R7
                AdccompbSelectGpioInput:
                                        ; Make sure that the AUX I/O index is valid
-00f1 ---- f8ed                         add         R7, #-ADI_ANALOG_MUX_AUXIO_BASE_INDEX
-00f2 ---- f007                         and         R7, #0x0007
+00f3 ---- f8ed                         add         R7, #-ADI_ANALOG_MUX_AUXIO_BASE_INDEX
+00f4 ---- f007                         and         R7, #0x0007
 
                                        ; Disconnect all signals
-00f3 86ff 63f8                         ld          R6, #(BV_ADI16_MUX2_ADCCOMPB_IN | BV_ADI16_MUX3_ADCCOMPB_IN)
-00f5 ---- eba3                         out         R6, [#IOP_ADICLR_MUX2_MUX3]
+00f5 86ff 63f8                         ld          R6, #(BV_ADI16_MUX2_ADCCOMPB_IN | BV_ADI16_MUX3_ADCCOMPB_IN)
+00f7 ---- eba3                         out         R6, [#IOP_ADICLR_MUX2_MUX3]
 
                                        ; Connect the specified GPIO
-00f6 8680 6000                         ld          R6, #ADI16_MUX3_ADCCOMPB_IN_AUXIO0
-00f8 ---- ed8f                         lsr         R6, R7
-00f9 ---- eb9b                         out         R6, [#IOP_ADISET_MUX2_MUX3]
+00f8 8680 6000                         ld          R6, #ADI16_MUX3_ADCCOMPB_IN_AUXIO0
+00fa ---- ed8f                         lsr         R6, R7
+00fb ---- eb9b                         out         R6, [#IOP_ADISET_MUX2_MUX3]
 
                                        ; Flush the ADI interface
-00fa ---- eb9b                         out         R6, [#IOP_ADISET_MUX2_MUX3]
+00fc ---- eb9b                         out         R6, [#IOP_ADISET_MUX2_MUX3]
 
-00fb ---- adb7                         rts
+00fd ---- adb7                         rts
 
 
 
@@ -583,24 +585,24 @@
                ;     R7
                AdcDisable:
                                        ; Disable the ADC reference
-00fc ---- 7079                         ld          R7, #((ADI16_ADCREF_EN | ADI16_ADCREF_REF_ON_IDLE) | (ADI16_ADCREF_SRC | (ADI16_ADCREF_EXT | ADI16_ADCREF_IOMUX)))
-00fd ---- fba7                         out         R7, [#IOP_ADICLR_ADCREF]
+00fe ---- 7079                         ld          R7, #((ADI16_ADCREF_EN | ADI16_ADCREF_REF_ON_IDLE) | (ADI16_ADCREF_SRC | (ADI16_ADCREF_EXT | ADI16_ADCREF_IOMUX)))
+00ff ---- fba7                         out         R7, [#IOP_ADICLR_ADCREF]
 
                                        ; Assert reset and disable the ADC
-00fe ---- 71fb                         ld          R7, #((ADI16_ADC_EN | ADI16_ADC_RESET_N) | (BV_ADI16_ADC_SMPL_CYCLE_EXP | (BV_ADI16_ADC_SMPL_MODE | ADI16_ADC_SCALE_DIS)))
-00ff ---- fba6                         out         R7, [#IOP_ADICLR_ADC]
+0100 ---- 71fb                         ld          R7, #((ADI16_ADC_EN | ADI16_ADC_RESET_N) | (BV_ADI16_ADC_SMPL_CYCLE_EXP | (BV_ADI16_ADC_SMPL_MODE | ADI16_ADC_SCALE_DIS)))
+0101 ---- fba6                         out         R7, [#IOP_ADICLR_ADC]
 
                                        ; Flush the ADI interface
-0100 ---- fba6                         out         R7, [#IOP_ADICLR_ADC]
+0102 ---- fba6                         out         R7, [#IOP_ADICLR_ADC]
 
                                        ; Disable the ADC clock (no need to wait since IOB_SYSIF_ADCCLKCTL_ACK goes low immediately)
-0101 ---- 4467                         iobclr      #IOB_SYSIF_ADCCLKCTL_REQ, [#IOP_SYSIF_ADCCLKCTL]
+0103 ---- 4467                         iobclr      #IOB_SYSIF_ADCCLKCTL_REQ, [#IOP_SYSIF_ADCCLKCTL]
 
                                        ; Disable the ADC data interface
-0102 ---- 448e                         iobclr      #0, [#IOP_ANAIF_ADCCTL]
+0104 ---- 448e                         iobclr      #0, [#IOP_ANAIF_ADCCTL]
 
-0103 ---- adb7                         rts
+0105 ---- adb7                         rts
                .segment end "Procedure Library"
 
 
-; Generated on 2019-09-30 11:33:18.740
+; Generated on 2021-02-04 

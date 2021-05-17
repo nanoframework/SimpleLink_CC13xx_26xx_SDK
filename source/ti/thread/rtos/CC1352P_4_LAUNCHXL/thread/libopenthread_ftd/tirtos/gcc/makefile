@@ -37,9 +37,9 @@ CFLAGS = -I../.. \
     -Wshadow \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-gcc.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc1352-gcc-ftd.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -I${WorkspaceDirPath}/libopenthread_ftd_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \
@@ -77,9 +77,9 @@ CPPFLAGS = -I../.. \
     -Wshadow \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc1352-gcc.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc1352-gcc-ftd.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc1352-config-ide.h"' \
     -I${WorkspaceDirPath}/libopenthread_ftd_CC1352P_4_LAUNCHXL_tirtos_gcc/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \

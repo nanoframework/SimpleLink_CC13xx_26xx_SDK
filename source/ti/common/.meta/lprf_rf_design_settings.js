@@ -77,8 +77,8 @@ const boardSpecificRfDesignSettings = {
     CC26X2R1_LAUNCHXL_RF_DESIGN_SETTINGS: {
         rfDesign: "LAUNCHXL-CC26X2R1"
     },
-    CC2652RB_LAUNCHXL_RF_DESIGN_SETTINGS: {
-        rfDesign: "LAUNCHXL-CC2652RB"
+    LP_CC2652RB_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2652RB"
     },
     LP_CC2652RSIP_RF_DESIGN_SETTINGS: {
         rfDesign: "LP_CC2652RSIP"

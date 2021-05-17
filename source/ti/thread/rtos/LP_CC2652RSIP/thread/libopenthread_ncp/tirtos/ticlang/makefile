@@ -28,9 +28,9 @@ CFLAGS = -I../.. \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-ticlang.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_LP_CC2652RSIP_tirtos_ticlang/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc2652-ticlang-ncp.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -I${WorkspaceDirPath}/libopenthread_ncp_LP_CC2652RSIP_tirtos_ticlang/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \
@@ -59,9 +59,9 @@ CPPFLAGS = -I../.. \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc2652-ticlang.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_LP_CC2652RSIP_tirtos_ticlang/config \
-    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_CONFIG_FILE='"openthread-config-cc2652-ticlang-ncp.h"' \
+    -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc2652-config-ide.h"' \
     -I${WorkspaceDirPath}/libopenthread_ncp_LP_CC2652RSIP_tirtos_ticlang/config \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src/core \
     -I${COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR}/source/third_party/openthread/src \

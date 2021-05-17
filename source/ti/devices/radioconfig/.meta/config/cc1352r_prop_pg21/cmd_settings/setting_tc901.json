@@ -144,7 +144,10 @@
                 ],
                 "OverrideField": {
                     "_name": "pRegOverride",
-                    "Block": "override_tc901.json"
+                    "Block": [
+                        "override_tc901.json",
+                        "override_hposc.json"
+                    ]
                 }
             },
             {

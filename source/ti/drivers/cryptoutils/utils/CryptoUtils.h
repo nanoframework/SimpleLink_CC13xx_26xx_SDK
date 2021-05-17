@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -113,6 +113,18 @@ bool CryptoUtils_buffersMatchWordAligned(const uint32_t *buffer0,
  *  @retval false               The buffer contained at least on non-zero byte
  */
 bool CryptoUtils_isBufferAllZeros(const void *buffer, size_t bufferByteLength);
+
+/**
+ *  @brief  Copies @c val into the first @c count bytes of the buffer
+ *          pointed to by @c dest.
+ *
+ *  @param  dest                Pointer to destination buffer
+ *  @param  destSize            Size of destination buffer in bytes
+ *  @param  val                 Fill byte value
+ *  @param  count               Number of bytes to fill
+ *
+ */
+void CryptoUtils_memset(void *dest, size_t destSize, uint8_t val, size_t count);
 
 /**
  *  @brief Reverses the byte order in a buffer of a given length
