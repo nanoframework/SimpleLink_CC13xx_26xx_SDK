@@ -71,6 +71,31 @@ const commonRadioConfig = system.getScript("/ti/devices/radioconfig/"
 const ParameterHandler = system.getScript("/ti/devices/radioconfig/"
 + "parameter_handler.js");
 
+/* Structure for Coex config */
+const coexConfig = {};
+
+/* Array of level options */
+const coexLevelOptions = [
+    {
+        name: 0,
+        displayName: "Low"
+    },
+    {
+        name: 1,
+        displayName: "High"
+    }
+];
+
+/* Map option to enum name */
+const priorityEnumLookup = {
+    0: "RF_PriorityCoexLow",
+    1: "RF_PriorityCoexHigh"
+};
+const requestEnumLookup = {
+    0: "RF_RequestCoexNoAssertRx",
+    1: "RF_RequestCoexAssertRx"
+};
+
 // Configurables for the RF Configuration module
 const config = {
     name: "radioSettings",
@@ -129,6 +154,98 @@ const config = {
             readOnly: Docs.channelPage.readOnly,
             description: Docs.channelPage.description,
             longDescription: Docs.channelPage.longDescription
+        },
+        {
+            name: "coexMode",
+            displayName: Docs.coex.enable.displayName,
+            default: "coexModeDisabled",
+            description: Docs.coex.enable.description,
+            longDescription: Docs.coex.enable.longDescription,
+            getDisabledOptions: getDisabledCoexModeOptions(),
+            options: [
+                {
+                    name: "coexModeDisabled",
+                    displayName: "Disabled"
+                },
+                {
+                    name: "coexMode2Wire",
+                    displayName: "2-Wire"
+                },
+                {
+                    name: "coexMode3Wire",
+                    displayName: "3-Wire"
+                }
+            ],
+            onChange: onCoexEnableChange
+        },
+        {
+            name: "coexUseCaseConfigGroup",
+            displayName: Docs.coex.useCaseConfigGroupIeee.displayName,
+            collapsed: true,
+            config: [
+                {
+                    name: "ieeeIniGroup",
+                    displayName:
+                        Docs.coex.useCaseConfigGroupIeee.ini.displayName,
+                    collapsed: false,
+                    config: [
+                        {
+                            name: "ieeeIniDefaultPriority",
+                            displayName: Docs.coex.defaultPriority.displayName,
+                            description: Docs.coex.defaultPriority.description,
+                            longDescription:
+                                Docs.coex.defaultPriority.longDescription,
+                            hidden: true,
+                            default: 0,
+                            options: coexLevelOptions,
+                            onChange: updateCoexConfig
+                        },
+                        {
+                            name: "ieeeIniAssertRequestForRx",
+                            displayName:
+                                Docs.coex.assertRequestForRx.displayName,
+                            description:
+                                Docs.coex.assertRequestForRx.description,
+                            longDescription:
+                                Docs.coex.assertRequestForRx.longDescription,
+                            hidden: true,
+                            default: true,
+                            onChange: updateCoexConfig
+                        }
+                    ]
+                },
+                {
+                    name: "ieeeConGroup",
+                    displayName:
+                        Docs.coex.useCaseConfigGroupIeee.con.displayName,
+                    collapsed: false,
+                    config: [
+                        {
+                            name: "ieeeConDefaultPriority",
+                            displayName: Docs.coex.defaultPriority.displayName,
+                            description: Docs.coex.defaultPriority.description,
+                            longDescription:
+                                Docs.coex.defaultPriority.longDescription,
+                            hidden: true,
+                            default: 0,
+                            options: coexLevelOptions,
+                            onChange: updateCoexConfig
+                        },
+                        {
+                            name: "ieeeConAssertRequestForRx",
+                            displayName:
+                                Docs.coex.assertRequestForRx.displayName,
+                            description:
+                                Docs.coex.assertRequestForRx.description,
+                            longDescription:
+                                Docs.coex.assertRequestForRx.longDescription,
+                            hidden: true,
+                            default: true,
+                            onChange: updateCoexConfig
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
@@ -138,6 +255,34 @@ const config = {
  Radio Group-Specific Functions
  *******************************************************************************
  */
+
+function onCoexEnableChange(inst, ui)
+{
+    const coexConfigs = Object.keys(ui).filter((key) => (key.includes("ieeeIni")
+        || key.includes("ieeeCon")));
+
+    coexConfigs.forEach((cfgName) =>
+    {
+        setRFConfigHiddenState(inst, ui, cfgName);
+    });
+
+    updateCoexConfig(inst);
+}
+
+function updateCoexConfig(inst)
+{
+    /* IEEE Use Case Config info */
+    coexConfig.ieeeInitiator = {
+        defaultPriority: priorityEnumLookup[inst.ieeeIniDefaultPriority],
+        assertRequestForRx:
+            requestEnumLookup[Number(inst.ieeeIniAssertRequestForRx)]
+    };
+    coexConfig.ieeeConnected = {
+        defaultPriority: priorityEnumLookup[inst.ieeeConDefaultPriority],
+        assertRequestForRx:
+        requestEnumLookup[Number(inst.ieeeConAssertRequestForRx)]
+    };
+}
 
 /*
  * ======== getRfDesignOptions ========
@@ -202,6 +347,14 @@ function getRfDesignOptions()
     else if(deviceId === "CC2652R7RGZ")
     {
         newRfDesignOptions = [{name: "LP_CC2652R7"}];
+    }
+    else if(deviceId === "CC2651R3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651R3"}];
+    }
+    else if(deviceId === "CC2651P3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651P3"}];
     }
     else
     {
@@ -445,7 +598,16 @@ function getRFConfigHiddenState(inst, cfgName)
             isVisible = !isCoPProject;
             break;
         }
+        case "ieeeIniDefaultPriority":
+        case "ieeeIniAssertRequestForRx":
+        case "ieeeConDefaultPriority":
+        case "ieeeConAssertRequestForRx":
+        {
+            isVisible = (inst.coexMode === "coexMode3Wire");
+            break;
+        }
         case "rfDesign":
+        case "coexMode":
         default:
         {
             isVisible = true;
@@ -531,6 +693,46 @@ function getSafeFreqSub1(inst)
 }
 
 /*
+ *  ======== isCoexEnabled ========
+ *  Check whether coexistence is enabled
+ *
+ * @returns Bool - true if coex enabled in 15.4 module, false otherwise
+ */
+function isCoexEnabled(inst)
+{
+    return inst.coexMode !== "coexModeDisabled";
+}
+
+/*
+ *  ======== getDisabledCoexModeOptions ========
+ *  Generates a list of options that should be disabled in the coex
+ *  drop-down
+ *
+ * @returns Array - array of strings that should be disabled
+ */
+function getDisabledCoexModeOptions()
+{
+    return(inst) =>
+    {
+        const disabledOptions = [];
+        if(inst.freqBand !== "freqBand24")
+        {
+            const disableReason = "RF coexistence only supported on 2.4 GHz";
+            disabledOptions.push({
+                name: "coexMode2Wire",
+                reason: disableReason
+            });
+
+            disabledOptions.push({
+                name: "coexMode3Wire",
+                reason: disableReason
+            });
+        }
+        return(disabledOptions);
+    };
+}
+
+/*
  * ======== validate ========
  * Validate this inst's configuration
  *
@@ -561,6 +763,23 @@ function validate(inst, validation)
         validation.logError(`Must match Based On RF Design setting in the \
             ${system.getReference(rfDesign, "rfDesign")} module`, inst,
         "rfDesign");
+    }
+
+    // Get the RF module to verify that RF Coexistence configs match
+    const rf = system.modules["/ti/drivers/RF"].$static;
+
+    if(isCoexEnabled(inst) && inst.freqBand !== "freqBand24")
+    {
+        validation.logError(`RF coexistence only supported on 2.4 GHz`, inst,
+            "coexMode");
+    }
+    else if((!isCoexEnabled(inst) && rf.coexEnable)
+        || (isCoexEnabled(inst) && (!rf.coexEnable
+        || rf.coexMode !== inst.coexMode)))
+    {
+        validation.logError(`Must match RF coexistence configuration in the \
+            ${system.getReference(rf, "coexEnable")} module`, inst,
+        "coexMode");
     }
 }
 
@@ -735,6 +954,16 @@ function moduleInstances(inst)
         });
     }
 
+    // Pull module for ti_154stack_config.c generation in all 2.4GHz examples
+    if(inst.freqBand === "freqBand24")
+    {
+        dependencyModule.push({
+            name: "coexSettings",
+            moduleName: "/ti/ti154stack/rf_config/ti154stack_coex_mod.js",
+            group: "coexUseCaseConfigGroup"
+        });
+    }
+
     return(dependencyModule);
 }
 
@@ -748,5 +977,10 @@ exports = {
     setFreqBandReadOnlyState: setFreqBandReadOnlyState,
     setRFConfigHiddenState: setRFConfigHiddenState,
     setAllRFConfigsHiddenState: setAllRFConfigsHiddenState,
-    getRFConfigHiddenState: getRFConfigHiddenState
+    getRFConfigHiddenState: getRFConfigHiddenState,
+    getCoexConfigIeee: function()
+    {
+        return coexConfig;
+    },
+    isCoexEnabled: isCoexEnabled
 };

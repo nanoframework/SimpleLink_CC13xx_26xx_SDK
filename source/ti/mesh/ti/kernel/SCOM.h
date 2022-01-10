@@ -129,7 +129,7 @@ extern void SCOM_enqueue(SCOM_Handle scom, SCOM_Elem *elem);
  *
  *  @return Pointer the first elem in the linked list or NULL if empty
  */
-extern SCOM_Elem *SCOM_get(SCOM_Handle scom, uint32_t timeout);
+extern SCOM_Elem *SCOM_get(SCOM_Handle scom, k_timeout_t timeout);
 
 /*!
  *  @brief  Function to atomically push an elem onto the beginning of a linked list

@@ -6,7 +6,7 @@
         with the CC13x2 Bluetooth Low Energy Protocol Stack.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -419,7 +419,7 @@ static uint8_t numPendingMsgs = 0;
 static bool oadWaitReboot = false;
 #endif
 
-#ifdef LPSTK
+#if defined(LPSTK) && defined(DMM_SENSOR)
 // Flag to indicate that OAD is in progress
 static bool oad_in_progress = FALSE;
 #endif /* LPSTK */
@@ -1062,7 +1062,7 @@ static void RemoteDisplay_init(void)
       OAD_register(&RemoteDisplay_oadCBs);
   }
 #endif
-#ifdef LPSTK
+#if defined(LPSTK) && defined(DMM_SENSOR)
     /*
      * NOTE!!
      * OAD_open() must be called before the LPSTK sensors are initialized because there
@@ -1149,7 +1149,7 @@ static void RemoteDisplay_taskFxn(UArg a0, UArg a1)
       // OAD events
       if(events & OAD_QUEUE_EVT)
       {
-#ifdef LPSTK
+#if defined(LPSTK) && defined(DMM_SENSOR)
           if (oad_in_progress == FALSE)
           {
               oad_in_progress = TRUE;
@@ -1163,6 +1163,16 @@ static void RemoteDisplay_taskFxn(UArg a0, UArg a1)
                *    as there will be no sensor profile communications
                */
               shutDownSensors(LPSTK_ACCELEROMETER);
+
+              /*
+               * Reset the base configuration of the SPI pins. The sensor
+               * controller interface files will have modified the config
+               * for accelerometer usage.
+               */
+              GPIO_resetConfig(CONFIG_GPIO_SPI_SS);
+              GPIO_resetConfig(CONFIG_PIN_SPI_1_SCLK);
+              GPIO_resetConfig(CONFIG_PIN_SPI_1_MOSI);
+              GPIO_resetConfig(CONFIG_PIN_SPI_1_MISO);
           }
 #endif /* LPSTK */
           // update DMM policy
@@ -1196,9 +1206,6 @@ static void RemoteDisplay_taskFxn(UArg a0, UArg a1)
 #ifndef CUI_DISABLE
               CUI_statusLinePrintf(remoteDisplayCuiHndl, rdStatusLineOad, CUI_COLOR_GREEN "Completed" CUI_COLOR_RESET);
 #endif /* CUI_DISABLE */
-#ifdef LPSTK
-              oad_in_progress = FALSE;
-#endif /* LPSTK */
           }
 #ifndef CUI_DISABLE
           else if (status == OAD_SUCCESS)
@@ -1229,6 +1236,10 @@ static void RemoteDisplay_taskFxn(UArg a0, UArg a1)
       {
           // Register for L2CAP Flow Control Events
           L2CAP_RegisterFlowCtrlTask(selfEntity);
+
+#if defined(LPSTK) && defined(DMM_SENSOR)
+          oad_in_progress = FALSE;
+#endif /* LPSTK */
       }
 #endif /* DMM_OAD */
     }

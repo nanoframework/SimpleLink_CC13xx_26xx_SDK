@@ -5,7 +5,7 @@
  @brief NPI BLE HCI Subsystem
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

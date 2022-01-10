@@ -291,71 +291,83 @@ function filterHardware(component)
 function moduleInstances(inst)
 {
     let pinInstances = new Array();
+    let shortName = inst.$name.replace("CONFIG_", "");
 
     if (inst.dataDirection != "Receive Only") {
         pinInstances.push(
             {
                 name: "txPinInstance",
-                displayName: "TX PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "TX configuration when not in use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART2",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "txPin",
-                        parentSignalDisplayName: "TX",
-                        mode: "Output",
-                        outputState: "Low",
-                        pull: "None" }
+                requiredArgs: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "txPin",
+                    parentSignalDisplayName: "TX"
+                },
+                args: {
+                    $name: "CONFIG_GPIO_" + shortName + "_TX",
+                    initialOutputState: "High",
+                    mode: "Output",
+                    pull: "None"
+                }
             }
         );
+        if (inst.flowControl) {
+            pinInstances.push({
+                name: "ctsPinInstance",
+                displayName: "CTS configuration when not in use",
+                moduleName: "/ti/drivers/GPIO",
+                collapsed: true,
+                requiredArgs: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "ctsPin",
+                    parentSignalDisplayName: "CTS"
+                },
+                args: {
+                    $name: "CONFIG_GPIO_" + shortName + "_CTS",
+                    mode: "Input",
+                    pull: "Pull Down"
+                }
+            });
+        }
     }
 
     if (inst.dataDirection != "Send Only") {
         pinInstances.push({
                 name: "rxPinInstance",
-                displayName: "RX PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "RX configuration when not in use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART2",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "rxPin",
-                        parentSignalDisplayName: "RX",
-                        mode: "Input",
-                        pull: "Pull Down" }
+                requiredArgs: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "rxPin",
+                    parentSignalDisplayName: "RX"
+                },
+                args: {
+                    $name: "CONFIG_GPIO_" + shortName + "_RX",
+                    mode: "Input",
+                    pull: "Pull Down"
+                }
             }
         );
-    }
-
-    if (inst.flowControl) {
-
-        if (inst.dataDirection != "Receive Only") {
-            pinInstances.push({
-                name: "ctsPinInstance",
-                displayName: "CTS PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
-                collapsed: true,
-                args: { parentMod: "/ti/drivers/UART2",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "ctsPin",
-                        parentSignalDisplayName: "CTS",
-                        mode: "Input",
-                        pull: "Pull Down" }
-            });
-        }
-
-        if (inst.dataDirection != "Send Only") {
+        if (inst.flowControl) {
             pinInstances.push({
                 name: "rtsPinInstance",
-                displayName: "RTS PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "RTS configuration when not in use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART2",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "rtsPin",
-                        parentSignalDisplayName: "RTS",
-                        mode: "Output",
-                        outputState: "Low",
-                        pull: "None" }
+                requiredArgs: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "rtsPin",
+                    parentSignalDisplayName: "RTS"
+                },
+                args: {
+                    $name: "CONFIG_GPIO_" + shortName + "_RTS",
+                    initialOutputState: "Low",
+                    mode: "Output",
+                    pull: "None"
+                }
             });
         }
     }

@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -607,12 +607,20 @@ typedef struct
   uint8_t status;         //!< Event status
 } GapAdv_periodicAdvEvt_t;
 
+/// @cond NODOC
 typedef struct
 {
   osal_event_hdr_t hdr;
   uint8_t opcode;
   uint8_t dataType;
-} gapAdvDataUpdateEvent_t;
+} GapAdv_dataUpdateEvent_t;
+
+typedef struct
+{
+  osal_event_hdr_t hdr;
+  uint8_t opcode;
+} GapAv_setAdvStatusDoneEvent_t;
+/// @endcond //NODOC
 
 /** @} End GapAdv_Structs */
 

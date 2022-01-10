@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,6 @@
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/dpl/SemaphoreP.h>
 #include <ti/drivers/UART2.h>
-#include <ti/drivers/pin/PINCC26XX.h>
 #include <ti/drivers/dma/UDMACC26XX.h>
 
 #ifdef __cplusplus
@@ -128,8 +127,8 @@ typedef enum {
  *          .flowControl  = UART2_FLOWCTRL_NONE,
  *          .rxPin        = IOID_2,
  *          .txPin        = IOID_3,
- *          .ctsPin       = PIN_UNASSIGNED,
- *          .rtsPin       = PIN_UNASSIGNED,
+ *          .ctsPin       = GPIO_INVALID_INDEX,
+ *          .rtsPin       = GPIO_INVALID_INDEX,
  *          .rxChannelMask  = 1 << UDMA_CHAN_UART0_RX,
  *          .txChannelMask  = 1 << UDMA_CHAN_UART0_TX,
  *          .txIntFifoThr = UART2CC26X2_FIFO_THRESHOLD_1_8,
@@ -140,10 +139,10 @@ typedef enum {
  *          .intNum       = INT_UART1_COMB,
  *          .intPriority  = (~0),
  *          .flowControl  = UART2_FLOWCTRL_NONE,
- *          .rxPin        = PIN_UNASSIGNED,
- *          .txPin        = PIN_UNASSIGNED,
- *          .ctsPin       = PIN_UNASSIGNED,
- *          .rtsPin       = PIN_UNASSIGNED,
+ *          .rxPin        = GPIO_INVALID_INDEX,
+ *          .txPin        = GPIO_INVALID_INDEX,
+ *          .ctsPin       = GPIO_INVALID_INDEX,
+ *          .rtsPin       = GPIO_INVALID_INDEX,
  *          .rxChannelMask  = 1 << UDMA_CHAN_UART1_RX,
  *          .txChannelMask  = 1 << UDMA_CHAN_UART1_TX,
  *          .txIntFifoThr = UART2CC26X2_FIFO_THRESHOLD_1_8,
@@ -158,15 +157,17 @@ typedef enum {
 
 typedef struct {
     UART2_BASE_HWATTRS
-    
-    /*! Mask for UDMA channel number for RX data (1 << channel number) */
-    uint32_t        rxChannelMask;
-    /*! Mask for UDMA channel number for TX data (1 << channel number) */
-    uint32_t        txChannelMask;
-    /*! UART TX interrupt FIFO threshold select */
-    UART2CC26X2_FifoThreshold txIntFifoThr;
-    /*! UART RX interrupt FIFO threshold select */
-    UART2CC26X2_FifoThreshold rxIntFifoThr;
+    volatile tDMAControlTable   *dmaTxTableEntryPri;    /*! uDMA controlTable primary tx entry */
+    volatile tDMAControlTable   *dmaRxTableEntryPri;    /*! uDMA controlTable primary rx entry */
+    uint32_t                    txChannelMask;          /*! Mask for uDMA tx channel number (1 << channel number) */
+    uint32_t                    rxChannelMask;          /*! Mask for uDMA rx channel number (1 << channel number) */
+    PowerCC26XX_Resource        powerId;                /*! Power driver ID of the UART instance */
+    int32_t                     txPinMux;               /*! Tx PIN mux value */
+    int32_t                     rxPinMux;               /*! Tx PIN mux value */
+    int32_t                     ctsPinMux;              /*! CTS PIN mux value for flow control */
+    int32_t                     rtsPinMux;              /*! RTS PIN mux value for flow control */
+    UART2CC26X2_FifoThreshold   txIntFifoThr;           /*! UART TX interrupt FIFO threshold select */
+    UART2CC26X2_FifoThreshold   rxIntFifoThr;           /*! UART RX interrupt FIFO threshold select */
 } UART2CC26X2_HWAttrs;
 
 /*!
@@ -177,17 +178,8 @@ typedef struct {
 typedef struct {
     UART2_BASE_OBJECT
 
-    UDMACC26XX_Handle    udmaHandle; /* For setting power dependency */
-
-    volatile tDMAControlTable    *rxDmaEntry;
-    volatile tDMAControlTable    *txDmaEntry;
-    
-    /* PIN driver state object and handle */
-    PIN_State            pinState;
-    PIN_Handle           hPin;
-
-    /* For Power management */
-    Power_NotifyObj      postNotify;
+    UDMACC26XX_Handle   udmaHandle;     /* For setting power dependency */
+    Power_NotifyObj     postNotify;     /* For Standby reconfiguration */
 } UART2CC26X2_Object, *UART2CC26X2_Handle;
 
 #ifdef __cplusplus

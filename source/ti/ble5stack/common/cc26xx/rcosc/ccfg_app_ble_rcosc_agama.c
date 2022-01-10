@@ -5,7 +5,7 @@
  @brief Customer Configuration for CC26xx device family (HW rev 2) using RCOSC
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

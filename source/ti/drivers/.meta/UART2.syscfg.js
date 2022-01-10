@@ -81,18 +81,6 @@ let config = [
 ];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  @param inst       - UART2 instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -128,7 +116,6 @@ of the [__UART driver__][5].
     defaultInstanceName: "CONFIG_UART2_",
     config        : Common.addNameConfig(config, "/ti/drivers/UART2", "CONFIG_UART2_"),
     modules       : Common.autoForceModules(["Board", "Power", "DMA"]),
-    validate      : validate,
 
     _getPinResources: _getPinResources
 };

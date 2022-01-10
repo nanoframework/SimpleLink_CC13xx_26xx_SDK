@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -179,8 +179,6 @@ function filterHardware(component)
  */
 function validate(inst, validation)
 {
-    Common.validateNames(inst, validation);
-
     /* Allow an input of 0 or ~0 */
     if (inst.defaultTxBufferValue.match( /((^0$)|(^~0$))/ )) {
         return;

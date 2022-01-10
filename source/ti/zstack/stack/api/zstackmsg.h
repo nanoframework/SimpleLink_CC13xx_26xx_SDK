@@ -77,7 +77,7 @@ typedef enum
     zstackmsg_CmdIDs_DEV_ZDO_CBS_REQ = 0x14,
     zstackmsg_CmdIDs_DEV_NWK_ROUTE_REQ = 0x15,
     zstackmsg_CmdIDs_DEV_NWK_CHECK_ROUTE_REQ = 0x16,
-    zstackmsg_CmdIDs_DEV_JAMMER_IND = 0x17,
+    // 0x17 is available for use. Was used for zstackmsg_CmdIDs_DEV_JAMMER_IND
     zstackmsg_CmdIDs_APS_REMOVE_GROUP = 0x18,
     zstackmsg_CmdIDs_APS_REMOVE_ALL_GROUPS = 0x19,
     zstackmsg_CmdIDs_APS_FIND_ALL_GROUPS_REQ = 0x1B,
@@ -87,11 +87,6 @@ typedef enum
     zstackmsg_CmdIDs_AF_REGISTER_REQ = 0x20,
     zstackmsg_CmdIDs_AF_UNREGISTER_REQ = 0x21,
     zstackmsg_CmdIDs_AF_DATA_REQ = 0x22,
-    zstackmsg_CmdIDs_AF_INTERPAN_CTL_REQ = 0x23,
-    zstackmsg_CmdIDs_AF_CONFIG_GET_REQ = 0x24,
-    zstackmsg_CmdIDs_AF_CONFIG_SET_REQ = 0x25,
-    zstackmsg_CmdIDs_ZDO_NWK_ADDR_REQ = 0x26,
-    zstackmsg_CmdIDs_ZDO_IEEE_ADDR_REQ = 0x27,
     zstackmsg_CmdIDs_ZDO_NODE_DESC_REQ = 0x28,
     zstackmsg_CmdIDs_ZDO_POWER_DESC_REQ = 0x29,
     zstackmsg_CmdIDs_ZDO_SIMPLE_DESC_REQ = 0x2A,
@@ -114,6 +109,11 @@ typedef enum
     zstackmsg_CmdIDs_ZDO_USER_DESCR_SET_REQ = 0x46,
     zstackmsg_CmdIDs_ZDO_USER_DESC_REQ = 0x47,
     zstackmsg_CmdIDs_ZDO_DEVICE_ANNOUNCE = 0x48,
+    zstackmsg_CmdIDs_AF_INTERPAN_CTL_REQ = 0x49,
+    zstackmsg_CmdIDs_AF_CONFIG_GET_REQ = 0x4A,
+    zstackmsg_CmdIDs_AF_CONFIG_SET_REQ = 0x4B,
+    zstackmsg_CmdIDs_ZDO_NWK_ADDR_REQ = 0x4C,
+    zstackmsg_CmdIDs_ZDO_IEEE_ADDR_REQ = 0x4D,
     zstackmsg_CmdIDs_ZDO_NWK_ADDR_RSP = 0x60,
     zstackmsg_CmdIDs_ZDO_IEEE_ADDR_RSP = 0x61,
     zstackmsg_CmdIDs_ZDO_NODE_DESC_RSP = 0x62,
@@ -222,6 +222,11 @@ typedef enum
     zstackmsg_CmdIDs_SYS_NWK_FRAME_FWD_NOTIFICATION_IND = 0xCC,
     zstackmsg_CmdIDs_PAUSE_DEVICE_REQ = 0xEB,
     zstackmsg_CmdIDs_RESERVED_1A = 0x1A,
+    zstackmsg_CmdIDs_RESERVED_23 = 0x23,
+    zstackmsg_CmdIDs_RESERVED_24 = 0x24,
+    zstackmsg_CmdIDs_RESERVED_25 = 0x25,
+    zstackmsg_CmdIDs_RESERVED_26 = 0x26,
+    zstackmsg_CmdIDs_RESERVED_27 = 0x27,
     zstackmsg_CmdIDs_RESERVED_31 = 0x31,
     zstackmsg_CmdIDs_RESERVED_32 = 0x32,
     zstackmsg_CmdIDs_RESERVED_33 = 0x33,
@@ -578,23 +583,6 @@ typedef struct _zstackmsg_devnwkcheckroutereq_t
     zstack_devNwkCheckRouteReq_t *pReq;
 
 } zstackmsg_devNwkCheckRouteReq_t;
-
-/**
- * This message is sent from ZStack Thread to indication change in
- * jammer detection.
- * The command ID for this message is zstackmsg_CmdIDs_DEV_JAMMER_IND.
- */
-typedef struct _zstackmsg_devjammerind_t
-{
-    /** message header<br>
-     * event field must be set to @ref zstack_CmdIDs
-     */
-    zstackmsg_HDR_t hdr;
-
-    /** Message command fields */
-    zstack_devJammerInd_t req;
-
-} zstackmsg_devJammerInd_t;
 
 /**
  * This message is sent from ZStack Thread whenever the Permit Join state
@@ -2746,9 +2734,9 @@ typedef struct _zstackmsg_bdbtouchlinkgetallowstealing_t
 /**
  * Send this message to the ZStack Thread to trigger the rejoin mechanism for End Devices
  * that has lost its parent.
- * The command ID for this message is zstackmsg_CmdIDs_BDB_ZED_ATTEMPT_RECOVER_NWK_REQ.
+ * The command ID for this message is zstackmsg_CmdIDs_BDB_RECOVER_NWK_REQ.
  */
-typedef struct _zstackmsg_bdbzedattemptrecovernwk_t
+typedef struct _zstackmsg_bdbrecovernwk_t
 {
     /** message header<br>
      * event field must be set to @ref zstack_CmdIDs
@@ -2760,9 +2748,9 @@ typedef struct _zstackmsg_bdbzedattemptrecovernwk_t
 
     //Indicate if the request was process or not. The request will fail
     //if the device has not been commissioned yet
-    zstack_bdbZedAttemptRecoverNwkRsp_t *pRsp;
+    zstack_bdbRecoverNwkRsp_t *pRsp;
 
-} zstackmsg_bdbZedAttemptRecoverNwkReq_t;
+} zstackmsg_bdbRecoverNwkReq_t;
 
 /**
  * Send this message to the ZStack Thread to indicate if Green Power Commissioning

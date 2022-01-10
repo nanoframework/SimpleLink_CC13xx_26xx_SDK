@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,4 +80,32 @@ void AESGCM_Operation_init(AESGCM_Operation *operationStruct) {
 
     /* The only supported ivLength is 12 for now */
     operationStruct->ivLength = 12;
+}
+
+/*
+ *  ======== AESGCM_OneStepOperation_init ========
+ */
+void AESGCM_OneStepOperation_init(AESGCM_OneStepOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESGCM_OneStepOperation));
+}
+
+/*
+ *  ======== AESGCM_SegmentedAADOperation_init ========
+ */
+void AESGCM_SegmentedAADOperation_init(AESGCM_SegmentedAADOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESGCM_SegmentedAADOperation));
+}
+
+/*
+ *  ======== AESGCM_SegmentedDataOperation_init ========
+ */
+void AESGCM_SegmentedDataOperation_init(AESGCM_SegmentedDataOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESGCM_SegmentedDataOperation));
+}
+
+/*
+ *  ======== AESGCM_SegmentedFinalizeOperation_init ========
+ */
+void AESGCM_SegmentedFinalizeOperation_init(AESGCM_SegmentedFinalizeOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESGCM_SegmentedFinalizeOperation));
 }

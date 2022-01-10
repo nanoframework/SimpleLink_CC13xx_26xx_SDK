@@ -1,5 +1,6 @@
 var commonSources = [
     "ADC.c",
+    "GPIO.c",
     "I2C.c",
     "NVS.c",
     "./nvs/NVSRAM.c",
@@ -27,10 +28,6 @@ var commonHeaders = [
     "GPIO.h",
     "I2C.h",
     "./i2c/I2CSupport.h",
-    "itm/hw_cpu_dwt.h",
-    "itm/hw_cpu_scs.h",
-    "itm/hw_cpu_tpiu.h",
-    "itm/hw_cpu_itm.h",
     "NVS.h",
     "./nvs/NVSRAM.h",
     "./nvs/NVSSPI25X.h",

@@ -81,6 +81,8 @@ function moduleInstances(inst)
         if(inst.numOfAdvSet == 1)
         {
             advParams_args.advType = "extended";
+            advParams_args.primPhy = "GAP_ADV_PRIM_PHY_1_MBPS";
+            advParams_args.secPhy  = "GAP_ADV_SEC_PHY_1_MBPS";
             advData_args.GAP_ADTYPE_FLAGS = true;
             advData_args.advertisingFlags = ["GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED","GAP_ADTYPE_FLAGS_GENERAL"];
             advData_args.GAP_ADTYPE_LOCAL_NAME_SHORT = true;

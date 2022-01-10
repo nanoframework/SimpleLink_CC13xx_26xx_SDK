@@ -5,7 +5,7 @@
  @brief Describe the purpose and contents of the file.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -97,7 +97,7 @@
 #define MAC_RADIO_TX_POWER_INVALID              0xFFFFFFFF
 
 #define MAC_RADIO_RECEIVER_SENSITIVITY_DBM      -100 /* dBm */
-#define MAC_RADIO_RECEIVER_SATURATION_DBM       -5   /* dBm */
+#define MAC_RADIO_RECEIVER_SATURATION_DBM       -20  /* dBm */
 
 
 /* offset applied to hardware RSSI value to get RF power level in dBm units */
@@ -112,7 +112,8 @@
 #define MAC_LBT_MAX_RND_STEP                     10  // 5 ms at maximum
 /* LBT threshold for 863Mhz band, 88kHz receiver band, 14dBm output */
 #define MAC_LBT_THRESHOLD                       -92 // -92 dBm
-
+/* LBT minimum TX off-time */
+#define MAC_LBT_MIN_TX_OFF_TIME                  100 // 100 ms
 /* ------------------------------------------------------------------------------------------------
  *                                      Common Radio Macros
  * ------------------------------------------------------------------------------------------------
@@ -129,6 +130,7 @@
 
 #define MAC_RADIO_RX_ON()                             macSendReceiveCmd()
 #define MAC_RADIO_RXTX_OFF()                          st( macStopCmd(TRUE); )
+#define MAC_RADIO_FH_RXTX_OFF()                       st( macStopCmd(FALSE); )
 
 #define MAC_RADIO_FLUSH_TX_FIFO()                     /* Nothing for CC13xx */
 

@@ -30,7 +30,7 @@
         Used to insert "[String]" before data.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -260,7 +260,7 @@ extern uint32 RAM_BASE_ADDR[];
 #define MAP_LL_AE_RegCBack                              ((llStatus_t                (*) (uint8, void *))                                                                                               ROM_BLE_JT_OFFSET(106))
 #define MAP_LL_AddWhiteListDevice                        ((uint8                    (*) (uint8 *, uint8))                                                                                              ROM_BLE_JT_OFFSET(107))
 #define MAP_LL_AuthPayloadTimeoutExpiredCback            ((void                     (*) (uint16))                                                                                                      ROM_BLE_JT_OFFSET(108))
-#define MAP_LL_ChanMapUpdate                             ((uint8                    (*) (uint8 *))                                                                                                     ROM_BLE_JT_OFFSET(109))
+#define MAP_LL_ChanMapUpdate                             ((uint8                    (*) (uint8 * , uint16))                                                                                            ROM_BLE_JT_OFFSET(109))
 #define MAP_LL_ClearWhiteList                            ((uint8                    (*) (void))                                                                                                        ROM_BLE_JT_OFFSET(110))
 #define MAP_LL_ConnActive                                ((uint8                    (*) (uint16))                                                                                                      ROM_BLE_JT_OFFSET(111))
 #define MAP_LL_ConnParamUpdateCback                      ((void                     (*) (uint8, uint16, uint16, uint16, uint16))                                                                       ROM_BLE_JT_OFFSET(112))

@@ -70,10 +70,6 @@
 #include "bdb.h"
 #include "ssp.h"
 
-#if defined( MT_MAC_FUNC ) || defined( MT_MAC_CB_FUNC )
-  #error "ERROR! MT_MAC functionalities should be disabled on ZDO devices"
-#endif
-
 #include <driverlib/sys_ctrl.h>
 
 /*********************************************************************
@@ -1030,6 +1026,13 @@ uint8_t ZDApp_RestoreNetworkState( void )
         devStartMode = MODE_REJOIN;
         _NIB.nwkState = NWK_INIT;
       }
+      else if( ZG_DEVICE_RTRONLY_TYPE &&
+               (zgRouterSilentRejoin == FALSE) )
+      {
+        devStartMode = MODE_REJOIN;
+        _NIB.nwkState = NWK_INIT;
+      }
+      // ZC silently restarts network, ZR silently rejoins network
       else
       {
         devStartMode = MODE_RESUME;
@@ -1478,7 +1481,10 @@ void ZDApp_ProcessNetworkJoin( void )
       bdbSecureRejoinAttempts = 0;
 
       // Verify NWK key is available before sending Device_annce
-      if ( ZDApp_RestoreNwkKey( TRUE ) == false )
+      // Device performing TC rejoin shall wait until (new) NWK key received
+      if ( ZDApp_RestoreNwkKey( TRUE ) == false ||
+           devState == DEV_NWK_TC_REJOIN_CURR_CHANNEL ||
+           devState == DEV_NWK_TC_REJOIN_ALL_CHANNEL )
       {
         if ( ZSTACK_END_DEVICE_BUILD )
         {
@@ -2130,8 +2136,9 @@ void ZDApp_LeaveUpdate( uint16_t nwkAddr, uint8_t* extAddr,
 
     device = AssocGetWithExt( extAddr );
 
-    //Send update device only if the device is not rejoining and also is still in our assoc table
-    if ( (rejoin == FALSE) && (device != NULL) )
+    //Send update device only if device is not rejoining and is either a child or neighboring router
+    if ( (rejoin == FALSE) &&
+         ( (device != NULL) || (nwkNeighborCheckAddr( nwkAddr, extAddr ) == NWKNEIGHBOR_FOUND) ) )
     {
       if(!APSME_IsDistributedSecurity())
       {
@@ -2604,7 +2611,7 @@ void ZDO_beaconNotifyIndCB( NLME_beaconInd_t *pBeacon )
       uint8_t capacity = FALSE;
 
       if ( ((pBeacon->LQI   > pNwkDesc->chosenRouterLinkQuality) &&
-            (pBeacon->depth < MAX_NODE_DEPTH)) ||
+            (pBeacon->depth <= MAX_NODE_DEPTH)) ||
           ((pBeacon->LQI   == pNwkDesc->chosenRouterLinkQuality) &&
            (pBeacon->depth < pNwkDesc->chosenRouterDepth)) )
       {
@@ -2921,7 +2928,7 @@ void ZDO_LeaveCnf( NLME_LeaveCnf_t* cnf )
   {
     // Pass the leave confirm to higher layer if callback registered
     if ( ( zdoCBFunc[ZDO_LEAVE_CNF_CBID] == NULL ) ||
-         ( (*zdoCBFunc[ZDO_LEAVE_CNF_CBID])( cnf ) == NULL ) )
+        ( (*zdoCBFunc[ZDO_LEAVE_CNF_CBID])( cnf ) == NULL ) )
     {
       // Prepare to leave with reset
       ZDApp_LeaveReset( cnf->rejoin );
@@ -2931,9 +2938,9 @@ void ZDO_LeaveCnf( NLME_LeaveCnf_t* cnf )
   {
     // Remove device address(optionally descendents) from data
     ZDApp_LeaveUpdate( cnf->dstAddr,
-                       cnf->extAddr,
-                       cnf->removeChildren,
-                       cnf->rejoin );
+                      cnf->extAddr,
+                      cnf->removeChildren,
+                      cnf->rejoin );
   }
 }
 

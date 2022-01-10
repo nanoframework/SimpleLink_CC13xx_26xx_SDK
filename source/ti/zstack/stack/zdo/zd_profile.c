@@ -105,7 +105,7 @@
  * CONSTANTS
  */
 
-#define ZDP_BUF_SZ          80
+#define ZDP_BUF_SZ          82
 
 CONST byte ZDP_AF_ENDPOINT = 0;
 
@@ -691,9 +691,11 @@ afStatus_t ZDP_ParentAnnce( uint8_t *TransSeq,
  */
 void zdpProcessAddrReq( zdoIncomingMsg_t *inMsg )
 {
+  AddrMgrEntry_t addrEntry;
   associated_devices_t *pAssoc;
   uint8_t reqType;
   uint16_t aoi = INVALID_NODE_ADDR;
+  uint8_t invalidIEEEAddr[Z_EXTADDR_LEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
   uint8_t *ieee = NULL;
 
   reqType = inMsg->asdu[(inMsg->clusterID == NWK_addr_req) ? Z_EXTADDR_LEN : sizeof( uint16_t ) ];
@@ -729,7 +731,6 @@ void zdpProcessAddrReq( zdoIncomingMsg_t *inMsg )
       && (((pAssoc = AssocGetWithShort( aoi )) != NULL)
              && (pAssoc->nodeRelation == CHILD_RFD)) )
     {
-      AddrMgrEntry_t addrEntry;
       addrEntry.user = ADDRMGR_USER_DEFAULT;
       addrEntry.index = pAssoc->addrIdx;
       if ( AddrMgrEntryGet( &addrEntry ) )
@@ -780,8 +781,6 @@ void zdpProcessAddrReq( zdoIncomingMsg_t *inMsg )
       else
       {
         //CCB 2113 Zigbee Core spec
-        uint8_t invalidIEEEAddr[Z_EXTADDR_LEN];
-        memset(invalidIEEEAddr,0xFF,Z_EXTADDR_LEN);
         ieee = invalidIEEEAddr;
       }
     }
@@ -794,8 +793,6 @@ void zdpProcessAddrReq( zdoIncomingMsg_t *inMsg )
     }
     else
     {
-      uint8_t invalidIEEEAddr[Z_EXTADDR_LEN];
-      memset(invalidIEEEAddr,0xFF,Z_EXTADDR_LEN);
       pBuf = osal_cpyExtAddr( pBuf, invalidIEEEAddr );
     }
 

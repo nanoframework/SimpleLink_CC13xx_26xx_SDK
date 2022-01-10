@@ -235,6 +235,8 @@ extern void AssocCheckDupNeighbors( void );
 
 extern void AssocChildAging( void );
 
+extern void AssocChildSecurityTimeout( void );
+
 extern uint8_t AssocChildTableUpdateTimeout( uint16_t nwkAddr );
 
 extern void AssocChildTableManagement( OsalPort_EventHdr *inMsg );

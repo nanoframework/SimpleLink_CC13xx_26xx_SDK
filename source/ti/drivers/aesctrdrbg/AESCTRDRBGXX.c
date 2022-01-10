@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,22 +46,19 @@
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 #include <ti/drivers/cryptoutils/utils/CryptoUtils.h>
 
+#if ((DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0) || \
+     (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1) || \
+     (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2) || \
+     (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4))
+    #include <ti/drivers/aesctr/AESCTRCC26XX.h>
+#endif
+
 /* Forward declarations */
 static void AESCTRDRBGXX_addBigendCounter(uint8_t *counter, uint32_t increment);
 static int_fast16_t AESCTRDRBGXX_updateState(AESCTRDRBG_Handle handle,
                                              const void *additionalData,
                                              size_t additionalDataLength);
 static void AESCTRDRBG_uninstantiate(AESCTRDRBG_Handle handle);
-
-/* Extern functions */
-
-/* These non-public functions are required to ensure thread-safe behavior
- * across multiple calls.
- */
-extern bool AESCTR_acquireLock(AESCTR_Handle handle, uint32_t timeout);
-extern void AESCTR_releaseLock(AESCTR_Handle handle);
-extern void AESCTR_enableThreadSafety(AESCTR_Handle handle);
-extern void AESCTR_disableThreadSafety(AESCTR_Handle handle);
 
 /* Static globals */
 static bool isInitialized = false;
@@ -388,6 +385,7 @@ int_fast16_t AESCTRDRBG_getRandomBytes(AESCTRDRBG_Handle handle,
     status = AESCTR_oneStepEncrypt(object->ctrHandle, &operation);
 
     if (status != AESCTR_STATUS_SUCCESS) {
+        AESCTR_releaseLock(object->ctrHandle);
         AESCTRDRBG_uninstantiate(handle);
         return AESCTRDRBG_STATUS_UNINSTANTIATED;
     }

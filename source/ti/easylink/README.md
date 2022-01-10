@@ -184,3 +184,11 @@ Changelog
 ### Version 4.10.00
 
 - Added TI Clang compiler support for all examples
+
+### Version 4.20.00
+
+- Fixed length of OAD block response packet
+
+### Version 4.30.00
+
+- GPIO driver has replaced pin driver 

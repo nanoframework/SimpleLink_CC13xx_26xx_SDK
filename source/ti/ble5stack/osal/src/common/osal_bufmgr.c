@@ -6,7 +6,7 @@
         reentrant hence cannot be called from an interrupt context.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -169,6 +169,7 @@ void osal_bm_free( void *payload_ptr )
       }
 
       // free the memory
+
       osal_mem_free( loop_ptr );
 
       // we're done here

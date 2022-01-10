@@ -50,12 +50,12 @@
     LED1 is not used in this application
 
   Application-specific menu system:
-
     <SET LOCAL TEMP> Set the temperature of the local temperature sensor
       Up/Down changes the temperature
-      This screen shows the following information:
-        Line2:
-          Shows the temperature of the local temperature sensor
+
+      The APP Info line will display the following information:
+        [Local Temperature]
+          XXC - temperature of the local temperature sensor
 
 *********************************************************************/
 
@@ -613,9 +613,9 @@ static void zclSampleTemperatureSensor_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

@@ -1,0 +1,48 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ti/bionic64"
+
+  memory = 2048
+  cpus = 2
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.synced_folder "../../../../../", "/home/vagrant/154stack-dev/lprf-dallas-154stack",
+    type: "rsync",
+    rsync__exclude: [ "VMs/" ],
+    rsync__verbose: false
+
+  config.vm.provider :virtualbox do |v|
+    v.name = "linux-gateway-sdk-gen"
+    v.cpus = cpus
+    v.memory = memory
+  end
+
+  # Set a few Conan environment variables for credentials. Read from the host environment and create
+  # a shell script that gets sourced on login.
+  config.vm.provision "shell", inline: <<-SHELL
+    echo export CONAN_LOGIN_USERNAME=#{ENV["CONAN_LOGIN_USERNAME"]} > /etc/profile.d/conan_user.sh
+    echo export CONAN_PASSWORD=#{ENV["CONAN_PASSWORD"]} >> /etc/profile.d/conan_user.sh
+  SHELL
+
+  # keys setup by Jenkins when the home-dir on the host is not accessible
+  if Etc.getlogin == "omapswcm" then
+    ssh_dir = "./.ssh"
+    config.vm.provision "file", source: ssh_dir+"/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+    config.vm.provision "file", source: ssh_dir+"/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
+    config.vm.provision "file", source: ssh_dir+"/known_hosts", destination: "/home/vagrant/.ssh/known_hosts"
+    config.vm.provision "shell", privileged: false, inline: "chmod 600 /home/vagrant/.ssh/id_rsa"
+    config.vm.provision "shell", privileged: false, inline: "chmod 600 /home/vagrant/.ssh/id_rsa.pub"
+    config.vm.provision "shell", privileged: false, inline: "chmod 600 /home/vagrant/.ssh/known_hosts"
+  end
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo ansible-galaxy install -c -r /home/vagrant/154stack-dev/lprf-dallas-154stack/source/ti/ti154stack/apps/linux/vagrant_provisioning/requirements.yml --force
+    ansible-playbook /home/vagrant/154stack-dev/lprf-dallas-154stack/source/ti/ti154stack/apps/linux/vagrant_provisioning/playbook.yml
+    sudo chown vagrant:vagrant /home/vagrant/154stack-dev
+  SHELL
+
+end

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@
  *
  * Cryptographic keying material may be stored on an embedded system multiple ways.
  *  - plaintext: in plaintext in flash or RAM
- *  - keyblob: in encrypted form in flash or RAM
  *  - key store: in a dedicated hardware database whose entries can not be directly
  *    read out.
  *
@@ -52,8 +51,8 @@
  *
  * The same CryptoKey may be passed to crypto APIs of different modes subject to
  * restrictions placed on the key by their storage types. Plaintext keys may be used
- * without restriction while key store and keyblob keys have their permitted uses
- * restricted when the keying material is loaded or the keyblob is encrypted respectively.
+ * without restriction while key store keys have their permitted uses
+ * restricted when the keying material is loaded.
  * These restrictions are specified in a CryptoKey_SecurityPolicy that is device-specific
  * and depends on the hardware capability of the device.
  *
@@ -66,11 +65,9 @@
  *  - CryptoKeyPlaintext_initBlankKey()
  *  - CryptoKeyKeyStore_initKey()
  *  - CryptoKeyKeyStore_initBlankKey()
- *  - CryptoKeyKeyBlob_initKey()
- *  - CryptoKeyKeyBlob_initBlankKey()
  *
- * The keyblob and keystore CryptoKeys may be used to create a keyblob or
- * load a key into a key store after their respective _init call.
+ * The keystore CryptoKeys may be used to load a key into a key store after
+ * its respective _init call.
  *
  * CryptoKeys can be initialized "blank", without keying material but with an empty buffer
  * or key store entry, to encode the destination of a key to be created in the
@@ -161,8 +158,6 @@ static const CryptoKey_Encoding CryptoKey_PLAINTEXT             = 0x02U;
 static const CryptoKey_Encoding CryptoKey_BLANK_PLAINTEXT       = 0x04U;
 static const CryptoKey_Encoding CryptoKey_KEYSTORE              = 0x08U;
 static const CryptoKey_Encoding CryptoKey_BLANK_KEYSTORE        = 0x10U;
-static const CryptoKey_Encoding CryptoKey_KEYBLOB               = 0x20U;
-static const CryptoKey_Encoding CryptoKey_BLANK_KEYBLOB         = 0x40U;
 
 /*!
  *  @brief  Plaintext CryptoKey datastructure.
@@ -188,30 +183,17 @@ typedef struct {
 } CryptoKey_KeyStore;
 
 /*!
- *  @brief  Keyblob CryptoKey datastructure.
- *
- * This structure contains all the information necessary to access keying material stored
- * in an encrypted structure in flash or RAM.
- */
-typedef struct {
-    uint8_t *keyBlob;
-    uint32_t keyBlobLength;
-} CryptoKey_KeyBlob;
-
-/*!
  * @brief  CryptoKey datastructure.
  *
  * This structure contains a CryptoKey_Encoding and one of
  * - CryptoKey_Plaintext
  * - CryptoKey_KeyStore
- * - CryptoKey_KeyBlob
  */
 typedef struct {
     CryptoKey_Encoding encoding;
     union {
         CryptoKey_Plaintext plaintext;
         CryptoKey_KeyStore keyStore;
-        CryptoKey_KeyBlob keyBlob;
     } u;
 } CryptoKey;
 
@@ -221,9 +203,9 @@ typedef struct {
  *
  * This structure is device-specific and declared here in incomplete form.
  * The structure is fully defined in CryptoKeyDEVICE.h. This creates a link-time binding
- * when using the structure with key store or keyblob functions. If the instance
+ * when using the structure with key store functions. If the instance
  * of the CryptoKey_SecurityPolicy is kept in a device-specific application-file,
- * the gernic application code may still use references to it despite being
+ * the generic application code may still use references to it despite being
  * an incomplete type in the generic application file at compile time.
  */
 typedef struct CryptoKey_SecurityPolicy_ CryptoKey_SecurityPolicy;

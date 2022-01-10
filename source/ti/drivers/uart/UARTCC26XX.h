@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -199,7 +199,7 @@
  *  };
  *  @endcode
  *
- * If the RTS and CTS pins are set to ::PIN_UNASSIGNED, the flow control is
+ * If the RTS and CTS pins are set to ::GPIO_INVALID_INDEX, the flow control is
  * disabled. An example is shown in the ::UARTCC26XX_HWAttrsV2 description.
  *
  * # Supported Functions #
@@ -381,7 +381,7 @@
 #include <stdbool.h>
 
 #include <ti/drivers/UART.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/utils/RingBuf.h>
 
@@ -520,8 +520,8 @@ extern const UART_FxnTable UARTCC26XX_fxnTable;
  *          .swiPriority = 0,
  *          .txPin       = CONFIG_UART_TX,
  *          .rxPin       = CONFIG_UART_RX,
- *          .ctsPin      = PIN_UNASSIGNED,
- *          .rtsPin      = PIN_UNASSIGNED,
+ *          .ctsPin      = GPIO_INVALID_INDEX,
+ *          .rtsPin      = GPIO_INVALID_INDEX,
  *          .ringBufPtr  = uartCC26XXRingBuffer[0],
  *          .ringBufSize = sizeof(uartCC26XXRingBuffer[0]),
  *          .txIntFifoThr= UARTCC26XX_FIFO_THRESHOLD_1_8,
@@ -623,10 +623,6 @@ typedef struct {
     size_t                readCount;          /*!< Number of Chars read */
     size_t                readSize;           /*!< Chars remaining in buffer */
     RingBuf_Object        ringBuffer;         /*!< local circular buffer object */
-
-    /* PIN driver state object and handle */
-    PIN_State              pinState;
-    PIN_Handle             hPin;
 
     /*! UART post-notification function pointer */
     void             *uartPostFxn;

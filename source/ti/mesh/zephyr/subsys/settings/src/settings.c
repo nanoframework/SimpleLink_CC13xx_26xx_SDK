@@ -21,6 +21,10 @@ LOG_MODULE_REGISTER(settings, CONFIG_SETTINGS_LOG_LEVEL);
 
 K_MUTEX_DEFINE(settings_lock);
 
+#ifdef __IAR_SYSTEMS_ICC__
+#pragma section="settings_handler_static_area"
+#endif /* __IAR_SYSTEMS_ICC__ */
+
 extern const struct settings_handler_static settings_handler_bt_mesh;
 
 void settings_store_init(void);
@@ -57,6 +61,7 @@ typedef struct
   uint8_t tailPage;     // transfer destination page
   uint8_t actPage;      // current active page
   uint8_t xsrcPage;     // transfer source page
+  uint8_t forceCompact; // force compaction to happen
   uint16_t actOffset;   // active page offset
   uint16_t xsrcOffset;  // transfer source page offset
   uint16_t xdstOffset;  // transfer destination page offset
@@ -146,15 +151,6 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 							const char **next)
 {
 	struct settings_handler_static *bestmatch;
-#if defined(__IAR_SYSTEMS_ICC__)
-	struct settings_handler_static *ch = (struct settings_handler_static *) &settings_handler_bt_mesh;
-#elif defined(__TI_COMPILER_VERSION__)
-#pragma diag_suppress 145
-	struct settings_handler_static *ch = &settings_handler_bt_mesh;
-#elif defined(__clang__)
-#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-    struct settings_handler_static *ch = &settings_handler_bt_mesh;
-#endif /* defined(__IAR_SYSTEMS_ICC__) */
 	const char *tmpnext;
 
 	bestmatch = NULL;
@@ -162,16 +158,16 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 		*next = NULL;
 	}
 
-	{
+	Z_STRUCT_SECTION_FOREACH(settings_handler_static, ch) {
 		if (!settings_name_steq(name, ch->name, &tmpnext)) {
-			return bestmatch;
+			continue;
 		}
 		if (!bestmatch) {
 			bestmatch = ch;
 			if (next) {
 				*next = tmpnext;
 			}
-			return bestmatch;
+			continue;
 		}
 		if (settings_name_steq(ch->name, bestmatch->name, NULL)) {
 			bestmatch = ch;
@@ -181,6 +177,28 @@ struct settings_handler_static *settings_parse_and_lookup(const char *name,
 		}
 	}
 
+#if defined(CONFIG_SETTINGS_DYNAMIC_HANDLERS)
+	struct settings_handler *ch;
+
+	SYS_SLIST_FOR_EACH_CONTAINER(&settings_handlers, ch, node) {
+		if (!settings_name_steq(name, ch->name, &tmpnext)) {
+			continue;
+		}
+		if (!bestmatch) {
+			bestmatch = (struct settings_handler_static *)ch;
+			if (next) {
+				*next = tmpnext;
+			}
+			continue;
+		}
+		if (settings_name_steq(ch->name, bestmatch->name, NULL)) {
+			bestmatch = (struct settings_handler_static *)ch;
+			if (next) {
+				*next = tmpnext;
+			}
+		}
+	}
+#endif /* CONFIG_SETTINGS_DYNAMIC_HANDLERS */
 	return bestmatch;
 }
 

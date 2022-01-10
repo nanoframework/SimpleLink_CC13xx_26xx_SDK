@@ -1,8 +1,21 @@
 TI 15.4-Stack Sensor Example
 =======================
 
-Example Summary
----------------
+## Table of Contents
+
+* [Example Summary](#ExampleSummary)
+* [Peripherals Exercised](#PeripheralsExercised)
+* [Resources & Jumper Settings](#Resources&JumperSettings)
+* [Example Application Dataflow](#ExampleApplicationDataflow)
+* [Example Usage](#ExampleUsage)
+* [Viewing Device PER (Packet Error Rate)](#ViewingDevicePER)
+* [Analyzing Network Traffic](#AnalyzingNetworkTraffic)
+* [Project Configuration](#ProjectConfiguration)
+  * [Disabling Common User Interface](#DisablingCommonUserInterface)
+  * [Multi-Page NV Configuration](#MultiPageNVConfiguration)
+  * [IAR Configuration](#IARConfiguration)
+
+## <a name="ExampleSummary"></a>Example Summary
 
 The sensor example application demonstrates how to implement a sensor network device using TI 15.4-Stack. TI 15.4-Stack based star network consists of two types of logical devices: the PAN-Coordinator and the network devices, e.g. the Collector and Sensor applications, respectively.
 
@@ -14,12 +27,10 @@ The example applications in TI 15.4-Stack are developed for the CC13x2 Launchpad
 
 > Note that this also includes the CC1352P-X boards, where the X represents which board subset is used, and the power amplification range.
 
-
-Peripherals Exercised
----------------------
+## <a name="PeripheralsExercised"></a>Peripherals Exercised
 
 > To trigger various events, buttons can be used as well as the configurable user interface.
-> The Example Usage section of this document explains how to use the user interface, although both the button presses and the UART perform the
+> The [Example Usage](#ExampleUsage) section of this document explains how to use the user interface, although both the button presses and the UART perform the
 > same actions.
 
 * `CONFIG_GPIO_RLED` - Turns on after the sensor connects to the collector.
@@ -28,26 +39,25 @@ Peripherals Exercised
 
 > If `CONFIG_GPIO_BTN2` is held while power is applied to the Launchpad, NV Flash will be erased.
 
+## <a name="Resources&JumperSettings"></a>Resources & Jumper Settings
 
-Resources & Jumper Settings
----------------------------
 The following hardware is required to run TI 15.4-Stack Out of Box (OOB) example applications:
+
 * Two [**CC13x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc1352r1) or two [**CC26x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc26x2r1)
 
 > If you're using an IDE (such as CCS or IAR), please refer to `Board.html` in
 your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
-&lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
+`<SDK_INSTALL_DIR>/source/ti/boards/<BOARD>`.
 
 Please refer to the following link for helpful SimpleLink Academy guides for ramping up
 on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
 
 For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
-`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+`<SDK_INSTALL_DIR>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
 
+## <a name="ExampleApplicationDataflow"></a>Example Application Dataflow
 
-Example Application Dataflow
----------------------------
 The sensor application has three processing loops each handling a different set of
 events. These are as follows:
 
@@ -55,7 +65,7 @@ events. These are as follows:
 	* Sensor event handling:
 		* Start sensor scan for network (SENSOR_START_EVT)
 		* Read sensor value and report to collector (SENSOR_READING_TIMEOUT_EVT)
-		* Diassociate sensor (SENSOR_DISASSOC_EVT)
+		* Disassociate sensor (SENSOR_DISASSOC_EVT)
 	* Triggers Jdllc_process and Ssf_processEvents
 	* Triggers MAC callback handling via ApiMac_processIncoming
 * Jdllc_process: Sensor logical link controller event handling
@@ -102,14 +112,13 @@ An overview of the sensor jdllc states and state transitions is as follows:
 	  +----------------- Jdllc_states_
 	                     orphan
 
+## <a name="ExampleUsage"></a>Example Usage
 
-Example Usage
--------------
 This example project implements a sensor end device: one of potentially many network devices in a PAN. This end device reads sensor information and sends it to the PAN-coordinator at a configured interval. This example assumes a second Launchpad is running the default collector application code to act as the PAN-coordinator.
 
 The example output can be viewed through the UART terminal.
 
-* Open a serial session (e.g. [`PuTTY`](http://www.putty.org/ "PuTTY's
+* Open a serial session (e.g. [PuTTY](http://www.putty.org/ "PuTTY's
 Homepage"), etc.) to the appropriate COM port with the following settings.
 
 * Note that if you are using Tera Term, by default, the Backspace key will be replaced with the delete key.
@@ -154,6 +163,7 @@ Status: Waiting...
 
 Status: Waiting...
 ```
+
 ```
  12 34 56 78 9A BC DE F0 00 00 00 00 00 00 00 00
 
@@ -170,11 +180,10 @@ Once the sensor is started, the settings can only be changed if it is restarted.
 > If the **AUTO_START** symbol is defined in your application, then the application will automatically configure itself on startup.
 > This is not enabled by default with the project, but it can be configured as described below.
 
-AUTO_START can be defined by removing the x in the .opts file under the defines folder.
--DxAUTO_START -> -DAUTO_START
+AUTO_START can be defined by removing the x in the .opts file under the defines folder: `-DxAUTO_START -> -DAUTO_START`
 
 > If the **AUTO_START** symbol is defined in your application, then the application will automatically configure itself on startup,
-and the sensor will display Starting... instead of Waiting...
+and the sensor will display `Starting...` instead of `Waiting...`
 
 > If the **AUTO_START** symbol is not defined pressing `CONFIG_GPIO_BTN1` will initialize the sensor application until the sensor has connected to a network.  Alternatively, the sensor can also be started through the user interface, as shown below.
 Note that the sensor will not join a network unless it is started.
@@ -189,7 +198,6 @@ Status: Starting...
 ```
 
 To DISASSOCIATE from a network:
-
 ```
  TI Sensor
 
@@ -233,24 +241,19 @@ Status: Joined--Mode=NBCN, Addr=0x0001, PanId=0x0001, Ch=0
 
 > In order for the network device to join, it must have either the generic PAN Id (0xFFFF, default configuration) or the same PAN Id as the collector. These settings can be found in the application's SysConfig dashboard.
 
-Analyzing Network Traffic
--------------------------
+## <a name="AnalyzingNetworkTraffic"></a>Analyzing Network Traffic
 
 TI 15.4-Stack provides the means to analyze over-the-air traffic by including a packet sniffer firmware image. With an additional CC13x2 Launchpad, users can set up a packet sniffer with the software provided in the SDK. More information about this can be found in the TI 15.4-Stack documentation under **Packet Sniffer**.
 
+## <a name="ViewingDevicePER"></a>Viewing Device PER (Packet Error Rate)
 
-Viewing Device PER (Packet Error Rate)
---------------------------------------
-
-PER is a simple value with the following equation
-* PER = 100 * (Number of Failed Packets / (Number of Successful Packets + Number of Failed Packets))
+PER is a simple value with the following equation: `PER = 100 * (Number of Failed Packets / (Number of Successful Packets + Number of Failed Packets))`
 
 This value can be used to judge how well the network doing.
 
 If you would like to see the stats on the Number of Failed and Successful Packets then simply define **DISPLAY_PER_STATS**. This will add the code necessary to update and display the stats to the UART Display.
 
-Project Configuration
---------------------------
+## <a name="ProjectConfiguration"></a>Project Configuration
 
 The System Configuration (SysConfig) tool is a graphical interface for configuring your TI 15.4-Stack project. Based on the parameters configured in the SysConfig dashboard, C source files and header files are generated. Further advanced parameters can be located in `advanced_config.h`.
 
@@ -268,7 +271,7 @@ Some important settings in the TI 15.4-Stack module include:
 
 More information about the configuration and feature options can be found in the TI 15.4-Stack documentation under **Example Applications > Configuration Parameters**.
 
-### Disabling Common User Interface
+### <a name="DisablingCommonUserInterface"></a>Disabling Common User Interface
 
 The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the project-specific .opts file:
 
@@ -276,26 +279,25 @@ The common user interface (CUI) is a UART based interface that allows users to c
 -DCUI_DISABLE
 ```
 
-> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
+> Please Note: particular features that are dependent on the CUI will be unavailable when this feature is enabled.
 
-### Multi-Page NV Configuration
+### <a name="MultiPageNVConfiguration"></a>Multi-Page NV Configuration
 
 By default, this project is configured to use two pages of NV. In order to modify this value, update the following:
+
 * `NVOCMP_NVPAGES=2` in the project-specific .opts file
-* `NVOCMP_NVPAGES=2` in the linker options
 * SysConfig NVS module:
    * Set Region Size based on the formula `NVOCMP_NVPAGES * 0x2000`
    * Set Region Base based on the formula `0x56000 - (NVOCMP_NVPAGES * 0x2000)`
 
 A detailed description of the application architecture can be found in your installation within the
-TI-15.4 Stack Getting Started Guide's Application Overview section.
+TI-15.4 Stack Getting Started Guide's Application Overview section: `<SDK_INSTALL_DIR>/docs/ti154stack/ti154stack-getting-started-guide.html`.
 
-&lt;SDK_INSTALL_DIR&gt;/docs/ti154stack/ti154stack-getting-started-guide.html.
+### <a name="IARConfiguration"></a>IAR Configuration
 
-> For IAR users:
-When using the CC13x2SDK, the TI XDS110v3 USB Emulator must
+When using the CC13x2 SDK, the TI XDS110v3 USB Emulator must
 be selected. For the CC13x2_LAUNCHXL, select TI XDS110 Emulator. In both cases,
 select the cJTAG interface.
 
-In order to build from flash, within the IAR Project options-> Build Actions
+In order to build from flash, within the IAR Project options > Build Actions
 Update the "Pre-build command line" and change the "NO_ROM=0" to "NO_ROM=1".

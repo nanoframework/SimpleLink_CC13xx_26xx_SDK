@@ -214,6 +214,10 @@ extern "C" {
   #define MAX_TCLK_FRAMECOUNTER_CHANGES    10
 #endif
 
+// used for IcIndex entry of the APSME_TCLinkKeyNVEntry_t
+#define APSME_IC_SET_MASK   0x80
+#define APSME_IC_INDEX_MASK 0x7F
+
 /******************************************************************************
  * TYPEDEFS
  */
@@ -518,7 +522,8 @@ typedef struct
   uint8_t  extAddr[Z_EXTADDR_LEN];
   uint8_t  keyAttributes;
   uint8_t  keyType;
-  uint8_t  SeedShift_IcIndex;    //For Unique key this is the number of shifts, for IC this is the offset on the NvId index
+  uint8_t  SeedShift;
+  uint8_t  IcIndex;
 } APSME_TCLinkKeyNVEntry_t;
 
 typedef struct

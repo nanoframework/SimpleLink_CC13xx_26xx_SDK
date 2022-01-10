@@ -42,12 +42,12 @@
 /* TI-RTOS drivers */
 #include <ti/drivers/ADCBuf.h>
 #include <ti/drivers/adcbuf/ADCBufCC26X2.h>
-#include <ti/drivers/PIN.h>
-#include <ti/drivers/pin/PINCC26XX.h>
 #include <ti/drivers/dma/UDMACC26XX.h>
 #include <ti/drivers/timer/GPTimerCC26XX.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/gpio/GPIOCC26XX.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(inc/hw_memmap.h)
@@ -490,17 +490,17 @@ int_fast16_t ADCBufCC26X2_convert(ADCBuf_Handle handle,
                                   ADCBuf_Conversion conversions[],
                                   uint_fast8_t channelCount)
 {
-    uint32_t                        key;
+    uint32_t                         key;
     ADCBufCC26X2_Object             *object;
     ADCBufCC26X2_HWAttrs const      *hwAttrs;
-    PIN_Config                      adcPinTable[2];
-    uint8_t                         i = 0;
+    ADCBufCC26X2_AdcChannelLutEntry  channelLookup;
 
     DebugP_assert(handle);
 
     /* Get the pointer to the object */
     object  = handle->object;
     hwAttrs = handle->hwAttrs;
+    channelLookup = hwAttrs->adcChannelLut[conversions->adcChannel];
 
     DebugP_assert(channelCount == 1);
     DebugP_assert((conversions->samplesRequestedCount <= UDMA_XFER_SIZE_MAX));
@@ -524,23 +524,7 @@ int_fast16_t ADCBufCC26X2_convert(ADCBuf_Handle handle,
     HwiP_restore(key);
 
     /* Specify input in ADC module */
-    AUXADCSelectInput(hwAttrs->adcChannelLut[conversions->adcChannel].compBInput);
-
-    /* Add pin to measure on */
-    adcPinTable[i++] = (hwAttrs->adcChannelLut[conversions->adcChannel].dio) |
-                        PIN_NOPULL |
-                        PIN_INPUT_DIS |
-                        PIN_GPIO_OUTPUT_DIS |
-                        PIN_IRQ_DIS |
-                        PIN_DRVSTR_MIN;
-
-    /* Terminate pin list */
-    adcPinTable[i] = PIN_TERMINATE;
-    object->pinHandle = PIN_open(&object->pinState, adcPinTable);
-    if (!object->pinHandle) {
-        object->conversionInProgress = false;
-        return ADCBuf_STATUS_ERROR;
-    }
+    AUXADCSelectInput(channelLookup.compBInput);
 
     /* Save which channel we are converting on for the callbackFxn */
     object->currentChannel = conversions->adcChannel;
@@ -548,12 +532,17 @@ int_fast16_t ADCBufCC26X2_convert(ADCBuf_Handle handle,
     /* Try to acquire the ADC semaphore if we do not already have it. */
     if (object->adcSemaphoreInPossession == false) {
          if (!AUXSMPHTryAcquire(AUX_SMPH_2)) {
-            PIN_close(object->pinHandle);
             object->conversionInProgress = false;
             DebugP_log0("ADCBuf: failed to acquire semaphore");
             return ADCBuf_STATUS_ERROR;
         }
         object->adcSemaphoreInPossession = true;
+    }
+
+    /* Add pin to measure on */
+    if (channelLookup.dio != GPIO_INVALID_INDEX)
+    {
+        GPIO_setConfig(channelLookup.dio, GPIO_CFG_NO_DIR);
     }
 
     /* Store location of the current conversion */
@@ -856,10 +845,12 @@ static void ADCBufCC26X2_loadDMAControlTableEntry(ADCBuf_Handle handle,
  *
  */
 static void ADCBufCC26X2_cleanADC(ADCBuf_Handle handle) {
-    ADCBufCC26X2_Object            *object;
+    ADCBufCC26X2_Object        *object;
+    ADCBufCC26X2_HWAttrs const *hwAttrs;
 
     /* Get the pointer to the object */
     object = handle->object;
+    hwAttrs = handle->hwAttrs;
 
     /* Stop the timer to stop generating triggers */
     GPTimerCC26XX_stop(object->timerHandle);
@@ -876,8 +867,11 @@ static void ADCBufCC26X2_cleanADC(ADCBuf_Handle handle) {
     /* Disable the UDMA channels */
     UDMACC26XX_channelDisable(object->udmaHandle, (1 << UDMA_CHAN_AUX_ADC));
 
-    /* Deallocate pins */
-    PIN_close(object->pinHandle);
+    /* Deallocate conversion pin */
+    if (hwAttrs->adcChannelLut[object->currentChannel].dio != GPIO_INVALID_INDEX)
+    {
+        GPIO_resetConfig(hwAttrs->adcChannelLut[object->currentChannel].dio);
+    }
 
     /* Disable UDMA mode for ADC */
     HWREG(AUX_EVCTL_BASE + AUX_EVCTL_O_DMACTL) =

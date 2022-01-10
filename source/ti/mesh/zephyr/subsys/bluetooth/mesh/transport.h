@@ -8,11 +8,8 @@
 
 #define TRANS_SEQ_AUTH_NVAL            0xffffffffffffffff
 
-#define BT_MESH_SDU_UNSEG_MAX          11
-#define BT_MESH_CTL_SEG_SDU_MAX        8
-#define BT_MESH_APP_SEG_SDU_MAX        12
-#define BT_MESH_TX_SDU_MAX (CONFIG_BT_MESH_TX_SEG_MAX * BT_MESH_APP_SEG_SDU_MAX)
-#define BT_MESH_RX_SDU_MAX (CONFIG_BT_MESH_RX_SEG_MAX * BT_MESH_APP_SEG_SDU_MAX)
+#define BT_MESH_SDU_UNSEG_MAX          (BT_MESH_SEG_SIZE - 1)
+#define BT_MESH_CTL_SEG_SDU_MAX        (BT_MESH_SEG_SIZE - 4)
 #define BT_MESH_RX_CTL_MAX (CONFIG_BT_MESH_RX_SEG_MAX * BT_MESH_CTL_SEG_SDU_MAX)
 
 #define TRANS_SEQ_ZERO_MASK            ((uint16_t)BIT_MASK(13))
@@ -79,19 +76,24 @@ ZEPHYR__PACKED(struct) bt_mesh_ctl_friend_sub_confirm {
 	uint8_t xact;
 };
 
-void bt_mesh_set_hb_sub_dst(uint16_t addr);
-
-struct bt_mesh_app_key *bt_mesh_app_key_find(uint16_t app_idx);
-
 bool bt_mesh_tx_in_progress(void);
 
 void bt_mesh_rx_reset(void);
-void bt_mesh_tx_reset(void);
 
 int bt_mesh_ctl_send(struct bt_mesh_net_tx *tx, uint8_t ctl_op, void *data,
 		     size_t data_len, const struct bt_mesh_send_cb *cb,
 		     void *cb_data);
 
+/** @brief Send an access payload message.
+ *
+ *  @param tx      Network TX parameters. Only @c ctx, @c src and @c friend_cred
+ *                 have to be filled.
+ *  @param msg     Access payload to send.
+ *  @param cb      Message callback.
+ *  @param cb_data Message callback data.
+ *
+ *  @return 0 on success, or (negative) error code otherwise.
+ */
 int bt_mesh_trans_send(struct bt_mesh_net_tx *tx, struct net_buf_simple *msg,
 		       const struct bt_mesh_send_cb *cb, void *cb_data);
 
@@ -99,11 +101,12 @@ int bt_mesh_trans_recv(struct net_buf_simple *buf, struct bt_mesh_net_rx *rx);
 
 void bt_mesh_trans_init(void);
 
-void bt_mesh_rpl_clear(void);
+void bt_mesh_trans_reset(void);
 
-bool bt_mesh_rpl_check(struct bt_mesh_net_rx *rx, struct bt_mesh_rpl **match);
+uint8_t bt_mesh_va_add(uint8_t uuid[16], uint16_t *addr);
 
-int bt_mesh_heartbeat_send(const struct bt_mesh_send_cb *cb, void *cb_data);
+uint8_t bt_mesh_va_del(uint8_t uuid[16], uint16_t *addr);
 
-int bt_mesh_app_key_get(const struct bt_mesh_subnet *subnet, uint16_t app_idx,
-			uint16_t addr, const uint8_t **key, uint8_t *aid);
+uint8_t *bt_mesh_va_label_get(uint16_t addr);
+
+void bt_mesh_va_pending_store(void);

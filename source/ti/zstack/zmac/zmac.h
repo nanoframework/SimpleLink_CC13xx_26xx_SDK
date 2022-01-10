@@ -59,6 +59,7 @@ extern "C"
 
 #include "zcomdef.h"
 #include "zmac_internal.h"
+#include "mac.h"
 
 /*********************************************************************
  * MACROS
@@ -674,6 +675,11 @@ typedef enum
    * This function sends out an enhanced active scan request
    */
   extern ZMacStatus_t ZMacEnhancedActiveScanReq( ZMacScanReq_t *param );
+
+  /*
+   * Sets MAC PIB values specific for Z-Stack (after calling ZMacReset)
+   */
+  extern void ZMacSetZigbeeMACParams(void);
 
 /*********************************************************************
 *********************************************************************/

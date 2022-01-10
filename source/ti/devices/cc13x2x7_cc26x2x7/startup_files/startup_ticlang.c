@@ -106,7 +106,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // 15 The SysTick handler
     //--- External interrupts ---
     IntDefaultHandler,                      // 16 AON edge detect
-    IntDefaultHandler,                      // 17 I2C
+    IntDefaultHandler,                      // 17 Interrupt event from I2C
     IntDefaultHandler,                      // 18 RF Core Command & Packet Engine 1
     IntDefaultHandler,                      // 19 PKA Interrupt event
     IntDefaultHandler,                      // 20 AON RTC

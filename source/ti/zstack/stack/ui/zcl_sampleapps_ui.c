@@ -2232,9 +2232,9 @@ CUI_clientHandle_t UI_Init(uint8_t  zclSampleApp_Entity, uint32_t *zclSampleAppE
   /* Initialize btns */
   Button_Params bparams;
   Button_Params_init(&bparams);
-  gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, NULL, &bparams);
+  gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
   // Open Right button without appCallBack
-  gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, NULL, &bparams);
+  gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
   // Read button state
   if (!GPIO_read(((Button_HWAttrs*)gRightButtonHandle->hwAttrs)->gpioIndex))
@@ -2635,7 +2635,9 @@ void zclsampleApp_ui_event_loop(void)
 
   if (events & SAMPLEAPP_UI_INPUT_EVT)
   {
-    CUI_retVal_t retVal = CUI_processMenuUpdate();
+    CUI_retVal_t retVal;
+    events &= ~SAMPLEAPP_UI_INPUT_EVT;
+    retVal = CUI_processMenuUpdate();
     if (CUI_SUCCESS != retVal)
     {
       while(1)
@@ -2643,7 +2645,6 @@ void zclsampleApp_ui_event_loop(void)
 
       };
     }
-    events &= ~SAMPLEAPP_UI_INPUT_EVT;
   }
 
 #if !defined (DISABLE_GREENPOWER_BASIC_PROXY) && (ZG_BUILD_RTR_TYPE)
@@ -2659,9 +2660,6 @@ void zclsampleApp_ui_event_loop(void)
     UI_processKey(keys, Button_EV_CLICKED);
     events &= ~SAMPLEAPP_KEY_EVT_UI;
   }
-
-
-  events = 0;  //This should not happen...
 }
 
 #if defined(USE_DMM) && defined(BLOCK_MODE_TEST)

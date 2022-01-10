@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,18 +46,6 @@ let family = Common.device2Family(system.deviceData, "ADCBuf");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  @param inst       - ADCBuf instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -91,7 +79,6 @@ by the application.
 
     defaultInstanceName: "CONFIG_ADCBUF_",
     config: Common.addNameConfig(config, "/ti/drivers/ADC", "CONFIG_ADCBUF_"),
-    validate: validate,
     modules: Common.autoForceModules(["Board", "Power", "DMA"]),
 
     _getPinResources: _getPinResources

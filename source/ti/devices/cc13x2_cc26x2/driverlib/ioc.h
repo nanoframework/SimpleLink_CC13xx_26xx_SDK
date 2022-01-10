@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       ioc.h
-*  Revised:        2020-11-05 14:33:43 +0100 (Thu, 05 Nov 2020)
-*  Revision:       59279
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the IO Controller.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -1086,7 +1086,6 @@ extern void IOCPinTypeSsiSlave(uint32_t ui32Base, uint32_t ui32Rx,
 //*****************************************************************************
 extern void IOCPinTypeI2c(uint32_t ui32Base, uint32_t ui32Data,
                           uint32_t ui32Clk);
-
 
 //*****************************************************************************
 //

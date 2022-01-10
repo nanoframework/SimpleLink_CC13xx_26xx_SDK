@@ -5,7 +5,7 @@
  @brief ECJPAKE alternate prototypes and structures.
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -250,7 +250,7 @@ int mbedtls_ecjpake_read_round_two( mbedtls_ecjpake_context *ctx,
 
 /**
  * \brief           Derive the shared secret
- *                  (TLS: Pre-Master Secret)
+ *                  (TLS: Pre-NetworkKey Secret)
  *
  * \param ctx       Context to use
  * \param buf       Buffer to write the contents to

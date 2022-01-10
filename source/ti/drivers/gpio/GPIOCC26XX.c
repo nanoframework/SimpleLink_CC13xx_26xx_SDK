@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,249 +31,41 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 
 #include <ti/drivers/dpl/HwiP.h>
-#include <ti/drivers/dpl/SemaphoreP.h>
 
-#include <ti/drivers/PIN.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/gpio/GPIOCC26XX.h>
+#include <ti/drivers/Power.h>
+#include <ti/drivers/power/PowerCC26XX.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(inc/hw_ints.h)
-#include DeviceFamily_constructPath(driverlib/interrupt.h)
-#include DeviceFamily_constructPath(driverlib/prcm.h)
+#include DeviceFamily_constructPath(inc/hw_ioc.h)
+#include DeviceFamily_constructPath(inc/hw_gpio.h)
+#include DeviceFamily_constructPath(inc/hw_aon_event.h)
+#include DeviceFamily_constructPath(inc/hw_memmap.h)
+#include DeviceFamily_constructPath(inc/hw_types.h)
 #include DeviceFamily_constructPath(driverlib/gpio.h)
-#include DeviceFamily_constructPath(driverlib/ioc.h)
 
-#if defined(__IAR_SYSTEMS_ICC__)
-#include <intrinsics.h>
-#define PIN2IOID(pin)   (31 - __CLZ(pin))
-#define IOID2PIN(ioid)  (1 << ioid)
-#endif
-
-#if defined(__TI_COMPILER_VERSION__)
-#define PIN2IOID(pin)   (31 - __clz(pin))
-#define IOID2PIN(ioid)  (1 << ioid)
-#endif
-
-#if defined(__GNUC__) && !defined(__TI_COMPILER_VERSION__)
-#define PIN2IOID(pin)   (31 - __builtin_clz(pin))
-#define IOID2PIN(ioid)  (1 << ioid)
-#endif
-
-/*
- * By default disable both asserts and log for this module.
- * This must be done before DebugP.h is included.
- */
-#ifndef DebugP_ASSERT_ENABLED
-#define DebugP_ASSERT_ENABLED 0
-#endif
-#ifndef DebugP_LOG_ENABLED
-#define DebugP_LOG_ENABLED 0
-#endif
-
-static PIN_State gpioPinState;
-static PIN_Handle gpioPinHandle;
-static PIN_Config gpioPinTable[] = {
-    PIN_TERMINATE
-};
-
-/*
- * Map GPIO_INT types to corresponding PIN interrupt options
- */
-static const uint32_t interruptType[] = {
-    0,                  /* Undefined interrupt type */
-    PIN_IRQ_NEGEDGE,    /* Interrupt on falling edge */
-    PIN_IRQ_POSEDGE,    /* Interrupt on rising edge */
-    PIN_IRQ_BOTHEDGES,  /* Interrupt on both edges */
-    0,                  /* Interrupt on low level, not supported */
-    0                   /* Interrupt on high level, not supported */
-};
-
-/*
- * EDGE_IRQ_EN_MASK is used to strip the EDGE_IRQ_EN bit (bit 18)
- * of an updateMask argument to prevent auto-enabling of interrupt
- * by PIN_setConfig().
- */
-#define EDGE_IRQ_EN_MASK        (0xFFFBFFFF)
-
-/* Table of GPIO input types */
-const uint32_t inPinTypes [] = {
-    PIN_INPUT_EN | PIN_NOPULL,      /* GPIO_CFG_IN_NOPULL */
-    PIN_INPUT_EN | PIN_PULLUP,      /* GPIO_CFG_IN_PU */
-    PIN_INPUT_EN | PIN_PULLDOWN     /* GPIO_CFG_IN_PD */
-};
-
-/* Table of GPIO output types */
-const uint32_t outPinTypes [] = {
-    PIN_GPIO_OUTPUT_EN | PIN_PUSHPULL,                   /* GPIO_CFG_OUT_STD */
-    PIN_GPIO_OUTPUT_EN | PIN_OPENDRAIN | PIN_NOPULL,     /* GPIO_CFG_OUT_OD_NOPULL */
-    PIN_GPIO_OUTPUT_EN | PIN_OPENDRAIN | PIN_PULLUP,     /* GPIO_CFG_OUT_OD_PU */
-    PIN_GPIO_OUTPUT_EN | PIN_OPENDRAIN | PIN_PULLDOWN    /* GPIO_CFG_OUT_OD_PD */
-};
-
-/* Table of GPIO drive strengths */
-const uint32_t outPinStrengths [] = {
-    PIN_DRVSTR_MIN,    /* GPIO_CFG_OUT_STR_LOW */
-    PIN_DRVSTR_MED,    /* GPIO_CFG_OUT_STR_MED */
-    PIN_DRVSTR_MAX     /* GPIO_CFG_OUT_STR_HIGH */
-};
-
-#define NUM_PORTS           1
-#define NUM_PINS_PER_PORT   32
-
-/*
- * Extracts the GPIO interrupt type from the pinConfig.  Value to index into the
- * interruptType table.
- */
-#define getIntTypeNumber(pinConfig) \
-    ((pinConfig & GPIO_CFG_INT_MASK) >> GPIO_CFG_INT_LSB)
-
-/* Uninitialized callbackInfo pinIndex */
-#define CALLBACK_INDEX_NOT_CONFIGURED 0xFF
-
-/*
- * Device specific interpretation of the GPIO_PinConfig content
- */
-typedef struct {
-    uint8_t ioid;
-    uint8_t added;  /* 0 = pin has not been added to gpioPinState */
-    uint16_t config;
-} PinConfig;
-
-/*
- * User defined pin indexes assigned to a port's pins.
- * Used by pin callback function to locate callback assigned
- * to a pin.
- */
-typedef struct {
-    /*
-     * the port's corresponding
-     * user defined pinId indices
-     */
-    uint8_t pinIndex[NUM_PINS_PER_PORT];
-} PortCallbackInfo;
-
-/*
- * Only one PortCallbackInfo object is needed for CC26xx since the 32 pins
- * are all on one port.
- */
-static PortCallbackInfo gpioCallbackInfo;
-
-/*
- *  Bit mask used to keep track of which pins (IOIDs) of the GPIO objects
- *  in the config structure have interrupts enabled.
- */
-static uint32_t configIntsEnabledMask = 0;
-
-/*
- * Internal boolean to confirm that GPIO_init() has been called.
- */
 static bool initCalled = false;
 
-__attribute__((weak))extern const GPIOCC26XX_Config GPIOCC26XX_config;
+// HW interrupt structure for I/O interrupt handler
+static HwiP_Struct gpioHwi;
 
-/*
- *  ======== getInPinTypesIndex ========
- */
-static inline uint32_t getInPinTypesIndex(uint32_t pinConfig)
-{
-    uint32_t index;
-
-    index = (pinConfig & GPIO_CFG_IN_TYPE_MASK) >> GPIO_CFG_IN_TYPE_LSB;
-
-    /*
-     * If index is out-of-range, default to 0. This should never
-     * happen, but it's needed to keep Klocwork checker happy.
-     */
-    if (index >= sizeof(inPinTypes) / sizeof(inPinTypes[0])) {
-        index = 0;
-    }
-
-    return (index);
-}
-
-/*
- *  ======== getInterruptTypeIndex ========
- */
-static inline uint32_t getInterruptTypeIndex(uint32_t pinConfig)
-{
-    uint32_t index;
-
-    index = (pinConfig & GPIO_CFG_INT_MASK) >> GPIO_CFG_INT_LSB;
-
-    /*
-     * If index is out-of-range, default to 0. This should never
-     * happen, but it's needed to keep Klocwork checker happy.
-     */
-    if (index >= sizeof(interruptType) / sizeof(interruptType[0])) {
-        index = 0;
-    }
-
-    return (index);
-};
-
-/*
- *  ======== getOutPinTypesIndex ========
- */
-static inline uint32_t getOutPinTypesIndex(uint32_t pinConfig)
-{
-    uint32_t index;
-
-    index = (pinConfig & GPIO_CFG_OUT_TYPE_MASK) >> GPIO_CFG_OUT_TYPE_LSB;
-
-    /*
-     * If index is out-of-range, default to 0. This should never
-     * happen, but it's needed to keep Klocwork checker happy.
-     */
-    if (index >= sizeof(outPinTypes) / sizeof(outPinTypes[0])) {
-        index = 0;
-    }
-
-    return (index);
-}
-
-/*
- *  ======== getOutPinStrengthsIndex ========
- */
-static inline uint32_t getOutPinStrengthsIndex(uint32_t pinConfig)
-{
-    uint32_t index;
-
-    index = (pinConfig & GPIO_CFG_OUT_STRENGTH_MASK) >>
-        GPIO_CFG_OUT_STRENGTH_LSB;
-
-    /*
-     * If index is out-of-range, default to 0. This should never
-     * happen, but it's needed to keep Klocwork checker happy.
-     */
-    if (index >= sizeof(outPinStrengths) / sizeof(outPinStrengths[0])) {
-        index = 0;
-    }
-
-    return (index);
-}
-
-/*
- *  ======== getPinNumber ========
- *
- *  Internal function to efficiently find the index of the right most set bit.
- */
-static inline uint32_t getPinNumber(uint32_t x) {
-    return(x); /* ioid is the same as the pinNumber */
-}
+// Link to config values defined by sysconfig
+extern GPIO_Config GPIO_config;
+extern const uint_least8_t GPIO_pinLowerBound;
+extern const uint_least8_t GPIO_pinUpperBound;
 
 /*
  *  ======== GPIO_clearInt ========
  */
 void GPIO_clearInt(uint_least8_t index)
 {
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    /* Clear interrupt flag */
-    PIN_clrPendInterrupt(gpioPinHandle, config->ioid);
+    GPIO_clearEventDio(index);
 }
 
 /*
@@ -281,18 +73,12 @@ void GPIO_clearInt(uint_least8_t index)
  */
 void GPIO_disableInt(uint_least8_t index)
 {
-    unsigned int key;
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    /* Make atomic update */
-    key = HwiP_disable();
-
-    /* Disable interrupt. */
-    PIN_setInterrupt(gpioPinHandle, config->ioid | PIN_IRQ_DIS);
-
-    configIntsEnabledMask &= ~(1 << config->ioid);
-
-    HwiP_restore(key);
+    /* Interrupt enable is bit 18. Here we mask 0x4 out of byte 2 to disable
+     * interrupts. Note we cannot just read-write the whole register.
+     * See the IOCFG comment in setConfig().
+     */
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index) + 2;
+    HWREGB(iocfgRegAddr) = HWREGB(iocfgRegAddr) & ~0x4;
 }
 
 /*
@@ -300,21 +86,241 @@ void GPIO_disableInt(uint_least8_t index)
  */
 void GPIO_enableInt(uint_least8_t index)
 {
-    unsigned int key;
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-    uint32_t intTypeNum;
+    /* Interrupt enable is bit 18. Here we or 0x4 into byte 2 to enable
+     * interrupts. Note we cannot just read-write the whole register.
+     * See the IOCFG comment in setConfig().
+     */
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index) + 2;
+    HWREGB(iocfgRegAddr) = HWREGB(iocfgRegAddr) | 0x4;
+}
 
-    /* Make atomic update */
+/* ======== PIN_hwi_bypass ========
+ * Compatibility for PIN and GPIO coexistence
+ */
+/* Deliberate no-op; if the application does not include the PIN driver,
+ * this method will be executed instead. This avoids pulling in PIN
+ * unconditionally.
+ */
+__attribute__((weak)) void PIN_hwi_bypass(uint32_t eventMask);
+
+/*
+ *  ======== GPIO_hwiIntFxn ========
+ *  Hwi function that processes GPIO interrupts.
+ */
+void GPIO_hwiIntFxn(uintptr_t arg)
+{
+    uint32_t flagIndex;
+    uint32_t eventMask;
+
+    /* Keep track of unhandled interrupts to forward to PIN
+     * This will be removed along with PIN in 2Q22's SDK
+     */
+    uint32_t pinEventMask = 0;
+
+    // Get and clear the interrupt mask
+    eventMask = HWREG(GPIO_BASE + GPIO_O_EVFLAGS31_0);
+    HWREG(GPIO_BASE + GPIO_O_EVFLAGS31_0) = eventMask;
+
+    while (eventMask)
+    {
+        // MASK_TO_PIN only detects the highest set bit
+        flagIndex = GPIO_MASK_TO_PIN(eventMask);
+
+        // So it's safe to use PIN_TO_MASK to clear that bit
+        eventMask &= ~GPIO_PIN_TO_MASK(flagIndex);
+
+        if (GPIO_config.callbacks[flagIndex] != NULL)
+        {
+            GPIO_config.callbacks[flagIndex](flagIndex);
+        }
+        else
+        {
+            pinEventMask |= GPIO_PIN_TO_MASK(flagIndex);
+        }
+    }
+
+    /* Forward unhandled interrupts to the PIN driver, if included
+     * If not included, just calls the empty function above
+     * This will be removed along with PIN in 2Q22's SDK
+     */
+    if (pinEventMask)
+    {
+        PIN_hwi_bypass(pinEventMask);
+    }
+
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+    uint32_t eventMaskUpper = HWREG(GPIO_BASE + GPIO_O_EVFLAGS47_32);
+    HWREG(GPIO_BASE + GPIO_O_EVFLAGS47_32) = eventMaskUpper;
+
+    while (eventMaskUpper)
+    {
+        // MASK_TO_PIN only detects the highest set bit
+        flagIndex = GPIO_MASK_TO_PIN(eventMaskUpper);
+
+        // So it's safe to use PIN_TO_MASK to clear that bit
+        eventMaskUpper &= ~GPIO_PIN_TO_MASK(flagIndex);
+
+        if (GPIO_config.callbacks[flagIndex + 32] != NULL)
+        {
+            GPIO_config.callbacks[flagIndex + 32](flagIndex + 32);
+        }
+    }
+#endif
+}
+
+/*
+ *  ======== GPIO_init ========
+ */
+void GPIO_init()
+{
+    uintptr_t key;
+    unsigned int i;
+    HwiP_Params hwiParams;
+    uint32_t enableMask = 0x0;
+
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+    uint32_t tempPinConfigs[64];
+#else
+    uint32_t tempPinConfigs[32];
+#endif
+
     key = HwiP_disable();
 
-    /* Get the index into the interruptType array */
-    intTypeNum = getIntTypeNumber((config->config << 16));
+    if (initCalled)
+    {
+        HwiP_restore(key);
+        return;
+    }
+    initCalled = true;
+    HwiP_restore(key);
 
-    /* Enable interrupt. */
-    PIN_setInterrupt(gpioPinHandle, (config->ioid | interruptType[intTypeNum]));
+    // This is safe even if Power_init has already been called.
+    Power_init();
 
-    configIntsEnabledMask |= (1 << config->ioid);
+    // Set Power dependecies & constraints
+    Power_setDependency(PowerCC26XX_PERIPH_GPIO);
 
+    // Setup HWI handler
+    HwiP_Params_init(&hwiParams);
+    hwiParams.priority = ~0;
+    HwiP_construct(&gpioHwi, INT_AON_GPIO_EDGE, GPIO_hwiIntFxn, &hwiParams);
+
+    // Note: pinUpperBound is inclusive, so we use <= instead of just <
+    for (i = GPIO_pinLowerBound; i <= GPIO_pinUpperBound; i++)
+    {
+        uint32_t pinConfig = GPIO_config.configs[i];
+
+        /* Need to mask off mux byte, since it contains special configs */
+        tempPinConfigs[i] = pinConfig & 0xFFFFFF00;
+
+        if (!(pinConfig & GPIOCC26XX_CFG_PIN_IS_INPUT_INTERNAL))
+        {
+            enableMask |= 1 << i;
+            GPIO_write(i, pinConfig & GPIO_CFG_OUT_HIGH ? 1 : 0);
+        }
+    }
+
+    HWREG(GPIO_BASE + GPIO_O_DOE31_0) = enableMask;
+
+    /* Apply all the masked values directly to IOC
+     * pinUpperBound is inclusive, so we need to add 1 to get the full range
+     * Multiply by 4 because each pin config and IOC register is 4 bytes wide
+     */
+    memcpy((void*) (IOC_BASE + IOC_O_IOCFG0 + (4 * GPIO_pinLowerBound)),
+           (void*) &tempPinConfigs[GPIO_pinLowerBound],
+           ((GPIO_pinUpperBound + 1) - GPIO_pinLowerBound) * 4);
+
+    // Setup wakeup source to wake up from standby (use MCU_WU1)
+    HWREG(AON_EVENT_BASE + AON_EVENT_O_MCUWUSEL) = (HWREG(AON_EVENT_BASE + AON_EVENT_O_MCUWUSEL) &
+                                                   (~AON_EVENT_MCUWUSEL_WU1_EV_M)) |
+                                                   AON_EVENT_MCUWUSEL_WU1_EV_PAD;
+}
+
+/*
+ *  ======== GPIO_read ========
+ */
+uint_fast8_t GPIO_read(uint_least8_t index)
+{
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+    if (index > 32)
+    {
+        return HWREG(GPIO_BASE + GPIO_O_DIN47_32) &
+               GPIO_PIN_TO_MASK(index - 32)
+               ? 1 : 0;
+    }
+#endif
+    return HWREG(GPIO_BASE + GPIO_O_DIN31_0)
+           & GPIO_PIN_TO_MASK(index)
+           ? 1 : 0;
+}
+
+/*
+ *  ======== GPIO_setConfig ========
+ */
+int_fast16_t GPIO_setConfig(uint_least8_t index, GPIO_PinConfig pinConfig)
+{
+    uintptr_t key;
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index);
+    uint32_t previousConfig = HWREG(iocfgRegAddr);
+
+    /* Note: Do not change this to check PIN_IS_OUTPUT, because that is 0x0 */
+    uint32_t pinWillBeOutput = !(pinConfig & GPIOCC26XX_CFG_PIN_IS_INPUT_INTERNAL);
+
+    /* Special configurations are stored in the lowest 8 bits and need to be removed
+     * We can make choices based on these values, but must not write them to hardware */
+    GPIO_PinConfig tmpConfig = pinConfig & 0xFFFFFF00;
+
+    if ((previousConfig & 0xFF) != GPIO_MUX_GPIO)
+    {
+        /* If we're updating mux as well, we can write the whole register */
+        HWREG(iocfgRegAddr) = tmpConfig | GPIO_MUX_GPIO;
+    }
+    else
+    {
+        /*
+        * Writes to the first byte of the IOCFG register will cause a glitch
+        * on the internal IO line. To avoid this, we only want to write
+        * the upper 24-bits of the IOCFG register when updating the configuration
+        * bits. We do this 1 byte at a time.
+        */
+        key = HwiP_disable();
+        HWREGB(iocfgRegAddr + 1) = (uint8_t) (tmpConfig >> 8);
+        HWREGB(iocfgRegAddr + 2) = (uint8_t) (tmpConfig >> 16);
+        HWREGB(iocfgRegAddr + 3) = (uint8_t) (tmpConfig >> 24);
+        HwiP_restore(key);
+    }
+
+    /* If this pin is being configured to an output, set the new output value
+     * It's important to do this before we change from INPUT to OUTPUT if
+     * applicable. If we're already an output this is fine, and if we're input
+     * changing to input this statement will not execute. */
+    if (pinWillBeOutput)
+    {
+        GPIO_write(index, pinConfig & GPIO_CFG_OUT_HIGH ? 1 : 0);
+    }
+
+    key = HwiP_disable();
+    GPIO_setOutputEnableDio(index, pinWillBeOutput ? GPIO_OUTPUT_ENABLE : GPIO_OUTPUT_DISABLE);
+    HwiP_restore(key);
+
+    return GPIO_STATUS_SUCCESS;
+}
+
+/*
+ *  ======== GPIO_setInterruptConfig ========
+ */
+void GPIO_setInterruptConfig(uint_least8_t index, GPIO_PinConfig config)
+{
+    uintptr_t key;
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index) + 2;
+
+    /* Shift down and mask away all non-interrupt configuration */
+    uint8_t maskedConfig = (config >> 16) & 0x7;
+
+    /* Mask out current interrupt config and apply the new one */
+    key = HwiP_disable();
+    uint8_t currentRegisterConfig = HWREGB(iocfgRegAddr) & 0xF8;
+    HWREGB(iocfgRegAddr) = currentRegisterConfig | maskedConfig;
     HwiP_restore(key);
 }
 
@@ -323,239 +329,25 @@ void GPIO_enableInt(uint_least8_t index)
  */
 void GPIO_getConfig(uint_least8_t index, GPIO_PinConfig *pinConfig)
 {
-    *pinConfig = GPIOCC26XX_config.pinConfigs[index];
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index);
+    *pinConfig = HWREG(iocfgRegAddr);
 }
 
 /*
- *  ======== GPIO_hwiIntFxn ========
- *  Hwi function that processes GPIO interrupts.
+ *  ======== GPIO_setMux ========
  */
-void GPIO_hwiIntFxn(PIN_Handle pinHandle, PIN_Id pinId)
+void GPIO_setMux(uint_least8_t index, uint32_t mux)
 {
-    unsigned int      pinIndex;
+    uintptr_t key;
+    uint32_t iocfgRegAddr = IOC_BASE + IOC_O_IOCFG0 + (4 * index);
+    uint32_t previousConfig = HWREG(iocfgRegAddr);
 
-    pinIndex = gpioCallbackInfo.pinIndex[pinId];
-
-    /* only call plugged callbacks */
-    if (pinIndex != CALLBACK_INDEX_NOT_CONFIGURED) {
-        /* PIN_swi() will call callback even if interrupt is disabled */
-        if ((1 << pinId) & configIntsEnabledMask) {
-            GPIOCC26XX_config.callbacks[pinIndex](pinIndex);
-        }
+    key = HwiP_disable();
+    if ((previousConfig & 0xFF) != mux)
+    {
+        HWREGB(iocfgRegAddr) = (uint8_t) (mux);
     }
-}
-
-/*
- *  ======== GPIO_init ========
- */
-void GPIO_init()
-{
-    unsigned int i, hwiKey;
-    SemaphoreP_Handle sem;
-    static SemaphoreP_Handle initSem;
-
-    /* speculatively create a binary semaphore */
-    sem = SemaphoreP_createBinary(1);
-
-    /* There is no way to inform user of this fatal error. */
-    if (sem == NULL) return;
-
-    hwiKey = HwiP_disable();
-
-    if (initSem == NULL) {
-        initSem = sem;
-        HwiP_restore(hwiKey);
-    }
-    else {
-        /* init already called */
-        HwiP_restore(hwiKey);
-        /* delete unused Semaphore */
-        if (sem) SemaphoreP_delete(sem);
-    }
-
-    /* now use the semaphore to protect init code */
-    SemaphoreP_pend(initSem, SemaphoreP_WAIT_FOREVER);
-
-    /* Only perform init once */
-    if (initCalled) {
-        SemaphoreP_post(initSem);
-        return;
-    }
-
-    gpioPinHandle = PIN_open(&gpioPinState, gpioPinTable);
-
-    /* install our Hwi callback function */
-    PIN_registerIntCb(gpioPinHandle, GPIO_hwiIntFxn);
-
-    for (i = 0; i < NUM_PINS_PER_PORT; i++) {
-        gpioCallbackInfo.pinIndex[i] = CALLBACK_INDEX_NOT_CONFIGURED;
-    }
-
-    /*
-     * Configure pins and create Hwis per static array content
-     */
-    for (i = 0; i < GPIOCC26XX_config.numberOfPinConfigs; i++) {
-        if (!(GPIOCC26XX_config.pinConfigs[i] & GPIO_DO_NOT_CONFIG)) {
-            GPIO_setConfig(i, GPIOCC26XX_config.pinConfigs[i]);
-        }
-        if (i < GPIOCC26XX_config.numberOfCallbacks) {
-            if (GPIOCC26XX_config.callbacks[i] != NULL) {
-                /* create Hwi as necessary */
-                GPIO_setCallback(i, GPIOCC26XX_config.callbacks[i]);
-            }
-        }
-    }
-
-    initCalled = true;
-
-    SemaphoreP_post(initSem);
-}
-
-/*
- *  ======== GPIO_read ========
- */
-uint_fast8_t GPIO_read(uint_least8_t index)
-{
-    unsigned int value;
-
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    value = GPIO_readMultiDio(IOID2PIN(config->ioid));
-
-    value = value & (IOID2PIN(config->ioid)) ? 1 : 0;
-
-    return (value);
-}
-
-/*
- *  ======== GPIO_setCallback ========
- */
-void GPIO_setCallback(uint_least8_t index, GPIO_CallbackFxn callback)
-{
-    uint32_t   pinNum;
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    /*
-     * Ignore bogus callback indexes.
-     * Required to prevent out-of-range callback accesses if
-     * there are configured pins without callbacks
-     */
-    if (index >= GPIOCC26XX_config.numberOfCallbacks) {
-        return;
-    }
-
-    /*
-     * plug the pin index into the corresponding
-     * port's callbackInfo pinIndex entry
-     */
-    pinNum = getPinNumber(config->ioid);
-
-    if (callback == NULL) {
-        gpioCallbackInfo.pinIndex[pinNum] =
-            CALLBACK_INDEX_NOT_CONFIGURED;
-    }
-    else {
-        gpioCallbackInfo.pinIndex[pinNum] = index;
-    }
-
-    /*
-     * Only update callBackFunctions entry if different.
-     * This allows the callBackFunctions array to be in flash for static systems.
-     */
-    if (GPIOCC26XX_config.callbacks[index] != callback) {
-        GPIOCC26XX_config.callbacks[index] = callback;
-    }
-}
-
-/*
- *  ======== GPIO_setConfig ========
- */
-int_fast16_t GPIO_setConfig(uint_least8_t index, GPIO_PinConfig pinConfig)
-{
-    unsigned int key;
-    uint16_t direction;
-    GPIO_PinConfig gpioPinConfig;
-    PIN_Config pinPinConfig = 0; /* PIN driver PIN_config ! */
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    if (pinPinConfig & GPIO_DO_NOT_CONFIG) {
-        return (GPIO_STATUS_SUCCESS);
-    }
-
-    if ((pinConfig & GPIO_CFG_IN_INT_ONLY) == 0) {
-        if (pinConfig & GPIO_CFG_INPUT) {
-            /* configure input */
-            direction = GPIO_OUTPUT_DISABLE;
-            pinPinConfig = inPinTypes[getInPinTypesIndex(pinConfig)];
-        }
-        else {
-            /* configure output */
-            direction = GPIO_OUTPUT_ENABLE;
-            pinPinConfig = outPinTypes[getOutPinTypesIndex(pinConfig)];
-            pinPinConfig |=
-                outPinStrengths[getOutPinStrengthsIndex(pinConfig)];
-        }
-
-        key = HwiP_disable();
-
-        /* Set output value */
-        if (direction == GPIO_OUTPUT_ENABLE) {
-            pinPinConfig |= ((pinConfig & GPIO_CFG_OUT_HIGH) ? PIN_GPIO_HIGH : PIN_GPIO_LOW);
-        }
-
-        /*
-         *  Update pinConfig with the latest GPIO configuration and
-         *  clear the GPIO_DO_NOT_CONFIG bit if it was set.
-         */
-        gpioPinConfig = GPIOCC26XX_config.pinConfigs[index];
-        gpioPinConfig &= ~(GPIO_CFG_IO_MASK | GPIO_DO_NOT_CONFIG);
-        gpioPinConfig |= (pinConfig & GPIO_CFG_IO_MASK);
-        GPIOCC26XX_config.pinConfigs[index] = gpioPinConfig;
-
-        HwiP_restore(key);
-    }
-
-    /* Set type of interrupt and then clear it */
-    if (pinConfig & GPIO_CFG_INT_MASK) {
-        key = HwiP_disable();
-
-        /*
-         *  Update pinConfig with the latest interrupt configuration and
-         *  clear the GPIO_DO_NOT_CONFIG bit if it was set.
-         */
-        gpioPinConfig = GPIOCC26XX_config.pinConfigs[index];
-        gpioPinConfig &= ~(GPIO_CFG_INT_MASK | GPIO_DO_NOT_CONFIG);
-        gpioPinConfig |= (pinConfig & GPIO_CFG_INT_MASK);
-        GPIOCC26XX_config.pinConfigs[index] = gpioPinConfig;
-
-        pinPinConfig |= interruptType[getInterruptTypeIndex(pinConfig)];
-        HwiP_restore(key);
-    }
-
-    /* or in the pin ID */
-    pinPinConfig |= (uint32_t)config->ioid;
-
-    if (config->added == 0) {
-        if (PIN_add(gpioPinHandle, pinPinConfig) != PIN_SUCCESS) {
-            return (GPIO_STATUS_ERROR);
-        }
-        config->added = 1;
-    }
-    else {
-        uint32_t bmMask;
-        if (pinConfig & GPIO_CFG_IN_INT_ONLY) {
-            bmMask = PIN_BM_IRQ;
-        }
-        else {
-            bmMask = PIN_BM_ALL;
-        }
-        if (PIN_setConfig(gpioPinHandle, bmMask & EDGE_IRQ_EN_MASK,
-                          pinPinConfig) != PIN_SUCCESS) {
-            return (GPIO_STATUS_ERROR);
-        }
-    }
-
-    return (GPIO_STATUS_SUCCESS);
+    HwiP_restore(key);
 }
 
 /*
@@ -563,18 +355,7 @@ int_fast16_t GPIO_setConfig(uint_least8_t index, GPIO_PinConfig pinConfig)
  */
 void GPIO_toggle(uint_least8_t index)
 {
-    unsigned int key;
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    /* Make atomic update */
-    key = HwiP_disable();
-
-    GPIO_toggleDio(config->ioid);
-
-    /* Update config table entry with value written */
-    GPIOCC26XX_config.pinConfigs[index] ^= GPIO_CFG_OUT_HIGH;
-
-    HwiP_restore(key);
+    GPIO_toggleDio(index);
 }
 
 /*
@@ -582,48 +363,5 @@ void GPIO_toggle(uint_least8_t index)
  */
 void GPIO_write(uint_least8_t index, unsigned int value)
 {
-    unsigned int key;
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-
-    key = HwiP_disable();
-
-    if (value) {
-        /* Set the pinConfig output bit to high */
-        GPIOCC26XX_config.pinConfigs[index] |= GPIO_CFG_OUT_HIGH;
-    }
-    else {
-        /* Clear output from pinConfig */
-        GPIOCC26XX_config.pinConfigs[index] &= ~GPIO_CFG_OUT_HIGH;
-    }
-
-    value = value ? IOID2PIN(config->ioid) : 0;
-
-    GPIO_writeMultiDio(IOID2PIN(config->ioid), value);
-
-    HwiP_restore(key);
-}
-
-/*
- *  ======== GPIOCC26xx_release ========
- */
-void GPIOCC26xx_release(int index)
-{
-    PinConfig *config = (PinConfig *) &GPIOCC26XX_config.pinConfigs[index];
-    unsigned int key;
-
-    key = HwiP_disable();
-
-    if (config->added) {
-        /* disable the pin's interrupt */
-        GPIO_disableInt(index);
-
-        /* remove its callback */
-        GPIO_setCallback(index, NULL);
-
-        config->added = 0;
-
-        PIN_remove(gpioPinHandle, config->ioid);
-    }
-
-    HwiP_restore(key);
+    HWREGB(GPIO_BASE + GPIO_O_DOUT3_0 + index) = (value & 0x1);
 }

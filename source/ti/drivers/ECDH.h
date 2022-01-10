@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@
  *        The driver validates private keys against the provided curve by default.
  *      - Initialize the private key CryptoKey. CryptoKeys are opaque data structures and representations
  *        of keying material and its storage. Depending on how the keying material
- *        is stored (RAM or flash, key store, key blob), the CryptoKey must be
+ *        is stored (RAM or flash, key store), the CryptoKey must be
  *        initialized differently. The ECDH API can handle all types of CryptoKey.
  *        However, not all device-specific implementations support all types of CryptoKey.
  *        Devices without a key store will not support CryptoKeys with keying material
@@ -117,6 +117,15 @@
  * to calculate the shared secret:
  *      - Initialize a CryptoKey as public key with the keying material received from the other
  *        party.
+ *      - Initialize the private key CryptoKey with the key used to generate your
+ *        public key. CryptoKeys are opaque data structures and representations
+ *        of keying material and its storage. Depending on how the keying material
+ *        is stored (RAM or flash, key store), the CryptoKey must be
+ *        initialized differently. The ECDH API can handle all types of CryptoKey.
+ *        However, not all device-specific implementations support all types of CryptoKey.
+ *        Devices without a key store will not support CryptoKeys with keying material
+ *        stored in a key store for example.
+ *        All devices support plaintext CryptoKeys.
  *      - Initialize a blank CryptoKey with the same size as the previously initialized
  *        public key.
  *      - Initialize the ECDH_OperationComputeSharedSecret struct and then populate it. By
@@ -183,6 +192,10 @@
  * | Montgomery         | [0x04, X, Y]          | 1 + 2 * Curve Param Length |
  * | Montgomery         | [X]                   | Curve Param Length         |
  * | Edwards            | [0x04, X, Y]          | 1 + 2 * Curve Param Length |
+ *
+ * Note: This driver will automatically prune the private key according to
+ *       RFC 7748 for the following curve:
+ *           X25519
  *
  * @anchor ti_drivers_ECDH_Synopsis
  * ## Synopsis

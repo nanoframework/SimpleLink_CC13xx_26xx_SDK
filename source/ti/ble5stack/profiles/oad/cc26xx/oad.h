@@ -5,7 +5,7 @@
  @brief This file contains OAD Profile header file.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -463,7 +463,7 @@ extern "C"
 /** @} End OAD_STATUS_CODES */
 
 /// @cond NODOC
-#if defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC13X2)
+#if defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC13X2) || defined(DeviceFamily_CC26X1)
 #define BIM_START                           0x56000
 #elif defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7)
 #define BIM_START                           0xAE000

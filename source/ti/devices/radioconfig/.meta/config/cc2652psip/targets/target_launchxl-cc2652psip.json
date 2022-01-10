@@ -3,11 +3,11 @@
         "Name": "LP_CC2652PSIP",
         "Revision": [],
         "Description": {
-            "p": "CC2652P SIP. 7x7 VQFN48 package. External bias, differential output, 2.4 GHz band."
+            "p": "CC2652P SIP. 7x7 VQFN48 package. Internal bias, differential output, 2.4 GHz band."
         },
         "DeviceName": "CC2652PSIP",
         "DevicePackage": "MOT 7x7",
-        "FrontEnd": "XD",
+        "FrontEnd": "ID",
         "PaSettings": "pasettings.json",
         "RfDesign": "CC2652PSIP",
         "DefaultCategory": "Settings",

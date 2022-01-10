@@ -35,7 +35,8 @@
 /*
  *  ======== rf_settings.h.xdt ========
  */
-    
+const DevInfo = system.getScript("/ti/devices/radioconfig/device_info.js");
+
 /* Header templates */
 const fileHeader = system.getTemplate("/ti/devices/radioconfig/templates/fileheader.xdt");
 
@@ -45,14 +46,18 @@ const patchHandler = system.getScript("/ti/devices/radioconfig/patch_handler.js"
 /* Localize the object names with this device ID */
 const keys = Object.keys(system.modules).sort();
 
-/* code generation template for RF Settings (H file) */
+/* Code generation template for RF Settings (H file) */
 const templateName = "/ti/devices/radioconfig/templates/rf_settings.h.xdt";
 
-/* get list of include files */
+/* Get list of include files */
 const includes = patchHandler.generateIncludesH(keys);
 
 /* RF Frontend header */
 const frontendHeader = system.getTemplate("/ti/devices/radioconfig/templates/rf_design.h.xdt");
+
+/* Version information */
+const versions = DevInfo.getVersionInfo();
+const studioVersion = '#define SMARTRF_STUDIO_VERSION "' + versions.dataVersion + '"';
 
 %%}
 `fileHeader("ti_radio_config.h")`
@@ -60,6 +65,9 @@ const frontendHeader = system.getTemplate("/ti/devices/radioconfig/templates/rf_
 #define _TI_RADIO_CONFIG_H_
 
 `includes`
+/* SmartRF Studio version that the RF data is fetched from */
+`studioVersion`
+
 `frontendHeader()`
 %
 % /* loop over all modules in the current configuration */

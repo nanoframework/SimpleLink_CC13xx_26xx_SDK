@@ -6,7 +6,7 @@
         for off-chip OAD applications.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -410,7 +410,7 @@ static void printMetaDataStruct(ExtImageInfo_t *meta, uint8_t imgNum,
 {
     uint8_t swVerSTR[OAD_SW_VER_LEN + 1];
     memcpy(swVerSTR, meta->fixedHdr.softVer, OAD_SW_VER_LEN);
-    swVerSTR[OAD_SW_VER_LEN] = NULL;
+    swVerSTR[OAD_SW_VER_LEN] = 0;
 
     /*
      * Print out metadata, format is "Member name: value"

@@ -7,7 +7,7 @@
         BLE Transport Layer.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -522,6 +522,10 @@ cmdPktTable_t hciCmdTable[] =
   {HCI_EXT_LL_TEST_MODE                     , hciExtLLTestMode                 },
 #endif // LL_TEST_MODE
   {HCI_EXT_READ_RAND_ADDR                   , hciExtReadRandAddr               },
+
+  //Channel map Classification API
+  {HCI_EXT_SET_HOST_DEFAULT_CHANNEL_CLASSIFICATION    , hciExtSetHostDefChanClass },
+  {HCI_EXT_SET_HOST_CONNECTION_CHANNEL_CLASSIFICATION , hciExtSetHostConnChanClass},
 
   // Last Table Entry Delimiter
   {0xFFFF                                   , NULL                             }
@@ -1753,6 +1757,45 @@ hciStatus_t hciLESetHostChanClass( uint8 *pBuf )
 }
 #endif // CTRL_CONFIG=INIT_CFG
 
+/*******************************************************************************
+ * @fn          hciExtSetHostDefChanClass
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciExtSetHostDefChanClass( uint8 *pBuf )
+{
+  return HCI_EXT_SetHostDefChanClassificationCmd( pBuf );
+}
+
+/*******************************************************************************
+ * @fn          hciExtSetHostConnChanClass
+ *
+ * @brief       Serial interface translation function for HCI API.
+ *
+ * input parameters
+ *
+ * @param       pBuf - Pointer to command parameters and payload.
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      hciStatus_t
+ */
+hciStatus_t hciExtSetHostConnChanClass( uint8 *pBuf )
+{
+  return HCI_EXT_SetHostConnChanClassificationCmd( pBuf , BUILD_UINT16(pBuf[5], pBuf[6]) );
+}
 
 #if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_CONN_CFG) || (CTRL_CONFIG & INIT_CFG))
 /*******************************************************************************

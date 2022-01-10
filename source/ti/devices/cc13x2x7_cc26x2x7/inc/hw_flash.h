@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       hw_flash_h
-*  Revised:        2020-06-23 16:04:59 +0200 (Tue, 23 Jun 2020)
-*  Revision:       57840
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 * Copyright (c) 2015 - 2017, Texas Instruments Incorporated
 * All rights reserved.

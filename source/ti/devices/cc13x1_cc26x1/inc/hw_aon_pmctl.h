@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       hw_aon_pmctl_h
-*  Revised:        2020-09-11 15:34:09 +0200 (Fri, 11 Sep 2020)
-*  Revision:       58601
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 * Copyright (c) 2015 - 2017, Texas Instruments Incorporated
 * All rights reserved.

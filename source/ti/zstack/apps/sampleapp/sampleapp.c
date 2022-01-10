@@ -271,9 +271,9 @@ static void sampleApp_process_loop( void )
 #if ZG_BUILD_ENDDEVICE_TYPE
         if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
         {
-          zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+          zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-          Zstackapi_bdbZedAttemptRecoverNwkReq(sampleApp_serviceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+          Zstackapi_bdbRecoverNwkReq(sampleApp_serviceTaskId,&zstack_bdbRecoverNwkRsp);
 
           appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
         }
@@ -603,6 +603,8 @@ static void sampleApp_Init( void )
   zclConfigInit();
 
   // Register the Application to receive the unprocessed Foundation command/response messages
+  // User TODO: change SAMPLEAPP_ENDPOINT if default application name is modified in sysconfig
+  // this will be defined in the generated file, zcl_config.h, in the "Simple Descriptor" section
   zclport_registerZclHandleExternal(SAMPLEAPP_ENDPOINT, sampleApp_ProcessIncomingMsg);
 
   //Write the bdb initialization parameters

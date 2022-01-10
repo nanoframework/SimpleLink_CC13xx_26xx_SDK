@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2017-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,11 +44,8 @@ only with a Texas Instruments clang compiler. You appear to be using a \
 different compiler.
 #endif
 
-/* CODEGEN-6425 work-around; remove when bug is fixed */
-#pragma clang system_header
-
 /* include toolchain's header file */
-#include_next <errno.h>
+#include <../../include/c/errno.h>
 
 /* These are in errno.h but commented out. Values match GNU ARM compiler. */
 

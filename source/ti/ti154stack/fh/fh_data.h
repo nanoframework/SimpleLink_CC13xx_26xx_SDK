@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 FH module data API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -54,6 +54,7 @@
 #include "hal_types.h"
 #include "fh_pib.h"
 #include "mac_low_level.h"
+#include "mac_radio_defs.h"
 
 #if defined(TIMAC_ROM_IMAGE_BUILD)
 #include "icall_osal_rom_jt.h"
@@ -229,7 +230,8 @@ typedef struct fh_debug_s
 #define FH_LBT_CCA_TIME                     (20000)                 /*<! corresponding to 5 ms */
 #define FH_TX_TIMING_TABLE_SIZE             (10)
 
-#define FH_LBT_MIN_TX_OFF_TIME              (100)               /*<! 100 ms */
+#define FH_LBT_MIN_TX_OFF_TIME              (MAC_LBT_MIN_TX_OFF_TIME)
+
 /* FH module TX done timing info */
 /*!
  FH tx done timing info - store the TX done timing and channel info

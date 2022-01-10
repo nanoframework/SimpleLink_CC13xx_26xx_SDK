@@ -76,83 +76,6 @@ for(elemIndex = 0 ; elemIndex < numOfElement ; elemIndex++ ) {
 *======================Foundation models======================
 */
 
-struct bt_mesh_cfg_srv cfg_srv = {
-    %if(ble.relay){
-    .relay = BT_MESH_RELAY_ENABLED,
-    %}else{
-    .relay = BT_MESH_RELAY_NOT_SUPPORTED,
-    %}
-    %if(ble.beaconState){
-    .beacon = BT_MESH_BEACON_ENABLED,
-    %}else{
-    .beacon = BT_MESH_BEACON_DISABLED,
-    %}
-    %if(ble.proxy){
-    .gatt_proxy = BT_MESH_GATT_PROXY_ENABLED,
-    %}else{
-    %if(ble.gattBearer){
-    .gatt_proxy = BT_MESH_GATT_PROXY_DISABLED,
-    %}else{
-    .gatt_proxy = BT_MESH_GATT_PROXY_NOT_SUPPORTED,
-    %}
-    %}
-    %if(ble.friend){
-    .frnd = BT_MESH_FRIEND_ENABLED,
-    %}else{
-    .frnd = BT_MESH_FRIEND_NOT_SUPPORTED,
-    %}
-     %if(ble.default_ttl){
-    .default_ttl = `ble.default_ttl`,
-    %}
-    /* `ble.net_transmit_count` re-transmissions with `ble.net_transmit_int_ms`ms interval */
-    .net_transmit = BT_MESH_TRANSMIT(`ble.net_transmit_count`, `ble.net_transmit_int_ms`),
-    %if(ble.relay){
-    %if(ble.relay_retransmit_count && ble.relay_retransmit_int_ms){
-    /* `ble.relay_retransmit_count` transmissions with `ble.relay_retransmit_int_ms`ms interval */
-    .relay_retransmit = BT_MESH_TRANSMIT(`ble.relay_retransmit_count`, `ble.relay_retransmit_int_ms`),
-    %}
-    %}
-    %if(ble.hb_pub_dst){
-    .hb_pub.dst = `common.decimalToHexString(ble.hb_pub_dst)`,
-    %}
-    %if(ble.hb_pub_count){
-    .hb_pub.count = `common.decimalToHexString(ble.hb_pub_count)`,
-    %}
-    %if(ble.hb_pub_period){
-    .hb_pub.period = `common.decimalToHexString(ble.hb_pub_period)`,
-    %}
-    %if(ble.hb_pub_ttl){
-    .hb_pub.ttl = `common.decimalToHexString(ble.hb_pub_ttl)`,
-    %}
-    %if(ble.hb_pub_net_idx){
-    .hb_pub.net_idx = `common.decimalToHexString(ble.hb_pub_net_idx)`,
-    %}
-    %if(ble.hb_pub_feat_relay ||ble.hb_pub_feat_proxy ||ble.hb_pub_feat_friend ||ble.hb_pub_feat_low_power ){
-	.hb_pub.feat = FEAT_SUPPORTED,
-    %}
-    %if(ble.hb_sub_expiry){
-    .hb_sub.expiry = `common.decimalToHexString(ble.hb_sub_expiry)`,
-    %}
-    %if(ble.hb_sub_src){
-    .hb_sub.src = `common.decimalToHexString(ble.hb_sub_src)`,
-    %}
-    %if(ble.hb_sub_dst){
-    .hb_sub.dst = `common.decimalToHexString(ble.hb_sub_dst)`,
-	%}
-    %if(ble.hb_sub_count){
-    .hb_sub.count = `common.decimalToHexString(ble.hb_sub_count)`,
-	%}
-    %if(ble.hb_sub_min_hops){
-    .hb_sub.min_hops = `common.decimalToHexString(ble.hb_sub_min_hops)`,
-	%}
-    %if(ble.hb_sub_max_hops ){
-    .hb_sub.max_hops = `common.decimalToHexString(ble.hb_sub_max_hops)`,
-	%}
-    %if(ble.hb_sub_func ){
-    .hb_sub.func = `ble.hb_sub_func`,
-
-	%}
-};
 %
 %if(ble.configurationClient)
 %{
@@ -303,7 +226,7 @@ BT_MESH_MODEL_PUB_DEFINE(`pubName`, NULL, `pubLen`);
 %for(elemIndex = 0 ; elemIndex<numOfElement ; elemIndex++){
     %if(elemIndex == 0){
 struct bt_mesh_model root_models[] = {
-    BT_MESH_MODEL_CFG_SRV(&cfg_srv),
+    BT_MESH_MODEL_CFG_SRV,
     %if(ble.configurationClient)
     %{
     BT_MESH_MODEL_CFG_CLI(&cfg_cli),
@@ -369,7 +292,7 @@ struct bt_mesh_elem elements[] = {
 *======================Elements End======================
 */
 
-const struct bt_mesh_comp comp = {
+struct bt_mesh_comp comp = {
     .cid = `common.decimalToHexString(ble.cid)`,
     .elem = elements,
     .elem_count = ARRAY_SIZE(elements),

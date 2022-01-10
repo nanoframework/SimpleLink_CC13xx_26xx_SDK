@@ -5,7 +5,7 @@
  @brief Launchpad Sensortag Kit Common framework
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -143,7 +143,7 @@ void Lpstk_init(void *evntHandle, Lpstk_AccelTiltCb accelCb)
 
     Lpstk_initHumidityAndTempSensor(0, 0, 0, 0, NULL);
     Lpstk_initLightSensor(0, 0,NULL);
-    Lpstk_initHallEffectSensor();
+    // Hall effect sensor doesn't require init
     Lpstk_initSensorControllerAccelerometer(scAccelTaskAlertCallback);
     Lpstk_openAccelerometerSensor();
 }
@@ -291,10 +291,10 @@ void Lpstk_getAccelerometer(Lpstk_Accelerometer *accel)
 {
     memcpy(accel, &lpstkSensors.accelerometer, sizeof(Lpstk_Accelerometer));
 }
-//get last hall
-float Lpstk_getMagFlux()
+//get last hall effect switch value
+bool Lpstk_getHallEffectSwitch()
 {
-    return lpstkSensors.halleffectMagFlux;
+    return lpstkSensors.halleffectSwitchValue;
 }
 //get last light
 float Lpstk_getLux()
@@ -319,10 +319,6 @@ void shutDownSensors(Lpstk_SensorMask sensors)
          * will be in use from the main application given that the sensor
          * controller has no way of knowing that the SPI is currently in use*/
         Lpstk_shutdownAccelerometerSensor();
-    }
-    if(sensors & LPSTK_HALL_EFFECT)
-    {
-        Lpstk_shutdownHallEffectSensor();
     }
 }
 
@@ -382,10 +378,6 @@ static void powerUpSensors(Lpstk_SensorMask sensors)
     {
         Lpstk_openAccelerometerSensor();
     }
-    if(sensors & LPSTK_HALL_EFFECT)
-    {
-        Lpstk_openHallEffectSensor();
-    }
 }
 
 static void processSensorRead(Lpstk_SensorMask sensors, bool shutdown)
@@ -417,7 +409,7 @@ static void processSensorRead(Lpstk_SensorMask sensors, bool shutdown)
     }
     if(sensors & LPSTK_HALL_EFFECT)
     {
-        Lpstk_readHallEffectSensor(&lpstkSensors.halleffectMagFlux);
+        Lpstk_readHallEffectSensor(&lpstkSensors.halleffectSwitchValue);
     }
 
     if(shutdown)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,9 @@
 /*!*****************************************************************************
  *  @file       UART.h
  *  @brief      Universal Asynchronous Receiver-Transmitter (UART) Driver
+ *
+ *  @warning "The UART1 driver will be removed in the 2Q22 release.
+ *  Please port your application to the UART2 driver."
  *
  *  To use the UART driver, ensure that the correct driver library for your
  *  device is linked in and include this header file as follows:

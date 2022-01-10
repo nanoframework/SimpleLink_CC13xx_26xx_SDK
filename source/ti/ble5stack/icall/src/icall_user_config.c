@@ -5,7 +5,7 @@
  @brief This file contains generic user configurable variables for icall thread.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -59,10 +59,18 @@
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/aesecb/AESECBCC26XX.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+#ifndef FREERTOS
 #include <ti/sysbios/knl/Swi.h>
+#endif
 #include <ti_drivers_config.h>
 #include <ti/drivers/ECDH.h>
+
+#if !defined(DeviceFamily_CC26X1)
 #include <ti/drivers/ecdh/ECDHCC26X2.h>
+#else
+#include <ti/drivers/ecdh/ECDHCC26X1.h>
+#endif
+
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 #include <ti/drivers/cryptoutils/sharedresources/CryptoResourceCC26XX.h>
 #include <ti/drivers/utils/Random.h>

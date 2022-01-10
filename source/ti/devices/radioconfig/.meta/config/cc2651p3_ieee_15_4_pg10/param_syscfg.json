@@ -7,11 +7,7 @@
             "options": [
                 {
                     "name": "ieee154",
-                    "displayName": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Pre-silicon settings)"
-                },
-                {
-                    "name": "ieee154p10",
-                    "displayName": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8, 10 dBm (Pre-silicon settings)"
+                    "displayName": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Release Candidate)"
                 }
             ],
             "default": "ieee154"
@@ -145,8 +141,7 @@
             "name": "highPA",
             "displayName": "High PA",
             "description": "Select if the High Power Amplifier on the device should be used",
-            "default": false,
-            "hidden": false
+            "default": false
         }
     ],
     "phys": {
@@ -154,14 +149,7 @@
             {
                 "file": "setting_ieee_802_15_4.json",
                 "name": "ieee154",
-                "description": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Pre-silicon settings)",
-                "options": "5dBm"
-            },
-            {
-                "file": "setting_ieee_802_15_4_10_dbm.json",
-                "name": "ieee154p10",
-                "description": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8, 10 dBm (Pre-silicon settings)",
-                "options": "10dBm"
+                "description": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Release Candidate)"
             }
         ]
     }

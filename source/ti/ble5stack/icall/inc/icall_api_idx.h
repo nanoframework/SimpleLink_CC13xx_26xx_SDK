@@ -5,7 +5,7 @@
  @brief implementation of API override for the case the stack is use as library.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -211,6 +211,7 @@
 #define IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd HCI_LE_SetConnectionlessIqSamplingEnableCmd
 #define IDX_HCI_LE_SetExtScanRspData                    HCI_LE_SetExtScanRspData
 #define IDX_HCI_LE_SetExtAdvData                        HCI_LE_SetExtAdvData
+#define IDX_HCI_LE_SetAdvStatus                         HCI_LE_SetAdvStatus
 
 /* HCI Extended API */
 /********************/
@@ -241,6 +242,8 @@
 #define IDX_HCI_EXT_GetConnInfoCmd                       HCI_EXT_GetConnInfoCmd
 #define IDX_HCI_EXT_GetActiveConnInfoCmd                 HCI_EXT_GetActiveConnInfoCmd
 #define IDX_HCI_EXT_SetDtmTxPktCntCmd                    HCI_EXT_SetDtmTxPktCntCmd
+#define IDX_HCI_EXT_SetHostDefChanClassificationCmd      HCI_EXT_SetHostDefChanClassificationCmd
+#define IDX_HCI_EXT_SetHostConnChanClassificationCmd     HCI_EXT_SetHostConnChanClassificationCmd
 #define IDX_HCI_TL_getCmdResponderID                     HCI_TL_getCmdResponderID
 #define IDX_HCI_LE_RandCmd                               HCI_LE_RandCmd
 #define IDX_HCI_LE_ReadBufSizeCmd                        HCI_LE_ReadBufSizeCmd
@@ -350,6 +353,8 @@
 #define IDX_GATT_InitServer                           GATT_InitServer
 #define IDX_GATT_SendRsp                              GATT_SendRsp
 #define IDX_GATT_GetNextHandle                        GATT_GetNextHandle
+#define IDX_GATT_ServiceNumAttrs                      GATT_ServiceNumAttrs
+#define IDX_GATT_FindHandle                           GATT_FindHandle
 #define IDX_GATT_PrepareWriteReq                      GATT_PrepareWriteReq
 #define IDX_GATT_ExecuteWriteReq                      GATT_ExecuteWriteReq
 #define IDX_GATT_FindUUIDRec                          GATT_FindUUIDRec

@@ -72,6 +72,31 @@ refer to the [BLE Stack User's Guide](/ble5stack/ble_user_guide/html/ble-stack-5
 gapbondmngr.html#gap-bond-manager-and-le-secure-connections)\n
 __Default__: True (checked)\n`
 
+// Long description for the extAdv configuration parameter
+const extAdvLongDescription = `BLE5 Extended advertising feature.\n
+For more information, refer to the [BLE Stack User's Guide]\
+(/ble5stack/ble_user_guide/html/ble-stack-5.x/gap-cc13x2_26x2.html)\n
+__Default__: True (enabled)\n
+__Note__: When the feature is disabled, remove all extended advertising sets`
+
+// Long description for the periodicAdv configuration parameter
+const periodicAdvLongDescription = `Periodic advertising feature.\n
+For more information, refer to the [BLE Stack User's Guide]\
+(/ble5stack/ble_user_guide/html/ble-stack-5.x/gap-cc13x2_26x2.html#periodic-\
+advertising)\n
+__Default__: False (disabled)\n
+__Note__: When the feature is enabled, add non-connectable non-scannable \
+extended advertising set`
+
+// Long description for the periodicAdvSync configuration parameter
+const periodicAdvSyncLongDescription = `Periodic adv sync feature.\n
+Synchronization can only occur when scanning is enabled. While scanning is \
+disabled, no attempt to synchronize will take place.\n
+For more information, refer to the [BLE Stack User's Guide]\
+(/ble5stack/ble_user_guide/html/ble-stack-5.x/gap-cc13x2_26x2.html#periodic-\
+advertising)\n
+__Default__: False (disabled)\n`
+
 // Long description for the gattDB configuration parameter
 const gattDBLongDescription = `Indicates that the GATT database is maintained off\
 the chip on the Application Processor (AP)\n
@@ -113,6 +138,9 @@ __Note__: When using PTM configuration please choose \`None\` \n`
  exports = {
     deviceRoleLongDescription: deviceRoleLongDescription,
     bondManagerLongDescription: bondManagerLongDescription,
+    extAdvLongDescription: extAdvLongDescription,
+    periodicAdvLongDescription: periodicAdvLongDescription,
+    periodicAdvSyncLongDescription: periodicAdvSyncLongDescription,
     gattDBLongDescription: gattDBLongDescription,
     gattNoClientLongDescription: gattNoClientLongDescription,
     L2CAPCOCLongDescription: L2CAPCOCLongDescription,

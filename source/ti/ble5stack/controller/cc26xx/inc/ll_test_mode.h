@@ -6,7 +6,7 @@
         API's etc. to support LL-only Test Mode.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

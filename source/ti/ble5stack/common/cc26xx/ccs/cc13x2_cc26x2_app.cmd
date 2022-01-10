@@ -22,7 +22,7 @@
                             Aligns to Flash word boundary by default.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -283,6 +283,7 @@ SECTIONS
   } LOAD_END(heapStart)
 
   .stack            :   >  SRAM (HIGH) LOAD_START(heapEnd)
+
 
   #ifdef CACHE_AS_RAM
 

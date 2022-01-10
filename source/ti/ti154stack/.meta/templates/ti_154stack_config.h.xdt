@@ -52,11 +52,18 @@ const testModeScript = system.getScript("/ti/ti154stack/test_config/"
 const securityScript = system.getScript("/ti/ti154stack/security_config/"
 + "ti154stack_security_config");
 
+// Get radio settings script
+const radioScript = system.getScript("/ti/ti154stack/rf_config/"
++ "ti154stack_rf_config");
+
 // Get common functions script
 const Common = system.getScript("/ti/ti154stack/ti154stack_common.js");
 
 // Get the TI 15.4 module
 const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
+
+// Get the RF module
+const RF = system.modules["/ti/drivers/RF"].$static;
 
 function keyTable() {
     const isSecureEnabled = inst.secureLevel !== "macSecurityDisabled";
@@ -77,6 +84,8 @@ function getProjectName(project) {
             return "Sensor Secure Manager (SM)";
         case "sensorOAD":
             return "Sensor Over-the-Air Download (OAD)";
+        case "coprocessor":
+            return "Coprocessor (CoP)";
         default:
             throw new Error("Unhanded project type: " + project);
     }
@@ -136,7 +145,7 @@ extern "C"
  It is represented as a bit string with LSB representing Ch0.
  e.g., 0x01 0x10 represents Ch0 and Ch12 are included.
  */
- #define CONFIG_FH_CHANNEL_MASK         { `_.slice(channelMaskHexArr,0,6)`, \
+#define CONFIG_FH_CHANNEL_MASK          { `_.slice(channelMaskHexArr,0,6)`, \
                                           `_.slice(channelMaskHexArr,6,12)`, \
                                           `_.slice(channelMaskHexArr,12)` }
 
@@ -291,6 +300,17 @@ validate user input during runtime channel mask configuration.
 #define SENSOR_TEST_RAMP_DATA_SIZE      `inst.sensorTestRampDataSize`
 
 % }
+% if (RF.coexEnable && RF.coexPhy.includes("ieee_15_4")) {
+
+/* Builds the image with Wifi Coexistence Enabled */
+#define IEEE_COEX_ENABLED
+
+% if (RF.coexMode === "coexMode3Wire") {
+/* IEEE 3 Wire Coexistence is enabled */
+#define IEEE_COEX_3_WIRE
+
+% } // End if (RF.coexMode === "coexMode3Wire")
+% } // End if (RF.coexEnable && RF.coexPhy.includes("ieee_15_4"))
 #ifdef __cplusplus
 }
 #endif

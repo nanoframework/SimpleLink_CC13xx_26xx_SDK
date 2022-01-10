@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2017-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,9 +44,6 @@ only with a Texas Instruments clang compiler. You appear to be using a \
 different compiler.
 #endif
 
-/* CODEGEN-6425 work-around; remove when bug is fixed */
-#pragma clang system_header
-
 #include <stddef.h>
 #include <stdint.h>
 
@@ -55,8 +52,8 @@ different compiler.
 #include "sys/types.h"
 
 /* toolchain header files */
-#include_next <time.h>
-#include <sys/timespec.h> /* CODEGEN-7114 work-around */
+#include <../../include/c/time.h>
+#include <../../include/c/sys/timespec.h> /* CODEGEN-7114 work-around */
 
 #ifdef __cplusplus
 extern "C" {

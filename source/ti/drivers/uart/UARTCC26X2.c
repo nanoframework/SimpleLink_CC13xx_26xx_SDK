@@ -52,7 +52,7 @@
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
 #include <ti/drivers/uart/UARTCC26X2.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(inc/hw_memmap.h)
@@ -98,7 +98,8 @@ static void disableRX(UART_Handle handle);
 static void enableRX(UART_Handle handle);
 static uint_fast16_t getPowerMgrId(uint32_t baseAddr);
 static void initHw(UART_Handle handle);
-static bool initIO(UART_Handle handle);
+static void finalizeIO(UART_Handle handle);
+static void initIO(UART_Handle handle);
 static int  postNotifyFxn(unsigned int eventType, uintptr_t eventArg,
     uintptr_t clientArg);
 static void readBlockingTimeout(uintptr_t arg);
@@ -117,7 +118,7 @@ static void writeSemCallback(UART_Handle handle, void *buffer, size_t count);
  */
 static inline bool isFlowControlEnabled(UARTCC26X2_HWAttrs const  *hwAttrs) {
     return ((hwAttrs->flowControl == UARTCC26X2_FLOWCTRL_HARDWARE) &&
-            (hwAttrs->ctsPin != PIN_UNASSIGNED) && (hwAttrs->rtsPin != PIN_UNASSIGNED));
+            (hwAttrs->ctsPin != GPIO_INVALID_INDEX) && (hwAttrs->rtsPin != GPIO_INVALID_INDEX));
 }
 
 /* UART function table for UARTCC26X2 implementation */
@@ -244,7 +245,7 @@ void UARTCC26X2_close(UART_Handle handle)
     SwiP_destruct(&(object->writeSwi));
 
     /* Deallocate pins */
-    PIN_close(object->hPin);
+    finalizeIO(handle);
 
     /* Unregister power notification objects */
     Power_unregisterNotify(&object->postNotify);
@@ -446,15 +447,7 @@ UART_Handle UARTCC26X2_open(UART_Handle handle, UART_Params *params)
     UARTDisable(hwAttrs->baseAddr);
 
     /* Configure IOs, make sure it was successful */
-    if (!initIO(handle)) {
-        /* Another driver or application already using these pins. */
-        DebugP_log0("Could not allocate pins, already in use.");
-        /* Release power dependency */
-        Power_releaseDependency(object->powerMgrId);
-        /* Mark the module as available */
-        object->state.opened = false;
-        return (NULL);
-    }
+    initIO(handle);
 
     /* Initialize the UART hardware module */
     initHw(handle);
@@ -957,65 +950,51 @@ static void initHw(UART_Handle handle)
 /*
  *  ======== initIO ========
  */
-static bool initIO(UART_Handle handle)
+static void initIO(UART_Handle handle)
 {
-    /* Locals */
-    UARTCC26X2_Object          *object;
-    UARTCC26X2_HWAttrs const   *hwAttrs;
-    PIN_Config                  uartPinTable[5];
-    uint32_t                    pinCount = 0;
+    UARTCC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
 
-    /* Get the pointer to the object and hwAttrs */
-    object = handle->object;
-    hwAttrs = handle->hwAttrs;
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->txPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->rxPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RX : IOC_PORT_MCU_UART1_RX);
+    }
+    if (isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(
+                hwAttrs->ctsPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS
+            );
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(
+                hwAttrs->rtsPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RTS : IOC_PORT_MCU_UART1_RTS
+            );
+        }
+    }
+}
 
-    /* Build local list of pins, allocate through PIN driver and map ports */
-    uartPinTable[pinCount++] = hwAttrs->rxPin | PIN_INPUT_EN;
-    /*
-     *  Make sure UART_TX pin is driven high after calling PIN_open(...) until
-     *  we've set the correct peripheral muxing in PINCC26XX_setMux(...).
-     *  This is to avoid falling edge glitches when configuring the
-     *  UART_TX pin.
-     */
-    uartPinTable[pinCount++] = hwAttrs->txPin | PIN_INPUT_DIS | PIN_PUSHPULL |
-            PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
+static void finalizeIO(UART_Handle handle)
+{
+    UARTCC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
 
-    if (isFlowControlEnabled(hwAttrs)) {
-        uartPinTable[pinCount++] = hwAttrs->ctsPin | PIN_INPUT_EN;
-        /* Avoiding glitches on the RTS, see comment for TX pin above. */
-        uartPinTable[pinCount++] = hwAttrs->rtsPin | PIN_INPUT_DIS |
-                PIN_PUSHPULL | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->txPin);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->rxPin);
     }
 
-    /* Terminate pin list */
-    uartPinTable[pinCount] = PIN_TERMINATE;
-
-    /* Open and assign pins through pin driver */
-    object->hPin = PIN_open(&object->pinState, uartPinTable);
-
-    /* Are pins already allocated */
-    if (!object->hPin) {
-        return (false);
+    if (isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->ctsPin);
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->rtsPin);
+        }
     }
-
-    /* Set IO muxing for the UART pins */
-    PINCC26XX_setMux(object->hPin, hwAttrs->rxPin,
-            (hwAttrs->baseAddr == UART0_BASE ?
-                    IOC_PORT_MCU_UART0_RX : IOC_PORT_MCU_UART1_RX));
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin,
-            (hwAttrs->baseAddr == UART0_BASE ?
-                    IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX));
-
-    if (isFlowControlEnabled(hwAttrs)) {
-        PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin,
-                (hwAttrs->baseAddr == UART0_BASE ?
-                        IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS));
-        PINCC26XX_setMux(object->hPin, hwAttrs->rtsPin,
-                (hwAttrs->baseAddr == UART0_BASE ?
-                        IOC_PORT_MCU_UART0_RTS : IOC_PORT_MCU_UART1_RTS));
-    }
-    /* Success */
-    return (true);
 }
 
 /*

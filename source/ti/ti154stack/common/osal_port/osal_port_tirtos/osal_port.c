@@ -5,7 +5,7 @@
  @brief converts ICAll and OSAL API's to native TIRTOS/POSIX calls
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -58,9 +58,11 @@
 #include <ti/drivers/power/PowerCC26XX.h>
 #include <ti/drivers/utils/Random.h>
 
+#ifndef TIRTOS7_SUPPORT
 // This include file will ensure HEAPMGR_CONFIG is properly setup in the ti-rtos
 // config file.
 #include <xdc/cfg/global.h>
+#endif
 
 /***** Defines *****/
 /* Only 1 application can talk to the MAC */

@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -43,7 +43,7 @@
 
 /**
  *  @defgroup Micro_BLE_Stack Micro BLE Stack
- *  @brief This module implmements the Micro BLE Stack
+ *  @brief This module implements the Micro BLE Stack
  *  For a detailed usage section describing how to send these commands and receive events,
  *  see the Micro BLE Stack Section of the User's Guide.
  *  @{
@@ -431,6 +431,12 @@ extern "C"
 /* Length of ADV Data */
 #define UBLE_MAX_ADVDATA_LEN         B_MAX_ADV_LEN  //!< Max Advertising Data Length
 
+#define UBLE_MAX_OVERLAP_TIME_LIMIT     0x7270E000  // 8 minutes in 625us ticks. chosen to be half of 17 minutes RF overlap.
+#define UBLE_MAX_32BIT_TIME             0xFFFFFFFF
+
+#define BLE_ROLE_PERIPHERAL  4
+#define BLE_ROLE_CENTRAL     8
+
 /** @} End UBLE_Constants */
 
 /*-------------------------------------------------------------------
@@ -575,6 +581,31 @@ PACKED_TYPEDEF_STRUCT {
  */
 bStatus_t uble_stackInit(ubleAddrType_t addrType, uint8* pStaticAddr,
                          ublePostEvtProxyCB_t pfnPostEvtProxyCB, uint8 timeCritical);
+
+/**
+ * @brief   This function determines if the first time parameter is greater
+ *          than the second time parameter, taking timer counter wrap into
+ *          account. If so, TRUE is returned.
+ *
+ * @param  time1 - First time.
+ * @param  time2 - Second time.
+ *
+ * @return  TRUE:  When first parameter is greater than second.
+ *          FALSE: When first parmaeter is less than or equal to
+ *                 the second.
+ */
+uint8 uble_timeCompare(uint32 time1, uint32 time2);
+
+/**
+ * @brief   This function determines the difference between two time
+ *          parameters, taking timer counter wrap into account.
+ *
+ * @param   time1 - First time.
+ * @param   time2 - Second time.
+ *
+ * @return  Difference between time1 and time2.
+ */
+uint32 uble_timeDelta(uint32 time1, uint32 time2);
 
 /**
  * @brief  Set a Micro BLE Stack parameter.

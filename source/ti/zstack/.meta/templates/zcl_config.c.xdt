@@ -345,7 +345,17 @@ for(deviceNum = 0; deviceNum < app.length; deviceNum++)
   let deviceVersion = app[deviceNum].deviceVersion;
   let flags = app[deviceNum].flags;
 
+  for (let i in serverAttributes) {
+    serverAttributes[i].sort(function(a, b) {
+      return (parseInt(a._id) - parseInt(b._id));
+    });
+  }
 
+  for (let i in clientAttributes) {
+    clientAttributes[i].sort(function(a, b) {
+      return (parseInt(a._id) - parseInt(b._id));
+    });
+  }
 
   /* --------------- Code Generation --------------- */
 
@@ -433,7 +443,7 @@ for(deviceNum = 0; deviceNum < app.length; deviceNum++)
         bdbString += '\tReq.maxReportInt = 0x' + ("0000" + (app[deviceNum]["server" + currCluster._id + currAttribute._id + "maxReportInterval"]).toString(16).toUpperCase()).substr(-4) + ';\n';
         bdbString += '\tReq.minReportInt = 0x' + ("0000" + (app[deviceNum]["server" + currCluster._id + currAttribute._id + "minReportInterval"]).toString(16).toUpperCase()).substr(-4) + ';\n';
         bdbString += '\tOsalPort_memcpy(Req.reportableChange, foo.arr, BDBREPORTING_MAX_ANALOG_ATTR_SIZE);\n';
-        bdbString += '\tZstackapi_bdbRepAddAttrCfgRecordDefaultToListReq(sampleApp_serviceTaskId,&Req);\n\n';
+        bdbString += '\tZstackapi_bdbRepAddAttrCfgRecordDefaultToListReq(' + appNameCamel + '_serviceTaskId,&Req);\n\n';
 
         accessControls.push('ACCESS_REPORTABLE');
         endReportable = 1;
@@ -564,7 +574,7 @@ for(deviceNum = 0; deviceNum < app.length; deviceNum++)
         bdbString += '\tReq.maxReportInt = 0x' + ("0000" + (app[deviceNum]["client" + currCluster._id + currAttribute._id + "maxReportInterval"]).toString(16).toUpperCase()).substr(-4) + ';\n';
         bdbString += '\tReq.minReportInt = 0x' + ("0000" + (app[deviceNum]["client" + currCluster._id + currAttribute._id + "minReportInterval"]).toString(16).toUpperCase()).substr(-4) + ';\n';
         bdbString += '\tOsalPort_memcpy(Req.reportableChange,' + reportableChange + ',BDBREPORTING_MAX_ANALOG_ATTR_SIZE);\n\n';
-        bdbString += '\tZstackapi_bdbRepAddAttrCfgRecordDefaultToListReq(sampleApp_serviceTaskId,&Req);\n';
+        bdbString += '\tZstackapi_bdbRepAddAttrCfgRecordDefaultToListReq(' + appNameCamel + '_serviceTaskId,&Req);\n';
 
         accessControls.push('ACCESS_REPORTABLE');
         endReportable = 1;

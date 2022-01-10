@@ -1,9 +1,9 @@
-makefile
 package.xdc
-libmap.xs
-package.xs
-product-linux.json
 package.bld
+package.xs
+libmap.xs
+product-linux.json
+makefile
 package/package.bld.xml
 package/build.cfg
 package/package.xdc.inc

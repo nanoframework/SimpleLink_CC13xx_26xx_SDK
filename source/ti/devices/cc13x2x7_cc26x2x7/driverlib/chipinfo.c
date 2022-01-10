@@ -1,11 +1,11 @@
 /******************************************************************************
-*  Filename:       chipinfo.c
-*  Revised:        2020-11-19 14:57:59 +0100 (Thu, 19 Nov 2020)
-*  Revision:       59512
+*  Filename:         chipinfo.c
+*  Revised:          $Date$
+*  Revision:         $Revision$
 *
-*  Description:    Collection of functions returning chip information.
+*  Description:     Collection of functions returning chip information.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,7 @@
     #define ThisLibraryIsFor_CC13x2x7_CC26x2x7_HaltIfViolated NOROM_ThisLibraryIsFor_CC13x2x7_CC26x2x7_HaltIfViolated
 #endif
 
+
 //*****************************************************************************
 //
 // ChipInfo_GetSupportedProtocol_BV()
@@ -67,7 +68,7 @@
 ProtocolBitVector_t
 ChipInfo_GetSupportedProtocol_BV( void )
 {
-   return ((ProtocolBitVector_t)( HWREG( PRCM_BASE + 0x1D4 ) & 0x0E ));
+    return ((ProtocolBitVector_t)( HWREG( PRCM_BASE + 0x1D4 ) & 0x0E ));
 }
 
 //*****************************************************************************
@@ -78,18 +79,18 @@ ChipInfo_GetSupportedProtocol_BV( void )
 PackageType_t
 ChipInfo_GetPackageType( void )
 {
-   PackageType_t packType = (PackageType_t)((
-      HWREG( FCFG1_BASE + FCFG1_O_USER_ID     ) &
-                          FCFG1_USER_ID_PKG_M ) >>
-                          FCFG1_USER_ID_PKG_S ) ;
+    PackageType_t packType = (PackageType_t)((
+        HWREG( FCFG1_BASE + FCFG1_O_USER_ID      ) &
+                                  FCFG1_USER_ID_PKG_M ) >>
+                                  FCFG1_USER_ID_PKG_S );
 
-   if (( packType < PACKAGE_4x4     ) ||
-       ( packType > PACKAGE_7x7_SIP )    )
-   {
-      packType = PACKAGE_Unknown;
-   }
+    if (( packType < PACKAGE_4x4      ) ||
+         ( packType > PACKAGE_7x7_SIP )     )
+    {
+        packType = PACKAGE_Unknown;
+    }
 
-   return ( packType );
+    return ( packType );
 }
 
 //*****************************************************************************
@@ -100,18 +101,17 @@ ChipInfo_GetPackageType( void )
 ChipFamily_t
 ChipInfo_GetChipFamily( void )
 {
-   uint32_t       waferId                    ;
-   ChipFamily_t   chipFam = FAMILY_Unknown   ;
+    uint32_t         waferId;
+    ChipFamily_t    chipFam = FAMILY_Unknown;
 
-   waferId = (( HWREG( FCFG1_BASE + FCFG1_O_ICEPICK_DEVICE_ID ) &
-                                      FCFG1_ICEPICK_DEVICE_ID_WAFER_ID_M ) >>
-                                      FCFG1_ICEPICK_DEVICE_ID_WAFER_ID_S ) ;
+    waferId = (( HWREG( FCFG1_BASE + FCFG1_O_ICEPICK_DEVICE_ID ) &
+                                                  FCFG1_ICEPICK_DEVICE_ID_WAFER_ID_M ) >>
+                                                  FCFG1_ICEPICK_DEVICE_ID_WAFER_ID_S );
+    if ( waferId == 0xBB77 ) {
+        chipFam = FAMILY_CC13x2x7_CC26x2x7;
+    }
 
-   if ( waferId == 0xBB77 ) {
-      chipFam = FAMILY_CC13x2x7_CC26x2x7 ;
-   }
-
-   return ( chipFam );
+    return ( chipFam );
 }
 
 //*****************************************************************************
@@ -122,46 +122,43 @@ ChipInfo_GetChipFamily( void )
 ChipType_t
 ChipInfo_GetChipType( void )
 {
-   ChipType_t     chipType       = CHIP_TYPE_Unknown        ;
-   ChipFamily_t   chipFam        = ChipInfo_GetChipFamily() ;
-   uint32_t       fcfg1UserId    = ChipInfo_GetUserId()     ;
-   uint32_t       fcfg1Protocol  = (( fcfg1UserId & FCFG1_USER_ID_PROTOCOL_M ) >>
-                                                    FCFG1_USER_ID_PROTOCOL_S ) ;
-   uint32_t       fcfg1Cc13      = (( fcfg1UserId & FCFG1_USER_ID_CC13_M ) >>
-                                                    FCFG1_USER_ID_CC13_S ) ;
-   uint32_t       fcfg1Pa        = (( fcfg1UserId & FCFG1_USER_ID_PA_M ) >>
-                                                    FCFG1_USER_ID_PA_S )   ;
+    ChipType_t      chipType         = CHIP_TYPE_Unknown;
+    ChipFamily_t    chipFam         = ChipInfo_GetChipFamily();
+    uint32_t        fcfg1UserId     = ChipInfo_GetUserId();
+    uint32_t        fcfg1Protocol   = (( fcfg1UserId & FCFG1_USER_ID_PROTOCOL_M ) >> FCFG1_USER_ID_PROTOCOL_S );
+    uint32_t         fcfg1Cc13      = (( fcfg1UserId & FCFG1_USER_ID_CC13_M ) >> FCFG1_USER_ID_CC13_S );
+    uint32_t         fcfg1Pa        = (( fcfg1UserId & FCFG1_USER_ID_PA_M ) >> FCFG1_USER_ID_PA_S );
 
-   if ( chipFam == FAMILY_CC13x2x7_CC26x2x7 ) {
-      switch ( fcfg1Protocol ) {
-      case 0x8 :
-         if ( fcfg1Cc13 ) {
-            if ( ! fcfg1Pa ) {
-               chipType = CHIP_TYPE_CC1312R7    ;
+    if ( chipFam == FAMILY_CC13x2x7_CC26x2x7 ) {
+        switch ( fcfg1Protocol ) {
+        case 0x8 :
+            if ( fcfg1Cc13 ) {
+                if ( ! fcfg1Pa ) {
+                    chipType = CHIP_TYPE_CC1312R7;
+                }
             }
-         }
-         break;
-      case 0xF :
-         if ( fcfg1Cc13 ) {
-            if ( fcfg1Pa ) {
-               chipType = CHIP_TYPE_CC1352P7    ;
-            }
-            else {
-               chipType = CHIP_TYPE_CC1352R7    ;
-            }
-         } else {
-            // ! fcfg1Cc13
-            if ( fcfg1Pa ) {
-               chipType = CHIP_TYPE_CC2652P7    ;
+            break;
+        case 0xF :
+            if ( fcfg1Cc13 ) {
+                if ( fcfg1Pa ) {
+                    chipType = CHIP_TYPE_CC1352P7;
+                }
+                else {
+                    chipType = CHIP_TYPE_CC1352R7;
+                }
             } else {
-               chipType = CHIP_TYPE_CC2652R7    ;
+                // ! fcfg1Cc13
+                if ( fcfg1Pa ) {
+                    chipType = CHIP_TYPE_CC2652P7;
+                } else {
+                    chipType = CHIP_TYPE_CC2652R7;
+                }
             }
-         }
-         break;
-      }
-   }
+            break;
+        }
+    }
 
-   return ( chipType );
+    return ( chipType );
 }
 
 //*****************************************************************************
@@ -172,20 +169,20 @@ ChipInfo_GetChipType( void )
 HwRevision_t
 ChipInfo_GetHwRevision( void )
 {
-   HwRevision_t   hwRev       = HWREV_Unknown                     ;
-   uint32_t       fcfg1Rev    = ChipInfo_GetDeviceIdHwRevCode()   ;
-   uint32_t       minorHwRev  = ChipInfo_GetMinorHwRev()          ;
-   ChipFamily_t   chipFam     = ChipInfo_GetChipFamily()          ;
+    HwRevision_t    hwRev       = HWREV_Unknown;
+    uint32_t        fcfg1Rev    = ChipInfo_GetDeviceIdHwRevCode();
+    uint32_t        minorHwRev  = ChipInfo_GetMinorHwRev();
+    ChipFamily_t    chipFam     = ChipInfo_GetChipFamily();
 
-   if ( chipFam == FAMILY_CC13x2x7_CC26x2x7 ) {
-      switch ( fcfg1Rev ) {
-      case 0 : // CC13x2x1x7, CC26x2x1x7
-         hwRev = (HwRevision_t)(((uint32_t)HWREV_1_0 ) + minorHwRev );
-         break;
-      }
-   }
+    if ( chipFam == FAMILY_CC13x2x7_CC26x2x7 ) {
+        switch ( fcfg1Rev ) {
+        case 0 : // CC13x2x1x7, CC26x2x1x7
+            hwRev = (HwRevision_t)(((uint32_t)HWREV_1_0 ) + minorHwRev );
+            break;
+        }
+    }
 
-   return ( hwRev );
+    return ( hwRev );
 }
 
 //*****************************************************************************
@@ -194,12 +191,12 @@ ChipInfo_GetHwRevision( void )
 void
 ThisLibraryIsFor_CC13x2x7_CC26x2x7_HaltIfViolated( void )
 {
-   if ( ! ChipInfo_ChipFamilyIs_CC13x2x7_CC26x2x7() )
-   {
-      while(1)
-      {
-         // This driverlib version is for the CC13x2x7/CC26x2x7 chips.
-         // Do nothing - stay here forever
-      }
-   }
+    if ( ! ChipInfo_ChipFamilyIs_CC13x2x7_CC26x2x7() )
+    {
+        while(1)
+        {
+            // This driverlib version is for the CC13x2x7/CC26x2x7 chips.
+            // Do nothing - stay here forever
+        }
+    }
 }

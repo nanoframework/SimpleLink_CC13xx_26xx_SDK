@@ -164,8 +164,8 @@ CONST zclCommandRec_t zclSampleLight_Cmds[] =
     COMMAND_ON_OFF_TOGGLE,
     CMD_DIR_SERVER_RECEIVED
   },
-#ifdef ZCL_LEVEL_CONTROL
-  ,{
+#ifdef ZCL_LEVEL_CTRL
+  {
     ZCL_CLUSTER_ID_GENERAL_LEVEL_CONTROL,
     COMMAND_LEVEL_MOVE_TO_LEVEL,
     CMD_DIR_SERVER_RECEIVED
@@ -205,7 +205,7 @@ CONST zclCommandRec_t zclSampleLight_Cmds[] =
     COMMAND_LEVEL_STOP_WITH_ON_OFF,
     CMD_DIR_SERVER_RECEIVED
   }
-#endif // ZCL_LEVEL_CONTROL
+#endif // ZCL_LEVEL_CTRL
 };
 
 CONST uint8_t zclCmdsArraySize = ( sizeof(zclSampleLight_Cmds) / sizeof(zclSampleLight_Cmds[0]) );

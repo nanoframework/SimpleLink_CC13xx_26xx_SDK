@@ -150,61 +150,135 @@ const moduleStatic = {
             ]
         },
         {
-            name: "bondManager",
-            displayName: "Bond Manager",
-            description: "The Gap Bond Manager is always enabled",
-            longDescription: Docs.bondManagerLongDescription,
-            default: true,
-            readOnly: true
-        },
-        {
-            name: "gattDB",
-            displayName: "GATT Database Off Chip",
-            description: "Indicates that the GATT database is maintained off the chip on the"
-                            + "Application Processor (AP)",
-            longDescription: Docs.gattDBLongDescription,
-            default: false
-        },
-        {
-            name: "gattNoClient",
-            displayName: "GATT No Client",
-            description: "The app must have GATT client functionality "
-                       + "to read the Resolvable Private Address Only "
-                       + "characteristic and the Central Address Resolution "
-                       + "characteristic. To enable it, Uncheck GATT "
-                       + "No Client.",
-            longDescription: Docs.gattNoClientLongDescription,
-            default: false,
-            hidden: false
-        },
-        {
-            name: "L2CAPCOC",
-            displayName: "L2CAP Connection Oriented Channels",
-            default: false,
-            longDescription: Docs.L2CAPCOCLongDescription
-        },
-        {
-            name: "delayingAttReadReq",
-            displayName: "Delaying An ATT Read Request",
-            longDescription: Docs.delayingAttReadReqLongDescription,
-            default: false,
-            hidden: false
-        },
-        {
-            name: "trensLayer",
-            displayName: "Transport Layer",
-            default:"HCI_TL_NONE",
-            description: "When using PTM configuration please choose HCI_TL_NONE",
-            longDescription: Docs.trensLayerLongDescription,
-            hidden: true,
-            options: [
+            name: "bleFeatures",
+            displayName: "BLE Features",
+            description: "BLE Stack Features",
+            config:[
                 {
-                    displayName: "None",
-                    name: "HCI_TL_NONE"
+                    name: "bondManager",
+                    displayName: "Bond Manager",
+                    description: "The Gap Bond Manager is always enabled",
+                    longDescription: Docs.bondManagerLongDescription,
+                    default: true,
+                    readOnly: true
                 },
                 {
-                    displayName: "Full",
-                    name: "HCI_TL_FULL"
+                    name: "extAdv",
+                    displayName: "Extended Advertising",
+                    description: "BLE5 extended advertising feature",
+                    longDescription: Docs.extAdvLongDescription,
+                    onChange: onExtAdvChange,
+                    default: true
+                },
+                {
+                    name: "periodicAdv",
+                    displayName: "Periodic Advertising",
+                    longDescription: Docs.periodicAdvLongDescription,
+                    hidden: false,
+                    default: false
+                },
+                {
+                    name: "periodicAdvSync",
+                    displayName: "Periodic Advertising Sync",
+                    longDescription: Docs.periodicAdvSyncLongDescription,
+                    hidden: true,
+                    default: false
+                },
+                {
+                    name: "disablePairing",
+                    displayName: "Disable Pairing",
+                    onChange: onDisablePairingChange,
+                    hidden: isFlashOnlyDevice(),
+                    default: false
+                },
+                {
+                    name: "gattDB",
+                    displayName: "GATT Database Off Chip",
+                    description: "Indicates that the GATT database is maintained off the chip on the"
+                                    + "Application Processor (AP)",
+                    longDescription: Docs.gattDBLongDescription,
+                    default: false
+                },
+                {
+                    name: "gattNoClient",
+                    displayName: "GATT No Client",
+                    description: "The app must have GATT client functionality "
+                               + "to read the Resolvable Private Address Only "
+                               + "characteristic and the Central Address Resolution "
+                               + "characteristic. To enable it, Uncheck GATT "
+                               + "No Client.",
+                    longDescription: Docs.gattNoClientLongDescription,
+                    default: false,
+                    hidden: false
+                },
+                {
+                    name: "L2CAPCOC",
+                    displayName: "L2CAP Connection Oriented Channels",
+                    default: false,
+                    longDescription: Docs.L2CAPCOCLongDescription
+                },
+                {
+                    name: "delayingAttReadReq",
+                    displayName: "Delaying An ATT Read Request",
+                    longDescription: Docs.delayingAttReadReqLongDescription,
+                    default: false,
+                    hidden: false
+                },
+                {
+                    name: "trensLayer",
+                    displayName: "Transport Layer",
+                    default:"HCI_TL_NONE",
+                    description: "When using PTM configuration please choose HCI_TL_NONE",
+                    longDescription: Docs.trensLayerLongDescription,
+                    hidden: true,
+                    options: [
+                        {
+                            displayName: "None",
+                            name: "HCI_TL_NONE"
+                        },
+                        {
+                            displayName: "Full",
+                            name: "HCI_TL_FULL"
+                        }
+                    ]
+                },
+                {
+                    name:"mesh",
+                    displayName: "Mesh",
+                    default: false,
+                    hidden: false,
+                    onChange: onMeshChange
+                },
+                {
+                    name:"meshApp",
+                    displayName: "Mesh Application",
+                    default: "meshOnly",
+                    onChange: onMeshAppChange,
+                    hidden: true,
+                    options: [
+                        {
+                            displayName: "Mesh Only",
+                            name: "meshOnly"
+                        },
+                        {
+                            displayName: "Mesh and Peripheral",
+                            name: "meshAndPeri"
+                        },
+                        {
+                            displayName: "Mesh and Peripheral OAD Offchip",
+                            name: "meshAndPeriOadOffchip"
+                        },
+                        {
+                            displayName: "Mesh and Peripheral OAD Onchip",
+                            name: "meshAndPeriOadOnchip"
+                        }
+                    ]
+                },
+                {
+                    name: "nwpMode",
+                    displayName: "Network Processor Mode",
+                    default: false,
+                    hidden: true
                 }
             ]
         },
@@ -219,44 +293,6 @@ const moduleStatic = {
             name: "gattBuilder",
             displayName: "Custom GATT",
             description: "Adding services and characteristic ",
-            default: false,
-            hidden: true
-        },
-        {
-            name:"mesh",
-            displayName: "Mesh",
-            default: false,
-            hidden: false,
-            onChange: onMeshChange
-        },
-        {
-            name:"meshApp",
-            displayName: "Mesh Application",
-            default: "meshOnly",
-            onChange: onMeshAppChange,
-            hidden: true,
-            options: [
-                {
-                    displayName: "Mesh Only",
-                    name: "meshOnly"
-                },
-                {
-                    displayName: "Mesh and Peripheral",
-                    name: "meshAndPeri"
-                },
-                {
-                    displayName: "Mesh and Peripheral OAD Offchip",
-                    name: "meshAndPeriOadOffchip"
-                },
-                {
-                    displayName: "Mesh and Peripheral OAD Onchip",
-                    name: "meshAndPeriOadOnchip"
-                }
-            ]
-        },
-        {
-            name: "nwpMode",
-            displayName: "Network Processor Mode",
             default: false,
             hidden: true
         },
@@ -309,6 +345,19 @@ function validate(inst, validation)
 }
 
 /*
+ *  ======== isFlashOnlyDevice ========
+ *  Check which device is used.
+ *  @return Bool - True if FlashOnly device
+ *                 False if FlashRom device
+ */
+function isFlashOnlyDevice() {
+    return (
+        // Return true if the device is from CC26X1 family
+        Common.device2DeviceFamily(system.deviceData.deviceId) == "DeviceFamily_CC26X1"
+    );
+}
+
+/*
  *  ======== ondeviceRoleChange ========
  * Change the bond manager value when changing the role combination
  * Broadcaster and observer are not using Bond Manager
@@ -323,14 +372,26 @@ function ondeviceRoleChange(inst,ui)
         inst.maxPDUNum = 0;
         inst.bondManager = false;
 
+        if(!isFlashOnlyDevice())
+        {
+            // Hide disablePairing
+            ui.disablePairing.hidden = true;
+        }
+
         // Change Device Name
         inst.deviceRole == "BROADCASTER_CFG" ? inst.deviceName = "Simple Broadcaster": inst.deviceName = "Simple Observer";
     }
     else
     {
-        inst.maxConnNum = 8;
+        inst.maxConnNum = generalScript.maxConnNumDefaultValue();
         inst.maxPDUNum = 5;
         inst.bondManager = true;
+
+        if(!isFlashOnlyDevice())
+        {
+            // Show disablePairing
+            ui.disablePairing.hidden = false;
+        }
 
         // Change Device Name
         if(inst.deviceRole == "PERIPHERAL_CFG")
@@ -382,6 +443,33 @@ function ondeviceRoleChange(inst,ui)
     // Hide/Unhide groups since the device role was changed
     changeGroupsState(inst,ui);
     inst.calledFromDeviceRole = false;
+
+    // Change the Periodic configurable state
+    onExtAdvChange(inst,ui);
+}
+
+/*
+ *  ======== onExtAdvChange ========
+ * Lock or unlock the deviceRole configurable,
+ * disable/enable the option to change the deviceRole.
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onExtAdvChange(inst,ui)
+{
+    const devFamily = Common.device2DeviceFamily(system.deviceData.deviceId);
+    // Hide/UnHide periodicAdv if extended advertising is enabled and the Broadcaster/Peripheral roles
+    // is used
+    inst.extAdv && (inst.deviceRole.includes("BROADCASTER_CFG") || inst.deviceRole.includes("PERIPHERAL_CFG")) ?
+    ui.periodicAdv.hidden = false : ui.periodicAdv.hidden = true;
+    // Hide/UnHide periodicAdv if extended advertising is enabled and the Observer/Central roles
+    // is used
+    // CC26X1 only support periodic advertising
+    if(devFamily != "DeviceFamily_CC26X1")
+    {
+        inst.extAdv && (inst.deviceRole.includes("OBSERVER_CFG") || inst.deviceRole.includes("CENTRAL_CFG")) ?
+        ui.periodicAdvSync.hidden = false : ui.periodicAdvSync.hidden = true;
+    }
 }
 
 /*
@@ -395,6 +483,27 @@ function onLockProjectChange(inst,ui)
 {
     inst.lockProject ? ui.deviceRole.readOnly = "Only this role is supported" :
                        ui.deviceRole.readOnly = false;
+}
+
+/*
+ *  ======== onDisablePairingChange ========
+ * When disablePairing is selected, change the bondPairing configurable
+ * value to GAPBOND_PAIRING_MODE_NO_PAIRING and make it readOnly
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onDisablePairingChange(inst,ui)
+{
+    if(inst.disablePairing)
+    {
+        inst.bondPairing = "GAPBOND_PAIRING_MODE_NO_PAIRING";
+        ui.bondPairing.readOnly = true;
+    }
+    else
+    {
+        inst.bondPairing = "GAPBOND_PAIRING_MODE_WAIT_FOR_REQ";
+        ui.bondPairing.readOnly = false;
+    }
 }
 
 /*
@@ -570,7 +679,7 @@ function getLibs(inst)
         // There are 3 different folders (cc26x2r1, cc13x2r1 and cc1352p)
         // Each device should use it from the appropriate folder.
         const devFamily = Common.device2DeviceFamily(system.deviceData.deviceId);
-        const basePath = "ti/ble5stack/libraries/";
+        let basePath = "ti/ble5stack/libraries/";
         const rfDesign = system.modules["/ti/devices/radioconfig/rfdesign"].$static;
         const LPName = rfDesign.rfDesign;
         let devLibsFolder = "cc26x2r1";
@@ -617,10 +726,26 @@ function getLibs(inst)
                 devLibsFolder = "cc13x2r1";
             }
         }
+        else if(devFamily == "DeviceFamily_CC26X1")
+        {
+            if(LPName == "LP_CC2651P3")
+            {
+                devLibsFolder = "cc2651p3";
+            }
+            else
+            {
+                devLibsFolder = "cc2651r3";
+            }
+            basePath = "ti/ble5stack_flash/libraries/";
+        }
 
         libs.push(basePath + devLibsFolder + "/OneLib.a");
         libs.push(basePath + devLibsFolder + "/StackWrapper.a");
-        libs.push(basePath + devLibsFolder + "/ble_r2.symbols");
+        // DeviceFamily_CC26X1 devices are using FlashOnly libs, which not required the ROM symbols
+        if(devFamily != "DeviceFamily_CC26X1")
+        {
+            libs.push(basePath + devLibsFolder + "/ble_r2.symbols");
+        }
     }
 
     // Add BLE Mesh libs

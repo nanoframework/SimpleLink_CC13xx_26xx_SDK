@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -57,6 +57,8 @@
 #include "mac_util.h"
 #include "macs.h"
 #include "macwrapper.h"
+
+#include "mac.h"
 
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Task.h>
@@ -286,6 +288,10 @@ void *ApiMac_init(uint8_t macTaskIdParam, bool enableFH)
     /* Set the device IEEE address */
     ApiMac_mlmeSetReqArray(ApiMac_attribute_extendedAddress, ApiMac_extAddr);
 
+#ifdef IEEE_COEX_ENABLED
+    ApiMac_mlmeEnableCoex(true);
+#endif
+
     return (appSemHandle);
 }
 
@@ -462,6 +468,47 @@ ApiMac_status_t ApiMac_mlmeGetReqArrayLen(ApiMac_attribute_array_t pibAttribute,
     }
 
     return (ApiMac_status_t) MAC_MlmeGetReq(pibAttribute, pValue);
+}
+
+/*!
+ This direct execute function retrieves an attribute value from
+ the MAC Coex PIB.
+
+ Public function defined in api_mac.h
+ */
+ApiMac_status_t ApiMac_mlmeGetCoexReqStruct(
+                ApiMac_coexAttribute_struct_t pibAttribute, void *pValue)
+{
+#ifdef IEEE_COEX_ENABLED
+    ((coexMetricsStruct_t *)pValue)->dbgCoexGrants = coexMetricsStruct.dbgCoexGrants;
+    ((coexMetricsStruct_t *)pValue)->dbgCoexRejects = coexMetricsStruct.dbgCoexRejects;
+    ((coexMetricsStruct_t *)pValue)->dbgCoexContRejects = coexMetricsStruct.dbgCoexContRejects;
+    ((coexMetricsStruct_t *)pValue)->dbgCoexMaxContRejects = coexMetricsStruct.dbgCoexMaxContRejects;
+#endif
+    return ApiMac_status_success;
+}
+
+/*!
+ This direct execute function retrieves an attribute value from
+ the MAC Statistics PIB.
+
+ Public function defined in api_mac.h
+ */
+ApiMac_status_t ApiMac_mlmeGetMacStatsReqStruct(
+                ApiMac_macStatistics_struct_t pibAttribute, void *pValue)
+{
+#ifdef IEEE_COEX_ENABLED
+    ((macStatisticsStruct_t *)pValue)->pta_lo_pri_req = macStatistics.pta_lo_pri_req;
+    ((macStatisticsStruct_t *)pValue)->pta_hi_pri_req = macStatistics.pta_hi_pri_req;
+    ((macStatisticsStruct_t *)pValue)->pta_lo_pri_denied = macStatistics.pta_lo_pri_denied;
+    ((macStatisticsStruct_t *)pValue)->pta_hi_pri_denied = macStatistics.pta_hi_pri_denied;
+    ((macStatisticsStruct_t *)pValue)->pta_denied_rate = macStatistics.pta_denied_rate;
+#endif
+    ((macStatisticsStruct_t *)pValue)->cca_retries = macStatistics.cca_retries;
+    ((macStatisticsStruct_t *)pValue)->cca_failures = macStatistics.cca_failures;
+    ((macStatisticsStruct_t *)pValue)->mac_tx_ucast_retry = macStatistics.mac_tx_ucast_retry;
+    ((macStatisticsStruct_t *)pValue)->mac_tx_ucast_fail = macStatistics.mac_tx_ucast_fail;
+    return ApiMac_status_success;
 }
 
 /*!
@@ -702,6 +749,63 @@ ApiMac_status_t ApiMac_mlmeSetReqArray(ApiMac_attribute_array_t pibAttribute,
     return (ApiMac_status_t) MAC_MlmeSetReq(pibAttribute, pValue);
 }
 
+/*!
+ This direct execute function sets an attribute value from
+ the MAC Coex PIB.
+
+ Public function defined in api_mac.h
+ */
+ApiMac_status_t ApiMac_mlmeSetCoexReqStruct(
+                ApiMac_coexAttribute_struct_t pibAttribute, void *pValue)
+{
+#ifdef IEEE_COEX_ENABLED
+    coexMetricsStruct.dbgCoexGrants = ((coexMetricsStruct_t *)pValue)->dbgCoexGrants;
+    coexMetricsStruct.dbgCoexRejects = ((coexMetricsStruct_t *)pValue)->dbgCoexRejects;
+    coexMetricsStruct.dbgCoexContRejects = ((coexMetricsStruct_t *)pValue)->dbgCoexContRejects;
+    coexMetricsStruct.dbgCoexMaxContRejects = ((coexMetricsStruct_t *)pValue)->dbgCoexMaxContRejects;
+#endif
+    return ApiMac_status_success;
+}
+
+/*!
+ This direct execute function sets an attribute value from
+ the MAC Statistics PIB.
+
+ Public function defined in api_mac.h
+ */
+ApiMac_status_t ApiMac_mlmeSetMacStatsReqStruct(
+            ApiMac_macStatistics_struct_t pibAttribute, void *pValue)
+{
+#ifdef IEEE_COEX_ENABLED
+    macStatistics.pta_lo_pri_req = ((macStatisticsStruct_t *)pValue)->pta_lo_pri_req;
+    macStatistics.pta_hi_pri_req = ((macStatisticsStruct_t *)pValue)->pta_hi_pri_req;
+    macStatistics.pta_lo_pri_denied = ((macStatisticsStruct_t *)pValue)->pta_lo_pri_denied;
+    macStatistics.pta_hi_pri_denied = ((macStatisticsStruct_t *)pValue)->pta_hi_pri_denied;
+    macStatistics.pta_denied_rate = ((macStatisticsStruct_t *)pValue)->pta_denied_rate;
+#endif
+    macStatistics.cca_retries = ((macStatisticsStruct_t *)pValue)->cca_retries;
+    macStatistics.cca_failures = ((macStatisticsStruct_t *)pValue)->cca_failures;
+    macStatistics.mac_tx_ucast_retry = ((macStatisticsStruct_t *)pValue)->mac_tx_ucast_retry;
+    macStatistics.mac_tx_ucast_fail = ((macStatisticsStruct_t *)pValue)->mac_tx_ucast_fail;
+    return ApiMac_status_success;
+}
+
+/*!
+  This is a function call to enable or disable coex in the MAC.
+  This must be called with enabled set to true for coex to function.
+*/
+ApiMac_status_t ApiMac_mlmeEnableCoex(bool enabled)
+{
+    ieeeCoexEnabled = enabled;
+#ifdef IEEE_COEX_3_WIRE
+    coexOverrideUseCases.ieeeConnEstab.defaultPriority = coexConfigIeee.ieeeInitiator.priority;
+    coexOverrideUseCases.ieeeConnEstab.assertRequestForRx = coexConfigIeee.ieeeInitiator.request;
+
+    coexOverrideUseCases.ieeeConnected.defaultPriority = coexConfigIeee.ieeeConnected.priority;
+    coexOverrideUseCases.ieeeConnected.assertRequestForRx = coexConfigIeee.ieeeConnected.request;
+#endif
+    return ApiMac_status_success;
+}
 /*!
  This direct execute function sets a frequency hopping attribute value
  in the MAC PIB.

@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       pka.c
-*  Revised:        2021-02-03 05:40:36 +0100 (Wed, 03 Feb 2021)
-*  Revision:       60277
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for the PKA module
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -196,16 +196,16 @@ function moduleInstances(inst)
             pinInstances.push(
                 {
                     name: "pwmPinInstance",
-                    displayName: "PWM Output PIN Configuration While Pin is Not In Use",
-                    moduleName: "/ti/drivers/PIN",
+                    displayName: "PWM Output GPIO Configuration While GPIO is Not In Use",
+                    moduleName: "/ti/drivers/GPIO",
                     collapsed: true,
-                    args: { parentMod: "/ti/drivers/Timer",
-                            parentInterfaceName: "timer",
+                    args: { parentInterfaceName: "timer",
                             parentSignalName: "pwmPin",
                             parentSignalDisplayName: "PWM Pin",
                             mode: "Output",
-                            outputState: "Low",
-                            pull: "None" }
+                            initialOutputState: "Low",
+                            pull: "None",
+                            $name: "CONFIG_GPIO_PWM_" + inst.$name.slice(inst.$name.length - 1)}
                 }
             );
             break;
@@ -286,18 +286,6 @@ function onHardwareChanged(inst, ui)
 }
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - Timer instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== exports ========
  *  Export device-specific extensions to base exports
  */
@@ -315,7 +303,6 @@ and non-portable APIs.
     defaultInstanceName : "CONFIG_GPTIMER_",
     config              : Common.addNameConfig(config, "/ti/drivers/timer/GPTimerCC26XX", "CONFIG_GPTIMER_"),
     modules             : Common.autoForceModules(["Board", "Power"]),
-    validate            : validate,
 
     templates: {
         boardc : "/ti/drivers/timer/GPTimerCC26XX.Board.c.xdt",

@@ -5,7 +5,7 @@
             "_name": "LP_CC2651P3",
             "Target": [
                 "target_cc2651p3-launchxl.json",
-                "target_cc2651p3-launchxl-highPA.json"
+                "target_cc2651p3-launchxl_highPA.json"
             ]
         }
     }

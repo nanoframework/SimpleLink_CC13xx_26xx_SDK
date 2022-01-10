@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -447,7 +447,7 @@ int_fast16_t NVSSPI25X_write(NVS_Handle handle, size_t offset, void *buffer,
     else if (flags & NVS_WRITE_PRE_VERIFY) {
         if ((hwAttrs->verifyBuf == NULL) || (hwAttrs->verifyBufSize == 0)) {
             SemaphoreP_post(writeSem);
-            return (NVS_STATUS_ERROR);
+            return (NVS_STATUS_VERIFYBUFFER);
         }
 
         retval = doWriteVerify(handle, offset, buffer, bufferSize,
@@ -524,7 +524,7 @@ int_fast16_t NVSSPI25X_write(NVS_Handle handle, size_t offset, void *buffer,
     else if (flags & NVS_WRITE_POST_VERIFY) {
         if ((hwAttrs->verifyBuf == NULL) || (hwAttrs->verifyBufSize == 0)) {
             SemaphoreP_post(writeSem);
-            return (NVS_STATUS_ERROR);
+            return (NVS_STATUS_VERIFYBUFFER);
         }
 
         retval = doWriteVerify(handle, offset, buffer, bufferSize,

@@ -132,11 +132,98 @@ __Default__ (2.4 GHz): APIMAC_CHANNEL_PAGE_NONE
 `
 };
 
+const coex = {
+    enable: {
+        displayName: "RF Coexistence",
+        description: "Select coex mode of operation",
+        longDescription: `
+Enable the use of external pin signaling to communicate with another RF capable
+device, for the devices to coexist in the same 2.4GHz frequency band.
+The coexistence (coex) feature is a wired signal interface between an IEEE 15.4
+device and a Wi-Fi device:
+
+\`\`\`
+Coex Secondary          Coex Primary
+   Device                  Device
++---------+             +---------+
+|IEEE 15.4|   Signals   |  Wi-Fi  |
+|         | <----/----> |         |
++---------+      n      +---------+
+\`\`\`
+The coex interface provides a set of signals based on the supported
+Packet Traffic Arbitration (PTA) approach:
+
+* REQUEST: Output signal, indicating a request to perform RF activity.
+* PRIORITY: Output signal, time-shared between indicating (1) request priority
+and (2) type of RF activity.
+* GRANT: Input signal, indicating the response to the request to perform RF
+activity.
+
+The available combinations of these signals are defined as _coex modes_.
+This option is used to match the interface of the coex master the device
+is coexisting with. The following signals are enabled for the different modes:
+
+|Coex Mode       | REQUEST | PRIORITY | GRANT |
+|----------------|:-------:|:--------:|:-----:|
+| 3-Wire         | x       | x        | x     |
+| 2-Wire         | x       |          | x     |
+
+__Default__: Disabled
+`
+    },
+    configGroup: {
+        displayName: "RF Coexistence Configuration"
+    },
+    defaultPriority: {
+        displayName: "Default Priority",
+        description: `
+Priority level used when time-shared PRIORITY signal indicates request
+priority
+`,
+        longDescription: `
+This option sets the priority level used by the PRIORITY signal when it
+indicates the priority of the coex request. The duration of this priority
+level is defined by the __Priority Indication Time__ option. See the
+__Coex Mode__ description for more information on what this signal is used for.
+`
+    },
+    assertRequestForRx: {
+        displayName: "Assert REQUEST Signal For RX",
+        description: "Specify if REQUEST signal is asserted for RX commands",
+        longDescription: `
+If this option is _disabled_, the IEEE device is configured to not assert the
+REQUEST signal (and subsequently disregard any of the other coex signals)
+when the scheduled RF activity is an RX command.
+
+Note: If an RX command is chained with a TX command, the REQUEST signal
+will be asserted in time for the TX activity and will _remain asserted_
+until the end of the command chain, even if the following command is an RX.
+
+\`\`\`
+              _______________
+REQ  ________|               |__
+        ____    ____    ____
+RF   __| rx |__| tx |__| rx |___
+\`\`\`
+`
+    },
+    useCaseConfigGroupIeee: {
+        displayName: "IEEE Use Case Configuration",
+        ini: {
+            displayName: "Connection Establishment"
+        },
+        con: {
+            displayName: "Connected"
+        }
+    }
+};
+
 exports = {
     rfDesign: rfDesign,
     freqBand: freqBand,
     freqSub1: freqSub1,
     phyType: phyType,
     phyID: phyID,
-    channelPage: channelPage
+    channelPage: channelPage,
+    coex: coex
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,16 +67,19 @@ var loc = environment['loc'] ? environment['loc'] : "";
 var ccOpts = {
     "ti.targets.arm.elf.M4"           : " -ms -g --c99 ",
     "ti.targets.arm.elf.M4F"          : " -ms -g --c99 ",
-    "ti.targets.arm.clang.M33"        : "",  // TBD
+    "ti.targets.arm.clang.M0"         : "",  // TBD
     "ti.targets.arm.clang.M33F"       : "",  // TBD
     "ti.targets.arm.clang.M4"         : "",  // TBD
     "ti.targets.arm.clang.M4F"        : "",  // TBD
+    "iar.targets.arm.M0"              : "",
     "iar.targets.arm.M4"              : "",
     "iar.targets.arm.M4F"             : "",
+    "iar.targets.arm.M33F"            : "",
     "gnu.targets.Linux86_64"          : " -Wall ",
+    "gnu.targets.arm.M0"              : " -std=c99 ",
     "gnu.targets.arm.M4"              : " -std=c99 ",
     "gnu.targets.arm.M4F"             : " -std=c99 ",
-    "gnu.targets.arm.GCArmv7AF"       : " -Wall "
+    "gnu.targets.arm.M33F"            : " -std=c99 ",
 };
 
 var lnkOpts = {
@@ -186,12 +189,12 @@ function getLibDirectory(suffix) {
             libdir = "lib/ccs/m4f";
             break;
 
-        case "m33":
-            libdir = "lib/ticlang/m33";
-            break;
-
         case "m33f":
             libdir = "lib/ticlang/m33f";
+            break;
+
+        case "m0":
+            libdir = "lib/ticlang/m0";
             break;
 
         case "m4":
@@ -202,6 +205,10 @@ function getLibDirectory(suffix) {
             libdir = "lib/ticlang/m4f";
             break;
 
+        case "rm0":
+            libdir = "lib/iar/m0";
+            break;
+
         case "rm4":
             libdir = "lib/iar/m4";
             break;
@@ -210,12 +217,24 @@ function getLibDirectory(suffix) {
             libdir = "lib/iar/m4f";
             break;
 
+        case "rm33f":
+            libdir = "lib/iar/m33f";
+            break;
+
+        case "m0g":
+            libdir = "lib/gcc/m0";
+            break;
+
         case "m4g":
             libdir = "lib/gcc/m4";
             break;
 
         case "m4fg":
             libdir = "lib/gcc/m4f";
+            break;
+
+        case "m33fg":
+            libdir = "lib/gcc/m33f";
             break;
 
         case "v7AF":

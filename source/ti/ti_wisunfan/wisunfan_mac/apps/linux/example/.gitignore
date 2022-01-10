@@ -1,0 +1,9 @@
+Debug
+Release
+obj
+*.sdf
+*/*.sdf
+*/.vs/*
+collector4windows
+collector4windows.zip
+

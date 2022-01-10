@@ -5,7 +5,7 @@
  @brief Common API layer to interface with sensors in the LPSTK
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -55,7 +55,6 @@
 
 #include <ti/common/sail/hdc2010/hdc2010.h>
 #include <ti/common/sail/opt3001/opt3001.h>
-#include <ti/common/sail/drv5055/drv5055.h>
 #include "lpstk/adxl362/scif.h"
 
 #include "ti_drivers_config.h"
@@ -106,8 +105,6 @@ const HDC2010_HWAttrs HDC2010_hwAttrs[1] = {
 
 static I2C_Handle      i2cHandle;
 static I2C_Params      i2cParams;
-static ADC_Handle      adcHandle;
-static ADC_Params      adcParams;
 /* Change the offset value according to the working environment. For environment without
  *magnetic field the value of offset should be 1.65V for a 3.3V power supply
 */
@@ -205,9 +202,8 @@ void Lpstk_initLightSensor(float hHiLim, float hLoLim,GPIO_CallbackFxn opt3001Ca
 
 void Lpstk_initHallEffectSensor()
 {
-    /* Call driver init functions */
-    ADC_init();
-    ADC_Params_init(&adcParams);
+    // TOOD: Shall this be kept?
+    return;
 }
 
 void Lpstk_initSensorControllerAccelerometer(SCIF_VFPTR scTaskAlertCallback)
@@ -285,23 +281,6 @@ uint8_t Lpstk_openLightSensor(void)
     return openStatus;
 }
 
-uint8_t Lpstk_openHallEffectSensor(void)
-{
-
-    uint8_t openStatus = LPSTK_NULL_HANDLE;
-    if(adcHandle == NULL)
-    {
-        ADC_Params_init(&adcParams);
-        adcHandle = ADC_open(CONFIG_ADC_0, &adcParams);
-    }
-    if(adcHandle != NULL)
-    {
-        openStatus = LPSTK_SUCCESS;
-    }
-
-    return openStatus;
-}
-
 uint8_t Lpstk_openAccelerometerSensor(void)
 {
     uint8_t status = LPSTK_SUCCESS;
@@ -347,15 +326,10 @@ bool Lpstk_readLightSensor(float *lux)
     return successRead;
 }
 
-bool Lpstk_readHallEffectSensor(float *flux)
+bool Lpstk_readHallEffectSensor(bool *switchValue)
 {
-    bool successRead = false;
-    if(adcHandle)
-    {
-        *flux = DRV5055_getMagneticFlux(adcHandle, DRV5055A4_3_3V, OFFSET, DRV5055_3_3V);
-        successRead = true;
-    }
-    return successRead;
+    *switchValue = GPIO_read(CONFIG_GPIO_DRV);
+    return true;
 }
 
 void Lpstk_readAccelerometerSensor(Lpstk_Accelerometer *accel)
@@ -393,15 +367,6 @@ void Lpstk_shutdownLightSensor(void)
     closeI2C();
 }
 
-void Lpstk_shutdownHallEffectSensor(void)
-{
-    if(adcHandle != NULL)
-    {
-        /* close ADC peripheral to enter low power mode */
-        ADC_close(adcHandle);
-    }
-
-}
 
 void Lpstk_shutdownAccelerometerSensor(void)
 {

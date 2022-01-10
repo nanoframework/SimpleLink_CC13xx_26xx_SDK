@@ -174,6 +174,17 @@ const config = {
             ]
         },
         {
+            name: "dupFilter",
+            displayName: "Duplicate Filter",
+            default: "SCAN_FLT_DUP_ENABLE",
+            hidden: true,
+            options: [
+                { displayName: "Disabled", name: "SCAN_FLT_DUP_DISABLE" },
+                { displayName: "Enabled", name: "SCAN_FLT_DUP_ENABLE"  },
+                { displayName: "Enabled, reset for each scan period", name: "SCAN_FLT_DUP_RESET" }
+            ]
+        },
+        {
             name: "disDevBySerUuid",
             displayName: "Discover Devices By Service UUID",
             description: "Check in order to discover only peripheral devices "

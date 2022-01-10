@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -726,7 +726,8 @@ typedef void (*I2S_StopInterface)(I2S_Handle handle);
  *  @brief      I2S slot memory length setting
  *
  *  The enum defines if the module uses a 16 bits or a 24 bits buffer in memory.
- *  This value has no influence on the number of bit transmitted.
+ *  This value has no influence on the number of bits transmitted, but it should
+ *  be consistent with the chosen word length.
  */
 typedef enum {
 
@@ -848,7 +849,7 @@ typedef struct {
      *   Not available for CC26XX: all transmissions are performed by CPU. */
 
     I2S_MemoryLength      memorySlotLength;
-    /*!< Memory buffer used.
+    /*!< Width of stored samples. It should be consistent with the word length.
      *   #I2S_MEMORY_LENGTH_8BITS:  Memory length is 8 bits (not available for CC26XX).
      *   #I2S_MEMORY_LENGTH_16BITS: Memory length is 16 bits.
      *   #I2S_MEMORY_LENGTH_24BITS: Memory length is 24 bits.

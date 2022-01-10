@@ -146,7 +146,7 @@ function modules(inst)
 
 exports = {
     staticOnly: true,
-    displayName: "Settings",
+    displayName: "POSIX Settings",
     moduleStatic: {
         validate: validate,
         modules: modules,

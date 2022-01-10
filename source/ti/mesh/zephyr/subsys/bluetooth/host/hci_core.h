@@ -5,11 +5,11 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
 #ifndef HCI_CORE_H_
 #define HCI_CORE_H_
 
 #include <bluetooth/conn.h>
+
 
 /* LL connection parameters */
 #define LE_CONN_LATENCY		0x0000
@@ -110,6 +110,14 @@ enum {
 	BT_PER_ADV_ENABLED,
 	/* Periodic Advertising parameters has been set in the controller. */
 	BT_PER_ADV_PARAMS_SET,
+	/* Constant Tone Extension parameters for Periodic Advertising
+	 * has been set in the controller.
+	 */
+	BT_PER_ADV_CTE_PARAMS_SET,
+	/* Constant Tone Extension for Periodic Advertising has been enabled
+	 * in the controller.
+	 */
+	BT_PER_ADV_CTE_ENABLED,
 
 	BT_ADV_NUM_FLAGS,
 };
@@ -119,7 +127,7 @@ struct bt_le_ext_adv {
 	uint8_t                 id;
 
 	/* Advertising handle */
-	uint16_t			handle;
+	uint8_t                 handle;
 
 	/* Current local Random Address */
 	bt_addr_le_t            random_addr;
@@ -130,7 +138,7 @@ struct bt_le_ext_adv {
 	ATOMIC_DEFINE(flags, BT_ADV_NUM_FLAGS);
 
 #if defined(CONFIG_BT_EXT_ADV)
-	const struct bt_le_ext_adv_cb *cb;
+	const struct bt_le_ext_adv_cb *cb; //TODO: Roy - removed with our version?
 
 	/* TX Power in use by the controller */
 	int8_t                    tx_power;
@@ -310,6 +318,34 @@ extern const struct bt_conn_auth_cb *bt_auth;
 enum bt_security_err bt_security_err_get(uint8_t hci_err);
 #endif /* CONFIG_BT_SMP || CONFIG_BT_BREDR */
 
+/* Data type to store state related with command to be updated
+ * when command completes successfully.
+ */
+struct bt_hci_cmd_state_set {
+	/* Target memory to be updated */
+	atomic_t *target;
+	/* Bit number to be updated in target memory */
+	int bit;
+	/* Value to determine if enable or disable bit */
+	bool val;
+};
+
+/* Initialize command state instance */
+static inline void bt_hci_cmd_state_set_init(struct bt_hci_cmd_state_set *state,
+					     atomic_t *target, int bit,
+					     bool val)
+{
+	state->target = target;
+	state->bit = bit;
+	state->val = val;
+}
+
+/* Set command state related with the command buffer */
+void bt_hci_cmd_data_state_set(struct net_buf *buf,
+			       struct bt_hci_cmd_state_set *state);
+
+int bt_hci_disconnect(uint16_t handle, uint8_t reason);
+
 #if (!defined __clang__) && !defined(__IAR_SYSTEMS_ICC__)
 #pragma diag_suppress 233
 bool bt_le_conn_params_valid(const struct bt_le_conn_param *param);
@@ -317,6 +353,7 @@ bool bt_le_conn_params_valid(const struct bt_le_conn_param *param);
 int bt_le_set_data_len(struct bt_conn *conn, uint16_t tx_octets, uint16_t tx_time);
 int bt_le_set_phy(struct bt_conn *conn, uint8_t all_phys,
 		  uint8_t pref_tx_phy, uint8_t pref_rx_phy, uint8_t phy_opts);
+
 int bt_le_scan_update(bool fast_scan);
 
 int bt_le_create_conn(const struct bt_conn *conn);
@@ -341,8 +378,10 @@ int bt_le_adv_start_internal(const struct bt_le_adv_param *param,
 			     const struct bt_data *ad, size_t ad_len,
 			     const struct bt_data *sd, size_t sd_len,
 			     const bt_addr_le_t *peer);
+
 void bt_le_adv_resume(void);
 bool bt_le_scan_random_addr_check(void);
+
 void bt_hci_host_num_completed_packets(struct net_buf *buf);
 
 /* HCI event handlers */
@@ -356,4 +395,4 @@ void hci_evt_user_confirm_req(struct net_buf *buf);
 void hci_evt_user_passkey_notify(struct net_buf *buf);
 void hci_evt_user_passkey_req(struct net_buf *buf);
 void hci_evt_auth_complete(struct net_buf *buf);
-#endif
+#endif /* HCI_CORE_H_ */

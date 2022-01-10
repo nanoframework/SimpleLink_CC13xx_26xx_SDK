@@ -499,22 +499,14 @@ function getLibs(mod) {
     if (mod.$static.genLibs == true) {
         const boardName = easylinkUtil.getDeviceOrLaunchPadName(true);
 
-        let lib = "ti/dmm/library/tirtos/";
+        let lib = "ti/dmm/lib/";
         let compiler = system.compiler;
-        let product = "";
 
-        if (boardName.includes("CC13")) {
-            product = "cc13x2";
-        } else if (boardName.includes("CC26")) {
-            product = "cc26x2";
-        }
-
-        lib += compiler + "/bin/";
-        lib += "dmmlib_" + product + ".a";
+        lib += compiler + "/m4f/";
+        lib += "dmmlib" + ".a";
 
         result.libs.push(lib);
     }
-
     return result;
 }
 

@@ -35,9 +35,9 @@
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/BIOS.h>
 
-#define K_MSEC(x) (x)
-#define K_SECONDS(s) (s * 1000u)
-#define K_MINUTES(m) (m * 60000u)
-#define K_HOURS(m) (m * 360000u)
+#define K_MSEC(x) Z_TIMEOUT_TICKS(MAX(x, 0))
+#define K_SECONDS(s) Z_TIMEOUT_TICKS(s * 1000u)
+#define K_MINUTES(m) Z_TIMEOUT_TICKS(m * 60000u)
+#define K_HOURS(m) Z_TIMEOUT_TICKS(m * 360000u)
 
 #endif /* ZEPHYR_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,18 +76,6 @@ function filterHardware(component) {
 }
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  param inst       - SD instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 function _getPinResources(inst)
@@ -140,6 +128,32 @@ function sharedModuleInstances(inst)
 }
 
 /*
+ *  ======== pinmuxRequirements ========
+ *  Returns peripheral pin requirements of the specified instance
+ */
+function pinmuxRequirements(inst)
+{
+    /* Some devices support non SPI modes */
+    if (inst.interfaceType && inst.interfaceType !== "SD SPI") {
+        return inst.$module.devSpecificPinmuxRequirements(inst);
+    }
+
+    let ssPin = {
+        name: "sdSSPin",
+        displayName: "SD SPI Slave Select",
+        interfaceName: "GPIO",
+        signalTypes: ["DOUT"]
+    };
+
+    /* If we have hardware, require the specific pins instead of generic DOUT pins */
+    if (inst.$hardware) {
+        ssPin.signalTypes = ["SPI_SS"];
+    }
+
+    return [ssPin];
+}
+
+/*
  *  ======== moduleInstances ========
  */
 function moduleInstances(inst)
@@ -166,11 +180,17 @@ function moduleInstances(inst)
         name: "slaveSelect",
         displayName: selectName,
         moduleName: "/ti/drivers/GPIO",
-        hardware: selectHardware,
         args: {
             mode: "Output",
             outputType: "Standard",
             initialOutputState:"High"
+        },
+        requiredArgs: {
+            /* Can't be changed by the user */
+            parentInterfaceName: "GPIO",
+            parentSignalName: "sdSSPin",
+            parentSignalDisplayName: selectName,
+            $hardware: selectHardware
         }
     }]);
 }
@@ -224,9 +244,9 @@ operations on SD cards.
 `,
     defaultInstanceName: "CONFIG_SD_",
     config: Common.addNameConfig(config, "/ti/drivers/SD", "CONFIG_SD_"),
-    validate: validate,
     modules: Common.autoForceModules(["Board", "Power"]),
     sharedModuleInstances: sharedModuleInstances,
+    pinmuxRequirements: pinmuxRequirements,
     moduleInstances: moduleInstances,
     filterHardware: filterHardware,
     _getPinResources: _getPinResources,

@@ -167,7 +167,8 @@ function moduleInstances(inst)
     // Get settings from selected phy
     const radioConfigArgs = _.cloneDeep(phySettings[0].args);
 
-    if(deviceId.match(/CC1352P/) || deviceId.match(/CC2652PSIP/))
+    if(deviceId.match(/CC1352P/) || deviceId.match(/CC2652PSIP/)
+        || deviceId.match(/CC2651P3/))
     {
         isPDevice = true;
         if ( !isNaN(inst.txPower) )
@@ -254,6 +255,10 @@ function getRfDesignOptions()
     {
         newRfDesignOptions = [{name: "LP_CC1352P7-4"}];
     }
+    else if(deviceId === "CC2651P3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651P3"}];
+    }
     else
     {
         throw new Error("Unknown deviceId " + deviceId + ".");
@@ -309,9 +314,14 @@ function getDefaultFreqBand()
 function getTxPowerConfigOptions(inst)
 {
     let txPowerValueList = [];
+    let phyType = "ieee154";
 
     // Get the command handler for this phy instance
-    const cmdHandler = CmdHandler.get(RadioConfig.PHY_IEEE_15_4, "ieee154");
+    if (inst.rfDesign == "LP_CC2652PSIP")
+    {
+        phyType = "ieee154p10";
+    }
+    const cmdHandler = CmdHandler.get(RadioConfig.PHY_IEEE_15_4, phyType);
     let freq = cmdHandler.getFrequency();
 
     // special case for P-4

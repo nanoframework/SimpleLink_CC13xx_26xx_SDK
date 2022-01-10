@@ -49,6 +49,10 @@ $Release Date: PACKAGE RELEASE DATE $
 #include <ti_drivers_config.h>
 
 // TI BLE Stack
+#ifndef ICALL_NO_APP_EVENTS
+#error "ICall is not configured properly, ICALL_NO_APP_EVENTS is not defined"
+#endif /* ICALL_NO_APP_EVENTS */
+#include "ble_stack_api.h"
 #include <devinfoservice.h>
 #include <simple_gatt_profile.h>
 #include <gapgattserver.h>
@@ -113,8 +117,6 @@ bStatus_t mesh_portingLayer_gattReadAttCB(uint16 connHandle,
 /* --------------- */
 /* --- General --- */
 /* --------------- */
-// Advertising handles
-static uint8 meshAdvHandle;
 
 // Zephyr BT Structure
 struct bt_dev bt_dev = {.hci_version = BT_HCI_VERSION_5_1};
@@ -127,19 +129,31 @@ static const char *pBleName;
 // Zephyr work Q init flag
 static bool bWorkQInitialized = FALSE;
 
+
+/* --------------------------- */
+/* ---- Advertise related ---- */
+/* --------------------------- */
+
+// Flag that indicates if this is the first time an adv is done,
+// it is used in order to call ICall_registerApp only once
+static bool meshAdvFirst = true;
+
+// Advertising handle
+static uint8 meshAdvHandle;
+
+#ifdef ZEPHYR_ADV_EXT
+// Callback given by mesh profile to BLE stack for extended
+// advertise set adv and connection
+const struct bt_le_ext_adv_cb *pZephyrAdvSetCBs = NULL;
+#endif
+
 /* --------------------- */
 /* --- iCall related --- */
 /* --------------------- */
 // Advertising thread entity ID globally used to check for source and/or
 // destination of messages
 ICall_EntityID advThreadSelfEntity;     // advertisement thread
-ICall_EntityID workQThreadSelfEntity;     // advertisement thread
-extern ICall_EntityID meshAppSelfEntity;
-
-// Advertising thread event globally used to post local events and pend on
-// system and local events
-ICall_SyncHandle advThreadSyncEvent;     // advertisement thread
-ICall_SyncHandle workQThreadSyncEvent;     // advertisement thread
+ICall_EntityID workQThreadSelfEntity;   // WorkQ thread
 
 /* ------------------------ */
 /* --- Scanning related --- */
@@ -179,7 +193,7 @@ static CONST gattServiceCBs_t mesh_portingLayer_provProxyServiceCBs = {
 };
 
 // Zephyr connection formation related cbs
-static struct bt_conn_cb *pZephyrConnCBs;
+static struct bt_conn_cb *pZephyrConnCBs = NULL;
 
 // Existing link mtuSize
 static uint16 mtuSize = 0;
@@ -226,10 +240,15 @@ ssize_t bt_gatt_attr_write_ccc(struct bt_conn *conn,
  * @param   arg  -  Custom application argument that can be returned
  *                  through this callback
  */
-static void mesh_portingLayer_advCB(uint32_t event, void *pBuf, uintptr_t arg)
+void mesh_portingLayer_advCB(uint32_t event, void *pBuf)
 {
-  // Handle BLE Event
-  SimpleMeshNode_advCB(event, pBuf, arg);
+#ifdef ZEPHYR_ADV_EXT
+  // Call the Zephyr adv cb
+  if ( (event & GAP_EVT_ADV_SET_TERMINATED) && pZephyrAdvSetCBs != NULL && pZephyrAdvSetCBs->sent != NULL)
+  {
+      pZephyrAdvSetCBs->sent(NULL, NULL);
+  }
+#endif
 }
 
 /******************************************************************************
@@ -255,7 +274,9 @@ void mesh_portingLayer_scanCB(uint32_t evt, void* pMsg, uintptr_t arg)
 
   // Verify scan report is non-connectable, non-scannable and legacy
   if ((evt & GAP_EVT_ADV_REPORT)                         &&
+#ifndef ZEPHYR_ADV_EXT
       (pAdvRpt->evtType & ADV_RPT_EVT_TYPE_LEGACY)       &&
+#endif
      !(pAdvRpt->evtType & ADV_RPT_EVT_TYPE_CONNECTABLE)  &&
      !(pAdvRpt->evtType & ADV_RPT_EVT_TYPE_SCANNABLE))
   {
@@ -378,11 +399,11 @@ bStatus_t mesh_portingLayer_newConnectionCB(gapEstLinkReqEvent_t *inputConn)
   {
     return INVALIDPARAMETER;
   }
-
+#ifndef ZEPHYR_ADV_EXT
   // Stop the Mesh advertising
   status = bt_le_adv_stop();
   BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status || bleAlreadyInRequestedMode == status);
-
+#endif
   // Get connection object pointer to fill
   outputConn = mesh_portingLayer_getFreeConn();
   if (NULL == outputConn)
@@ -396,9 +417,18 @@ bStatus_t mesh_portingLayer_newConnectionCB(gapEstLinkReqEvent_t *inputConn)
                                                   outputConn);
   BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
 
-  // Call zephyr cb
-  (pZephyrConnCBs->connected)(outputConn, outputConn->err);
-
+  // Call zephyr proxy cb
+  if (pZephyrConnCBs != NULL && pZephyrConnCBs->connected != NULL)
+  {
+    (pZephyrConnCBs->connected)(outputConn, outputConn->err);
+  }
+#ifdef ZEPHYR_ADV_EXT
+  // Call zephyr extended adv cb
+  if (pZephyrAdvSetCBs != NULL && pZephyrAdvSetCBs->connected != NULL)
+  {
+    (pZephyrAdvSetCBs->connected)(NULL, NULL);
+  }
+#endif
   return status;
 }
 
@@ -428,7 +458,10 @@ bStatus_t mesh_portingLayer_disconnectCB(gapTerminateLinkEvent_t *inputConn)
                                                   inputConn->connectionHandle);
   BT_LE_PORTING_LAYER_ASSERT(NULL != connToDisconnect);
 
-  (pZephyrConnCBs->disconnected)(connToDisconnect, inputConn->reason);
+  if (pZephyrConnCBs != NULL && pZephyrConnCBs->disconnected != NULL)
+  {
+    (pZephyrConnCBs->disconnected)(connToDisconnect, inputConn->reason);
+  }
 
   status = mesh_portingLayer_freeConnByHandle(connToDisconnect->handle);
   BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
@@ -787,7 +820,6 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
   ICall_Errno      err          = ICALL_ERRNO_SUCCESS;
   static uint8_t  *advData      = NULL;
   static uint16_t  advLen       = 0;
-  static bool      meshAdvFirst = true;
   uint8_t          newAdvLen     = 0;
   uint8_t          insertIdx;
 #ifdef CONFIG_BT_MESH_PROXY
@@ -823,11 +855,11 @@ int bt_le_adv_start(const struct bt_le_adv_param *param,
   // must not be called more than once
   if (meshAdvFirst)
   {
-    err = ICall_registerApp(&advThreadSelfEntity, &advThreadSyncEvent);
+    err = bleStack_register(&advThreadSelfEntity, 0);
     BT_LE_PORTING_LAYER_ASSERT(ICALL_ERRNO_SUCCESS == err);
 
     // Create Advertisement set and assign handle
-    status = GapAdv_create(&mesh_portingLayer_advCB, &tiParams, &meshAdvHandle);
+    status = GapAdv_create(&SimpleMeshNode_advCB, &tiParams, &meshAdvHandle);
     BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
 
     // Set event mask for set
@@ -976,6 +1008,259 @@ int bt_le_adv_stop(void)
   return status;
 }
 
+#ifdef ZEPHYR_ADV_EXT
+/******************************************************************************
+ * @fn      bt_le_ext_adv_create
+ *
+ * @brief   Create advertisement set
+ *
+ * @param   - param - pointer to a bt_le_adv_param struct
+ * @param   - cb    - pointer to a bt_le_ext_adv_cb struct
+ * @param   - adv   - pointer to a bt_le_ext_adv struct
+ *
+ * @return Zero on success or (negative) error code otherwise.
+ */
+int bt_le_ext_adv_create(const struct bt_le_adv_param *param,
+                         const struct bt_le_ext_adv_cb *cb,
+                         struct bt_le_ext_adv **adv)
+{
+    bStatus_t        status;
+    GapAdv_params_t  tiParams;
+
+    (*adv) = ICall_malloc(sizeof(struct bt_le_ext_adv));
+
+    // Verify input parameters are legal
+    if (!(*adv) || !param)
+    {
+      return -EINVAL;
+    }
+
+    // Register the advertise set CBs
+    pZephyrAdvSetCBs = cb;
+
+    // Parse Zephyr BLE Stack structures into TI BLE Stack structures
+    status = mesh_portingLayer_convertZephAdvParam(param, &tiParams);
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Create Advertisement set and assign handle
+    status = GapAdv_create(&SimpleMeshNode_advCB, &tiParams, &((*adv)->handle));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Set event mask for set
+    status = GapAdv_setEventMask(((*adv)->handle), GAP_ADV_EVT_MASK_ALL);
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv eventProps
+    status = GapAdv_setParam(((*adv)->handle), GAP_ADV_PARAM_PROPS,
+                             &(tiParams.eventProps));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv primIntMin
+    status = GapAdv_setParam(((*adv)->handle), GAP_ADV_PARAM_PRIMARY_INTERVAL_MIN,
+                             &(tiParams.primIntMin));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv primIntMax
+    status = GapAdv_setParam(((*adv)->handle), GAP_ADV_PARAM_PRIMARY_INTERVAL_MAX,
+                             &(tiParams.primIntMax));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    return status;
+}
+
+/******************************************************************************
+ * @fn      bt_le_ext_adv_start
+ *
+ * @brief   Start advertising
+ *
+ * @param   - adv   - pointer to a bt_le_ext_adv struct
+ * @param   - param - pointer to a bt_le_adv_param struct
+ *
+ * @return Zero on success or (negative) error code otherwise.
+ */
+int bt_le_ext_adv_start(struct bt_le_ext_adv *adv,
+                        struct bt_le_ext_adv_start_param *param)
+{
+    bStatus_t status;
+
+    // Verify input parameters are legal
+    if (!adv || !param)
+    {
+      return -EINVAL;
+    }
+
+    if (param->timeout == 0 && param->num_events == 0)
+    {
+        // Enable continuous advertising
+        status = GapAdv_enable(adv->handle, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
+    }
+    else if (param->timeout > param->num_events)
+    {
+        // Enable advertising for a specific duration (param->timeout)
+        status = GapAdv_enable(adv->handle, GAP_ADV_ENABLE_OPTIONS_USE_DURATION, param->timeout);
+    }
+    else
+    {
+        // Enable advertising for maximum number of events (param->num_events)
+        status = GapAdv_enable(adv->handle, GAP_ADV_ENABLE_OPTIONS_USE_MAX_EVENTS, param->num_events);
+    }
+    // Update flag
+    if (status == SUCCESS)
+    {
+        meshAdvFirst = false;
+    }
+
+    return status;
+}
+
+/******************************************************************************
+ * @fn      bt_le_ext_adv_stop
+ *
+ * @brief   Stop advertising
+ *
+ * @param   - adv - pointer to a bt_le_ext_adv struct
+ *
+ * @return Zero on success or (negative) error code otherwise.
+ */
+int bt_le_ext_adv_stop(struct bt_le_ext_adv *adv)
+{
+    bStatus_t status;
+
+    // Verify input parameters are legal
+    if (!adv)
+    {
+      return -EINVAL;
+    }
+
+   // Disable advertising of mesh extended adv set
+    status = GapAdv_disable(adv->handle);
+
+    return status;
+}
+
+/******************************************************************************
+ * @fn      bt_le_ext_adv_set_data
+ *
+ * @brief   Set advertise data and scan response data
+ *          Note: According to the spec, for extended advertisement,
+ *                the advertisement shall not be both connectable and
+ *                scannable.
+ *                Since the advertise set is extended and connectable,
+ *                the scan response (sd) data is ignored in this function.
+ *
+ * @param   - adv    - pointer to a bt_le_ext_adv struct
+ * @param   - ad     - pointer to advertisement data
+ * @param   - ad_len - number of AD structures for advertisement data
+ * @param   - sd     - pointer to scan data
+ * @param   - sd_len - number of AD structures for scan response data
+ *
+ * @return Zero on success or (negative) error code otherwise.
+ */
+int bt_le_ext_adv_set_data(struct bt_le_ext_adv *adv,
+                           const struct bt_data *ad, size_t ad_len,
+                           const struct bt_data *sd, size_t sd_len)
+{
+    bStatus_t status;
+    static uint8_t  *advDataExt      = NULL;
+    static uint16_t  advLenExt       = 0;
+    uint8_t          newAdvLen       = 0;
+    uint8_t          insertIdx;
+
+    // Verify input parameters are legal
+    if (!adv || !ad || (0 == ad_len))
+    {
+      return -EINVAL;
+    }
+
+    // Sum up total size of all AD structs of advertising data
+    for (int i = 0; i < ad_len; i++)
+    {
+      newAdvLen += ad[i].data_len+2;  // add 2 for length and type parameters
+    }
+
+    // If data length has changed, free buffer and reallocate a new one
+    if (newAdvLen != advLenExt)
+    {
+      // Only free if previously allocated
+      if (!meshAdvFirst)
+      {
+        ICall_free(advDataExt);
+        status = GapAdv_prepareLoadByHandle(adv->handle,
+                                            GAP_ADV_FREE_OPTION_ADV_DATA);
+        BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+      }
+
+      // Adv total length must also include len+type to the adv buffer
+      advLenExt = newAdvLen;
+
+      // Allocate a data buffer for the advertisement data
+      advDataExt = ICall_malloc(advLenExt);
+      BT_LE_PORTING_LAYER_ASSERT(NULL != advDataExt);
+    }
+
+    // Prepare insert index
+    insertIdx = 0;
+
+    // Create advertisement data - iterate over all AD structures
+    for (int i = 0; i < ad_len; i++)
+    {
+      // Setup adv header
+      advDataExt[insertIdx++] = ad[i].data_len+1; // Length of adv data + type
+      advDataExt[insertIdx++] = ad[i].type;
+
+      // Copy advertisement data
+      memcpy(&advDataExt[insertIdx], ad[i].data, ad[i].data_len);
+
+      // Advance insertion index by data_len
+      insertIdx += ad[i].data_len;
+    }
+
+    // Load advertising data for adv set that is statically allocated by the app
+    status = GapAdv_loadByHandle(adv->handle, GAP_ADV_DATA_TYPE_ADV, advLenExt, advDataExt);
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+  return status;
+}
+
+/******************************************************************************
+ * @fn      bt_le_ext_adv_update_param
+ *
+ * @brief   Update the advertise set parameters
+ *
+ * @param   - adv   - pointer to a bt_le_ext_adv struct
+ * @param   - param - pointer to a bt_le_adv_param struct
+ *
+ * @return Zero on success or (negative) error code otherwise.
+ */
+int bt_le_ext_adv_update_param(struct bt_le_ext_adv *adv,
+                               const struct bt_le_adv_param *param)
+{
+    bStatus_t status;
+    GapAdv_params_t  tiParams;
+
+    // Parse Zephyr BLE Stack structures into TI BLE Stack structures
+    status = mesh_portingLayer_convertZephAdvParam(param, &tiParams);
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv eventProps
+    status = GapAdv_setParam(adv->handle, GAP_ADV_PARAM_PROPS,
+                             &(tiParams.eventProps));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv primIntMin
+    status = GapAdv_setParam(adv->handle, GAP_ADV_PARAM_PRIMARY_INTERVAL_MIN,
+                             &(tiParams.primIntMin));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    // Trigger the setParam cmd to update the adv primIntMax
+    status = GapAdv_setParam(adv->handle, GAP_ADV_PARAM_PRIMARY_INTERVAL_MAX,
+                             &(tiParams.primIntMax));
+    BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+    return status;
+}
+#endif
+
 /******************************************************************************
  * @fn      bt_le_scan_start
  *
@@ -1040,18 +1325,16 @@ int bt_le_scan_start(const struct bt_le_scan_param *param, bt_le_scan_cb_t cb)
   status = GapScan_setParam(SCAN_PARAM_PRIM_PHYS, &temp8);
   BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
 
-  // Set PDU type filter (Only Non-connectable, Complete and Legacy packets)
-  temp16 = (SCAN_FLT_PDU_NONCONNECTABLE_ONLY |
-            SCAN_FLT_PDU_COMPLETE_ONLY |
-            SCAN_FLT_PDU_LEGACY_ONLY);
-
+  // Set PDU type filter
+  temp16 = DEFAULT_MESH_SCAN_FLT_PDU;
   status = GapScan_setParam(SCAN_PARAM_FLT_PDU_TYPE, &temp16);
   BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);
+
+  bMeshIsScanning = TRUE;
 
   // Enable scanning
   status = GapScan_enable(0, DEFAULT_MESH_SCAN_DURATION, 0);
 
-  bMeshIsScanning = TRUE;
   return status;
 }
 
@@ -1101,7 +1384,7 @@ void bt_le_register_work_q()
   // must only be called once!
   if (bWorkQInitialized == FALSE)
   {
-    err = ICall_registerApp(&workQThreadSelfEntity, &workQThreadSyncEvent);
+    err = bleStack_register(&workQThreadSelfEntity, 0);
     BT_LE_PORTING_LAYER_ASSERT(ICALL_ERRNO_SUCCESS == err);
 
     bWorkQInitialized = TRUE;
@@ -1397,6 +1680,12 @@ int bt_gatt_notify_cb(struct bt_conn *conn,
 
   // Clear attribute data for security purposes
   memset(pAttr->pValue, 0, params->len);
+
+  // Call the notification value callback
+  if(params->func)
+  {
+      params->func(conn, params->user_data);
+  }
 
   return SUCCESS;
 }

@@ -372,6 +372,7 @@ function getDeviceIsa(devId = null)
             isa = "m4f";
             break;
         case /CC(?:13|26).4/.test(devId):
+        case /CC26.3/.test(devId):
             isa = "m33f";
             break;
         case /CC23/.test(devId):

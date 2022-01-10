@@ -6,7 +6,7 @@
         RF Core Firmware Specification for IEEE 802.15.4.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -205,6 +205,13 @@ typedef struct
 } macFrmFilter_t;
 
 
+typedef struct {
+    RF_CoexOverride    ieeeInitiator;
+    RF_CoexOverride    ieeeConnected;
+} RF_CoexOverride_IEEEUseCases;
+
+extern RF_CoexOverride_IEEEUseCases coexConfigIeee;
+
 /* Software SFD detected callback */
 typedef void (*macSfdDetectCBack_t)(uint8 status);
 
@@ -222,11 +229,17 @@ typedef struct
     uint16    ackTimeRollover;
 } MAC_ACK_DBG;
 
-#ifdef FH_HOP_DEBUG
+#if defined(FH_HOP_DEBUG) || defined(SFD_DEBUG)
+/* Sub-G RX Debug Counters */
 typedef struct
 {
-    uint16    num_sfd_rx_stop;
-    uint16    num_sfd_rx_abort;
+    uint32    num_sfd_rx_stop;
+    uint32    num_sfd_rx_abort;
+    uint32    num_sfd_detected;
+    uint32    num_sfd_back_to_back;
+    uint32    num_sfd_tx_go;
+    uint32    num_tx_queued;
+    uint32    num_sfd_timeouts;
 } MAC_SFD_DBG;
 extern MAC_SFD_DBG macSfdDbg;
 #endif
@@ -286,6 +299,62 @@ extern macSfdDetectCBack_t macSfdDetectCback;
 extern volatile int8_t lastRatChanA;
 extern volatile int8_t lastRatChanB;
 
+extern bool ieeeCoexEnabled;
+
+/* Coex Debug Variables */
+typedef struct {
+    uint32_t dbgCoexGrants;
+    uint32_t dbgCoexRejects;
+    uint16_t dbgCoexContRejects;
+    uint16_t dbgCoexMaxContRejects;
+} coexMetricsStruct_t;
+
+typedef struct {
+    /* Total number of low priority PTA request */
+    uint16_t pta_lo_pri_req;
+    /* Total number of high priority PTA request */
+    uint16_t pta_hi_pri_req;
+    /* Total number of low priority PTA request denied by master */
+    uint16_t pta_lo_pri_denied;
+    /* Total number of high priority PTA request denied by master */
+    uint16_t pta_hi_pri_denied;
+    /* Total number of CCA retries */
+    uint16_t cca_retries;
+    /* Total number of CCA failure */
+    uint16_t cca_failures;
+    /* Total number of Unicast retries at MAC layer */
+    uint16_t mac_tx_ucast_retry;
+    /* Total number of Unicast failures at MAC layer */
+    uint16_t mac_tx_ucast_fail;
+    /* PTA deny rate */
+    uint16_t pta_denied_rate;
+} macStatisticsStruct_t;
+
+extern macStatisticsStruct_t macStatistics;
+
+extern volatile RF_PriorityCoex lastTxPriority;
+extern volatile RF_PriorityCoex lastRxPriority;
+
+/*Coex Debug Struct Definition*/
+extern coexMetricsStruct_t coexMetricsStruct;
+
+/* CoEx use case struct */
+typedef struct
+{
+    RF_PriorityCoex   defaultPriority;
+    RF_RequestCoex    assertRequestForRx;
+} coexUseCase_t;
+
+/* CoEx use case configuration structure for IEEE. */
+typedef struct
+{
+    coexUseCase_t ieeeConnEstab;
+    coexUseCase_t ieeeConnected;
+} coexOverrideUseCases_t;
+
+/* Coex Priority Use Case Variable Definition */
+extern coexOverrideUseCases_t coexOverrideUseCases;
+
 #if defined(COMBO_MAC) || !defined(FREQ_2_4G)
 extern uint8 macReqAccessTimeCnt;
 extern uint8 reqAccessAlloc;
@@ -312,10 +381,12 @@ extern void macRatDisableChannels(void);
 extern void macRatDisableChannelB(void);
 extern void macRxCb(RF_Handle h, RF_CmdHandle ch, RF_EventMask e);
 extern void macRequestBackoff(uint8_t backoffType, uint32_t backOffDur);
+extern void macRequestSFDTimeout(void);
 MAC_INTERNAL_API uint32 macGetRFCmdDuration(uint32_t len, bool ackRequest);
 MAC_INTERNAL_API void macTxBackoffTimerExpiry(void *arg);
 MAC_INTERNAL_API void macRxBackoffTimerExpiry(void *arg);
 MAC_INTERNAL_API void macNopBackoffTimerExpiry(void *arg);
+
 
 /*******************************************************************************
  */

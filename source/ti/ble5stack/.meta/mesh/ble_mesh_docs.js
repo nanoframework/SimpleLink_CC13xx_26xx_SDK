@@ -156,6 +156,10 @@ const modelExtensionsLongDescription = `Enable support for the model \
 extension concept, allowing the Access layer to know about Mesh model \
 relationships.`
 
+// Long description for the provTimeout configuration parameter
+const provTimeoutLongDescription = `Timeout value in ms, of retransmit provisioning PDUs. \
+Valid value ranges from 100 to 800 ms.`
+
 // Exports the long descriptions for each configurable
 exports = {
     useNVLongDescription: useNVLongDescription,
@@ -175,5 +179,6 @@ exports = {
     maxSizeRXSduLongDescription: maxSizeRXSduLongDescription,
     modelGroupAddrCountLongDescription: modelGroupAddrCountLongDescription,
     modelAppKeysCountLongDescription: modelAppKeysCountLongDescription,
-    modelExtensionsLongDescription: modelExtensionsLongDescription
+    modelExtensionsLongDescription: modelExtensionsLongDescription,
+    provTimeoutLongDescription: provTimeoutLongDescription
 };

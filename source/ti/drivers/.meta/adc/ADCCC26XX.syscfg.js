@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -156,7 +156,7 @@ for proper operation; this capcitor is connected to DCOUPL.
 
     modules: Common.autoForceModules(["Board", "Power"]),
 
-    /* PIN instances */
+    /* GPIO instances */
     moduleInstances: moduleInstances,
 
     onHardwareChanged: onHardwareChanged,
@@ -229,35 +229,37 @@ function pinmuxRequirements(inst)
 
 /*
  *  ======== moduleInstances ========
- *  returns PIN instances
+ *  returns GPIO instances
  */
 function moduleInstances(inst)
 {
-
     if (inst.internalSignal !== "None") {
         return ([]);
     }
 
-    let pinInstances = new Array();
+    /* This avoids constructions like CONFIG_GPIO_CONFIG_ADC_0_AIN */
+    let shortName = inst.$name.replace("CONFIG_", "");
+    let gpioInstances = new Array();
 
-    pinInstances.push(
+    gpioInstances.push(
         {
             name: "adcPinInstance",
-            displayName: "ADC Input PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "ADC Pin configuration while not in use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/ADC",
+            requiredArgs: {
                 parentInterfaceName: "adc",
                 parentSignalName: "adcPin",
-                parentSignalDisplayName: "ADC Pin",
-                mode: "Input",
-                pull: "None"
+                parentSignalDisplayName: "ADC Pin"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_AIN",
+                mode: "Input"
             }
         }
     );
 
-    return (pinInstances);
+    return (gpioInstances);
 }
 
 /*

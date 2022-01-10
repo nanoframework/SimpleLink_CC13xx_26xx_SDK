@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -376,6 +376,15 @@ extern "C" {
  *  desired.
  */
 #define NVS_STATUS_INV_WRITE        (-7)
+
+ /*!
+  *  @brief   An error status code returned by NVS_write()
+  *
+  *  NVS_write() will return this value if #NVS_WRITE_PRE_VERIFY
+  *  or #NVS_WRITE_POST_VERIFY is requested but the verification buffer has not been configured.
+  */
+ #define NVS_STATUS_VERIFYBUFFER        (-8)
+
 
 /** @}*/
 
@@ -829,7 +838,10 @@ extern void NVS_unlock(NVS_Handle handle);
  *  @retval  #NVS_STATUS_INV_ALIGNMENT  If #NVS_WRITE_ERASE is requested
  *                                      and @p offset is not aligned on
  *                                      a sector boundary
- *
+ *  @retval  #NVS_STATUS_VERIFYBUFFER   If #NVS_WRITE_PRE_VERIFY or #NVS_WRITE_POST_VERIFY
+ *                                      is requested but the verification buffer has not 
+ *                                      been configured.
+ * 
  *  @remark  This call may lock a region to ensure atomic access to the region.
  */
 extern int_fast16_t NVS_write(NVS_Handle handle, size_t offset, void *buffer,

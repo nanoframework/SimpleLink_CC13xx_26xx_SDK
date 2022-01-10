@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,18 +46,6 @@ let family = Common.device2Family(system.deviceData, "Capture");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  @param inst       - Capture instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -88,7 +76,6 @@ on a GPIO pin.
 `,
     defaultInstanceName: "CONFIG_CAPTURE_",
     config: Common.addNameConfig(config, "/ti/drivers/Capture", "CONFIG_CAPTURE_"),
-    validate: validate,
     modules: Common.autoForceModules(["Board", "Power"]),
 
     _getPinResources: _getPinResources

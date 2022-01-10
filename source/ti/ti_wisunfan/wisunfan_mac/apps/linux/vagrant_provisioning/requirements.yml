@@ -1,0 +1,7 @@
+---
+
+- src: git+https://bitbucket.itg.ti.com/scm/devops/ansible-role-conan.git
+  version: master
+
+- src: git+https://bitbucket.itg.ti.com/scm/devops/ansible-role-swtools.git
+  version: master

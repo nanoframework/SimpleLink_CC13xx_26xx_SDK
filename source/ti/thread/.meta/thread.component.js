@@ -43,7 +43,7 @@ let topModules = [];
 let templates = [];
 
 /* Only export TIOP module if device is supported */
-if(deviceId.match(/CC(2652|1352(R1|P1|P7))/))
+if(deviceId.match(/CC(2652|1352(R1|P1|P7))|CC2674R10/))
 {
     topModules = [
         {

@@ -4,13 +4,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
 #ifdef CONFIG_BT_SETTINGS
+
 #include <errno.h>
 #include <string.h>
 
 #include "settings/settings.h"
 #include "settings/settings_nvs.h"
+//#include "settings_priv.h"
 #include <storage/flash_map.h>
 
 #include <logging/log.h>
@@ -48,6 +49,7 @@ typedef struct
   uint8_t tailPage;     // transfer destination page
   uint8_t actPage;      // current active page
   uint8_t xsrcPage;     // transfer source page
+  uint8_t forceCompact; // force compaction to happen
   uint16_t actOffset;   // active page offset
   uint16_t xsrcOffset;  // transfer source page offset
   uint16_t xdstOffset;  // transfer destination page offset
@@ -255,6 +257,9 @@ static int settings_nvs_save(struct settings_store *cs, const char *name,
 	/* write the value */
 	rc = nvs_write(&cf->cf_nvs, write_name_id + NVS_NAME_ID_OFFSET,
 		       value, val_len);
+	if (rc < 0) {
+		return rc;
+	}
 
 	/* write the name if required */
 	if (write_name) {
@@ -360,4 +365,5 @@ int settings_backend_init(void)
 
 	return rc;
 }
-#endif //CONFIG_BT_SETTINGS
+
+#endif /* CONFIG_BT_SETTINGS */

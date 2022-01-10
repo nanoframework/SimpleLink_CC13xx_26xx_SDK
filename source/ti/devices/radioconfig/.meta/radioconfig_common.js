@@ -60,11 +60,12 @@ exports = {
     HAS_24G: hasBle,
     HAS_IEEE_15_4: hasIeee,
     HAS_24G_PROP: has24gProp,
-    isSub1gDevice: () => Device.includes("CC13") || Device.includes("CC267"),
+    isSub1gDevice: () => Device.includes("CC13") || Device.includes("CC2672"),
     isSub1gOnlyDevice: () => Device.includes("CC131"),
-    is24gOnlyDevice: () => Device.match(/CC26[45]/),
+    is24gOnlyDevice: () => Device.match(/CC26[457]/) && !Device.includes("CC2672"),
     isDeviceClass3: () => Device.match(/1[PR]3R/) !== null,
-    isDeviceClass10: () => Device.match(/[15]4[RP]10/) !== null,
+    isDeviceClass7: () => Device.match(/2[PR]7R/) !== null,
+    isDeviceClass10: () => Device.match(/[157]4[RP]10/) !== null,
     FreqLower169: 169.4,
     FreqHigher169: 169.475,
     FreqLower433: 420,
@@ -326,18 +327,21 @@ function flattenConfigs(configList) {
  */
 function getCoexConfig() {
     const modules = system.modules;
-    let useBLE = false;
+    let coexPhy = null;
 
     // Iterate RadioConfig modules
     _.each(modules, (mod) => {
         if (mod.$name.includes("radioconfig/settings/ble")) {
-            useBLE = true;
+            coexPhy = "ble";
+        }
+        if (mod.$name.includes("radioconfig/settings/ieee")) {
+            coexPhy = "ieee_15_4";
         }
     });
 
-    if (useBLE) {
+    if (coexPhy) {
         const RF = system.modules["/ti/drivers/RF"];
-        const CoExConfig = RF.getCoexConfig();
+        const CoExConfig = RF.getCoexConfig(coexPhy);
         return CoExConfig.coExEnable.bCoExEnable === 1 ? CoExConfig : null;
     }
     return null;

@@ -1065,7 +1065,7 @@ void ZDNwkMgr_ProcessNetworkReport( ZDNwkMgr_NetworkReport_t *pNetworkReport )
       }
     }
 
-      */
+      */ // End ZDNwkMgr_ProcessNetworkReport
 }
 
 /*********************************************************************

@@ -438,7 +438,27 @@ static void MT_AppUserCmd(uint8_t *pBuf)
     case TP_GU_SET_RX_APS_SEC:
       retValue = TestProfileApp_GuSetRxApsSecurity( LO_UINT16(param1), param2 );
       break;
+
+    case TP_CONFIG_KEY_EXCHANGE:
+      retValue = TestProfileApp_ConfigureKeyExchange( LO_UINT16(param1) );
+      break;
+
+    case TP_GU_SET_JOINER_NWKADDR:
+      retValue = TestProfileApp_GuSetJoinerNwkAddr( param1, param2 );
+      break;
+
+    case TP_GU_SET_NWKDEPTH:
+      retValue = TestProfileApp_SetNwkDepth( LO_UINT16(param1), param2 );
+	  break;
+
+    case TP_GU_SET_NEIGHBOR_TXCOST:
+      retValue = TestProfileApp_SetNeighborTxCost( param1, LO_UINT16(param2) );
+    break;
 #endif
+
+    case TP_SET_ALLOW19SEC:
+      retValue = TestProfileApp_SetAllowR19Sec( LO_UINT16(param1) );
+      break;
 
     case TP_SET_LEAVE_REQ_ALLOWED:
       retValue = TestProfileApp_SetLeaveReqAllowed( LO_UINT16(param1) );
@@ -458,7 +478,12 @@ static void MT_AppUserCmd(uint8_t *pBuf)
   case TP_SEND_ZDO_INVALID_CMD:
       retValue = TestProfileApp_SendInvalidCmd( param1, param2 );
   break;
-
+  case TP_SEND_ENDDEVTIMEOUT_REQ:
+    retValue = TestProfileApp_SendEndDevTimeoutReq( param1 );
+  break;
+  case TP_SET_CLEAR_TCLK_ON_LEAVE:
+    retValue = TestProfileApp_SetClearTCLKOnDevLeft( param1 );
+  break;
 #endif // APP_TP2
 
 #endif  // APP_TP || APP_TP2

@@ -5,7 +5,7 @@
  @brief This file includes typedefs and functions required for high level mac patches.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -152,6 +152,7 @@ MAC_INTERNAL_API void macTxBackoffHandler(macEvent_t *pEvent);
 MAC_INTERNAL_API void macRxBackoffHandler(macEvent_t *pEvent);
 
 MAC_INTERNAL_API uint8 macBuildDataFrame(macEvent_t *pEvent);
+MAC_INTERNAL_API void macDataTxComplete(macTx_t *pMsg);
 
 #endif /* defined(TIMAC_ROM_PATCH) */
 

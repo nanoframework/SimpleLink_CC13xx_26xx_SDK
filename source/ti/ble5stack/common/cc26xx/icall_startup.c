@@ -5,7 +5,7 @@
  @brief Startup code for CC2650 for use with IAR.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

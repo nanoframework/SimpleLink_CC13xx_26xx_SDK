@@ -5,7 +5,7 @@
  @brief Collector Specific Functions API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -80,6 +80,12 @@ extern "C"
 #define CSF_KEY_EVENT 0x0001
 #define COLLECTOR_UI_INPUT_EVT            0x0002
 #define COLLECTOR_SENSOR_ACTION_EVT       0x0004
+#ifdef IEEE_COEX_METRICS
+#define COEX_IEEE_METRICS_EVT             0x0008
+#endif
+#ifdef MAC_STATS
+#define MAC_STATS_EVT                     0x0010
+#endif
 
 #define CSF_INVALID_SHORT_ADDR            0xFFFF
 #define CSF_INVALID_SUBID                 0xFFFF
@@ -92,7 +98,6 @@ extern "C"
 /******************************************************************************
  Typedefs
  *****************************************************************************/
-
 
 /******************************************************************************
  Function Prototypes
@@ -265,6 +270,20 @@ extern void Csf_stateChangeUpdate(Cllc_states_t state);
  */
 extern void Csf_initializeTrackingClock(void);
 
+#ifdef IEEE_COEX_METRICS
+/*!
+ * @brief       Initialize the coex clock.
+ */
+extern void Csf_initializeCoexClock(void);
+#endif
+
+#ifdef MAC_STATS
+/*!
+ * @brief       Initialize the mac stats clock.
+ */
+extern void Csf_initializeStatsClock(void);
+#endif
+
 /*!
  * @brief       Initialize the identify clock.
  */
@@ -276,6 +295,24 @@ extern void Csf_initializeIdentifyClock(void);
  * @param       trackingTime - set timer this value (in msec)
  */
 extern void Csf_setTrackingClock(uint32_t trackingTime);
+
+#ifdef IEEE_COEX_METRICS
+/*!
+ * @brief       Set the coex metrics clock.
+ *
+ * @param       coexTime - set timer this value (in msec)
+ */
+extern void Csf_setCoexClock(uint32_t coexTime);
+#endif
+
+#ifdef MAC_STATS
+/*!
+ * @brief       Set the mac stats clock.
+ *
+ * @param       statsTime - set timer this value (in msec)
+ */
+extern void Csf_setStatsClock(uint32_t statsTime);
+#endif
 
 /*!
  * @brief       Initialize the broadcast clock.

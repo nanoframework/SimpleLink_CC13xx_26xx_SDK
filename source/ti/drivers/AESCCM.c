@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,4 +77,32 @@ AESCCM_Handle AESCCM_open(uint_least8_t index, const AESCCM_Params *params) {
  */
 void AESCCM_Operation_init(AESCCM_Operation *operationStruct) {
     memset(operationStruct, 0x00, sizeof(AESCCM_Operation));
+}
+
+/*
+ *  ======== AESCCM_OneStepOperation_init ========
+ */
+void AESCCM_OneStepOperation_init(AESCCM_OneStepOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCCM_OneStepOperation));
+}
+
+/*
+ *  ======== AESCCM_SegmentedAADOperation_init ========
+ */
+void AESCCM_SegmentedAADOperation_init(AESCCM_SegmentedAADOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCCM_SegmentedAADOperation));
+}
+
+/*
+ *  ======== AESCCM_SegmentedDataOperation_init ========
+ */
+void AESCCM_SegmentedDataOperation_init(AESCCM_SegmentedDataOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCCM_SegmentedDataOperation));
+}
+
+/*
+ *  ======== AESCCM_SegmentedFinalizeOperation_init ========
+ */
+void AESCCM_SegmentedFinalizeOperation_init(AESCCM_SegmentedFinalizeOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCCM_SegmentedFinalizeOperation));
 }

@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       i2c.h
-*  Revised:        2020-12-01 16:53:49 +0100 (Tue, 01 Dec 2020)
-*  Revision:       59683
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the I2C.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

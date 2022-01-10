@@ -6,7 +6,7 @@
  This module is the Joining Device Logical Link Controller for the application.
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

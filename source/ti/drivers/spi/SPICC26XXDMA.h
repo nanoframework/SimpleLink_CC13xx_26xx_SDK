@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021 Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -847,7 +847,7 @@ typedef struct {
     /* Optional slave mode features */
     bool                   returnPartial;      /*!< Optional slave mode return partial on CSN deassert */
 
-    /* Scratch buffer of size uint32_t */
+    /* Scratch buffer of size uint16_t */
     uint16_t               scratchBuf;
 
     /* SPI pre- and post notification functions */

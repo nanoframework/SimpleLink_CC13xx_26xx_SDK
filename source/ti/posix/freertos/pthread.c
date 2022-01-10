@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2016-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -274,6 +274,23 @@ int pthread_attr_setschedparam(pthread_attr_t *attr,
         return (EINVAL);
     }
     attr->priority = priority;
+    return (0);
+}
+
+/*
+ *  ======== pthread_attr_setstack ========
+ *  The current implementation of pthread_create() for FreeRTOS
+ *  uses xTaskCreate(). xTaskCreate() automatically allocates a
+ *  memory area of size attr->stacksize from FreeRTOS's heap
+ *  without taking into consideration the pointer attr->stack. 
+ *  Any allocated memory area for the pointer attr->stack will
+ *  therefore be unused.
+ */
+int pthread_attr_setstack (pthread_attr_t *attr, void *stackaddr,
+        size_t stacksize)
+{
+    attr->stack = stackaddr;
+    attr->stacksize = stacksize;
     return (0);
 }
 

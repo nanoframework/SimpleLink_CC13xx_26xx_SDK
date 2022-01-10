@@ -5,7 +5,7 @@
             "+../../README.html -> README.html",
             "+../../log.c -> log.c",
             "+../main_freertos.c -> main_freertos.c",
-            "+../log_freertos.syscfg -> log_freertos.syscfg",
+            "+../log.syscfg -> log.syscfg",
             "+../../../../../../../source/ti/boards/LP_CC1312R7/Board.html -> Board.html",
             "+cc13x2x7_cc26x2x7_freertos.lds -> cc13x2x7_cc26x2x7_freertos.lds"
         ]

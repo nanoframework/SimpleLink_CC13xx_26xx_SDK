@@ -4,7 +4,7 @@
  @brief
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -118,6 +118,21 @@ extern uint8_t stackTask_getStackServiceId(void);
  **************************************************************************************************
  */
 extern Task_Handle* stackTaskGetTaskHndl(void);
+
+#ifdef IEEE_COEX_ENABLED
+/**************************************************************************************************
+ * @fn          stackTask_EnableCoex
+ *
+ * @brief       This enables or disables coex in Zstack.
+ *
+ * @param       enabled - true if enabling Coex, false if disabling
+ *
+ *
+ * @return      none
+ **************************************************************************************************
+ */
+extern void stackTask_EnableCoex(bool enabled);
+#endif /* IEEE_COEX_ENABLED */
 
 /*********************************************************************
 *********************************************************************/

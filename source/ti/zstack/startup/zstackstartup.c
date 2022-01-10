@@ -494,6 +494,31 @@ static void stackTaskFxn(UArg a0, UArg a1)
     }
 }
 
+#ifdef IEEE_COEX_ENABLED
+/**************************************************************************************************
+ * @fn          stackTask_EnableCoex
+ *
+ * @brief       This enables or disables coex in Zstack.
+ *
+ * @param       enabled - true if enabling Coex, false if disabling
+ *
+ *
+ * @return      none
+ **************************************************************************************************
+ */
+void stackTask_EnableCoex(bool enabled)
+{
+    ieeeCoexEnabled = enabled;
+#ifdef IEEE_COEX_3_WIRE
+    coexOverrideUseCases.ieeeConnEstab.defaultPriority = coexConfigIeee.ieeeInitiator.priority;
+    coexOverrideUseCases.ieeeConnEstab.assertRequestForRx = coexConfigIeee.ieeeInitiator.request;
+
+    coexOverrideUseCases.ieeeConnected.defaultPriority = coexConfigIeee.ieeeConnected.priority;
+    coexOverrideUseCases.ieeeConnected.assertRequestForRx = coexConfigIeee.ieeeConnected.request;
+#endif /* IEEE_COEX_3_WIRE */
+}
+#endif /* IEEE_COEX_ENABLED */
+
 /**************************************************************************************************
  * @fn          stackInit
  *
@@ -649,16 +674,22 @@ static void stackInit(void)
 
     ZMacReset( TRUE );
 
-    uint8_t responseWaitTime = 16;
-    ZMacSetReq(MAC_RESPONSE_WAIT_TIME, &responseWaitTime);
+    ZMacSetZigbeeMACParams();
 
-    uint16_t transactionPersistenceTime = 500;
-    ZMacSetReq(MAC_TRANSACTION_PERSISTENCE_TIME, (byte *)&transactionPersistenceTime);
+#ifdef IEEE_COEX_ENABLED
+    //Create Coex Metrics Variable
+    coexMetricsStruct_t ZMacCoexMetrics;
+    ZMacCoexMetrics.dbgCoexGrants = 0;
+    ZMacCoexMetrics.dbgCoexRejects = 0;
+    ZMacCoexMetrics.dbgCoexContRejects = 0;
+    ZMacCoexMetrics.dbgCoexMaxContRejects = 0;
 
-    uint8_t macFrameRetries = ZMAC_MAX_FRAME_RETRIES;
-    ZMacSetReq(MAC_MAX_FRAME_RETRIES, &macFrameRetries);
+    //Init Coex Metrics to 0
+    ZMacSetReq(MAC_COEX_METRICS, (byte *)&ZMacCoexMetrics);
 
-    ZMacSetTransmitPower( (ZMacTransmitPower_t)TXPOWER );
+    // Enable Coex
+    stackTask_EnableCoex( TRUE );
+#endif /* IEEE_COEX_ENABLED */
 
 #if (RFD_RX_ALWAYS_ON_CAPABLE == TRUE)
     if( ZG_DEVICE_ENDDEVICE_TYPE && zgRxAlwaysOn == TRUE )

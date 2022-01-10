@@ -5,7 +5,7 @@
  @brief Coordinator Logical Link Controller
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -109,6 +109,8 @@ typedef enum
     Cllc_coordStates_initialized = 0,
     /*! MAC  coordinator is performing a active scan  */
     Cllc_coordStates_scanActive,
+    /*! MAC  coordinator is performing a ED scan  */
+    Cllc_coordStates_scanEnergyDetect,
     /*! active scan  confirm received*/
     Cllc_coordStates_scanActiveCnf,
     /*! Eneergy detect scan confirm received */

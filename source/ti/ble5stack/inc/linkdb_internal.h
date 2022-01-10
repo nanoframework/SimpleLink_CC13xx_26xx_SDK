@@ -5,7 +5,7 @@
  @brief This file contains internal linkDB interfaces and defines.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -115,20 +115,25 @@ typedef struct
 /// Additional internal information pertaining to the link
 typedef struct
 {
-  uint8 taskID;                 //!< Application that controls the link
-  uint16 connectionHandle;      //!< Controller connection handle
-  uint8 stateFlags;             //!< LINK_CONNECTED, LINK_AUTHENTICATED...
-  uint8 addrType;               //!< Address type of connected device
-  uint8 addr[B_ADDR_LEN];       //!< Other Device's address
-  uint8 addrPriv[B_ADDR_LEN];   //!< Other Device's Private address
-  uint8 connRole;               //!< Connection formed as Master or Slave
-  uint16 connInterval;          //!< The connection's interval (n * 1.23 ms)
-  uint16 MTU;                   //!< The connection's MTU size
-  linkSec_t sec;                //!< Connection Security related items
-  encParams_t *pEncParams;      //!< pointer to STK / LTK, ediv, rand
-  uint16 connTimeout;           //!< Supervision timeout
-  uint16 connLatency;           //!< Slave latency
+  uint8 taskID;                  //!< Application that controls the link
+  uint16 connectionHandle;       //!< Controller connection handle
+  uint8 stateFlags;              //!< LINK_CONNECTED, LINK_AUTHENTICATED...
+  uint8 addrType;                //!< Address type of connected device
+  uint8 addr[B_ADDR_LEN];        //!< Other Device's address
+  uint8 addrPriv[B_ADDR_LEN];    //!< Other Device's Private address
+  uint8 connRole;                //!< Connection formed as Master or Slave
+  uint16 connInterval;           //!< The connection's interval (n * 1.23 ms)
+  uint16 MTU;                    //!< The connection's MTU size
+  linkSec_t sec;                 //!< Connection Security related items
+  encParams_t *pEncParams;       //!< pointer to STK / LTK, ediv, rand
+  uint16 connTimeout;            //!< Supervision timeout
+  uint16 connLatency;            //!< Slave latency
 } linkDBItem_t;
+
+typedef struct
+{
+  uint8 addr[B_ADDR_LEN];        //!< This device's Private addresses during connection establishment
+} linkDBLocalAddrDuringConnEst_t;
 
 /// Function pointer used to perform specialized link database searches
 typedef void (*pfnPerformFuncCB_t)
@@ -309,12 +314,34 @@ extern linkDBItem_t *linkDB_Find( uint16 connectionHandle );
   extern void linkDB_PerformFunc( pfnPerformFuncCB_t cb );
 
 /**
- * Aet a device into Secure Connection Only Mode.
+ * Set a device into Secure Connection Only Mode.
  *
  * @param  state -  TRUE for Secure Connections Only Mode. FALSE to disable
  *         Secure Connections Only Mode.
  */
   extern void linkDB_SecurityModeSCOnly( uint8 state );
+
+/**
+ * Sets the local device's address used during connection establishment.
+ * WARNING: never use it before connection establish complete evt, must be called with valid connectionHandle
+ *
+ * @param       connHandle - record connection handle
+ *              addr       - The address to set
+ *
+ */
+  extern void linkDB_setAddrByConnHandle( uint16 connHandle, uint8_t *addr );
+
+/**
+ * Returns the local device's address used during connection establishment
+ * WARNING: never use it before connection establish complete evt, must be called with valid connectionHandle
+
+ * @param       connHandle - record connection handle
+ *
+ * @return      Device's address used during connection establishment.
+ *              NULL if BDAddrPerConnHandle isn't initialized.
+ *              Unknown behaviour If no connection for this connection handle.
+ */
+  extern uint8_t *linkDB_getAddrByConnHandle( uint16 connHandle );
 
 /*********************************************************************
 *********************************************************************/

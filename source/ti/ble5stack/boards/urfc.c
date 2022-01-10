@@ -5,7 +5,7 @@
  @brief User configurable variables for the Micro BLE Stack Radio.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -50,6 +50,7 @@
  */
 
 #include "urfc.h"
+#include "hal_defs.h"
 #include <ti_drivers_config.h>
 
 /******************************************************************************
@@ -105,42 +106,14 @@ const RF_Mode ubRfMode =
 #if defined(CC26XX)
   // CC26xx Normal Package with Flash Settings for 48 MHz device
   #if defined(CC26X2)
-
-  #define  CTE_GENERIC_RX_ENABLE        (1)
-  #define  CTE_USE_RFE_RAM              (4)
-  #define  CTE_FLOW_CONTROL             (6)
-
-  // Supported CTE for generic Rx and allow using RFE Ram for sampling
-  #define CTECONFIG ((1 << CTE_GENERIC_RX_ENABLE) | (1 << CTE_USE_RFE_RAM) | 1 << CTE_FLOW_CONTROL)
-  // 4 us before start of sampling
-  #define CTEOFFSET (4)
-  // 4 MHz sampling rate on 1 Mbps packets
-  #define CTE_SAMPLING_CONFIG (4)
-
-  #define NUM_ENTRIES  3
-  #define SWITCH_TIME  2
-
-  #define ANT1         (1<<28)
-  #define ANT2         (1<<29)
-  #define ANT3         (1<<30)
-  #define IO_MASK      (ANT1 | ANT2 | ANT3)
-
-  uint32_t antSwitching[] =
-  {
-    NUM_ENTRIES | (SWITCH_TIME << 8),
-    IO_MASK,
-    ANT1,
-    ANT2,
-    ANT3
-  };
-
   regOverride_t pOverridesCommon[] = {
     0x00158000, // S2RCFG: Capture S2R from FrontEnd, on event (CM0 will arm)
     0x000E51D0, // After FRAC
-    ((CTECONFIG << 16) | 0x8BB3), // Enable CTE capture
-    ((CTEOFFSET << 24) | ((CTE_SAMPLING_CONFIG | (CTE_SAMPLING_CONFIG << 4)) << 16) | 0x0BC3), // Sampling rate, offset
-    0xC0040341, // Pointer to antenna switching table in next entry
-    (uint32_t) antSwitching, // Pointer to antenna switching table
+    ((CTE_CONFIG << 16) | 0x8BB3), // Enable CTE capture
+    ((CTE_OFFSET << 24) | ((CTE_SAMPLING_CONFIG_1MBPS | (CTE_SAMPLING_CONFIG_1MBPS << 4)) << 16) | 0x0BC3), // Sampling rate, offset
+    0xC0080341, // Pointer to antenna switching table in next entry
+    (uint32_t) NULL, // Pointer to antenna switching table
+    (uint32_t) NULL,
      END_OVERRIDE };
 
    regOverride_t pOverrides1Mbps[] = {

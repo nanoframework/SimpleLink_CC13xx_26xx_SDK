@@ -65,6 +65,14 @@ const config = {
             longDescription: Docs.useNVLongDescription
         },
         {
+            name: "useExtAdv",
+            displayName: "Use Extended Advertising",
+            onChange: onUseExtAdvChange,
+            description: "Enables the option to use extended advertising instead of legacy advertising",
+            hidden: true,
+            default: false
+        },
+        {
             name: "staticProv",
             displayName: "Static Provisioning",
             onChange: onStaticProvChange,
@@ -127,7 +135,16 @@ const config = {
                     hidden: true,
                     description: "Provisioning support using GATT (PB-GATT)",
                     longDescription: Docs.gattBearerLongDescription
-                }
+                },
+                {
+                    name         : 'provTimeout',
+                    displayName  : 'Provisioning Timeout Value',
+                    hidden         : true,
+                    description  : "Timeout value in ms, of retransmit provisioning PDUs.",
+                    longDescription: Docs.provTimeoutLongDescription,
+                    default      : 500
+                },
+
             ]
         },
         {
@@ -216,14 +233,6 @@ const config = {
                             hidden: true,
                             description: "Maximum number of segments in incoming messages",
                             longDescription: Docs.maxNumSegInMsgRXLongDescription
-                        },
-                        {
-                            name: "maxSizeRXSdu",
-                            displayName: "Max size of RX SDUs",
-                            default: 110,
-                            hidden: true,
-                            description: "Maximum incoming Upper Transport Access PDU length",
-                            longDescription: Docs.maxSizeRXSduLongDescription
                         }
                     ]
                 }
@@ -267,6 +276,21 @@ const config = {
     ]
 };
 
+/*
+ *  ======== onUseExtAdvChange ========
+ * Change the TX/RX Max Num of Segments in Message parameters.
+ *
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onUseExtAdvChange(inst,ui)
+{
+    if(inst.useExtAdv)
+    {
+        inst.maxNumSegInMsgTX > 4 ? inst.maxNumSegInMsgTX = 4 : true;
+        inst.maxNumSegInMsgRX > 4 ? inst.maxNumSegInMsgRX = 4 : true;
+    }
+}
 /*
  *  ======== onStaticProvChange ========
  * Add/Remove the configuration client model and
@@ -336,6 +360,14 @@ function validate(inst, validation)
     meshProvDataScript.validate(inst, validation);
     meshDcdScript.validate(inst, validation);
 
+    if(inst.useExtAdv)
+    {
+        validation.logWarning("The Advertising Extensions are not part of SIG"
+                            + " specified Mesh standard, it is a proprietary"
+                            + " solution",
+                              inst, "useExtAdv");
+    }
+
     if(inst.staticProv)
     {
         validation.logWarning("Static provisioning should only be used for"
@@ -380,13 +412,28 @@ function validate(inst, validation)
     {
         validation.logError("Num of advertising buffers range is 6 to 256", inst, "numAdvBuf");
     }
-    if(inst.maxNumSegInMsgTX < 2 || inst.maxNumSegInMsgTX > 32)
+
+    if(inst.useExtAdv)
     {
-        validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgTX");
+        if(inst.maxNumSegInMsgTX < 2 || inst.maxNumSegInMsgTX > 4)
+        {
+            validation.logError("Max Num of Segments in Message range is 2 to 4", inst, "maxNumSegInMsgTX");
+        }
+        if(inst.maxNumSegInMsgRX < 2 || inst.maxNumSegInMsgRX > 4)
+        {
+            validation.logError("Max Num of Segments in Message range is 2 to 4", inst, "maxNumSegInMsgRX");
+        }
     }
-    if(inst.maxNumSegInMsgRX < 2 || inst.maxNumSegInMsgRX > 32)
+    else
     {
-        validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgRX");
+        if(inst.maxNumSegInMsgTX < 2 || inst.maxNumSegInMsgTX > 32)
+        {
+            validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgTX");
+        }
+        if(inst.maxNumSegInMsgRX < 2 || inst.maxNumSegInMsgRX > 32)
+        {
+            validation.logError("Max Num of Segments in Message range is 2 to 32", inst, "maxNumSegInMsgRX");
+        }
     }
     if(inst.maxNumSegMsgRX < 1 || inst.maxNumSegMsgRX > 255)
     {
@@ -406,6 +453,13 @@ function validate(inst, validation)
     {
         validation.logError("Model App Keys Count range is 1 to 4096", inst, "modelAppKeysCount");
     }
+
+    // Provisioning Layer Configuration validation
+    if(inst.provTimeout < 100 || inst.provTimeout > 800)
+    {
+        validation.logError("Provision Tiemout range is 100 to 800", inst, "provTimeout");
+    }
+
 }
 
 /*

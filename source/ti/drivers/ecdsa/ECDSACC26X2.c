@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,21 +65,21 @@
 
 #define SCRATCH_KEY_OFFSET 512
 #define SCRATCH_KEY_SIZE 96
-#define SCRATCH_PRIVATE_KEY ((uint8_t *)(PKA_RAM_BASE               \
+#define SCRATCH_PRIVATE_KEY ((uint32_t *)(PKA_RAM_BASE               \
                                          + SCRATCH_KEY_OFFSET))
-#define SCRATCH_PUBLIC_X ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_X ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_KEY_OFFSET          \
                                       + 1 * SCRATCH_KEY_SIZE))
-#define SCRATCH_PUBLIC_Y ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_Y ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_KEY_OFFSET          \
                                       + 2 * SCRATCH_KEY_SIZE))
 
 #define SCRATCH_BUFFER_OFFSET 1024
 #define SCRATCH_BUFFER_SIZE 256
-#define SCRATCH_BUFFER_0 ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_BUFFER_0 ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + 0 * SCRATCH_BUFFER_SIZE))
-#define SCRATCH_BUFFER_1 ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_BUFFER_1 ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + 1 * SCRATCH_BUFFER_SIZE))
 
@@ -343,7 +343,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
                                        SCRATCH_PRIVATE_KEY,
                                        object->operation.sign->curve->length);
 
-            PKABigNumMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumMultiplyStart((uint8_t *)SCRATCH_PRIVATE_KEY,
                                    object->operation.sign->curve->length,
                                    object->operation.sign->r,
                                    object->operation.sign->curve->length,
@@ -355,7 +355,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
 
             scratchBuffer0Size = SCRATCH_BUFFER_SIZE;
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumMultGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                                &scratchBuffer0Size,
                                                resultAddress);
 
@@ -368,9 +368,9 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
                                        SCRATCH_BUFFER_1,
                                        object->operation.verify->curve->length);
 
-            PKABigNumAddStart(SCRATCH_BUFFER_0,
+            PKABigNumAddStart((uint8_t *)SCRATCH_BUFFER_0,
                               scratchBuffer0Size,
-                              SCRATCH_BUFFER_1,
+                              (uint8_t *)SCRATCH_BUFFER_1,
                               object->operation.sign->curve->length,
                               &resultAddress);
 
@@ -380,7 +380,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
 
             scratchBuffer0Size = SCRATCH_BUFFER_SIZE;
 
-            pkaResult = PKABigNumAddGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumAddGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                               &scratchBuffer0Size,
                                               resultAddress);
 
@@ -388,7 +388,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_SIGN_MULT_BY_PMSN_INVERSE:
 
-            PKABigNumMultiplyStart(SCRATCH_BUFFER_0,
+            PKABigNumMultiplyStart((uint8_t *)SCRATCH_BUFFER_0,
                                    scratchBuffer0Size,
                                    object->operation.sign->s,
                                    object->operation.sign->curve->length,
@@ -401,7 +401,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
 
             scratchBuffer0Size = SCRATCH_BUFFER_SIZE;
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumMultGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                                &scratchBuffer0Size,
                                                resultAddress);
 
@@ -409,7 +409,7 @@ static int_fast16_t ECDSACC26X2_runSignFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_SIGN_MOD_N:
 
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t *)SCRATCH_BUFFER_0,
                               scratchBuffer0Size,
                               object->operation.sign->curve->order,
                               object->operation.sign->curve->length,
@@ -465,7 +465,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.verify->curve->length);
 
-            PKABigNumCmpStart(SCRATCH_BUFFER_0,
+            PKABigNumCmpStart((uint8_t *)SCRATCH_BUFFER_0,
                               object->operation.verify->curve->order,
                               object->operation.verify->curve->length);
 
@@ -482,7 +482,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.verify->curve->length);
 
-            PKABigNumCmpStart(SCRATCH_BUFFER_0,
+            PKABigNumCmpStart((uint8_t *)SCRATCH_BUFFER_0,
                               object->operation.verify->curve->order,
                               object->operation.verify->curve->length);
 
@@ -510,8 +510,8 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.verify->curve->length);
 
-            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart(SCRATCH_PUBLIC_X,
-                                                              SCRATCH_PUBLIC_Y,
+            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart((uint8_t *)SCRATCH_PUBLIC_X,
+                                                              (uint8_t *)SCRATCH_PUBLIC_Y,
                                                               object->operation.verify->curve->prime,
                                                               object->operation.verify->curve->a,
                                                               object->operation.verify->curve->b,
@@ -528,7 +528,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.verify->curve->length);
 
-            PKABigNumInvModStart(SCRATCH_BUFFER_0,
+            PKABigNumInvModStart((uint8_t *)SCRATCH_BUFFER_0,
                                  object->operation.verify->curve->length,
                                  object->operation.verify->curve->order,
                                  object->operation.verify->curve->length,
@@ -538,7 +538,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_COMPUTE_S_INV_RESULT:
 
-            pkaResult = PKABigNumInvModGetResult(SCRATCH_BUFFER_1,
+            pkaResult = PKABigNumInvModGetResult((uint8_t *)SCRATCH_BUFFER_1,
                                                  object->operation.verify->curve->length,
                                                  resultAddress);
 
@@ -551,9 +551,9 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.verify->curve->length);
 
-            PKABigNumMultiplyStart(SCRATCH_BUFFER_1,
+            PKABigNumMultiplyStart((uint8_t *)SCRATCH_BUFFER_1,
                                    object->operation.verify->curve->length,
-                                   SCRATCH_BUFFER_0,
+                                   (uint8_t *)SCRATCH_BUFFER_0,
                                    object->operation.verify->curve->length,
                                    &resultAddress);
 
@@ -563,7 +563,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
             scratchBuffer0Size = SCRATCH_BUFFER_SIZE;
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumMultGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                                &scratchBuffer0Size,
                                                resultAddress);
 
@@ -571,7 +571,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_S_INV_MULT_HASH_MOD_N:
 
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t *)SCRATCH_BUFFER_0,
                               scratchBuffer0Size,
                               object->operation.verify->curve->order,
                               object->operation.verify->curve->length,
@@ -581,7 +581,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_S_INV_MULT_HASH_MOD_N_RESULT:
             // Check previous result
-            pkaResult = PKABigNumModGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumModGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                               object->operation.verify->curve->length,
                                               resultAddress);
 
@@ -592,7 +592,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_MULT_G:
 
-            PKAEccMultiplyStart(SCRATCH_BUFFER_0,
+            PKAEccMultiplyStart((uint8_t *)SCRATCH_BUFFER_0,
                                 object->operation.verify->curve->generatorX,
                                 object->operation.verify->curve->generatorY,
                                 object->operation.verify->curve->prime,
@@ -605,8 +605,8 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_MULT_G_RESULT:
 
-            pkaResult = PKAEccMultiplyGetResult(SCRATCH_BUFFER_0,
-                                                SCRATCH_BUFFER_0 + object->operation.verify->curve->length,
+            pkaResult = PKAEccMultiplyGetResult((uint8_t *)SCRATCH_BUFFER_0,
+                                                (uint8_t *)SCRATCH_BUFFER_0 + object->operation.verify->curve->length,
                                                 resultAddress,
                                                 object->operation.verify->curve->length);
 
@@ -619,9 +619,9 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_PRIVATE_KEY,
                                        object->operation.verify->curve->length);
 
-            PKABigNumMultiplyStart(SCRATCH_BUFFER_1,
+            PKABigNumMultiplyStart((uint8_t *)SCRATCH_BUFFER_1,
                                    object->operation.verify->curve->length,
-                                   SCRATCH_PRIVATE_KEY,
+                                   (uint8_t *)SCRATCH_PRIVATE_KEY,
                                    object->operation.verify->curve->length,
                                    &resultAddress);
 
@@ -631,7 +631,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
             scratchBuffer1Size = SCRATCH_BUFFER_SIZE;
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_1,
+            pkaResult = PKABigNumMultGetResult((uint8_t *)SCRATCH_BUFFER_1,
                                                &scratchBuffer1Size,
                                                resultAddress);
 
@@ -639,7 +639,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_MULT_S_INV_R_MOD_N:
 
-            PKABigNumModStart(SCRATCH_BUFFER_1,
+            PKABigNumModStart((uint8_t *)SCRATCH_BUFFER_1,
                               scratchBuffer1Size,
                               object->operation.verify->curve->order,
                               object->operation.verify->curve->length,
@@ -649,7 +649,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_MULT_S_INV_R_MOD_N_RESULT:
 
-            pkaResult = PKABigNumModGetResult(SCRATCH_BUFFER_1,
+            pkaResult = PKABigNumModGetResult((uint8_t *)SCRATCH_BUFFER_1,
                                               object->operation.verify->curve->length,
                                               resultAddress);
 
@@ -670,9 +670,9 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.verify->curve->length);
 
-            PKAEccMultiplyStart(SCRATCH_BUFFER_1,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t *)SCRATCH_BUFFER_1,
+                                (uint8_t *)SCRATCH_PUBLIC_X,
+                                (uint8_t *)SCRATCH_PUBLIC_Y,
                                 object->operation.verify->curve->prime,
                                 object->operation.verify->curve->a,
                                 object->operation.verify->curve->b,
@@ -683,8 +683,8 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_MULT_PUB_KEY_RESULT:
 
-            pkaResult = PKAEccMultiplyGetResult(SCRATCH_BUFFER_1,
-                                                SCRATCH_BUFFER_1 + object->operation.verify->curve->length,
+            pkaResult = PKAEccMultiplyGetResult((uint8_t *)SCRATCH_BUFFER_1,
+                                                (uint8_t *)SCRATCH_BUFFER_1 + object->operation.verify->curve->length,
                                                 resultAddress,
                                                 object->operation.verify->curve->length);
 
@@ -692,10 +692,10 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_ADD_MULT_RESULTS:
 
-            PKAEccAddStart(SCRATCH_BUFFER_0,
-                           SCRATCH_BUFFER_0 + object->operation.verify->curve->length,
-                           SCRATCH_BUFFER_1,
-                           SCRATCH_BUFFER_1 + object->operation.verify->curve->length,
+            PKAEccAddStart((uint8_t *)SCRATCH_BUFFER_0,
+                           (uint8_t *)SCRATCH_BUFFER_0 + object->operation.verify->curve->length,
+                           (uint8_t *)SCRATCH_BUFFER_1,
+                           (uint8_t *)SCRATCH_BUFFER_1 + object->operation.verify->curve->length,
                            object->operation.verify->curve->prime,
                            object->operation.verify->curve->a,
                            object->operation.verify->curve->length,
@@ -705,7 +705,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_ADD_MULT_RESULTS_RESULT:
 
-            pkaResult = PKAEccAddGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKAEccAddGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                            NULL,
                                            resultAddress,
                                            object->operation.verify->curve->length);
@@ -714,7 +714,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_POINTX_MOD_N:
 
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t *)SCRATCH_BUFFER_0,
                               object->operation.verify->curve->length,
                               object->operation.verify->curve->order,
                               object->operation.verify->curve->length,
@@ -724,7 +724,7 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
 
         case ECDSACC26X2_FSM_VERIFY_POINTX_MOD_N_RESULT:
 
-            pkaResult = PKABigNumModGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumModGetResult((uint8_t *)SCRATCH_BUFFER_0,
                                               object->operation.verify->curve->length,
                                               resultAddress);
 
@@ -739,8 +739,8 @@ static int_fast16_t ECDSACC26X2_runVerifyFSM(ECDSA_Handle handle) {
             /* The CPU will rearrange each word in r to take care of aligned
              * access. The scratch buffer location is already word aligned.
              */
-            if (CryptoUtils_buffersMatchWordAligned((uint32_t *)SCRATCH_BUFFER_0,
-                                                    (uint32_t *)SCRATCH_PRIVATE_KEY,
+            if (CryptoUtils_buffersMatchWordAligned(SCRATCH_BUFFER_0,
+                                                    SCRATCH_PRIVATE_KEY,
                                                     object->operation.verify->curve->length)) {
                 return ECDSA_STATUS_SUCCESS;
             }

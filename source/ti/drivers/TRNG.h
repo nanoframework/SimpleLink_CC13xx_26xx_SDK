@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@
  *      - Option 1: Use TRNG_generateKey() that writes random bytes to a CryptoKey. <br>
  *        Initialize a blank CryptoKey. These opaque data structures are representations
  *        of keying material and its storage. Depending on how the keying material
- *        is stored (RAM or flash, key store, key blob), the CryptoKey must be
+ *        is stored (RAM or flash, key store), the CryptoKey must be
  *        initialized differently. The TRNG API can handle all types of CryptoKey.
  *        However, not all device-specific implementations support all types of CryptoKey.
  *        Devices without a key store will not support CryptoKeys with keying material

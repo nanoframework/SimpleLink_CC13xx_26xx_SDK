@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 by Texas Instruments Incorporated.
+ *  Copyright 2021 by Texas Instruments Incorporated.
  *
  */
 
@@ -102,7 +102,7 @@ function _mkCmds(target)
     return(tool2cmd);
 }
 /*
- *  @(#) gnu.targets.arm; 1, 0, 0,; 9-3-2020 14:50:59; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
+ *  @(#) gnu.targets.arm; 1, 0, 0,; 7-28-2021 06:57:32; /db/ztree/library/trees/xdctargets/xdctargets-w20/src/ xlibrary
 
  */
 

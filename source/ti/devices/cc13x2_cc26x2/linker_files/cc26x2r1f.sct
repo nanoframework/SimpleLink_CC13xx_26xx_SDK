@@ -2,9 +2,6 @@
 ; *  @file           cc26x2r1f.sct
 ; *  @brief          CC26x2R1F rev2 scatter loading file for ARM linker.
 ; *
-; *  Revised         $Date$
-; *  Revision        $Revision$
-; *
 ; *  This file is auto-generated.
 ; *
 ; *  Copyright (C) 2017 Texas Instruments Incorporated - http://www.ti.com/

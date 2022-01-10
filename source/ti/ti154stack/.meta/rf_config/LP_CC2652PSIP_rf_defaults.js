@@ -58,9 +58,13 @@ const rfCommon = system.getScript("/ti/ti154stack/rf_config/"
 // Object containing IEEE settings for the LP_CC2652PSIP
 const devSpecificIEEESettings = {
     args: {
+        phyType: "ieee154p10",
+        highPA: true,
+        txPowerHi: "10",
         codeExportConfig: {
             cmdList_ieee_15_4: ["cmdRadioSetupPa"],
-            cmdRadioSetupPa: "RF_cmdRadioSetup_ieee154"
+            cmdRadioSetupPa: "RF_cmdRadioSetup_ieee154",
+            paExport: "combined"
         }
     }
 };
@@ -78,9 +82,11 @@ const defaultPropPhyList = [
 ];
 
 // Array containing all the IEEE phy settings for the LP_CC2652PSIP
+// Have to have commonIEEESettings listed first for the command setup to 
+// happen properly.
 const defaultIEEEPhyList = [
-    rfCommon.mergeRFSettings(devSpecificIEEESettings,
-        rfCommon.commonIEEESettings)
+    rfCommon.mergeRFSettings(rfCommon.commonIEEESettings,
+        devSpecificIEEESettings)
 ];
 
 exports = {

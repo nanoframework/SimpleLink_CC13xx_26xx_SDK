@@ -39,10 +39,14 @@ const Common = system.getScript("/ti/drivers/Common.js");
 
 const numPins = 48;
 const device = system.deviceData.deviceId;
+const board = system.deviceData.board;
 const isBAW = device.match(/CC2652RB/) !== null;
 const isSIP = device.match(/CC2652.*SIP/) !== null;
 const isM33 = device.match(/CC(?:13|26).4/) !== null;
-
+var isBAWBoard = false;
+if (board != null) {
+    isBAWBoard = board.name.match(/CC2652RB/) !== null;
+}
 const templateModule = [{
     name: "ccfgTemplate",
     moduleName: "/ti/devices/CCFGTemplate"
@@ -101,7 +105,12 @@ const config = [
             {name: "LF XOSC"},
             {name: "LF RCOSC"}
         ],
-        default: "LF XOSC",
+        // The default LF clock source is set to LF RCOSC, only if LP_CC2652RB
+        // board is selected. In all other cases, including the selection of
+        // CC2652RB device(without the board), the default remains as LF XOSC.
+        // This reflects the default absence of LF crystal on the LP_CC2652RB
+        // board.
+        default: isBAWBoard ? "LF RCOSC" : "LF XOSC",
         onChange: (inst, ui) => {
             ui.extClkDio.hidden = !(inst.srcClkLF === "External LF clock");
             ui.rtcIncrement.hidden = !(inst.srcClkLF === "External LF clock");
@@ -401,7 +410,7 @@ const config = [
         config: [
             {
                 name: "configureIDAU",
-                displayName: "Configure Non-secure Memory Boundaries",
+                displayName: "Configure Non-secure Memory Bounds",
                 description: "Enables boot-time configuration of the IDAU for non-secure memory access.",
                 longDescription: `With this option disabled, all SRAM and flash will be marked for access only by
             secure masters and as callable by non-secure masters.`,
@@ -482,7 +491,7 @@ const config = [
         config: [
             {
                 name: "lockNonSecureVectorTableBaseAddress",
-                displayName: "Lock Non-secure Vector Table Address",
+                displayName: "Lock Non-Secure Vector Table Address",
                 description: "Disables write access to non-secure vector table base address.",
                 hidden: !isM33,
                 default: false
@@ -496,14 +505,14 @@ const config = [
             },
             {
                 name: "lockSAURegions",
-                displayName: "Lock Security Attrrbution Unit (SAU) Regions",
-                description: "Disables write access to the SAU region configuration.",
+                displayName: "Lock SAU Regions",
+                description: "Disables write access to the Security Attribution Unit (SAU) region configuration.",
                 hidden: !isM33,
                 default: false
             },
             {
                 name: "lockNonSecureMPU",
-                displayName: "Lock Non-secure MPU",
+                displayName: "Lock Non-Secure MPU",
                 description: "Disables write access to the non-secure memory protection unit.",
                 hidden: !isM33,
                 default: false
@@ -517,17 +526,17 @@ const config = [
             },
             {
                 name: "disableSecureNonInvasiveDebug",
-                displayName: "Disable invasive debugging of non-secure masters",
-                description: `Disables debug actions that involve stopping execution, modifying registers, or
-reading from and writing to memory using the core.`,
+                displayName: "Disable Invasive Non-Secure Debug",
+                description: `Disables debug invasive debugging of non-secure masters with actions that involve
+stopping execution, modifying registers, or reading from and writing to memory using the core.`,
                 hidden: !isM33,
                 default: false
             },
             {
                 name: "disableSecureInvasiveDebug",
-                displayName: "Disable invasive debugging of secure masters",
-                description: `Disables debug actions that involve stopping execution, modifying registers, or
-reading from and writing to memory using the core.`,
+                displayName: "Disable Invasive Secure Debug",
+                description: `Disables debug invasive debugging of secure masters with actions that involve stopping
+execution, modifying registers, or reading from and writing to memory using the core.`,
                 hidden: !isM33,
                 default: false
             }
@@ -604,17 +613,45 @@ reading from and writing to memory using the core.`,
     },
     {
         name: "enableCodeGeneration",
+        displayName: "Enable SysConfig CCFG Configuration",
         description: "Enables or disables generation of ti_devices_config.c.",
-        longDescription: `This configurable may be used to enable or disable
-generation of the ti_devices_config.c file. To support early initialization
-on some devices, this module will continue to generate functions to
-__Board_init()__ inside the ti_drivers_config.c file. Additionally, any
-necessary headers will be generated inside the ti_drivers_config.h file.
+        longDescription: `This configurable may be used to enable or disable the
+generation of the ti_devices_config.c file. Examples without ti_devices_config.c
+generation may still be configured through the ccfg.c source file. To support early
+initialization on some devices, this module will continue to generate functions to
+__Board_init()__ inside the ti_drivers_config.c file. Additionally, any necessary
+headers will be generated inside the ti_drivers_config.h file.
 `,
         hidden: true,
         default: true,
         onChange: (inst, ui) => {
-                templateModuleInstance = inst.enableCodeGeneration ? templateModule : templateInitModule;
+            templateModuleInstance = inst.enableCodeGeneration ? templateModule : templateInitModule;
+
+            const configs = Object.keys(ui).filter((key) => (!key.includes("$")
+                && key !== "ccfgTemplate"));
+
+            // Hide module configs if code generation is disabled
+            configs.forEach((cfgName) =>
+            {
+                if(cfgName === "enableCodeGeneration")
+                {
+                    const readOnly = "The CCFG area cannot be configured "
+                        + "through SysConfig for this example. Refer to "
+                        + "the ccfg.c source file in order to overwrite the "
+                        + "default configuration.";
+
+                    ui[cfgName].hidden = inst.enableCodeGeneration;
+                    ui[cfgName].readOnly = inst.enableCodeGeneration ? false : readOnly;
+                }
+                else
+                {
+                    const cfg = inst.$module.$configByName[cfgName];
+
+                    // Reset config visibility if code generation is enabled
+                    ui[cfgName].hidden = inst.enableCodeGeneration ? cfg.hidden : true;
+                    inst[cfgName] = cfg.default;
+                }
+            });
         }
     }
 ];
@@ -713,6 +750,13 @@ function validate(inst, validation) {
     if (inst.sramNonsecureBoundary % 0x400 != 0) {
         Common.logError(validation, inst, "sramNonsecureBoundary",
             "This value must be 1KB-aligned (multiples of 0x400)");
+    }
+
+    // Ensure a valid LF clock source for BAW launchpad
+    if (inst.srcClkLF == "LF XOSC" && isBAWBoard) {
+        Common.logWarning(validation, inst, "srcClkLF",
+            "The LP_CC2652RB launchpad does not contain an LF crystal by default.\
+            Make sure to mount an OSC before using this option");
     }
 }
 

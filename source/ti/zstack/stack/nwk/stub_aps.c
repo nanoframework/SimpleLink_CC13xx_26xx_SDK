@@ -565,8 +565,12 @@ ZStatus_t StubAPS_SetIntraPanChannel( void )
   rxOnIdle = false;
   ZMacSetReq( ZMacRxOnIdle, &rxOnIdle );
 
-  // set the NIB channel
-  ZMacSetReq( ZMacChannel, &(_NIB.nwkLogicalChannel) );
+  // Valid channels for 2.4Ghz
+  if ((_NIB.nwkLogicalChannel >= 11) && (_NIB.nwkLogicalChannel <= 26))
+  {
+    // set the PIB channel
+    ZMacSetReq( ZMacChannel, &(_NIB.nwkLogicalChannel) );
+  }
 
   // turn MAC receiver back on
   rxOnIdle = true;

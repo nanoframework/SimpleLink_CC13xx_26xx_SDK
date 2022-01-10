@@ -50,7 +50,7 @@ static struct flash_driver_api dev_driver_api =
 
 // Top Level Device Structure
 struct device dev_struct = {
-  .driver_api = &dev_driver_api,
+  .api = (void *)&dev_driver_api,
   .config = NULL, //&dev_config;
 };
 

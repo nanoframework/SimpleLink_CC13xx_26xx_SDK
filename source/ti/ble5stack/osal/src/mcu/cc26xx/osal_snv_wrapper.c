@@ -6,7 +6,7 @@
         wrapper to NVOCMP(NV On Chip multi Page)
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -57,7 +57,7 @@
 #define FLASH_PAGE_SIZE 0x2000
 #endif
 
-#ifndef RTLS_PASSIVE
+#if !defined(RTLS_PASSIVE) && !defined(RTLS_CONNECTION_MONITOR)
 // Get nvintf function pointer struct from global driver table
 extern const drvTblPtr_t driverTable;
 #endif
@@ -78,7 +78,7 @@ NVINTF_nvFuncts_t nvFptrs;
  */
 uint8 osal_snv_init( void )
 {
-#ifndef RTLS_PASSIVE
+#if !defined(RTLS_PASSIVE) && !defined(RTLS_CONNECTION_MONITOR)
   // Get function pointers from driver table
   nvFptrs = *((NVINTF_nvFuncts_t *)(driverTable.nvintfStructPtr));
 #endif

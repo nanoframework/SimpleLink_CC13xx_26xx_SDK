@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,16 +67,16 @@ typedef union {
 void writeEccPoint(const ECC_Param *x, const ECC_Param *y, CryptoKey *key) {
     /* Reverse and copy the X and Y coordinates back to the CryptoKey buffer.
      * Octet string format requires big-endian formatting of X and Y.*/
-    CryptoUtils_reverseCopyPad(&x->word[1],
-                               key->u.plaintext.keyMaterial
-                                + OCTET_STRING_OFFSET,
-                                ECC_NISTP256_PARAM_LENGTH_BYTES);
+    CryptoUtils_reverseCopy(&x->word[1],
+                            key->u.plaintext.keyMaterial
+                             + OCTET_STRING_OFFSET,
+                            ECC_NISTP256_PARAM_LENGTH_BYTES);
 
-    CryptoUtils_reverseCopyPad(&y->word[1],
-                               key->u.plaintext.keyMaterial
-                                + ECC_NISTP256_PARAM_LENGTH_BYTES
-                                + OCTET_STRING_OFFSET,
-                                ECC_NISTP256_PARAM_LENGTH_BYTES);
+    CryptoUtils_reverseCopy(&y->word[1],
+                            key->u.plaintext.keyMaterial
+                             + ECC_NISTP256_PARAM_LENGTH_BYTES
+                             + OCTET_STRING_OFFSET,
+                            ECC_NISTP256_PARAM_LENGTH_BYTES);
 
     /* Write the octet string format constant to the CryptoKey buffer */
     key->u.plaintext.keyMaterial[0] = 0x04;

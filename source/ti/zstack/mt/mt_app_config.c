@@ -77,10 +77,10 @@ static void MT_AppCnfBDBStartCommissioning(uint8_t* pBuf);
 #endif
 #if (ZG_BUILD_JOINING_TYPE)
     static void MT_AppCnfBDBSetActiveCentralizedKey(uint8_t* pBuf);
+    static void MT_AppCnfBDBRecoverNwk(uint8_t* pBuf);
 #endif
 
 #if (ZG_BUILD_ENDDEVICE_TYPE)
-    static void MT_AppCnfBDBZedAttemptRecoverNwk(uint8_t* pBuf);
     static void MT_AppCnfSetPollRateType(uint8_t* pBuf);
 #endif
 
@@ -128,6 +128,7 @@ uint8_t MT_AppCnfCommandProcessing(uint8_t *pBuf)
       MT_AppCnfBDBSetChannel(pBuf);
     break;
 
+
 #if (ZG_BUILD_COORDINATOR_TYPE)
       case MT_APP_CNF_BDB_ADD_INSTALLCODE:
         MT_AppCnfBDBAddInstallCode(pBuf);
@@ -143,12 +144,12 @@ uint8_t MT_AppCnfCommandProcessing(uint8_t *pBuf)
       case MT_APP_CNF_BDB_SET_ACTIVE_DEFAULT_CENTRALIZED_KEY:
         MT_AppCnfBDBSetActiveCentralizedKey(pBuf);
       break;
+      case MT_APP_CNF_BDB_RECOVER_NWK:
+        MT_AppCnfBDBRecoverNwk(pBuf);
+      break;
 #endif
 
 #if (ZG_BUILD_ENDDEVICE_TYPE)
-      case MT_APP_CNF_BDB_ZED_ATTEMPT_RECOVER_NWK:
-        MT_AppCnfBDBZedAttemptRecoverNwk(pBuf);
-      break;
       case MT_APP_CNF_SET_POLL_RATE_TYPE:
         MT_AppCnfSetPollRateType(pBuf);
       break;
@@ -375,19 +376,16 @@ static void MT_AppCnfBDBSetActiveCentralizedKey(uint8_t* pBuf)
   MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_APP_CNF), cmdId, 1, &retValue);
 }
 
-#endif //#if(ZG_BUILD_JOINING_TYPE)
-
-#if (ZG_BUILD_ENDDEVICE_TYPE)
  /*********************************************************************
- * @fn      MT_AppCnfBDBZedAttemptRecoverNwk
+ * @fn      MT_AppCnfBDBRecoverNwk
  *
- * @brief   Instruct the ZED to try to rejoin its previews network
+ * @brief   Instruct a joiner to try to rejoin its previous network
  *
  * @param   pBuf - pointer to received buffer
  *
  * @return  void
  */
-static void MT_AppCnfBDBZedAttemptRecoverNwk(uint8_t* pBuf)
+static void MT_AppCnfBDBRecoverNwk(uint8_t* pBuf)
 {
   uint8_t retValue;
   uint8_t cmdId;
@@ -396,11 +394,16 @@ static void MT_AppCnfBDBZedAttemptRecoverNwk(uint8_t* pBuf)
   cmdId = pBuf[MT_RPC_POS_CMD1];
   pBuf += MT_RPC_FRAME_HDR_SZ;
 
-  retValue = bdb_ZedAttemptRecoverNwk();
+  retValue = bdb_recoverNwk();
 
   /* Build and send back the response */
   MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_APP_CNF), cmdId, 1, &retValue);
 }
+
+#endif //#if(ZG_BUILD_JOINING_TYPE)
+
+
+#if (ZG_BUILD_ENDDEVICE_TYPE)
 /*********************************************************************
  * @fn      MT_AppCnfSetPollRateType
  *

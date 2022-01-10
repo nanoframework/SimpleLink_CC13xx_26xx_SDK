@@ -6,7 +6,7 @@
         for two-button menu implementation.
 
  Group: WCS BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -80,7 +80,9 @@ extern "C"
         If none or not desired, NULL should be given.
 */
 #define MENU_OBJ(W, X, Y, Z) { \
-W.pTitle=(uint8 *)X; W.attrib.numItem=Y; W.attrib.bActive=TBM_ITEM_ALL; W.pUpper=Z; \
+W.pTitle=(uint8*)X;\
+W.attrib.numItem=Y;\
+W.attrib.bActive=TBM_ITEM_ALL; W.pUpper=Z; \
 W.itemEntry = ICall_malloc(Y * sizeof(tbmItemEntry_t));}
 
 /* Submenu item entry.
@@ -96,7 +98,7 @@ W.itemEntry = ICall_malloc(Y * sizeof(tbmItemEntry_t));}
      X: Action description.
      Y: Pointer to action function
 */
-#define MENU_ITEM_ACTION(W, N, X, Y) {if (W.itemEntry){W.itemEntry[N].pDesc=((uint8 *)X); W.itemEntry[N].item.pfnAction=(Y);}}
+#define MENU_ITEM_ACTION(W, N, X, Y) {if (W.itemEntry){W.itemEntry[N].pDesc=(uint8*)(X); W.itemEntry[N].item.pfnAction=(Y);}}
 
 /* Multiple Actions items entry.
      W: This menu object

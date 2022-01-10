@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -112,18 +112,6 @@ function _getPinResources(inst)
 }
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  @param inst       - I2CSlave instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base properties and methods
  */
@@ -145,7 +133,6 @@ let base = {
 `,
     defaultInstanceName: "CONFIG_I2CSLAVE_",
     config: Common.addNameConfig(config, "/ti/drivers/I2CSlave", "CONFIG_I2CSLAVE_"),
-    validate: validate,
     modules: Common.autoForceModules(["Board", "Power"]),
     busModule: true, /* true => instances of this module can be shared */
     filterHardware: filterHardware,

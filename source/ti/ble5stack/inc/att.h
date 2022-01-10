@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -144,6 +144,7 @@ extern "C"
 #define ATT_CMD_FLAG_BIT                 0x40 //!< Command Flag (bit 6)
 #define ATT_AUTHEN_SIG_FLAG_BIT          0x80 //!< Authentication Signature Flag (bit 7)
 #define ATT_BT_UUID_SIZE                 2 //!< Size of 16-bit Bluetooth UUID
+#define ATT_32_BIT_UUID_SIZE             4 //!< Size of 32-bit Bluetooth UUID
 #define ATT_UUID_SIZE                    16 //!< Size of 128-bit UUID
 #define ATT_MSG_TIMEOUT                  30 //!< ATT Response or Confirmation timeout
 /** @} End ATT_Bitmasks */

@@ -45,20 +45,32 @@ const patchHandler = system.getScript("/ti/devices/radioconfig/patch_handler.js"
 /* Radio code export configuration */
 const CodeExportHandler = system.getScript("/ti/devices/radioconfig/code_export_param");
 
-/* localize the object names with this device ID */
+// Common utility functions
+const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
+
+/* Localize the object names with this device ID */
 const keys = Object.keys(system.modules).sort();
 
-/* code generation template for RF Settings (C file) */
+/* Code generation template for RF Settings (C file) */
 const templateName = "/ti/devices/radioconfig/templates/rf_settings.c.xdt";
 
 /* CoEx */
+const CoExConfig = Common.getCoexConfig();
 const coExCode = system.getTemplate("/ti/devices/radioconfig/settings/coex.c.xdt");
-const useCoEx = coExCode() !== null;
+let coexType = null;
+if (CoExConfig != null) {
+    if ("cmdIeeeRxConfig" in CoExConfig) {
+        coexType = "coex_ieee";
+    }
+    else {
+        coexType = "coex_ble";
+    }
+}
 
-/* get list of include files */
-let paths = patchHandler.generateIncludesC(keys, useCoEx);
+/* Get list of include files */
+let paths = patchHandler.generateIncludesC(keys, coexType);
 
-/* add include files for stack overrides */
+/* Add include files for stack overrides */
 const info = CodeExportHandler.getCustomOverrideInfo();
 const len = info.paths.length;
 
@@ -86,6 +98,6 @@ const frontendCode = system.getTemplate("/ti/devices/radioconfig/templates/rf_de
         % /* load its template and expand it */
         % const gen = system.getTemplate(mod.templates[templateName]);
         % const phyGroup = mod.phyGroup;
-`gen(mod,phyGroup,useCoEx)`
+`gen(mod,phyGroup,coexType)`
     % }
 % }

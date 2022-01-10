@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -160,7 +160,7 @@ function onBaudRateChanged(inst, ui)
  */
 function validate(inst, validation)
 {
-    Common.validateNames(inst, validation);
+
     let baudRateActual = Math.floor(clockSpeed/(inst.tpiuPrescaler + 1));
     let baudRateRangeH = inst.baudRate + (inst.baudRate*BAUDRATE_ERROR_MARGIN);
     let baudRateRangeL = inst.baudRate - (inst.baudRate*BAUDRATE_ERROR_MARGIN);

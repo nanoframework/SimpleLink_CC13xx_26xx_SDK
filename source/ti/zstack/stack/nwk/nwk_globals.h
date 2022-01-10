@@ -191,6 +191,11 @@ extern "C" {
   #define MAX_BCAST 9
 #endif
 
+#if !defined ( NWK_MAX_BROADCAST_JITTER )
+  // The maximum broadcast jitter time in 2 msec periods (0x40 msec on 2.4GHz)
+  #define NWK_MAX_BROADCAST_JITTER  0x20
+#endif
+
 // Maxiumum number of secure partners(Commercial mode only).
 #if ZG_BUILD_COORDINATOR_TYPE
 // Adding 5 entries to allow up to 5 legacy devices join concurrently when the rest of the
@@ -297,6 +302,10 @@ extern "C" {
 //The first MAX_NWK_SEC_MATERIAL_TABLE_ENTRIES-1 networks will be stored, while the last
 //will be used for the remaining networks joined
 #define MAX_NWK_SEC_MATERIAL_TABLE_ENTRIES   5
+
+#if !defined ( NWK_JOIN_SECURITY_TIMEOUT_PERIOD )
+  #define NWK_JOIN_SECURITY_TIMEOUT_PERIOD 5000
+#endif
 
 /*********************************************************************
  * TYPEDEFS
@@ -426,6 +435,9 @@ extern CONST uint32_t gMAX_NWK_FRAMECOUNTER_CHANGES;
   extern uint8_t gMAX_MNP_QUEUED;
 #endif
 
+extern CONFIG_ITEM uint16_t gNWK_MAX_BROADCAST_JITTER;
+
+extern CONST uint32_t gNWK_JOIN_SECURITY_TIMEOUT_PERIOD;
 
 /*********************************************************************
  * APS GLOBAL VARIABLES

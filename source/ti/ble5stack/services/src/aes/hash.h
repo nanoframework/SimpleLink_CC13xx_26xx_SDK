@@ -5,7 +5,7 @@
  @brief Provides interface for the keyed hash function.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -165,10 +165,6 @@ typedef struct {
  *  The application must not access any member variables of this structure!
  */
 typedef struct {
-    /*!< Pin state object */
-    PIN_State                       pinState;
-    /*!< Pin handle */
-    PIN_Handle                      pinHandle;
     /*!< Flag if the instance is in use */
     bool                            isOpen;
     /*!< Flag to indicate if thread safety is ensured by the driver */

@@ -38,7 +38,6 @@
 
     let RF_CCFG = system.modules["/ti/devices/CCFG"];
     let rfCompensateHf = false;
-
     if (RF_CCFG !== undefined) {
         // If CCFG configuration enables HF XOSC calibration, ensure RF Driver does that.
         if (RF_CCFG.$static.enableXoscHfComp === true) {
@@ -47,6 +46,10 @@
     }
 %%}
 %   if (rfCompensateHf === true) {
-    // Enable compensation of HF clock source for RF due to CCFG setting.
-    RF_enableHPOSCTemperatureCompensation();
+    /* Enable compensation of HF clock source for RF due to CCFG setting. */
+    RF_Stat status = RF_enableHPOSCTemperatureCompensation();
+    /* Hang here if RF driver fails to enable compensation */
+    if (status != RF_StatSuccess) {
+        while (1);
+    }
 %   }

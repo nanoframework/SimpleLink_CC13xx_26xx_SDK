@@ -5,7 +5,7 @@
 *
 *  Description:    Driver for the AUX Digital-to-Analog Converter interface.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -268,4 +268,10 @@ AUXDACDisable(void)
 
     // Disconnect COMPA_IN from DIOs
     HWREGB(AUX_ADI4_BASE + ADI_4_AUX_O_MUX1) = 0x0;
+
+    // Set operational mode to Power-Down
+    HWREG(AUX_SYSIF_BASE + AUX_SYSIF_O_OPMODEREQ) = AUX_SYSIF_OPMODEREQ_REQ_PDA;
+
+    // Set the peripheral operational rate to the SCE rate
+    HWREGB(AUX_SYSIF_BASE + AUX_SYSIF_O_PEROPRATE) = AUX_SYSIF_PEROPRATE_ANAIF_DAC_OP_RATE_SCE_RATE;
 }

@@ -86,13 +86,14 @@
 #include "gpd_memory.h"
 #include "util_timer.h"
 
+#include "ti_zstack_config.h"
+
 
 /*********************************************************************
  * MACROS
  */
 
 #define CONFIG_FH_ENABLE             false
-#define CONFIG_TRANSMIT_POWER        0
 
 /*********************************************************************
  * TYPEDEFS
@@ -332,7 +333,7 @@ static void gpdSampleTempSensor_Init(void)
 
     /* Set the transmit power */
     ApiMac_mlmeSetReqUint8(ApiMac_attribute_phyTransmitPowerSigned,
-                           (uint8_t)CONFIG_TRANSMIT_POWER);
+                           (uint8_t)TXPOWER);
 
 #ifdef NV_RESTORE
     gp_appNvInit(pfnZdlNV);
@@ -532,10 +533,13 @@ static void Initialize_UI(void)
     /* Initialize btns */
     Button_Params bparams;
     Button_Params_init(&bparams);
-    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, gpdSampleTempSensor_changeKeyCallback, &bparams);
+    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
     // Open Right button without appCallBack
-    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, gpdSampleTempSensor_changeKeyCallback, &bparams);
+    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
+    // Set button callback
+    Button_setCallback(gLeftButtonHandle, gpdSampleTempSensor_changeKeyCallback);
+    Button_setCallback(gRightButtonHandle, gpdSampleTempSensor_changeKeyCallback);
 
     /* Initialize the LEDS */
     LED_Params ledParams;

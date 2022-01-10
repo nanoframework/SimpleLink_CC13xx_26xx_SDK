@@ -57,6 +57,9 @@
     if (devId.match(/CC13.[12]/) || devId.match(/CC26.[12]/)) {
         driver = 'CC26X2';
     }
+    else if (devId.match(/CC13.4/) || devId.match(/CC26.4/) || devId.match(/CC2653/)) {
+        driver = 'CC26X4';
+    }
     else {
         driver = 'CC26XX';
         attrsVer = 'V1';
@@ -68,6 +71,10 @@
  */
 #include <ti/drivers/SPI.h>
 #include <ti/drivers/spi/SPI`driver`DMA.h>
+#include <ti/drivers/dma/UDMACC26XX.h>
+
+#include <ti/devices/DeviceFamily.h>
+#include DeviceFamily_constructPath(driverlib/ioc.h)
 
 #define `countDef` `instances.length`
 
@@ -77,20 +84,35 @@
 SPI`driver`DMA_Object spi`driver`DMAObjects[`countDef`];
 
 /*
+ * ======== spi`driver`DMA uDMA Table Entries  ========
+ */
+% for (let i = 0; i < instances.length; i++) {
+    % let inst = instances[i];
+    % let spi = inst.spi;
+    % let name = spi.$solution.peripheralName;
+    % /* Get the index of the SPI instance by extracting the last character */
+    % let spiIndex = name.slice(name.length - 1);
+    % /* Use SSI for driverlib access since CC26X4 changed the peripheral name but we did not change driverlib */
+    % let ssiName = name.replace("SPI", "SSI");
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaSpi`spiIndex`TxControlTableEntry, UDMA_CHAN_`ssiName`_TX);
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaSpi`spiIndex`RxControlTableEntry, UDMA_CHAN_`ssiName`_RX);
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaSpi`spiIndex`TxAltControlTableEntry, (UDMA_CHAN_`ssiName`_TX | UDMA_ALT_SELECT));
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaSpi`spiIndex`RxAltControlTableEntry, (UDMA_CHAN_`ssiName`_RX | UDMA_ALT_SELECT));
+
+%}
+
+/*
  *  ======== spi`driver`DMAHWAttrs ========
  */
 const SPI`driver`DMA_HWAttrs`attrsVer` spi`driver`DMAHWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
     % let inst = instances[i];
     % let spi = inst.spi;
-    % let ssPin;
     % let name = spi.$solution.peripheralName;
-    % let sclkPin = spi.sclkPin.$solution.devicePinName.substring(4);
-    % let mosiPin = spi.mosiPin.$solution.devicePinName.substring(4);
-    % let misoPin = spi.misoPin.$solution.devicePinName.substring(4);
-    % if (inst.mode != 'Three Pin') {
-    %     ssPin = spi.ssPin.$solution.devicePinName.substring(4);
-    % }
+    % /* Get the index of the SPI instance by extracting the last character */
+    % let spiIndex = name.slice(name.length - 1);
+    % /* Use SSI for driverlib access since CC26X4 changed the peripheral name but we did not change driverlib */
+    % let ssiName = name.replace("SPI", "SSI");
     /* `inst.$name` */
     % if (inst.$hardware) {
     %    if (inst.$hardware.displayName) {
@@ -99,21 +121,29 @@ const SPI`driver`DMA_HWAttrs`attrsVer` spi`driver`DMAHWAttrs[`countDef`] = {
     % }
     {
         .baseAddr = `name`_BASE,
-        .intNum = INT_`name`_COMB,
+        .intNum = INT_`ssiName`_COMB,
         .intPriority = `Common.intPriority2Hex(inst.dmaInterruptPriority)`,
         .swiPriority = `Common.swiPriority2Int(inst.softwareInterruptPriority)`,
-        .powerMngrId = PowerCC26XX_PERIPH_`name`,
+        .powerMngrId = PowerCC26XX_PERIPH_`ssiName`,
         .defaultTxBufValue = `inst.defaultTxBufferValue`,
-        .rxChannelBitMask = 1<<UDMA_CHAN_`name`_RX,
-        .txChannelBitMask = 1<<UDMA_CHAN_`name`_TX,
+        .rxChannelBitMask = 1<<UDMA_CHAN_`ssiName`_RX,
+        .txChannelBitMask = 1<<UDMA_CHAN_`ssiName`_TX,
+        .dmaTxTableEntryPri = &dmaSpi`spiIndex`TxControlTableEntry,
+        .dmaRxTableEntryPri = &dmaSpi`spiIndex`RxControlTableEntry,
+        .dmaTxTableEntryAlt = &dmaSpi`spiIndex`TxAltControlTableEntry,
+        .dmaRxTableEntryAlt = &dmaSpi`spiIndex`RxAltControlTableEntry,
         .minDmaTransferSize = `inst.minDmaTransferSize`,
-        .mosiPin = IOID_`mosiPin`,
-        .misoPin = IOID_`misoPin`,
-        .clkPin  = IOID_`sclkPin`,
+        .txPinMux   = IOC_PORT_MCU_`ssiName`_TX,
+        .rxPinMux   = IOC_PORT_MCU_`ssiName`_RX,
+        .clkPinMux  = IOC_PORT_MCU_`ssiName`_CLK,
+        .csnPinMux  = IOC_PORT_MCU_`ssiName`_FSS,
+        .mosiPin = `inst.mosiPinInstance.$name`,
+        .misoPin = `inst.misoPinInstance.$name`,
+        .clkPin  = `inst.sclkPinInstance.$name`,
     % if (inst.mode != 'Three Pin') {
-        .csnPin  = IOID_`ssPin`
+        .csnPin  = `inst.ssPinInstance.$name`
     % } else {
-        .csnPin  = PIN_UNASSIGNED
+        .csnPin  = GPIO_INVALID_INDEX
     % }
     },
 % }

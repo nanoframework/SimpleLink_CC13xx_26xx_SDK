@@ -1,0 +1,5 @@
+objs
+host_*_test
+bbb_*_test
+Debug
+Release

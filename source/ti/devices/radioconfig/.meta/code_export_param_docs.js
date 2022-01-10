@@ -38,6 +38,29 @@
 
 "use strict";
 
+const customOverrideDescription = `
+The custom override feature allows adding overrides that are not part of the standard overrides for  
+Radio Core software. Custom overrides may be applied on two levels. *Stack overrides* are used by for instance
+the BLE stack to apply overrides that this particular stack needs but are not available as a core feature.
+In addition *Application overrides* may be applied when there is a need for fine tuning of a particular application,
+for instance Angle of Arrival. Stack and application overrides may be combined.
+
+Inclusion of custom overrides is facilitated by the *Code Export Configuration* panel where a pair of configurables are 
+provided for each of the two stack override types.
+
+The "Stack Override File" expects a path name to the file where the stack override macro resides. The path must be 
+relative to the SDK source directory. Example: "ti/devices/radioconfig/stack_override_example.h". The Stack override 
+macro must be a macro-name that is defined in the Stack Override File, e.g. BLE_STACK_OVERRIDES.
+
+"Application Override File" and "Application Override Macro" exhibits exactly the same behavior as the stack override.
+
+It is possible to select files outside the SDK installation by "moving up" from the root, 
+e.g ../../mysource/app_override.h
+
+The SDK contains two example files, one for each custom override. The files can be found in 
+"source/ti/devices/radioconfig" and contain further details.
+`;
+
 const codeExportDocs = [
     {
         configurable: "symGenMethod",
@@ -89,6 +112,22 @@ const codeExportDocs = [
     {
         configurable: "overrides",
         longDescription: "Sets the name for the Override array."
+    },
+    {
+        configurable: "stackOverride",
+        longDescription: customOverrideDescription
+    },
+    {
+        configurable: "stackOverrideMacro",
+        longDescription: customOverrideDescription
+    },
+    {
+        configurable: "appOverride",
+        longDescription: customOverrideDescription
+    },
+    {
+        configurable: "appOverrideMacro",
+        longDescription: customOverrideDescription
     }
 ];
 

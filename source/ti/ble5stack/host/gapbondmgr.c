@@ -5,7 +5,7 @@
  @brief GAP peripheral profile manages bonded connections
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -121,58 +121,9 @@
 //      bonding
 #define RPAO_MODE                                       0
 
-/**
- * GAP Bond Manager NV layout
- *
- * The NV definitions:
- *     BLE_NVID_GAP_BOND_START - starting NV ID
- *     gapBond_maxBonds - Maximum number of bonding allowed (32 is max for
- *                        number of NV IDs allocated in bcomdef.h).
- *
- * A single bonding entry consists of 6 components (NV items):
- *     Bond Record - defined as gapBondRec_t and uses GAP_BOND_REC_ID_OFFSET
- *         for an NV ID
- *     local LTK Info - defined as gapBondLTK_t and uses
- *         GAP_BOND_LOCAL_LTK_OFFSET for an NV ID
- *     device LTK Info - defined as gapBondLTK_t and uses
- *         GAP_BOND_DEV_LTK_OFFSET for an NV ID
- *     device IRK - defined as "uint8_t devIRK[KEYLEN]" and uses
- *         GAP_BOND_DEV_IRK_OFFSET for an NV ID
- *     device CSRK - defined as "uint8_t devCSRK[KEYLEN]" and uses
- *        GAP_BOND_DEV_CSRK_OFFSET for an NV ID
- *     device Sign Counter - defined as a uint32_t and uses
- *        GAP_BOND_DEV_SIGN_COUNTER_OFFSET for an NV ID
- *
- * When the device is initialized for the first time, all (gapBond_maxBonds) NV
- * items are created and initialized to all 0xFF's. A bonding record of all
- * 0xFF's indicates that the bonding record is empty and free to use.
- *
- * The calculation for each bonding records NV IDs:
- *    MAIN_RECORD_NV_ID = ((bondIdx * GAP_BOND_REC_IDS) +
- *                         BLE_NVID_GAP_BOND_START)
- *    LOCAL_LTK_NV_ID = (((bondIdx * GAP_BOND_REC_IDS) +
- *                       GAP_BOND_LOCAL_LTK_OFFSET) + BLE_NVID_GAP_BOND_START)
- *
- */
-
-#define GAP_BOND_REC_ID_OFFSET              0 //!< NV ID for the main bonding record
-#define GAP_BOND_LOCAL_LTK_OFFSET           1 //!< NV ID for the bonding record's local LTK information
-#define GAP_BOND_DEV_LTK_OFFSET             2 //!< NV ID for the bonding records' device LTK information
-#define GAP_BOND_DEV_IRK_OFFSET             3 //!< NV ID for the bonding records' device IRK
-#define GAP_BOND_DEV_CSRK_OFFSET            4 //!< NV ID for the bonding records' device CSRK
-#define GAP_BOND_DEV_SIGN_COUNTER_OFFSET    5 //!< NV ID for the bonding records' device Sign Counter
-#define GAP_BOND_REC_IDS                    6
-
 // Key Size Limits
 #define MIN_ENC_KEYSIZE                     7  //!< Minimum number of bytes for the encryption key
 #define MAX_ENC_KEYSIZE                     16 //!< Maximum number of bytes for the encryption key
-
-// Bonded State Flags
-#define GAP_BONDED_STATE_AUTHENTICATED                  0x01
-#define GAP_BONDED_STATE_SERVICE_CHANGED                0x02
-#define GAP_BONDED_STATE_CAR                            0x04
-#define GAP_BONDED_STATE_SECURECONNECTION               0x08
-#define GAP_BONDED_STATE_RPA_ONLY                       0x10
 
 // Pairing Queue States
 typedef enum gbmPairFSM
@@ -191,44 +142,6 @@ typedef enum gbmPairFSM
 /*********************************************************************
  * TYPEDEFS
  */
-
-// Structure of NV data for the connected device's encryption information
-typedef struct
-{
-  uint8_t   LTK[KEYLEN];              // Long Term Key (LTK)
-  uint16_t  div;  //lint -e754        // LTK eDiv
-  uint8_t   rand[B_RANDOM_NUM_SIZE];  // LTK random number
-  uint8_t   keySize;                  // LTK key size
-} gapBondLTK_t;
-
-// Structure of NV data for the connected device's address information
-typedef struct
-{
-  /**
-   * Peer's address
-   *
-   * If identity information exists for this bond, this will be an
-   * identity address
-   */
-  uint8_t               addr[B_ADDR_LEN];
-  /**
-   * Peer's address type
-   */
-  GAP_Peer_Addr_Types_t addrType;
-  /**
-   * State flags of bond
-   *
-   * @ref GAP_BONDED_STATE_FLAGS
-   */
-  uint8_t               stateFlags;
-} gapBondRec_t;
-
-// Structure of NV data for the connected device's characteristic configuration
-typedef struct
-{
-  uint16_t attrHandle;  // attribute handle
-  uint8_t  value;       // attribute value for this device
-} gapBondCharCfg_t;
 
 typedef struct gapBondStateQueueNode
 {
@@ -373,6 +286,10 @@ static uint8_t gapBondMgrUpdateCharCfg(uint8_t idx, uint16_t attrHandle,
 static gapBondCharCfg_t *gapBondMgrFindCharCfgItem(uint16_t attrHandle,
                                                    gapBondCharCfg_t *charCfgTbl);
 static void gapBondMgrInvertCharCfgItem(gapBondCharCfg_t *charCfgTbl);
+static uint8_t gapBondMgrSaveBond(uint8_t bondIdx, gapBondRec_t* pBondRec,
+                                  gapBondLTK_t* pLocalLtk, gapBondLTK_t* pDevLtk,
+                                  uint8_t* pIRK, uint8_t* pSRK, uint32_t signCount,
+                                  int8_t syncRL);
 static uint8_t gapBondMgrAddBond(gapBondRec_t *pBondRec,
                                  gapAuthCompleteEvent_t *pPkt);
 static uint8_t gapBondMgrGetStateFlags(uint8_t idx);
@@ -1646,7 +1563,7 @@ uint8_t GAPBondMgr_ProcessGAPMsg(gapEventHdr_t *pMsg)
                                  NULL, NULL, NULL) == SUCCESS)
           {
 #ifdef GAPBONDMGR_TESTMODE
-            // For PTS - GAP/SEC/AUT/BV-22-C [Lost Bond – Responder Role]
+            // For PTS - GAP/SEC/AUT/BV-22-C [Lost Bond ï¿½ Responder Role]
             gapSendBondLostEvent(pPkt->connectionHandle,pLinkItem->addr);
 #endif
           }
@@ -2322,6 +2239,96 @@ static void gapBondMgrInvertCharCfgItem(gapBondCharCfg_t *charCfgTbl)
 }
 
 /*********************************************************************
+ * @fn      gapBondMgrSaveBond
+ *
+ * @brief   Save a bond record to NV
+ *
+ * @param   pBondRec - basic bond record
+ * @param   pLocalLTK - LTK used by this device during pairing
+ * @param   pDevLTK - LTK used by the connected device during pairing
+ * @param   pIRK - IRK used by the connected device during pairing
+ * @param   pSRK - SRK used by the connected device during pairing
+ * @param   signCounter - Sign counter used by the connected device during
+ *                        pairing
+ * @param   syncRL - Flag indicating whether Resolving List must be resynched
+ *
+ * @return  SUCCESS if bond was added
+ *          NV_OPER_FAILED for failure
+ */
+static uint8_t gapBondMgrSaveBond(uint8_t bondIdx,
+                                  gapBondRec_t* pBondRec,
+                                  gapBondLTK_t* pLocalLtk,
+                                  gapBondLTK_t* pDevLtk,
+                                  uint8_t* pIRK,
+                                  uint8_t* pSRK,
+                                  uint32_t signCount,
+                                  int8_t syncRL)
+{
+  uint8_t snvErrorCode = SUCCESS;
+  gapBondCharCfg_t *charCfg = (gapBondCharCfg_t *)MAP_osal_mem_alloc(sizeof (gapBondCharCfg_t) * gapBond_maxCharCfg);
+  if (charCfg == NULL)
+  {
+    HAL_ASSERT( HAL_ASSERT_CAUSE_OUT_OF_MEMORY );
+    return (NV_OPER_FAILED);
+  }
+
+  // Save the main information
+  snvErrorCode |= osal_snv_write(MAIN_RECORD_NV_ID(bondIdx), sizeof(gapBondRec_t), pBondRec);
+
+  // Once main information is saved, it qualifies to update the LRU table.
+  gapBondMgrUpdateLruBondList(bondIdx);
+
+  // Write out FF's over the characteristic configuration entry, to overwrite
+  // any previous bond data that may have been stored
+  VOID MAP_osal_memset(charCfg, 0xFF, sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg);
+
+  snvErrorCode |= osal_snv_write(GATT_CFG_NV_ID(bondIdx), sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg, charCfg);
+
+  // Update Bond RAM Shadow just with the newly added bond entry
+  VOID MAP_osal_memcpy(&(bonds[bondIdx]), pBondRec, sizeof(gapBondRec_t));
+
+  if(pIRK)
+  {
+    // Add device to resolving list
+    if ((HCI_LE_AddDeviceToResolvingListCmd((pBondRec->addrType & MASK_ADDRTYPE_ID),
+                                             pBondRec->addr, pIRK, NULL) != SUCCESS) && syncRL)
+    {
+      gapBond_syncRL = TRUE;
+    }
+
+    // If available, save the connected device's IRK
+    snvErrorCode |= osal_snv_write(DEV_IRK_NV_ID(bondIdx), KEYLEN, pIRK);
+  }
+
+  // If available, save the LTK information
+  if(pLocalLtk)
+  {
+    snvErrorCode |= osal_snv_write(LOCAL_LTK_NV_ID(bondIdx), sizeof(gapBondLTK_t), pLocalLtk);
+  }
+
+  // If available, save the connected device's LTK information
+  if(pDevLtk)
+  {
+	snvErrorCode |= osal_snv_write(DEV_LTK_NV_ID(bondIdx), sizeof(gapBondLTK_t), pDevLtk);
+  }
+
+  // If available, save the connected device's Signature information
+  if(pSRK)
+  {
+    snvErrorCode |= osal_snv_write(DEV_CSRK_NV_ID(bondIdx), KEYLEN, pSRK);
+    snvErrorCode |= osal_snv_write(DEV_SIGN_COUNTER_NV_ID(bondIdx), sizeof(uint32_t), &signCount);
+  }
+
+  if(autoSyncWhiteList)
+  {
+    gapBondMgr_SyncWhiteList();
+  }
+
+  MAP_osal_mem_free(charCfg);
+  return (snvErrorCode);
+}
+
+/*********************************************************************
  * @fn      gapBondMgrAddBond
  *
  * @brief   Save a bond from a GAP Auth Complete Event
@@ -2335,14 +2342,15 @@ static void gapBondMgrInvertCharCfgItem(gapBondCharCfg_t *charCfgTbl)
  *                        pairing
  *
  * @return SUCCESS if bond was added
- * @return bleNoResources if there are no empty slots
+ *         bleNoResources if there are no empty slots
  */
 static uint8_t gapBondMgrAddBond(gapBondRec_t *pBondRec,
                                  gapAuthCompleteEvent_t *pPkt)
 {
-  // First see if we already have an existing bond for this device
   uint8_t bondIdx;
+  uint8_t snvErrorCode = SUCCESS;
 
+  // First see if we already have an existing bond for this device
   if(GAPBondMgr_FindAddr(pBondRec->addr, pBondRec->addrType,
                          &bondIdx, NULL, NULL) != SUCCESS)
   {
@@ -2369,79 +2377,179 @@ static uint8_t gapBondMgrAddBond(gapBondRec_t *pBondRec,
   // If an empty slot was found
   if(bondIdx < gapBond_maxBonds)
   {
-    gapBondCharCfg_t *charCfg = (gapBondCharCfg_t *)MAP_osal_mem_alloc( sizeof (gapBondCharCfg_t) * gapBond_maxCharCfg );
-    if (charCfg == NULL)
-    {
-      HAL_ASSERT( HAL_ASSERT_CAUSE_OUT_OF_MEMORY );
-      return (NV_OPER_FAILED);
-    }
-
-    // Save the main information
-    VOID osal_snv_write(MAIN_RECORD_NV_ID(bondIdx), sizeof(gapBondRec_t),
-                        pBondRec);
-
-    // Once main information is saved, it qualifies to update the LRU table.
-    gapBondMgrUpdateLruBondList(bondIdx);
-
-    // Write out FF's over the characteristic configuration entry, to overwrite
-    // any previous bond data that may have been stored
-    VOID MAP_osal_memset(charCfg, 0xFF, sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg);
-
-    VOID osal_snv_write(GATT_CFG_NV_ID(bondIdx), sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg, charCfg);
-
-    // Update Bond RAM Shadow just with the newly added bond entry
-    VOID MAP_osal_memcpy(&(bonds[bondIdx]), pBondRec, sizeof(gapBondRec_t));
-
-    if(pPkt->pIdentityInfo)
-    {
-      // Add device to resolving list
-      HCI_LE_AddDeviceToResolvingListCmd((pPkt->pIdentityInfo->addrType &
-                                             MASK_ADDRTYPE_ID),
-                                             pPkt->pIdentityInfo->bd_addr,
-                                             pPkt->pIdentityInfo->irk, NULL);
-    }
-
-    // If available, save the connected device's IRK
-    if(pPkt->pIdentityInfo)
-    {
-      VOID osal_snv_write(DEV_IRK_NV_ID(bondIdx), KEYLEN,
-                          pPkt->pIdentityInfo->irk);
-    }
-
-    // If available, save the LTK information
-    if(pPkt->pSecurityInfo)
-    {
-      VOID osal_snv_write(LOCAL_LTK_NV_ID(bondIdx), sizeof(gapBondLTK_t),
-                          pPkt->pSecurityInfo);
-    }
-
-    // If available, save the connected device's LTK information
-    if(pPkt->pDevSecInfo)
-    {
-      VOID osal_snv_write(DEV_LTK_NV_ID(bondIdx), sizeof(gapBondLTK_t),
-                          pPkt->pDevSecInfo);
-    }
-    // If available, save the connected device's Signature information
-    if(pPkt->pSigningInfo)
-    {
-      VOID osal_snv_write(DEV_CSRK_NV_ID(bondIdx), KEYLEN,
-                          pPkt->pSigningInfo->srk);
-      VOID osal_snv_write(DEV_SIGN_COUNTER_NV_ID(bondIdx), sizeof(uint32_t),
-                          &(pPkt->pSigningInfo->signCounter));
-    }
-
-    if(autoSyncWhiteList)
-    {
-      gapBondMgr_SyncWhiteList();
-    }
+    snvErrorCode = gapBondMgrSaveBond(bondIdx, pBondRec,
+                                      (gapBondLTK_t*) pPkt->pSecurityInfo,
+                                      (gapBondLTK_t*) pPkt->pDevSecInfo,
+                                      pPkt->pIdentityInfo ? pPkt->pIdentityInfo->irk : NULL,
+                                      pPkt->pSigningInfo ? pPkt->pSigningInfo->srk : NULL,
+                                      pPkt->pSigningInfo ? pPkt->pSigningInfo->signCounter : 0,
+                                      FALSE);
 
     // Update NV to have same CCC values as GATT database
     gapBondMgr_SyncCharCfg(pPkt->connectionHandle);
-    MAP_osal_mem_free( charCfg );
   }
   else
   {
     return(bleNoResources);
+  }
+
+  // Check for there was an error when writing to the NV area
+  if (snvErrorCode != SUCCESS)
+  {
+    gapBondMgrEraseBonding(bondIdx);
+    gapBondMgrReadBonds();
+  }
+
+  return (snvErrorCode);
+}
+
+/*********************************************************************
+ * @fn      gapBondMgrImportBond
+ *
+ * @brief   Import bond record to NV
+ *
+ * @param   pBondRec - basic bond record
+ * @param   pLocalLTK - LTK used by the device that has the same public address as current device
+ * @param   pDevLTK - LTK used by the peer device during pairing
+ * @param   pIRK - IRK used by the peer device during pairing
+ * @param   pSRK - SRK used by the peer device during pairing
+ * @param   signCounter - Sign counter used by the peer device during pairing
+ * @param   charCfg - GATT characteristic configuration
+ *
+ * @return SUCCESS if bond was imported
+ * @return bleNoResources if there are no empty slots
+ */
+uint8_t gapBondMgrImportBond(gapBondRec_t* pBondRec,
+                             gapBondLTK_t* pLocalLtk,
+                             gapBondLTK_t* pDevLtk,
+                             uint8_t* pIRK,
+                             uint8_t* pSRK,
+                             uint32_t signCount,
+                             gapBondCharCfg_t* charCfg)
+{
+  uint8_t bondIdx;
+  uint8_t snvErrorCode = SUCCESS;
+
+  // First see if we already have an existing bond for this device
+  if(GAPBondMgr_FindAddr(pBondRec->addr, pBondRec->addrType,
+                         &bondIdx, NULL, NULL) != SUCCESS)
+  {
+    bondIdx = gapBondMgrFindEmpty();
+  }
+  else if(pIRK)
+  {
+    uint8_t oldIrk[KEYLEN];
+
+    // Verify that that a previous bond had an IRK before attempting to
+    // remove it from the Controller's resolving list.
+    if((osal_snv_read(DEV_IRK_NV_ID(bondIdx), KEYLEN, oldIrk) == SUCCESS) &&
+       (MAP_osal_isbufset(oldIrk, 0xFF, KEYLEN) == FALSE))
+    {
+      // If a current record is simply being updated then erase previous
+      // entry in resolving list for this peer. Will subsequently update
+      // RL with new ID info for peer
+      if (MAP_HCI_LE_RemoveDeviceFromResolvingListCmd((pBondRec->addrType &MASK_ADDRTYPE_ID),
+          pBondRec->addr) != SUCCESS)
+      {
+        gapBond_syncRL = TRUE;
+      }
+    }
+  }
+
+  // If an empty slot was found
+  if(bondIdx < gapBond_maxBonds)
+  {
+    snvErrorCode = gapBondMgrSaveBond(bondIdx, pBondRec, pLocalLtk, pDevLtk, pIRK, pSRK,
+                                      signCount, TRUE);
+
+    // If available, save the connected device's GATT configurations
+    if (charCfg)
+    {
+      snvErrorCode |=  osal_snv_write(GATT_CFG_NV_ID(bondIdx),
+                          sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg,
+                          charCfg);
+    }
+  }
+  else
+  {
+   return(bleNoResources);
+  }
+
+  // Check for there was an error when writing to the NV area
+  if (snvErrorCode != SUCCESS)
+  {
+    gapBondMgrEraseBonding(bondIdx);
+    gapBondMgrReadBonds();
+  }
+  return (snvErrorCode);
+}
+
+/*********************************************************************
+ * @fn      gapBondMgrReadBondRec
+ *
+ * @brief   Read bond record from NV
+ *
+ * @param   pBondRec - basic bond record
+ * @param   pLocalLTK - LTK used by this device during pairing
+ * @param   pDevLTK - LTK used by the peer device during pairing
+ * @param   pIRK - IRK used by the peer device during pairing
+ * @param   pSRK - SRK used by the peer device during pairing
+ * @param   signCounter - Sign counter used by the peer device during pairing
+ * @param   charCfg - GATT characteristic configuration
+ *
+ * @return  SUCCESS if bond was extracted
+ *          bleGAPNotFound if there is no bond record
+ */
+uint8_t gapBondMgrReadBondRec(GAP_Peer_Addr_Types_t addrType,
+                              uint8_t *pDevAddr,
+                              gapBondRec_t* pBondRec,
+                              gapBondLTK_t* pLocalLtk,
+                              gapBondLTK_t* pDevLtk,
+                              uint8_t* pIRK,
+                              uint8_t* pSRK,
+                              uint32_t signCount,
+                              gapBondCharCfg_t* charCfg)
+{
+  // NV Index
+  uint8_t idx;
+
+  // If a pre-existing bond was found
+  if(GAPBondMgr_FindAddr(pDevAddr, addrType, &idx, NULL, NULL) == SUCCESS)
+  {
+    // See if the entry exists in NV
+    if(osal_snv_read(MAIN_RECORD_NV_ID(idx), sizeof(gapBondRec_t), pBondRec) != SUCCESS)
+    {
+      // Can't read the entry, assume that it doesn't exist
+      return (bleGAPNotFound);
+    }
+
+    // Load the local LTK information
+    VOID osal_snv_read(LOCAL_LTK_NV_ID(idx), sizeof(gapBondLTK_t), pLocalLtk);
+
+    // Load the connected device's LTK information
+    VOID osal_snv_read(DEV_LTK_NV_ID(idx), sizeof(gapBondLTK_t), pDevLtk);
+
+    // Load in NV IRK Record
+    VOID osal_snv_read(DEV_IRK_NV_ID(idx), KEYLEN, pIRK);
+
+    // Load the Signing Key
+    if(osal_snv_read(DEV_CSRK_NV_ID(idx), KEYLEN, pSRK) == SUCCESS)
+    {
+      if(osal_isbufset(pSRK, 0xFF, KEYLEN) == FALSE)
+      {
+        // Load the signing information for this connection
+        VOID osal_snv_read(DEV_SIGN_COUNTER_NV_ID(idx), sizeof(uint32_t),
+	                           &(signCount));
+      }
+    }
+
+    // Load the characteristic configuration
+    VOID osal_snv_read(GATT_CFG_NV_ID(idx), sizeof(gapBondCharCfg_t) * gapBond_maxCharCfg, charCfg);
+  }
+  else
+  {
+    // The address wasn't found in the bonding table if we get here
+    return (bleGAPNotFound);
   }
 
   return (SUCCESS);
@@ -2997,7 +3105,7 @@ static uint8_t gapBondMgr_ProcessOSALMsg(osal_event_hdr_t *pMsg)
  *
  * @return  SUCCESS or FAILURE
  */
-uint8_t gapBondMgr_CheckNVLen(uint8_t id, uint8_t len)
+uint8_t gapBondMgr_CheckNVLen(uint16_t id, uint8_t len)
 {
   uint8_t stat = FAILURE;
 

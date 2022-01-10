@@ -19,6 +19,8 @@
                             "CMD_BLE5_ADV_DIR",
                             "CMD_BLE5_ADV_SCAN",
                             "CMD_BLE5_ADV",
+                            "CMD_BLE5_SCANNER_PER",
+                            "CMD_BLE5_ADV_PER",
                             "CMD_BLE_ADV",
                             "CMD_BLE_ADV_NC",
                             "CMD_BLE_ADV_DIR",

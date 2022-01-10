@@ -5,7 +5,7 @@
 @brief  sensor model defines and API
 
 Group: WCS, BTS
-Target Device: cc13x2_26x2
+Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
@@ -261,8 +261,9 @@ ZEPHYR__TYPEDEF_PACKED(struct)
     uint8_t  fas16tCadenceHigh;         //ToDo variable
 } sensorCadenceStatus_t;
 
-
-// Callbacks for getting sensors info
+/*
+ * Callbacks for getting sensors info
+ */
 typedef int                      (*sensorModels_getDataCB_t)(uint8_t **pData, uint16_t *dataLen);
 typedef sensorDescriportState_t *(*sensorModels_getDescCB_t)(void);
 
@@ -275,18 +276,109 @@ typedef struct
 /*********************************************************************
  * API FUNCTIONS
  */
+
+/*********************************************************************
+ * @fn      sensorModels_registerModel
+ *
+ * @brief   register new model
+ *
+ */
 int  sensorModels_registerModel(uint8_t elem_idx, uint16_t propertyId, sensorModels_CBs_t *sensorCBs, int sensorDataLen);
+
+/*********************************************************************
+ * @fn      sensorModels_send_desc_get
+ *
+ * @brief   Client send sensor_desc_get request
+ *
+ */
 void sensorModels_send_desc_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_get
+ *
+ * @brief   Client send sensor_get request
+ *
+ */
 void sensorModels_send_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_Column_get
+ *
+ * @brief   Client send sensor_Column_get request
+ *
+ */
 void sensorModels_send_Column_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId, uint8_t rawValueX);
+
+/*********************************************************************
+ * @fn      sensorModels_send_Series_get
+ *
+ * @brief   Client send sensor_Series_get request
+ *
+ */
 void sensorModels_send_Series_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId, uint8_t rawValueX1, uint8_t rawValueX2);
+
+/*********************************************************************
+ * @fn      sensorModels_send_status_by_id
+ *
+ * @brief   unsolicited message from App - send back the sensor Marshalled header+data
+ *
+ */
 void sensorModels_send_status_by_id(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_settings_get
+ *
+ * @brief   Client send sensor_settings_get request
+ *
+ */
 void sensorModels_send_settings_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_cadence_get
+ *
+ * @brief   Client send sensor_Cadence_get request
+ *
+ */
 void sensorModels_send_cadence_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_cadence_set
+ *
+ * @brief   Client send sensor_Cadence_set request
+ *
+ */
 void sensorModels_send_cadence_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_cadence_set_unack
+ *
+ * @brief   Client send sensor_Cadence_set request
+ *
+ */
 void sensorModels_send_cadence_set_unack(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_setting_get
+ *
+ * @brief   Client send sensor_setting_get request
+ *
+ */
 void sensorModels_send_setting_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId, uint16_t settingPropertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_setting_set
+ *
+ * @brief   Client send sensor_setting_set request
+ *
+ */
 void sensorModels_send_setting_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId, uint16_t settingPropertyId);
+
+/*********************************************************************
+ * @fn      sensorModels_send_setting_set_unack
+ *
+ * @brief   Client send sensor_setting_set request
+ *
+ */
 void sensorModels_send_setting_set_unack(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, uint16_t propertyId, uint16_t settingPropertyId);
 
 #endif /* SENSOR_MODELS_H_ */

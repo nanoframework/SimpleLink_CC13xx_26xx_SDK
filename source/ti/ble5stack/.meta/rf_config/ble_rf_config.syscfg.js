@@ -200,7 +200,7 @@ function getPaTableValues(rfDesign, tableOptions)
                                                     config.displayName.valueOf() >= 14);
     }
     // If using CC1352P-4 device
-    else if(rfDesign == "LAUNCHXL-CC1352P-4" || rfDesign == "LP_CC2652PSIP" || rfDesign == "LP_CC1352P7-4")
+    else if(rfDesign == "LAUNCHXL-CC1352P-4" || rfDesign == "LP_CC2652PSIP" || rfDesign == "LP_CC1352P7-4" || rfDesign == "LP_CC2651P3")
     {
         currentOptions = tableOptions.filter(config => config.displayName.valueOf() <= 10);
     }
@@ -261,6 +261,14 @@ function getRfDesignOptions(deviceId)
     else if(deviceId === "CC2652R7RGZ")
     {
         newRfDesignOptions = [{name: "LP_CC2652R7"}];
+    }
+    else if(deviceId === "CC2651P3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651P3"}];
+    }
+    else if(deviceId === "CC2651R3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651R3"}];
     }
 
     return(newRfDesignOptions);
@@ -335,10 +343,10 @@ function moduleInstances(inst)
         permission: "ReadOnly"
     }
 
-    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC2652PSIP" || inst.rfDesign == "LP_CC1352P7-4")
+    if(inst.rfDesign == "LAUNCHXL-CC1352P-2" || inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC2652PSIP" || inst.rfDesign == "LP_CC1352P7-4" || inst.rfDesign == "LP_CC2651P3")
     {
         args.highPA = true;
-        if(inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC1352P7-4")
+        if(inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC1352P7-4" || inst.rfDesign == "LP_CC2652PSIP")
         {
             args.phyType = "bt5le1mp10";
             args.txPowerHi = "10";

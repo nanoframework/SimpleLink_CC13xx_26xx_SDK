@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       gpio.h
-*  Revised:        2020-09-09 19:57:34 +0200 (Wed, 09 Sep 2020)
-*  Revision:       58572
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the GPIO.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,7 @@ dioNumberLegal( uint32_t dioNumber )
     // CC13x2 + CC26x2
     if ( ChipInfo_ChipFamilyIs_CC13x2_CC26x2() )
     {
-        return ( (dioNumber >= (31 - ioCount)) && (dioNumber < 31) )
+        return ( (dioNumber >= (31 - ioCount)) && (dioNumber < 31) );
     }
     // Special handling of CC13x0 7x7, where IO_CNT = 30 and legal range is 1..30
     // for all other chips legal range is 0..(dioNumber-1)
@@ -97,7 +97,6 @@ dioNumberLegal( uint32_t dioNumber )
     {
         return ( dioNumber < ioCount );
     }
-
 }
 #endif
 
@@ -139,6 +138,7 @@ dioNumberLegal( uint32_t dioNumber )
 #define GPIO_DIO_30_MASK        0x40000000  // GPIO DIO 30 mask
 #define GPIO_DIO_31_MASK        0x80000000  // GPIO DIO 31 mask
 #define GPIO_DIO_ALL_MASK       0xFFFFFFFF  // GPIO all DIOs mask
+
 
 //*****************************************************************************
 //

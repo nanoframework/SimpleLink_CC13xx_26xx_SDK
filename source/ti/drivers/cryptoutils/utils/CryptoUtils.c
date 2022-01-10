@@ -38,13 +38,28 @@
 
 #include <ti/drivers/cryptoutils/utils/CryptoUtils.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define CRYPTOUTILS_NOINLINE __attribute__((noinline))
+#else
+    #define CRYPTOUTILS_NOINLINE
+#endif
+
 /*
  *  ======== CryptoUtils_buffersMatch ========
  */
-bool CryptoUtils_buffersMatch(const void *buffer0,
-                              const void *buffer1,
-                              size_t bufferByteLength) {
-    uint8_t tempResult = 0;
+#if defined(__IAR_SYSTEMS_ICC__)
+#pragma inline=never
+#elif defined(__TI_COMPILER_VERSION__) && !defined(__cplusplus)
+#pragma FUNC_CANNOT_INLINE (CryptoUtils_buffersMatch)
+#elif defined(__TI_COMPILER_VERSION__)
+#pragma FUNC_CANNOT_INLINE
+#endif
+CRYPTOUTILS_NOINLINE bool CryptoUtils_buffersMatch(const volatile void *volatile buffer0,
+                                                   const volatile void *volatile buffer1,
+                                                   size_t bufferByteLength) {
+    volatile uint8_t tempResult = 0;
+    uint8_t byte0;
+    uint8_t byte1;
     size_t i;
 
     /* XOR each byte of the buffer together and OR the results.
@@ -53,19 +68,31 @@ bool CryptoUtils_buffersMatch(const void *buffer0,
      * timing attacks.
      */
     for (i = 0; i < bufferByteLength; i++) {
-        tempResult |= ((uint8_t *)buffer0)[i] ^ ((uint8_t *)buffer1)[i];
+        byte0 = ((uint8_t *)buffer0)[i];
+        byte1 = ((uint8_t *)buffer1)[i];
+
+        tempResult |= byte0 ^ byte1;
     }
 
-    return tempResult == 0 ? true : false;
+    return tempResult == 0;
 }
 
 /*
  *  ======== CryptoUtils_buffersMatchWordAligned ========
  */
-bool CryptoUtils_buffersMatchWordAligned(const uint32_t *buffer0,
-                                         const uint32_t *buffer1,
-                                         size_t bufferByteLength) {
-    uint32_t tempResult = 0;
+#if defined(__IAR_SYSTEMS_ICC__)
+#pragma inline=never
+#elif defined(__TI_COMPILER_VERSION__) && !defined(__cplusplus)
+#pragma FUNC_CANNOT_INLINE (CryptoUtils_buffersMatchWordAligned)
+#elif defined(__TI_COMPILER_VERSION__)
+#pragma FUNC_CANNOT_INLINE
+#endif
+CRYPTOUTILS_NOINLINE bool CryptoUtils_buffersMatchWordAligned(const volatile uint32_t *volatile buffer0,
+                                                              const volatile uint32_t *volatile buffer1,
+                                                              size_t bufferByteLength) {
+    volatile uint32_t tempResult = 0;
+    uint32_t word0;
+    uint32_t word1;
     size_t i;
 
     /* We could skip the branch and just set tempResult equal to the
@@ -81,10 +108,13 @@ bool CryptoUtils_buffersMatchWordAligned(const uint32_t *buffer0,
      * timing attacks.
      */
     for (i = 0; i < bufferByteLength / sizeof(uint32_t); i++) {
-        tempResult |= buffer0[i] ^ buffer1[i];
+        word0 = buffer0[i];
+        word1 = buffer1[i];
+
+        tempResult |= word0 ^ word1;
     }
 
-    return tempResult == 0 ? true : false;
+    return tempResult == 0;
 }
 
 /*
@@ -136,7 +166,7 @@ void CryptoUtils_memset(void *dest, size_t destSize, uint8_t val, size_t count) 
  *  ======== CryptoUtils_copyPad ========
  */
 void CryptoUtils_copyPad(const void *source,
-                         void *destination,
+                         uint32_t *destination,
                          size_t sourceLength) {
     uint32_t i;
     uint8_t remainder;
@@ -163,7 +193,7 @@ void CryptoUtils_copyPad(const void *source,
             tempBytePointer[2] = sourceBytePointer[sourceOffset + 2];
             tempBytePointer[3] = sourceBytePointer[sourceOffset + 3];
 
-            *((uint32_t *)destination + i) = temp;
+            *(destination + i) = temp;
     }
 
     /* Reset to 0 so we do not have to zero-out individual bytes */
@@ -176,17 +206,17 @@ void CryptoUtils_copyPad(const void *source,
 
         tempBytePointer[0] = sourceBytePointer[0];
 
-        /* i is reused from the loop above. This write  zero-pads the
+        /* i is reused from the loop above. This write zero-pads the
          * destination buffer to word-length.
          */
-        *((uint32_t *)destination + i) = temp;
+        *(destination + i) = temp;
     }
     else if (remainder == 2) {
 
         tempBytePointer[0] = sourceBytePointer[0];
         tempBytePointer[1] = sourceBytePointer[1];
 
-       *((uint32_t *)destination + i) = temp;
+       *(destination + i) = temp;
     }
     else if (remainder == 3) {
 
@@ -194,7 +224,7 @@ void CryptoUtils_copyPad(const void *source,
         tempBytePointer[1] = sourceBytePointer[1];
         tempBytePointer[2] = sourceBytePointer[2];
 
-        *((uint32_t *)destination + i) = temp;
+        *(destination + i) = temp;
     }
 
 }
@@ -203,7 +233,7 @@ void CryptoUtils_copyPad(const void *source,
  *  ======== CryptoUtils_reverseCopyPad ========
  */
 void CryptoUtils_reverseCopyPad(const void *source,
-                                void *destination,
+                                uint32_t *destination,
                                 size_t sourceLength) {
     uint32_t i;
     uint8_t remainder;
@@ -230,7 +260,7 @@ void CryptoUtils_reverseCopyPad(const void *source,
             tempBytePointer[1] = sourceBytePointer[sourceOffset - 1];
             tempBytePointer[0] = sourceBytePointer[sourceOffset - 0];
 
-            *((uint32_t *)destination + i) = temp;
+            *(destination + i) = temp;
     }
 
     /* Reset to 0 so we do not have to zero-out individual bytes */
@@ -246,14 +276,14 @@ void CryptoUtils_reverseCopyPad(const void *source,
         /* i is reused from the loop above. This write  zero-pads the
          * destination buffer to word-length.
          */
-        *((uint32_t *)destination + i) = temp;
+        *(destination + i) = temp;
     }
     else if (remainder == 2) {
 
         tempBytePointer[0] = sourceBytePointer[1];
         tempBytePointer[1] = sourceBytePointer[0];
 
-       *((uint32_t *)destination + i) = temp;
+       *(destination + i) = temp;
     }
     else if (remainder == 3) {
 
@@ -261,7 +291,39 @@ void CryptoUtils_reverseCopyPad(const void *source,
         tempBytePointer[1] = sourceBytePointer[1];
         tempBytePointer[2] = sourceBytePointer[0];
 
-        *((uint32_t *)destination + i) = temp;
+        *(destination + i) = temp;
     }
+}
 
+/*
+ *  ======== CryptoUtils_reverseCopy ========
+ */
+void CryptoUtils_reverseCopy(const void *source,
+                             void *destination,
+                             size_t sourceLength)
+{
+    /*
+     * If destination address is word-aligned and source length is a word-multiple,
+     * use CryptoUtils_reverseCopyPad() for better efficiency.
+     */
+    if ((((uint32_t)destination | sourceLength) & 0x3) == 0)
+    {
+        CryptoUtils_reverseCopyPad(source,
+                                   (uint32_t*)destination,
+                                   sourceLength);
+    }
+    else
+    {
+        const uint8_t *sourceBytePtr = (const uint8_t *)source;
+        uint8_t *dstBytePtr = (uint8_t *)destination + sourceLength - 1;
+
+        /*
+         * Copy source to destination starting at the end of source and the
+         * beginning of destination.
+         */
+        while (sourceLength--)
+        {
+            *dstBytePtr-- = *sourceBytePtr++;
+        }
+    }
 }

@@ -9,7 +9,7 @@
             "+../main_freertos.c -> main_freertos.c",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../../../../../../source/ti/boards/CC1352P_2_LAUNCHXL/Board.html -> Board.html",
-            "+../../tirtos/ticlang/cc13x2_cc26x2_freertos.cmd -> cc13x2_cc26x2_freertos.cmd"
+            "+cc13x2_cc26x2_freertos.cmd -> cc13x2_cc26x2_freertos.cmd"
         ]
     }
 ]

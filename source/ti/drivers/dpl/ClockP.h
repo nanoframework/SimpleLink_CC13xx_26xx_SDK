@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,7 +84,7 @@ extern "C" {
  */
 typedef union ClockP_Struct {
     uint32_t dummy;  /*!< Align object */
-    char     data[ClockP_STRUCT_SIZE];
+    uint8_t  data[ClockP_STRUCT_SIZE];
 } ClockP_Struct;
 
 /*!
@@ -276,6 +276,15 @@ extern void ClockP_Params_init(ClockP_Params *params);
  *  Cannot change the initial timeout if the clock has been started.
  */
 extern void ClockP_setTimeout(ClockP_Handle handle, uint32_t timeout);
+
+/*!
+ *  @brief  Set the clock period
+ *
+ *  @param period    Periodic interval in ClockP ticks
+ *
+ *  Cannot be used to set the clock period to zero.
+ */
+extern void ClockP_setPeriod(ClockP_Handle handle, uint32_t period);
 
 /*!
  *  @brief  Function to start a clock.

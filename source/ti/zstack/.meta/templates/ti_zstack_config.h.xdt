@@ -39,6 +39,7 @@
 /* Static module and submodules and scripts */
 const zstack = system.modules['/ti/zstack/zstack'].$static;
 const Common = system.getScript("/ti/zstack/zstack_common.js");
+const RF = system.modules["/ti/drivers/RF"].$static;
 
 /* Channel bitmasks */
 const defaultChanlist = Common.chanArrToBitmask(zstack.rf.primaryChannels);
@@ -522,6 +523,18 @@ if (zstack.touchlink.touchlinkEnabled == true)
 #ifndef END_DEV_TIMEOUT_VALUE
 #define END_DEV_TIMEOUT_VALUE        `zstack.network.endDeviceTimeout`
 #endif
+
+% if (RF.coexEnable && RF.coexPhy.includes("ieee_15_4")) {
+
+/* Builds the image with Wifi Coexistence Enabled */
+#define IEEE_COEX_ENABLED
+
+% if (RF.coexMode === "coexMode3Wire") {
+/* IEEE 3 Wire Coexistence is enabled */
+#define IEEE_COEX_3_WIRE
+
+% } // End if (RF.coexMode === "coexMode3Wire")
+% } // End if (RF.coexEnable && RF.coexPhy.includes("ieee_15_4"))
 
 `tlFlag`
 

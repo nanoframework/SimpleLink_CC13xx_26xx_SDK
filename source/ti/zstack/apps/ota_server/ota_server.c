@@ -598,9 +598,9 @@ static void otaServer_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }
@@ -1540,9 +1540,9 @@ static void Initialize_UI(void)
     /* Initialize btns */
     Button_Params bparams;
     Button_Params_init(&bparams);
-    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, otaServer_changeKeyCallback, &bparams);
+    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
     // Open Right button without appCallBack
-    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, NULL, &bparams);
+    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
     if (!GPIO_read(((Button_HWAttrs*)gRightButtonHandle->hwAttrs)->gpioIndex))
     {
@@ -1550,6 +1550,7 @@ static void Initialize_UI(void)
     }
 
     // Set button callback
+    Button_setCallback(gLeftButtonHandle, otaServer_changeKeyCallback);
     Button_setCallback(gRightButtonHandle, otaServer_changeKeyCallback);
 }
 

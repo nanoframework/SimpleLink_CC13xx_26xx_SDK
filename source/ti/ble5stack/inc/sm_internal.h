@@ -5,7 +5,7 @@
  @brief This file contains internal interfaces for the SM.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -291,6 +291,7 @@ extern smpPairingPublicKey_t sm_eccKeys_sc_host_debug;
 extern uint8 smProcessHCIBLEEventCode( hciEvt_CmdComplete_t *pMsg );
 extern uint8 smProcessHCIBLEMetaEventCode( hciEvt_CmdComplete_t *pMsg );
 extern uint8 smProcessOSALMsg( osal_event_hdr_t *pMsg );
+extern uint8 smpResponderProcessIncoming_hook( linkDBItem_t *pLinkItem, uint8 cmdID, smpMsgs_t *pParsedMsg );
 
 /*********************************************************************
  * SM Manager Internal Functions
@@ -328,6 +329,7 @@ extern void smEndPairing( uint8 status );
 extern void smFreePairingParams( void );
 extern uint8 smF5Wrapper( uint8 *nonceA, uint8 *nonceB );
 extern bStatus_t smGenerateAddrInput(uint8 *addrA, uint8 *addrB);
+extern bStatus_t smGenerateAddrInput_sPatch(uint8 *addrA, uint8 *addrB);
 extern bStatus_t smGenerateConfirm( void );
 extern uint8 smGenerateDHKeyCheck( uint8 *nonce1, uint8 *nonce2, uint8 *pR, uint8 isLocalIOCap );
 extern bStatus_t smGeneratePairingReqRsp( void );

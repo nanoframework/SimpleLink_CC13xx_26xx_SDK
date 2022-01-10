@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 by Texas Instruments Incorporated.
+ *  Copyright 2021 by Texas Instruments Incorporated.
  *
  */
 
@@ -93,7 +93,7 @@ __weak void SysTick_Handler( void ) { while (1) {} }
 __weak void SecureFault_Handler( void ) { while (1) {} }
 #endif
 /*
- *  @(#) iar.targets.arm.rts; 1, 0, 0,; 9-3-2020 14:59:39; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
+ *  @(#) iar.targets.arm.rts; 1, 0, 0,; 7-28-2021 07:05:45; /db/ztree/library/trees/xdctargets/xdctargets-w20/src/ xlibrary
 
  */
 

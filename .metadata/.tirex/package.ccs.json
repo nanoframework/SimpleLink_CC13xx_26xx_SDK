@@ -1,11 +1,11 @@
 [
     {
-        "rootMacroName": "COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR",
+        "rootMacroName": "COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR",
         "compilerIncludePath": [],
         "compilerSymbols": [],
         "linkerSearchPath": [],
         "properties": {
-            "rtsc.repoMacroName": "COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR_REPOS",
+            "rtsc.repoMacroName": "COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR_REPOS",
             "rtsc.repositories": [
                 "source",
                 "kernel/tirtos/packages"
@@ -23,6 +23,9 @@
             "docs/ti154stack/mac_api/html",
             "docs/tirtos/sysbios/docs/cdoc",
             "docs/tirtos/uia/docs/cdoc",
+            "docs/tirtos7/doxygen/m0/html",
+            "docs/tirtos7/doxygen/m33/html",
+            "docs/tirtos7/doxygen/m4/html",
             "docs/tiutils/html"
         ]
     }

@@ -5,7 +5,7 @@
  @brief CC2650 specific ICall function implementation
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -318,7 +318,7 @@ ICallPlatform_pwrRegisterNotify(ICall_PwrRegisterNotifyArgs *args)
   for (i = 0; i < sizeof(obj)/sizeof(obj[0]); i++)
   {
     Power_registerNotify(obj[i], events[i],
-                         ICallPlatform_pwrNotify,
+                       (Power_NotifyFxn)ICallPlatform_pwrNotify,
                          (uintptr_t) args->obj);
   }
   return ICALL_ERRNO_SUCCESS;

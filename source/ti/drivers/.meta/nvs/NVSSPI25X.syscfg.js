@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ let config = [
         name: "verifyBufferSize",
         displayName: "Verify Buffer Size",
         description: "Size of the write verification buffer in bytes.",
-        default: 0
+        default: 0x100
     },
     {
         name: "statusPollDelay",

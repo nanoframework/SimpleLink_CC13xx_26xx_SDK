@@ -19,6 +19,9 @@ include $(CORESDK_INSTALL_DIR)/imports.mak
 #     http://rtsc.eclipse.org/docs-tip/Command_-_xdc#Environment_Variables
 #
 XDCARGS= \
+    gnu.targets.arm.M33F=\"$(GCC_ARMCOMPILER)\" \
+    iar.targets.arm.M33F=\"$(IAR_ARMCOMPILER)\" \
+    ti.targets.arm.clang.M33F=\"$(TICLANG_ARMCOMPILER)\" \
     ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
     ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
     gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
@@ -32,7 +35,7 @@ XDCARGS= \
 #
 # Set XDCPATH to contain necessary repositories.
 #
-XDCPATH=$(CORESDK_INSTALL_DIR)/source;$(CORESDK_INSTALL_DIR)/kernel/tirtos/packages
+XDCPATH=$(XDC_INSTALL_DIR)/packages;$(CORESDK_INSTALL_DIR)/source;$(CORESDK_INSTALL_DIR)/kernel/tirtos/packages;$(CORESDK_INSTALL_DIR)/tfm_s/build/cc26x4_gnu/production_full/interface/include;$(CORESDK_INSTALL_DIR)/tfm_s/build/cc26x4_gnu/production_full/Release/export/tfm/inc
 
 #
 # Set XDCOPTIONS.  Use -v for a verbose build.

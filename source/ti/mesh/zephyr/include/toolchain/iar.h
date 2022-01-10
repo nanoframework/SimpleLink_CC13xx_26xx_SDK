@@ -139,9 +139,9 @@ do {                                                                    \
 #define Z_GENERIC_SECTION(segment) __GENERIC_SECTION(segment)
 
 #define ___in_section(a, b, c) \
-	__attribute__((section("." Z_STRINGIFY(a)			\
+    @ "." Z_STRINGIFY(a)			\
 				"." Z_STRINGIFY(b)			\
-				"." Z_STRINGIFY(c))))
+				"." Z_STRINGIFY(c)
 #define __in_section(a, b, c) ___in_section(a, b, c)
 
 #define __in_section_unique(seg) ___in_section(seg, __FILE__, __COUNTER__)
@@ -160,13 +160,13 @@ do {                                                                    \
 #endif /* !CONFIG_XIP */
 
 #ifndef __aligned
-#define __aligned(x)	__attribute__((__aligned__(x)))
+#define __aligned(x)
 #endif
 #define __may_alias     __attribute__((__may_alias__))
 #ifndef __printf_like
 #define __printf_like(f, a)   __attribute__((format (printf, f, a)))
 #endif
-#define __used		__attribute__((__used__))
+#define __used	__root	
 #ifndef __deprecated
 #define __deprecated	__attribute__((deprecated))
 #endif

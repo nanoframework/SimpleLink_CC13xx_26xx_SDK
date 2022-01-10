@@ -54,14 +54,7 @@
   Application-specific menu system:
 
     <TOGGLE LIGHT> Toggle the local light and display its status and level
-      Press OK to toggle the local light on and off.
-      This screen shows the following information
-        Line1: (only populated if ZCL_LEVEL_CTRL is defined)
-          LEVEL XXX - xxx is the current level of the light if the light state is ON, or the target level
-            of the light when the light state is off. The target level is the level that the light will be
-            set to when it is switched from off to on using the on or the toggle commands.
-        Line2:
-          LIGHT OFF / ON: shows the current state of the light.
+      Press ENTER to toggle the local light on and off.
       Note when ZCL_LEVEL_CTRL is enabled:
         - If the light state is ON and the light level is X, and then the light receives the OFF or TOGGLE
           commands: The level will decrease gradually until it reaches 1, and only then the light state will
@@ -73,6 +66,20 @@
           increase gradually until it reaches level X.
         - Any level-setting command will affect the level directly, and may also affect the on/off state,
           depending on the command's arguments.
+
+    <DISCOVER> Sends Identify Query to start discovery mechanism for creating bind to a Switch
+      Press ENTER to make the Light send an Identify Query request.
+      When Switch devices respond to the query, the Light shall discover any missing information
+        from the responding device to form the bind, and afterwards will begin sending reports
+        (when BDB_REPORTING is enabled) every 3-10 seconds (by default). This is modifiable by
+        setting the minReportInt and maxReportInt.
+
+    The APP Info line will display the following information:
+      [Light State]
+        On/Off - current state of the local light
+      [Level] - Only populated if ZCL_LEVEL_CTRL is defined. Shows current level of light
+        if light state is ON, or the target level to be set to when switched from off to on
+        using the on or toggle command.
 
 *********************************************************************/
 
@@ -1081,9 +1088,9 @@ static void zclSampleLight_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }
@@ -2381,7 +2388,7 @@ static void zclSampleLight_SceneRecallCB( zclSceneReq_t *pReq )
              uint8_t tempState = *extField.AttrBuf;
              zclSampleLight_updateOnOffAttribute(tempState);
          }
-#ifdef ZCL_LVL_CTRL
+#ifdef ZCL_LEVEL_CTRL
          //If Level Control then retrieve the attribute
          else if(extField.ClusterID == ZCL_CLUSTER_ID_GENERAL_LEVEL_CONTROL)
          {
@@ -2446,7 +2453,7 @@ static uint8_t zclSampleLight_SceneStoreCB( zclSceneReq_t *pReq )
             }
             *extField.AttrBuf = tempState;
         }
-#ifdef ZCL_LVL_CTRL
+#ifdef ZCL_LEVEL_CTRL
         //If Level Control then store attribute
         else if(extField.ClusterID == ZCL_CLUSTER_ID_GENERAL_LEVEL_CONTROL)
         {

@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       aes.h
-*  Revised:        2019-01-25 14:45:16 +0100 (Fri, 25 Jan 2019)
-*  Revision:       54287
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    AES header file.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -213,7 +213,8 @@ extern "C"
 //! \return None
 //
 //*****************************************************************************
-extern void AESStartDMAOperation(const uint8_t *channel0Addr, uint32_t channel0Length,  uint8_t *channel1Addr, uint32_t channel1Length);
+extern void AESStartDMAOperation(const uint8_t *channel0Addr, uint32_t channel0Length,
+                                 uint8_t *channel1Addr, uint32_t channel1Length);
 
 //*****************************************************************************
 //
@@ -255,6 +256,41 @@ extern void AESStartDMAOperation(const uint8_t *channel0Addr, uint32_t channel0L
 //
 //*****************************************************************************
 extern void AESSetInitializationVector(const uint32_t *initializationVector);
+
+//*****************************************************************************
+//
+//! \brief Read the initialization vector (IV) out from the crypto module
+//!        for Non-Authenticated Modes (CBC or CTR).
+//!
+//! This function copies the IV calculated by the crypto module in CBC or CTR
+//! mode to \c iv.
+//!
+//! \param [out] iv Pointer to an array with four 32-bit elements (16-bytes).
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESReadNonAuthenticationModeIV(uint32_t *iv);
+
+//*****************************************************************************
+//
+//! \brief Read the initialization vector (IV) out from the crypto module
+//!        for Authenticated Modes (CCM or GCM).
+//!
+//! This function copies the IV calculated by the crypto module in CCM or GCM
+//! mode to \c iv.
+//!
+//! \pre #AESReadTag() must be called first.
+//!
+//! \param [out] iv Pointer to an array with four 32-bit elements (16-bytes).
+//!
+//! \return None
+//!
+//! \sa #AESReadTag()
+//
+//*****************************************************************************
+void AESReadAuthenticationModeIV(uint32_t *iv);
+
 
 //*****************************************************************************
 //
@@ -585,16 +621,25 @@ __STATIC_INLINE void AESSetAuthLength(uint32_t length)
 
 //*****************************************************************************
 //
-//! \brief Reset the accelerator and cancel ongoing operations
+//! \brief Reset the accelerator and cancel ongoing operations.
 //!
+//! \pre AESDMAReset
 //!
 //! \return None
 //
 //*****************************************************************************
-__STATIC_INLINE void AESReset(void)
-{
-    HWREG(CRYPTO_BASE + CRYPTO_O_SWRESET) = 0x00000001;
-}
+void AESReset(void);
+
+//*****************************************************************************
+//
+//! \brief Reset the accelerator DMA.
+//!
+//! \return None
+//!
+//! \sa AESReset
+//
+//*****************************************************************************
+void AESDMAReset(void);
 
 //*****************************************************************************
 //
@@ -776,6 +821,109 @@ __STATIC_INLINE void AESIntUnregister(void)
     //
     IntUnregister(INT_CRYPTO_RESULT_AVAIL_IRQ);
 }
+
+//*****************************************************************************
+//
+//! \brief Read the Crypto module control and mode register value.
+//!
+//! \return Returns the AES_CTL register value
+//
+//*****************************************************************************
+__STATIC_INLINE uint32_t AESGetCtrl(void)
+{
+    return(HWREG(CRYPTO_BASE + CRYPTO_O_AESCTL));
+}
+
+//*****************************************************************************
+//
+//! \brief Write the crypto module KEY2 registers
+//!
+//! \param [in] key2 Pointer to the 4 x 32-bit key-material to be written to
+//!                  AES_KEY2_0 .. AES_KEY2_3 registers.
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESWriteKey2(const uint32_t *key2);
+
+//*****************************************************************************
+//
+//! \brief Write the crypto module KEY3 registers
+//!
+//! \param [in] key3 Pointer to the 4 x 32-bit key-material to be written to
+//!                  AES_KEY3_0 .. AES_KEY3_3 registers.
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESWriteKey3(const uint32_t *key3);
+
+//*****************************************************************************
+//
+//! \brief Clear the crypto module DATA_IN registers
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESClearDataIn(void);
+
+//*****************************************************************************
+//
+//! \brief Write the crypto module DATA_IN registers.
+//!
+//! \param [in] dataInBuffer Pointer to the 4 x 32-bit buffer containing data
+//!                          to be written to AES_DATA_IN_0 .. AES_DATA_IN_3
+//!                          registers.
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESWriteDataIn(const uint32_t *dataInBuffer);
+
+//*****************************************************************************
+//
+//! \brief Read the crypto module DATA_OUT registers.
+//!
+//! \param [out] dataOutBuffer Pointer to the 4 x 32-bit buffer to output
+//!                            data from AES_DATA_OUT_0 .. AES_DATA_OUT_3
+//!                            registers.
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESReadDataOut(uint32_t *dataOutBuffer);
+
+//*****************************************************************************
+//
+//! \brief Clear the crypto module KEY2 registers
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESClearKey2(void);
+
+//*****************************************************************************
+//
+//! \brief Clear the crypto module KEY3 registers
+//!
+//! \return None
+//
+//*****************************************************************************
+void AESClearKey3(void);
+
+//*****************************************************************************
+//
+//! \brief Clear key registers as required for AES CBC-MAC
+//!
+//! \return None
+//
+//*****************************************************************************
+__STATIC_INLINE void AESCBCMACClearKeys(void)
+{
+    AESClearKey2();
+    AESClearKey3();
+}
+
 
 //*****************************************************************************
 //

@@ -55,9 +55,6 @@
 /* MAC radio */
 #include "mac_radio_defs.h"
 
-/* Hal */
-#include "hal_uart.h"
-
 #ifdef FEATURE_MAC_SECURITY
   #include "mac_security_pib.h"
   #include "mac_security.h"
@@ -120,9 +117,11 @@ static uint8_t mtMacBeaconPayload[MT_MAC_BEACON_PAYLOAD_MAX];
  ***************************************************************************************************/
 static void MT_MacSpi2Sec( ZMacSec_t *pSec, uint8_t *pSrc );
 static void MT_MacSpi2Addr( zAddrType_t *pDst, uint8_t *pSrc );
-static void MT_MacAddr2Spi( uint8_t *pDst, zAddrType_t *pSrc );
-static void MT_MacExtCpy( uint8_t *pDst, uint8_t *pSrc );
 static void MT_MacRevExtCpy( uint8_t *pDst, uint8_t *pSrc );
+
+#if defined ( MT_MAC_CB_FUNC )
+static void MT_MacAddr2Spi( uint8_t *pDst, zAddrType_t *pSrc );
+#endif
 
 void MT_MacResetReq(uint8_t *pBuf);
 void MT_MacInit(uint8_t *pBuf);
@@ -1087,15 +1086,15 @@ void MT_MacSetRxGainReq(uint8_t *pBuf)
 void MT_MacAssociateRsp(uint8_t *pBuf)
 {
   uint8_t retValue, cmdId;
-  ZMacAssociateRsp_t assocRsp;
 
   /* Parse header */
   cmdId = pBuf[MT_RPC_POS_CMD1];
   pBuf += MT_RPC_FRAME_HDR_SZ;
 
 #ifdef RTR_NWK
+    ZMacAssociateRsp_t assocRsp;
     /* The address of the device requesting association */
-    MT_MacExtCpy(assocRsp.DeviceAddress, pBuf);
+    osal_cpyExtAddr(assocRsp.DeviceAddress, pBuf);
     pBuf += Z_EXTADDR_LEN;
 
     /* The short address allocated to the (associated) device */
@@ -1986,28 +1985,6 @@ void nwk_MTCallbackSubNwkPurgeCnf( ZMacPurgeCnf_t *param )
  ***************************************************************************************************/
 
 /***************************************************************************************************
- * @fn      MT_MacExtCpy
- *
- * @brief
- *
- *   Copy an extended address.
- *
- * @param   pDst - Pointer to data destination
- * @param   pSrc - Pointer to data source
- *
- * @return  void
- ***************************************************************************************************/
-static void MT_MacExtCpy( uint8_t *pDst, uint8_t *pSrc )
-{
-  int8_t i;
-
-  for ( i = 0; i < Z_EXTADDR_LEN; i++ )
-  {
-    *pDst++ = pSrc[i];
-  }
-}
-
-/***************************************************************************************************
  * @fn      MT_MacRevExtCpy
  *
  * @brief
@@ -2068,6 +2045,7 @@ static void MT_MacSpi2Sec( ZMacSec_t *pSec, uint8_t *pSrc )
   OsalPort_memcpy (pSec, pSrc, sizeof (ZMacSec_t));
 }
 
+#if defined ( MT_MAC_CB_FUNC )
 /***************************************************************************************************
  * @fn      MT_MacAddr2Spi
  *
@@ -2104,6 +2082,7 @@ static void MT_MacAddr2Spi( uint8_t *pDst, zAddrType_t *pSrc )
     }
   }
 }
+#endif // MT_MAC_CB_FUNC
 
 /***************************************************************************************************
  ***************************************************************************************************/

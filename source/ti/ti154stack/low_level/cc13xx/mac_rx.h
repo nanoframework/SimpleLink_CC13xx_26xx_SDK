@@ -5,7 +5,7 @@
  @brief Describe the purpose and contents of the file.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -71,6 +71,7 @@
 #define MAC_RX_ACTIVE_NO_ACTIVITY       0x00  /* zero reserved for boolean use, e.g. !macRxActive */
 #define MAC_RX_ACTIVE_STARTED          (0x01 | MAC_RX_ACTIVE_PHYSICAL_BV)
 #define MAC_RX_ACTIVE_DONE              0x02
+#define MAC_RX_ACTIVE_SFD              (0x03 | MAC_RX_ACTIVE_PHYSICAL_BV)
 
 /* RX PACKET status */
 #define MAC_RX_PKT_STATUS_OK            0x00
@@ -105,6 +106,7 @@ MAC_INTERNAL_API void macRxRadioPowerUpInit(void);
 MAC_INTERNAL_API void macRxHaltCleanup(void);
 MAC_INTERNAL_API void macRxFifoOverflowIsr(void);
 MAC_INTERNAL_API void macRxAckTxDoneCallback(void);
+MAC_INTERNAL_API void macRxSFDTimerExpiry(void);
 
 extern void macRxFrameIsr(void);
 extern void macRxNokIsr(void);

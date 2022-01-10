@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -310,8 +310,8 @@
             /* See schematic linked at top of file */
             "settings": {
                 "DIN": {
-                    "pull": "Pull Up",
-                    "interruptTrigger": "Falling Edge"
+                    "pull": "Internal",
+                    "polarity": "Active Low"
                 }
             },
             "connections" : {
@@ -325,8 +325,8 @@
             /* See schematic linked at top of file */
             "settings": {
                 "DIN": {
-                    "pull": "Pull Up",
-                    "interruptTrigger": "Falling Edge"
+                    "pull": "Internal",
+                    "polarity": "Active Low"
                 }
             },
             "connections" : {

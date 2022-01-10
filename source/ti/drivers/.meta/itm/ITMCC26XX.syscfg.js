@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2020-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,27 +76,28 @@ function _getPinResources(inst)
 
 /*
  *  ======== moduleInstances ========
- *  returns PIN instances
+ *  returns GPIO instances
  */
 function moduleInstances(inst)
 {
-    let pinInstances = new Array();
+    let gpioInstances = new Array();
 
-    pinInstances.push({
+    gpioInstances.push({
         name: "swoPinInstance",
         displayName: "Serial Wire Output (SWO) Instance - Output",
-        moduleName: "/ti/drivers/PIN",
-        readOnly: true,
+        moduleName: "/ti/drivers/GPIO",
         requiredArgs: {
-            parentMod: "/ti/drivers/ITM",
+            parentInterfaceName: "GPIO",
             parentSignalName: "swoPin",
-            parentSignalDisplayName: "SWO",
-            mode: "Output",
-            pull: "None"
-         }
+            parentSignalDisplayName: "SWO"
+        },
+        args: {
+            $name: "CONFIG_GPIO_ITM_SWO",
+            mode: "Output"
+        }
     });
 
-    return (pinInstances);
+    return (gpioInstances);
 }
 
 /*

@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,8 +71,11 @@
 
 #include <ti/drivers/UART2.h>
 #include <ti/drivers/uart2/`driver`.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/Power.h>
+#include <ti/drivers/dma/UDMACC26XX.h>
 #include <ti/drivers/power/PowerCC26X2.h>
+#include <ti/devices/`devicesDir`/driverlib/ioc.h>
 #include <ti/devices/`devicesDir`/inc/hw_memmap.h>
 #include <ti/devices/`devicesDir`/inc/hw_ints.h>
 
@@ -86,36 +89,37 @@ static unsigned char uart2RxRingBuffer`i`[`inst.rxRingBufferSize`];
 static unsigned char uart2TxRingBuffer`i`[`inst.txRingBufferSize`];
 % }
 
+% for (let i = 0; i < instances.length; i++) {
+%     let inst        = instances[i];
+%     let uart        = inst.uart;
+%     let solution    = uart.$solution;
+%     let peripheral  = system.deviceData.peripherals[solution.peripheralName];
+%     /* Get the index of the UART instance by extracting the last character */
+%     let index       = peripheral.name.slice(peripheral.name.length - 1);
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart`index`RxControlTableEntry, UDMA_CHAN_`peripheral.name`_RX);
+ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart`index`TxControlTableEntry, UDMA_CHAN_`peripheral.name`_TX);
+% }
+
 static const `driver`_HWAttrs uart2CC26X2HWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
 %     let inst        = instances[i];
 %     let uart        = inst.uart;
 %     let solution    = uart.$solution;
 %     let peripheral  = system.deviceData.peripherals[solution.peripheralName];
-%     let rxPinName   = 'PIN_UNASSIGNED';
-%     let txPinName   = 'PIN_UNASSIGNED';
-%     let ctsPinName  = 'PIN_UNASSIGNED';
-%     let rtsPinName  = 'PIN_UNASSIGNED';
-%     if ('rxPin' in uart) {
-%         /* Replace 'DIO' with 'IOID' */
-%         rxPinName =  'IOID' + uart.rxPin.$solution.devicePinName.substring(3);
-%     }
-%     if ('txPin' in uart) {
-%         txPinName =  'IOID' + uart.txPin.$solution.devicePinName.substring(3);
-%     }
+%     /* Get the index of the UART instance by extracting the last character */
+%     let index       = peripheral.name.slice(peripheral.name.length - 1);
 %
-%     let flowName;
+%     let rxPinName = 'rxPinInstance' in inst ? inst.rxPinInstance.$name : 'GPIO_INVALID_INDEX';
+%     let txPinName = 'txPinInstance' in inst ? inst.txPinInstance.$name : 'GPIO_INVALID_INDEX';
+%
+%     let flowName = 'UART2_FLOWCTRL_NONE';
+%     let ctsPinName = 'GPIO_INVALID_INDEX';
+%     let rtsPinName = 'GPIO_INVALID_INDEX';
+%
 %     if (inst.flowControl) {
+%         ctsPinName = 'ctsPin' in inst ? inst.ctsPinInstance.$name : 'GPIO_INVALID_INDEX';
+%         rtsPinName = 'rtsPin' in inst ? inst.rtsPinInstance.$name : 'GPIO_INVALID_INDEX';
 %         flowName = 'UART2_FLOWCTRL_HARDWARE';
-%         if ('ctsPin' in uart) {
-%             ctsPinName = 'IOID' + uart.ctsPin.$solution.devicePinName.substring(3);
-%         }
-%         if ('rtsPin' in uart) {
-%             rtsPinName = 'IOID' + uart.rtsPin.$solution.devicePinName.substring(3);
-%         }
-%     }
-%     else {
-%         flowName = 'UART2_FLOWCTRL_NONE';
 %     }
   {
     .baseAddr           = `peripheral.name`_BASE,
@@ -126,10 +130,17 @@ static const `driver`_HWAttrs uart2CC26X2HWAttrs[`countDef`] = {
     .ctsPin             = `ctsPinName`,
     .rtsPin             = `rtsPinName`,
     .flowControl        = `flowName`,
+    .powerId            = PowerCC26XX_PERIPH_UART`index`,
     .rxBufPtr           = uart2RxRingBuffer`i`,
     .rxBufSize          = sizeof(uart2RxRingBuffer`i`),
     .txBufPtr           = uart2TxRingBuffer`i`,
     .txBufSize          = sizeof(uart2TxRingBuffer`i`),
+    .txPinMux           = IOC_PORT_MCU_`peripheral.name`_TX,
+    .rxPinMux           = IOC_PORT_MCU_`peripheral.name`_RX,
+    .ctsPinMux          = IOC_PORT_MCU_`peripheral.name`_CTS,
+    .rtsPinMux          = IOC_PORT_MCU_`peripheral.name`_RTS,
+    .dmaTxTableEntryPri = &dmaUart`index`TxControlTableEntry,
+    .dmaRxTableEntryPri = &dmaUart`index`RxControlTableEntry,
     .rxChannelMask      = 1 << UDMA_CHAN_`peripheral.name`_RX,
     .txChannelMask      = 1 << UDMA_CHAN_`peripheral.name`_TX,
     .txIntFifoThr       = `driver`_`map[inst.txInterruptFifoThreshold]`,

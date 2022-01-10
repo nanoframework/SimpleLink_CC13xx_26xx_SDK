@@ -5,7 +5,7 @@
  @brief Compile-time parameters which are configurable by the user.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

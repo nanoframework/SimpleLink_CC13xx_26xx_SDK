@@ -39,6 +39,8 @@
 
 // Get general long descriptions
 const Docs = system.getScript("/ti/ble5stack/general/ble_general_docs.js");
+// Get common Script
+const Common = system.getScript("/ti/ble5stack/ble_common.js");
 
 const config = {
     displayName: "General Configuration",
@@ -104,7 +106,7 @@ const config = {
         {
             name: "maxConnNum",
             displayName: "Max Number of Connections",
-            default: 8,
+            default: maxConnNumDefaultValue(),
             longDescription: Docs.maxConnNumLongDescription
         },
         {
@@ -164,6 +166,20 @@ function onAddressModeChange(inst,ui)
 }
 
 /*
+ *  ======== maxConnNumDefaultValue ========
+ *  Return the required default value of the maxConnNum according
+ *  to the current device.
+ *  @returns - the default max num of conns value
+ */
+function maxConnNumDefaultValue()
+{
+    let maxConnNum;
+    (Common.device2DeviceFamily(system.deviceData.deviceId)
+     == "DeviceFamily_CC26X1") ? maxConnNum = 4 : maxConnNum = 8;
+    return maxConnNum;
+}
+
+/*
  * ======== validate ========
  * Validate this inst's configuration
  *
@@ -172,20 +188,36 @@ function onAddressModeChange(inst,ui)
  */
 function validate(inst, validation)
 {
+    // Get the device family
+    const devFamily = Common.device2DeviceFamily(system.deviceData.deviceId);
+
     if(inst.deviceName.length > 21)
     {
         validation.logError("Max Length of Device Name Attribute is 21", inst, "deviceName");
     }
-    // Limit Maximum Number of Connections to be 16 when device role != Central
-    if(inst.deviceRole != "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 16))
+
+    // Limit Maximum Number of Connections to be 8 for Agama Lite devices
+    if(devFamily == "DeviceFamily_CC26X1")
     {
-        validation.logError("Maximum Number of Connections range is 0 to 16", inst, "maxConnNum");
+        if(inst.maxConnNum < 0 || inst.maxConnNum > 8)
+        {
+            validation.logError("Maximum Number of Connections range is 0 to 8", inst, "maxConnNum");
+        }
     }
-    // Limit Maximum Number of Connections to be 31 when device role == Central
-    if(inst.deviceRole == "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 32))
+    else // For all other device families
     {
-        validation.logError("Maximum Number of Connections range is 0 to 32", inst, "maxConnNum");
+        // Limit Maximum Number of Connections to be 16 when device role != Central
+        if(inst.deviceRole != "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 16))
+        {
+            validation.logError("Maximum Number of Connections range is 0 to 16", inst, "maxConnNum");
+        }
+        // Limit Maximum Number of Connections to be 31 when device role == Central
+        if(inst.deviceRole == "CENTRAL_CFG" && (inst.maxConnNum < 0 || inst.maxConnNum > 32))
+        {
+            validation.logError("Maximum Number of Connections range is 0 to 32", inst, "maxConnNum");
+        }
     }
+
     if(inst.maxPDUSize < 27 || inst.maxPDUSize > 255)
     {
         validation.logError("Max PDU size Valid range is 27 to 255", inst, "maxPDUSize");
@@ -206,5 +238,6 @@ function validate(inst, validation)
  */
 exports = {
     config: config,
-    validate: validate
+    validate: validate,
+    maxConnNumDefaultValue: maxConnNumDefaultValue
 };

@@ -5,7 +5,7 @@
  @brief converts ICAll and OSAL API's to native TIRTOS/POSIX calls
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -236,6 +236,8 @@ uint32_t OsalPortTimers_getTimerTimeout(uint8_t taskId, uint32_t eventId)
  */
 void OsalPortTimers_cleanUpTimers(void)
 {
+   uintptr_t key = OsalPort_enterCS();
+
   if (pDeleteTimerEntries != NULL) {
     TimerEntry_t *current = pDeleteTimerEntries;
     TimerEntry_t *next;
@@ -250,6 +252,8 @@ void OsalPortTimers_cleanUpTimers(void)
     }
     pDeleteTimerEntries = NULL;
   }
+
+  OsalPort_leaveCS(key);
 }
 
 /*********************************************************************

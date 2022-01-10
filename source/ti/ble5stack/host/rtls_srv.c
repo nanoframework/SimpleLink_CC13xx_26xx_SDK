@@ -5,7 +5,7 @@
  @brief RTLS Services Manager
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -1280,7 +1280,7 @@ bStatus_t RTLSSrv_setCLCteSamplingEnableCmd( uint16_t syncHandle,
                                              uint8_t numAnt,
                                              uint8_t pAntPattern[] )
 {
-  llPeriodicScanSet_t *pPeriodicScan = llGetPeriodicScan( syncHandle );
+  llPeriodicScanSet_t *pPeriodicScan = MAP_llGetPeriodicScan( syncHandle );
 
   // Verify this is a valid periodic scan syncHandle
   if (pPeriodicScan == NULL)

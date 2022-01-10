@@ -107,6 +107,18 @@ public class ti_loggers_utils
             sb.append("'lib/gcc/m4/loggers_release.a',\n");
             sb.append("'lib/iar/m4/loggers_debug.a',\n");
             sb.append("'lib/iar/m4/loggers_release.a',\n");
+            sb.append("'lib/ticlang/m0/loggers_debug.a',\n");
+            sb.append("'lib/ticlang/m0/loggers_release.a',\n");
+            sb.append("'lib/gcc/m0/loggers_debug.a',\n");
+            sb.append("'lib/gcc/m0/loggers_release.a',\n");
+            sb.append("'lib/iar/m0/loggers_debug.a',\n");
+            sb.append("'lib/iar/m0/loggers_release.a',\n");
+            sb.append("'lib/iar/m33f/loggers_debug.a',\n");
+            sb.append("'lib/iar/m33f/loggers_release.a',\n");
+            sb.append("'lib/gcc/m33f/loggers_debug.a',\n");
+            sb.append("'lib/gcc/m33f/loggers_release.a',\n");
+            sb.append("'lib/ticlang/m33f/loggers_debug.a',\n");
+            sb.append("'lib/ticlang/m33f/loggers_release.a',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ccs/m4f/loggers_debug.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
@@ -125,6 +137,18 @@ public class ti_loggers_utils
             sb.append("['lib/gcc/m4/loggers_release.a', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
             sb.append("['lib/iar/m4/loggers_debug.a', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
             sb.append("['lib/iar/m4/loggers_release.a', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
+            sb.append("['lib/ticlang/m0/loggers_debug.a', {target: 'ti.targets.arm.clang.M0', suffix: 'm0'}],\n");
+            sb.append("['lib/ticlang/m0/loggers_release.a', {target: 'ti.targets.arm.clang.M0', suffix: 'm0'}],\n");
+            sb.append("['lib/gcc/m0/loggers_debug.a', {target: 'gnu.targets.arm.M0', suffix: 'm0g'}],\n");
+            sb.append("['lib/gcc/m0/loggers_release.a', {target: 'gnu.targets.arm.M0', suffix: 'm0g'}],\n");
+            sb.append("['lib/iar/m0/loggers_debug.a', {target: 'iar.targets.arm.M0', suffix: 'rm0'}],\n");
+            sb.append("['lib/iar/m0/loggers_release.a', {target: 'iar.targets.arm.M0', suffix: 'rm0'}],\n");
+            sb.append("['lib/iar/m33f/loggers_debug.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
+            sb.append("['lib/iar/m33f/loggers_release.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
+            sb.append("['lib/gcc/m33f/loggers_debug.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/gcc/m33f/loggers_release.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/ticlang/m33f/loggers_debug.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
+            sb.append("['lib/ticlang/m33f/loggers_release.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

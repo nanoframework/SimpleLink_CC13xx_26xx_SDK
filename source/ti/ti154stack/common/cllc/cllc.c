@@ -7,7 +7,7 @@
  This module is the Coordinator Logical Link Controller for the application.
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -778,7 +778,7 @@ void Cllc_startNetwork(void)
          Start active scan request to determine channel and PAN ID
          for coordinator
          */
-        switchState(Cllc_coordStates_scanActive);
+        switchState(Cllc_coordStates_scanEnergyDetect);
     }
     else
     {
@@ -1186,16 +1186,17 @@ static void processState(Cllc_coord_states_t state)
             }
             break;
 
-        case Cllc_coordStates_scanActiveCnf:
+        case Cllc_coordStates_scanEnergyDetect:
             if(!CONFIG_FH_ENABLE)
             {
-                /* Energy detect scan */
+                /* Energy Detect scan */
                 sendScanReq(ApiMac_scantype_energyDetect);
             }
             break;
 
+        case Cllc_coordStates_scanActiveCnf:
         case Cllc_coordStates_scanEdCnf:
-            /* Do not re-send start request for ED Scan if network has started */
+            /* Do not re-send start request for Scan if network has started */
             if(coordInfoBlock.currentCllcState < Cllc_states_started)
             {
                 if(!CONFIG_FH_ENABLE)
@@ -1317,11 +1318,11 @@ static void scanCnfCb(ApiMac_mlmeScanCnf_t *pData)
     if((pData->status == ApiMac_status_success) || (pData->status
                       == ApiMac_status_noBeacon))
     {
-        if(pData->scanType == ApiMac_scantype_active)
+        if(pData->scanType == ApiMac_scantype_energyDetect)
         {
-            switchState(Cllc_coordStates_scanActiveCnf);
+            switchState(Cllc_coordStates_scanActive);
         }
-        else if(pData->scanType == ApiMac_scantype_energyDetect)
+        else if(pData->scanType == ApiMac_scantype_active)
         {
             /* Do not update coordinator channel if network has already started */
             if(coordInfoBlock.currentCllcState < Cllc_states_started)
@@ -1330,12 +1331,12 @@ static void scanCnfCb(ApiMac_mlmeScanCnf_t *pData)
                   = findBestChannel(pData->result.pEnergyDetect);
             }
 
-            switchState(Cllc_coordStates_scanEdCnf);
+            switchState(Cllc_coordStates_scanActiveCnf);
         }
     }
     else
     {
-        switchState(Cllc_coordStates_scanActive);
+        switchState(Cllc_coordStates_scanEnergyDetect);
     }
 
     if(macCallbacksCopy.pScanCnfCb != NULL)
@@ -1367,7 +1368,7 @@ static void startCnfCb(ApiMac_mlmeStartCnf_t *pData)
     }
     else
     {
-        switchState(Cllc_coordStates_scanActive);
+        switchState(Cllc_coordStates_scanEnergyDetect);
     }
 
     if(macCallbacksCopy.pStartCnfCb)

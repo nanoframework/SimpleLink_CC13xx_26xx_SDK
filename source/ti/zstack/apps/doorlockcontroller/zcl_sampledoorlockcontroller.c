@@ -47,29 +47,29 @@
   Application-specific UI peripherals being used:
 
   - LEDs:
-    LED1 reflects the current door lock state (locked = on)
+    LED1:
+      - Off: Indicates remote door is unlocked.
+      - On: Indicates remote door is locked.
 
   Application-specific menu system:
-	  <DISCOVER DOOR LOCK> Press 'E' to discover Door Lock device to create a bind to it.
-	    This has to be done after the Door Lock become discoverable. Once Door Lock Controller has created the bind
-	    it can control the Door Lock with the TOGGLE LOCK screen.
+    <DISCOVER> Sends Identify Query to start discovery mechanism for creating bind to a Door Lock.
+      Once the discovery process is done, Door Lock Controller can open/close the Door Lock.
 
     <CHANGE PIN> Change the PIN used in the Lock/Unlock command
-      Up/Down changes the value of the current digit, OK/Select sets the current digit
-      This screen shows the following information:
-        Line1:
-          After entering all 4 pin digits, briefly shows "PIN SAVED" message
-        Line2:
-          Shows the Enter PIN prompt with the current PIN digit visible
+      The user may type the digit using the number keys OR use Up/Down arrow keys to change the
+        value of the current digit.
 
-    <TOGGLE LOCK> Send a Lock/Unlock command to the remote door
-      Up sends a lock command, Down sends an unlock command
-      This screen shows the following information:
-        Line1:
-          Shows instructions normally, displays Lock/Unlock Failure message
-          when applicable
-        Line2:
-          Shows the current lock state, as reported by the remote door
+    <LOCK DOOR> Sends the Lock Door command to remote Door Lock device
+
+    <UNLOCK DOOR> Sends the Unlock Door command to remote Door Lock device
+
+    The APP Info line will display the following information:
+      [Lock State]
+        Locked/Unlocked - current remote door lock state
+      [Current PIN]
+        XXXX - current PIN used in the Lock/Unlock command
+      [Last Command Status]
+        SUCCESSFUL/FAILURE/WRONG PIN/UNKNOWN - status of last command sent to remote door lock
 
 *********************************************************************/
 
@@ -765,9 +765,9 @@ static void zclSampleDoorLockController_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

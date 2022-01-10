@@ -79,6 +79,10 @@
 
   #elif defined(CONFIG_ARCH_POSIX)
 
+  #elif defined(CONFIG_SPARC)
+
+    #define PERFOPT_ALIGN .align  4
+
   #else
 
     #error Architecture unsupported
@@ -187,9 +191,15 @@
  * In the linker script, create output sections for these using
  * Z_ITERABLE_SECTION_ROM or Z_ITERABLE_SECTION_RAM.
  */
+#ifdef __IAR_SYSTEMS_ICC__
+#define Z_STRUCT_SECTION_ITERABLE(struct_type, name) \
+	 __used Z_DECL_ALIGN(struct struct_type) name \
+	__in_section(_##struct_type, static, name)
+#else /* __IAR_SYSTEMS_ICC__ */
 #define Z_STRUCT_SECTION_ITERABLE(struct_type, name) \
 	Z_DECL_ALIGN(struct struct_type) name \
 	__in_section(_##struct_type, static, name) __used
+#endif /* __IAR_SYSTEMS_ICC__ */
 
 /* Special variant of Z_STRUCT_SECTION_ITERABLE, for placing alternate
  * data types within the iterable section of a specific data type. The
@@ -205,6 +215,15 @@
  * _<struct_type>_list_end symbol to mark the start and the end of the
  * list of struct objects to iterate over.
  */
+#ifdef __IAR_SYSTEMS_ICC__
+#define Z_STRUCT_SECTION_FOREACH(struct_type, iterator) \
+    for (struct struct_type *iterator = \
+            __section_begin(STRINGIFY(_CONCAT(struct_type,_area))); \
+         ({ __ASSERT(iterator <= __section_end(STRINGIFY(_CONCAT(struct_type,_area))), \
+             "unexpected list end location"); \
+        iterator < __section_end(STRINGIFY(_CONCAT(struct_type,_area))); }); \
+         iterator++)
+#else /* __IAR_SYSTEMS_ICC__ */
 #define Z_STRUCT_SECTION_FOREACH(struct_type, iterator) \
 	extern struct struct_type _CONCAT(_##struct_type, _list_start)[]; \
 	extern struct struct_type _CONCAT(_##struct_type, _list_end)[]; \
@@ -214,5 +233,6 @@
 			 "unexpected list end location"); \
 		iterator < _CONCAT(_##struct_type, _list_end); }); \
 	     iterator++)
+#endif /* __IAR_SYSTEMS_ICC__ */
 
 #endif /* ZEPHYR_INCLUDE_TOOLCHAIN_COMMON_H_ */

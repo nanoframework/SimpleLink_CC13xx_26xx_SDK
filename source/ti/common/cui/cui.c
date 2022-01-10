@@ -19,7 +19,7 @@
          required.
 
  Group: LPRF SW RND
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -66,15 +66,11 @@
 #include <stdio.h>
 #ifndef CUI_POSIX
 #include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
-#else
-#include <unistd.h>
 #endif
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/dpl/SemaphoreP.h>
 #include <ti/drivers/dpl/SystemP.h>
-#include <ti/drivers/UART.h>
-#include <ti/drivers/uart/UARTCC26XX.h>
+#include <ti/drivers/UART2.h>
 #include <ti/drivers/utils/Random.h>
 #include <ti/drivers/apps/LED.h>
 #include DeviceFamily_constructPath(driverlib/cpu.h)
@@ -172,20 +168,17 @@ static SemaphoreP_Struct gClientsSemStruct;
 /*
  * [UART Specific Global Variables]
  */
-static UART_Params gUartParams;
-static UART_Handle gUartHandle = NULL;
+static UART2_Handle gUartHandle = NULL;
 #ifndef CUI_MIN_FOOTPRINT
-static uint8_t gUartTxBuffer[CUI_NUM_UART_CHARS];
 static uint8_t gUartRxBuffer[CUI_NUM_UART_CHARS];
 #endif
 
 static SemaphoreP_Handle gUartSem;
 static SemaphoreP_Struct gUartSemStruct;
 
-static uint8_t gRingBuff[512];
-static size_t gRingBuffHeadIdx = 0;
-static size_t gRingBuffTailIdx = 0;
-static size_t gRingBuffPendLen = 0;
+static uint8_t gTxBuff[512];
+static size_t gTxLen = 0;
+static size_t gTxSent = 0;
 
 #ifndef CUI_MIN_FOOTPRINT
 /*
@@ -234,9 +227,9 @@ static CUI_retVal_t CUI_publicAPIChecks(const CUI_clientHandle_t _clientHandle);
 static CUI_retVal_t CUI_acquireStatusLine(const CUI_clientHandle_t _clientHandle, const char* _pLabel, const bool _refreshInd, uint32_t* _pLineId);
 static CUI_retVal_t CUI_validateHandle(const CUI_clientHandle_t _clientHandle);
 static int CUI_getClientIndex(const CUI_clientHandle_t _clientHandle);
-static void UartWriteCallback(UART_Handle _handle, void *_buf, size_t _size);
+static void UartWriteCallback(UART2_Handle _handle, void *_buf, size_t _size, void *_userArg, int_fast16_t _status);
 #ifndef CUI_MIN_FOOTPRINT
-static void UartReadCallback(UART_Handle _handle, void *_buf, size_t _size);
+static void UartReadCallback(UART2_Handle _handle, void *_buf, size_t _size, void *_userArg, int_fast16_t _status);
 #endif
 static CUI_retVal_t CUI_updateRemLen(size_t* _currRemLen, char* _buff, size_t _buffSize);
 static CUI_retVal_t CUI_writeString(void * _buffer, size_t _size);
@@ -298,19 +291,18 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
             gMenuSem = SemaphoreP_construct(&gMenuSemStruct, 1, &gSemParams);
 #endif
             {
-                // General UART setup
-                UART_init();
-                UART_Params_init(&gUartParams);
-                gUartParams.baudRate = 115200;
-                gUartParams.writeMode     = UART_MODE_CALLBACK;
-                gUartParams.writeDataMode = UART_DATA_BINARY;
-                gUartParams.writeCallback = UartWriteCallback;
+                UART2_Params uartParams;
+
+                UART2_Params_init(&uartParams);
+                uartParams.baudRate = 115200;
+                uartParams.writeMode     = UART2_Mode_CALLBACK;
+                uartParams.writeCallback = UartWriteCallback;
 #ifndef CUI_MIN_FOOTPRINT
-                gUartParams.readMode      = UART_MODE_CALLBACK;
-                gUartParams.readDataMode  = UART_DATA_BINARY;
-                gUartParams.readCallback  = UartReadCallback;
+                uartParams.readMode       = UART2_Mode_CALLBACK;
+                uartParams.readCallback   = UartReadCallback;
+                uartParams.readReturnMode = UART2_ReadReturnMode_PARTIAL;
 #endif
-                gUartHandle = UART_open(CONFIG_DISPLAY_UART, &gUartParams);
+                gUartHandle = UART2_open(CONFIG_DISPLAY_UART, &uartParams);
                 if (NULL == gUartHandle)
                 {
                     return CUI_FAILURE;
@@ -318,15 +310,15 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
                 else
                 {
 #ifndef CUI_MIN_FOOTPRINT
-                    UART_read(gUartHandle, gUartRxBuffer, sizeof(gUartRxBuffer));
-                    UART_control(gUartHandle, UARTCC26XX_CMD_RETURN_PARTIAL_ENABLE, NULL);
+                    // kick off the first read
+                    UART2_read(gUartHandle, gUartRxBuffer, sizeof(gUartRxBuffer), NULL);
 #endif
 
                     char clearScreenStr[] = CUI_ESC_CLR CUI_ESC_TRM_MODE CUI_ESC_CUR_HIDE;
 
                     if (CUI_SUCCESS != CUI_writeString(clearScreenStr, strlen(clearScreenStr)))
                     {
-                        UART_close(gUartHandle);
+                        UART2_close(gUartHandle);
                         return CUI_FAILURE;
                     }
                 }
@@ -357,6 +349,7 @@ CUI_retVal_t CUI_init(CUI_params_t* _pParams)
             }
         }
 
+        SemaphoreP_post(gUartSem);
         gModuleInitialized = true;
         return CUI_SUCCESS;
     }
@@ -478,7 +471,7 @@ CUI_retVal_t CUI_close()
                 free(gStatusLineResources[i]);
             }
         }
-        UART_close(gUartHandle);
+        UART2_close(gUartHandle);
         SemaphoreP_post(gStatusSem);
     }
 
@@ -968,7 +961,7 @@ CUI_retVal_t CUI_processMenuUpdate(void)
     }
 
     CUI_menuItem_t* pItemEntry = &(gpCurrMenu->menuItems[gCurrMenuItemEntry]);
-    uint8_t input = gUartTxBuffer[0];
+    uint8_t input = gUartRxBuffer[0];
     bool inputBad = false;
 
     // Decode special escape sequences
@@ -978,23 +971,23 @@ CUI_retVal_t CUI_processMenuUpdate(void)
          * If the first character is CUI_INPUT_ESC, then look
          *  for the accepted sequences.
          */
-        if (memcmp(gUartTxBuffer, CUI_ESC_UP, sizeof(CUI_ESC_UP)) == 0)
+        if (memcmp(gUartRxBuffer, CUI_ESC_UP, sizeof(CUI_ESC_UP)) == 0)
         {
             input = CUI_INPUT_UP;
         }
-        else if (memcmp(gUartTxBuffer, CUI_ESC_DOWN, sizeof(CUI_ESC_DOWN)) == 0)
+        else if (memcmp(gUartRxBuffer, CUI_ESC_DOWN, sizeof(CUI_ESC_DOWN)) == 0)
         {
             input = CUI_INPUT_DOWN;
         }
-        else if (memcmp(gUartTxBuffer, CUI_ESC_RIGHT, sizeof(CUI_ESC_RIGHT)) == 0)
+        else if (memcmp(gUartRxBuffer, CUI_ESC_RIGHT, sizeof(CUI_ESC_RIGHT)) == 0)
         {
             input = CUI_INPUT_RIGHT;
         }
-        else if (memcmp(gUartTxBuffer, CUI_ESC_LEFT, sizeof(CUI_ESC_LEFT)) == 0)
+        else if (memcmp(gUartRxBuffer, CUI_ESC_LEFT, sizeof(CUI_ESC_LEFT)) == 0)
         {
             input = CUI_INPUT_LEFT;
         }
-        else if (memcmp(gUartTxBuffer, CUI_ESC_ESC, sizeof(gUartTxBuffer)))
+        else if (memcmp(gUartRxBuffer, CUI_ESC_ESC, sizeof(gUartRxBuffer)))
         {
             // The rx buffer is full of junk. Let's ignore it just in case.
             inputBad = true;
@@ -1099,9 +1092,9 @@ CUI_retVal_t CUI_processMenuUpdate(void)
     }
 
     //Clear the buffer
-    memset(gUartTxBuffer, '\0', sizeof(gUartTxBuffer));
+    memset(gUartRxBuffer, '\0', sizeof(gUartRxBuffer));
 
-    UART_read(gUartHandle, gUartRxBuffer, sizeof(gUartRxBuffer));
+    UART2_read(gUartHandle, gUartRxBuffer, sizeof(gUartRxBuffer), NULL);
     return CUI_SUCCESS;
 }
 #else
@@ -1389,141 +1382,45 @@ static CUI_retVal_t CUI_updateRemLen(size_t* _currRemLen, char* _buff, size_t _b
     return CUI_SUCCESS;
 }
 
-static void UartWriteCallback(UART_Handle _handle, void *_buf, size_t _size)
+static void UartWriteCallback(UART2_Handle _handle, void *_buf, size_t _size, void *_userArg, int_fast16_t _status)
 {
+    (void)_userArg;
+    (void)_status;
 
-    gRingBuffPendLen -= _size;
-    gRingBuffTailIdx = (gRingBuffTailIdx + _size) % sizeof(gRingBuff);
-    static size_t maxPending = 0;
-
-    if (gRingBuffPendLen > maxPending)
+    gTxSent += _size;
+    if (gTxSent < gTxLen)
     {
-        maxPending = gRingBuffPendLen;
+        UART2_write(gUartHandle, (const void*)&(gTxBuff[gTxSent]), gTxLen - gTxSent, NULL);
     }
-
-
-    if (gRingBuffPendLen)
+    else
     {
-        if ((sizeof(gRingBuff) - gRingBuffTailIdx) < gRingBuffPendLen)
-        {
-            UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], sizeof(gRingBuff) - gRingBuffTailIdx);
-        }
-        else
-        {
-            UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], gRingBuffPendLen);
-        }
+        SemaphoreP_post(gUartSem);
     }
 }
 
 #ifndef CUI_MIN_FOOTPRINT
-static void UartReadCallback(UART_Handle _handle, void *_buf, size_t _size)
+static void UartReadCallback(UART2_Handle _handle, void *_buf, size_t _size, void *_userArg, int_fast16_t _status)
 {
-    // Make sure we received all expected bytes
-    if (_size)
-    {
-        // If cleared, then read it
-        if(gUartTxBuffer[0] == 0)
-        {
-            // Copy bytes from RX buffer to TX buffer
-            for(size_t i = 0; i < _size; i++)
-            {
-                gUartTxBuffer[i] = ((uint8_t*)_buf)[i];
-            }
-        }
-        memset(_buf, '\0', _size);
-        CUI_callMenuUartUpdateFn();
-    }
-    else
-    {
-        // Handle error or call to UART_readCancel()
-        UART_readCancel(gUartHandle);
-    }
+    (void)_userArg;
+    (void)_status;
+    CUI_callMenuUartUpdateFn();
 }
 #endif
 
 static CUI_retVal_t CUI_writeString(void * _buffer, size_t _size)
 {
-    /*
-     * Since the UART driver is in Callback mode which is non blocking.
-     *  If UART_write is called before a previous call to UART_write
-     *  has completed it will not be printed. By taking a quick
-     *  nap we can attempt to perform the subsequent write. If the
-     *  previous call still hasn't finished after this nap the write
-     *  will be skipped as it would have been before.
-     */
-
-    //Error if no buffer
-    if((gUartHandle == NULL) || (_buffer == NULL) )
+    // Check pre-conditions
+    if((gUartHandle == NULL) || (_buffer == NULL) || (_size > sizeof(gTxBuff)))
     {
         return CUI_UART_FAILURE;
     }
     SemaphoreP_pend(gUartSem, SemaphoreP_WAIT_FOREVER);
 
-    UART_writeCancel(gUartHandle);
+    gTxSent = 0;
+    gTxLen = _size;
+    memcpy(gTxBuff, _buffer, _size);
 
-    if ((sizeof(gRingBuff) - gRingBuffPendLen) < _size)
-    {
-        uint8_t i;
-        for (i = 0; i < 10; i++)
-        {
-            if ((sizeof(gRingBuff) - gRingBuffTailIdx) < gRingBuffPendLen)
-            {
-               UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], sizeof(gRingBuff) - gRingBuffTailIdx);
-            }
-            else
-            {
-               UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], gRingBuffPendLen);
-            }
-
-#ifndef CUI_POSIX
-            Task_sleep(100);
-#else
-            usleep(1000);
-#endif
-            UART_writeCancel(gUartHandle);
-            if ((sizeof(gRingBuff) - gRingBuffPendLen) >= _size)
-            {
-                i = 0;
-                break;
-            }
-        }
-
-        if (i) {
-            //error
-            while(1){}
-
-        }
-    }
-
-
-    // update ring buff pending length
-    gRingBuffPendLen += _size;
-
-    // handle writing around the end of the ring buffer
-    if ((sizeof(gRingBuff) - gRingBuffHeadIdx) < _size)
-    {
-        memcpy(&gRingBuff[gRingBuffHeadIdx], _buffer, sizeof(gRingBuff) - gRingBuffHeadIdx);
-        memcpy(gRingBuff, &((uint8_t *)_buffer)[sizeof(gRingBuff) - gRingBuffHeadIdx], _size - (sizeof(gRingBuff) - gRingBuffHeadIdx));
-    }
-    else
-    {
-        memcpy(&gRingBuff[gRingBuffHeadIdx], _buffer, _size);
-    }
-
-    // update ring buff idx w/ wrap around logic
-    gRingBuffHeadIdx = (gRingBuffHeadIdx + _size) % sizeof(gRingBuff);
-
-
-    if ((sizeof(gRingBuff) - gRingBuffTailIdx) < gRingBuffPendLen)
-    {
-        UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], sizeof(gRingBuff) - gRingBuffTailIdx);
-    }
-    else
-    {
-        UART_write(gUartHandle, (const void*)&gRingBuff[gRingBuffTailIdx], gRingBuffPendLen);
-    }
-
-    SemaphoreP_post(gUartSem);
+    UART2_write(gUartHandle, (const void*)gTxBuff, _size, NULL);
 
     return CUI_SUCCESS;
 }
@@ -1986,3 +1883,4 @@ static CUI_retVal_t CUI_findMenu(CUI_menu_t* _pMenu, CUI_menu_t* _pDesiredMenu, 
     return CUI_FAILURE;
 }
 #endif /* ifndef CUI_MIN_FOOTPRINT */
+

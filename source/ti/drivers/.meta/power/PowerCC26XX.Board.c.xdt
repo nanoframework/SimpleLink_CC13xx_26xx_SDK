@@ -68,7 +68,7 @@
     let devId = system.deviceData.deviceId;
 
     let driver = "";  /* String to attach to "UART" for driver name */
-    if (devId.match(/CC13.[124]/) || devId.match(/CC26.[124]/)) {
+    if (devId.match(/CC13.[124]/) || devId.match(/CC26.[1234]/)) {
         driver = 'CC26X2';
     }
     else {

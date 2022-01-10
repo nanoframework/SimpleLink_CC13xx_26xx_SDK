@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,15 +40,15 @@
 
 #include <ti/drivers/i2c/I2CCC26XX.h>
 #include <ti/drivers/i2c/I2CSupport.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/Power.h>
+#include <ti/drivers/power/PowerCC26XX.h>
 
 #include <ti/drivers/dpl/DebugP.h>
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/dpl/SemaphoreP.h>
 #include <ti/drivers/dpl/SwiP.h>
-
-#include <ti/drivers/Power.h>
-#include <ti/drivers/power/PowerCC26XX.h>
 
 /* Driverlib header files */
 #include <ti/devices/DeviceFamily.h>
@@ -133,7 +133,8 @@ void I2C_close(I2C_Handle handle)
     I2CMasterDisable(hwAttrs->baseAddr);
 
     /* Deallocate pins */
-    PIN_close(object->hPin);
+    GPIO_resetConfig(object->sclPin);
+    GPIO_resetConfig(object->sdaPin);
 
     /* Power off the I2C module */
     Power_releaseDependency(hwAttrs->powerMngrId);
@@ -674,9 +675,6 @@ static void I2CCC26XX_initHw(I2C_Handle handle) {
 static int I2CCC26XX_initIO(I2C_Handle handle, void *pinCfg) {
     I2CCC26XX_Object           *object;
     I2CCC26XX_HWAttrsV1 const  *hwAttrs;
-    I2CCC26XX_I2CPinCfg         i2cPins;
-    PIN_Config                  i2cPinTable[3];
-    uint32_t                    i = 0;
 
     /* Get the pointer to the object and hwAttrs */
     object = handle->object;
@@ -684,35 +682,21 @@ static int I2CCC26XX_initIO(I2C_Handle handle, void *pinCfg) {
 
     /* If the pinCfg pointer is NULL, use hwAttrs pins */
     if (pinCfg == NULL) {
-        i2cPins.pinSDA = hwAttrs->sdaPin;
-        i2cPins.pinSCL = hwAttrs->sclPin;
+        object->sdaPin = hwAttrs->sdaPin;
+        object->sclPin = hwAttrs->sclPin;
     } else {
-        i2cPins.pinSDA = ((I2CCC26XX_I2CPinCfg *)pinCfg)->pinSDA;
-        i2cPins.pinSCL = ((I2CCC26XX_I2CPinCfg *)pinCfg)->pinSCL;
+        object->sdaPin = ((I2CCC26XX_I2CPinCfg *)pinCfg)->pinSDA;
+        object->sclPin = ((I2CCC26XX_I2CPinCfg *)pinCfg)->pinSCL;
     }
 
-    /* Handle error */
-    if(i2cPins.pinSDA == PIN_UNASSIGNED || i2cPins.pinSCL == PIN_UNASSIGNED) {
-        return (I2C_STATUS_ERROR);
-    }
+    /* Configure I2C pins SDA and SCL and set their muxes */
+    GPIO_setConfig(object->sdaPin, GPIO_CFG_OUT_OD_PU);
+    GPIO_setMux(object->sdaPin, hwAttrs->sdaPinMux);
 
-    /* Configure I2C pins SDA and SCL*/
-    i2cPinTable[i++] = i2cPins.pinSDA | PIN_INPUT_EN | PIN_PULLUP | PIN_OPENDRAIN;
-    i2cPinTable[i++] = i2cPins.pinSCL | PIN_INPUT_EN | PIN_PULLUP | PIN_OPENDRAIN;
-    i2cPinTable[i++] = PIN_TERMINATE;
+    GPIO_setConfig(object->sclPin, GPIO_CFG_OUT_OD_PU);
+    GPIO_setMux(object->sclPin, hwAttrs->sclPinMux);
 
-    /* Allocate pins*/
-    object->hPin = PIN_open(&object->pinState, i2cPinTable);
-
-    if (!object->hPin) {
-        return (I2C_STATUS_ERROR);
-    }
-
-    /* Set IO muxing for the I2C pins */
-    PINCC26XX_setMux(object->hPin, i2cPins.pinSDA, IOC_PORT_MCU_I2C_MSSDA);
-    PINCC26XX_setMux(object->hPin, i2cPins.pinSCL, IOC_PORT_MCU_I2C_MSSCL);
-
-    return (I2C_STATUS_SUCCESS);
+    return I2C_STATUS_SUCCESS;
 }
 
 /*

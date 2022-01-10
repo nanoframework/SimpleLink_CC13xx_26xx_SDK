@@ -147,15 +147,15 @@
  * # Supported Internal Signals #
  * Below is a table of internal signals that can be measured using the ADC.
  * Since we are not connecting to a DIO, there is no DIO to internal signal mapping.
- * The DIO field in the channel lookup table should be marked PIN_UNASSIGNED.
+ * The DIO field in the channel lookup table should be marked GPIO_INVALID_INDEX.
  * This table can be used to create virtual channel entries in the
  * ADCBufCC26X2_adcChannelLut table in the board file.
  *
  * | DIO                | Internal Signal CompBInput    |
  * |--------------------|-------------------------------|
- * | PIN_UNASSIGNED     | ADC_COMPB_IN_DCOUPL           |
- * | PIN_UNASSIGNED     | ADC_COMPB_IN_VSS              |
- * | PIN_UNASSIGNED     | ADC_COMPB_IN_VDDS             |
+ * | GPIO_INVALID_INDEX | ADC_COMPB_IN_DCOUPL           |
+ * | GPIO_INVALID_INDEX | ADC_COMPB_IN_VSS              |
+ * | GPIO_INVALID_INDEX | ADC_COMPB_IN_VDDS             |
  *
  * # Error handling #
  * The following errors may occur when opening the ADC without assertions enabled:
@@ -292,12 +292,11 @@
 #include <stdbool.h>
 
 #include <ti/drivers/ADCBuf.h>
-#include <ti/drivers/PIN.h>
-#include <ti/drivers/pin/PINCC26XX.h>
-#include <ti/drivers/dma/UDMACC26XX.h>
-#include <ti/drivers/timer/GPTimerCC26XX.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
+#include <ti/drivers/dma/UDMACC26XX.h>
+#include <ti/drivers/timer/GPTimerCC26XX.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(driverlib/aux_adc.h)
@@ -499,7 +498,7 @@ typedef enum {
  *
  *  Non-dio signals can be used as well. To do this, compBInput is set to the
  *  driverlib define corresponding to the desired non-dio signal and dio is set
- *  to PIN_UNASSIGNED.
+ *  to GPIO_INVALID_INDEX.
  */
 typedef struct{
     uint8_t dio;            /*!< DIO that this virtual channel is mapped to */
@@ -621,10 +620,6 @@ typedef struct{
     SemaphoreP_Struct                conversionComplete;         /*!< ADC semaphore */
 
     ADCBuf_Conversion               *currentConversion;         /*!< Pointer to the current conversion struct */
-
-    /* PIN driver state object and handle */
-    PIN_State                       pinState;                   /*!< Pin state object */
-    PIN_Handle                      pinHandle;                  /*!< Pin handle */
 
     /* UDMA driver handle */
     UDMACC26XX_Handle               udmaHandle;                 /*!< UDMA handle */

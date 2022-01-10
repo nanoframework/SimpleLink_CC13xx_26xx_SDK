@@ -481,6 +481,8 @@ extern uint8_t bdbSecureRejoinAttempts;
 
 extern bool bdb_performingTCRejoin;
 
+extern bool bdb_acceptNewTrustCenterLinkKey;
+
 /*********************************************************************
  * FUNCTION MACROS
  */
@@ -501,6 +503,7 @@ extern void bdb_nwkAssocAttemt(bool didSuccess);
 extern ZStatus_t bdb_rejoinNwk(void);
 extern void touchLinkInitiator_ResetToFNProcedure( void );
 extern void bdb_tcLinkKeyExchangeAttempt(bool didSuccess, uint8_t bdbTCExchangeState);
+extern void bdb_changeTCExchangeState(uint8_t bdbTCExchangeState);
 extern void bdb_SendMsg(uint8_t taskID, uint8_t toCommissioningState,uint8_t status, uint8_t len, uint8_t *buf);
 extern void bdb_setNodeJoinLinkKeyType(uint8_t KeyType);
 extern bdbFindingBindingRespondent_t* bdb_AddRespondentNode( bdbFindingBindingRespondent_t **pHead, zclIdentifyQueryRsp_t *pCmd );
@@ -839,12 +842,12 @@ void bdb_resetStateMachine(void);
 /*****************************
  * ZED API
  */
-#if (ZG_BUILD_ENDDEVICE_TYPE)
+#if (ZG_BUILD_JOINING_TYPE)
 
 /*
- * @brief   Instruct the ZED to try to rejoin its previews network
+ * @brief   Instruct a joiner to try to rejoin its previous network
  */
-uint8_t bdb_ZedAttemptRecoverNwk(void);
+uint8_t bdb_recoverNwk(void);
 
 #endif
 

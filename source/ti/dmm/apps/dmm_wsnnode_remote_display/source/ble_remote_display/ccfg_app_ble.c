@@ -5,7 +5,7 @@
  @brief Customer Configuration CC26xx PG2 device family.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

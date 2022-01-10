@@ -72,21 +72,23 @@ extern "C" {
 #define NWK_ASSOCIATE_RESP    0x06
 #define NWK_DISASSOCIATE_REQ  0x07
 
-#define NWK_AUTO_POLL_EVT         0x0001
-#define NWK_NOT_EXPECTING_EVT     0x0004
-#define NWK_ZED_KEEP_ALIVE_EVT    0x0002
-#define RTG_TIMER_EVENT           0x0010
-#define NWK_DATABUF_SEND          0x0020
-#define NWK_BCAST_TIMER_EVT       0x0040
-#define NWK_PERMITJOIN_EVT        0x0080
-#define NWK_LINK_STATUS_EVT       0x0100
-#define NWK_PID_UPDATE_EVT        0x0200
-#define NWK_REJOIN_TIMEOUT_EVT    0x0400
-#define NWK_MTO_RTG_REQ_EVT       0x0800
-#define NWK_MTO_RTG_REQ_DELAY_EVT 0x1000
-#define NWK_BROADCAST_MSG_EVT     0x2000
-#define NWK_CHILD_AGE_TIMER_EVT   0x4000
+#define NWK_AUTO_POLL_EVT                    0x0001
+#define NWK_ZED_KEEP_ALIVE_EVT               0x0002
+#define NWK_NOT_EXPECTING_EVT                0x0004
+#define NWK_STARTUP_REBROADCAST_TIMEOUT_EVT  0x0008
+#define RTG_TIMER_EVENT                      0x0010
+#define NWK_DATABUF_SEND                     0x0020
+#define NWK_BCAST_TIMER_EVT                  0x0040
+#define NWK_PERMITJOIN_EVT                   0x0080
+#define NWK_LINK_STATUS_EVT                  0x0100
+#define NWK_PID_UPDATE_EVT                   0x0200
+#define NWK_REJOIN_TIMEOUT_EVT               0x0400
+#define NWK_MTO_RTG_REQ_EVT                  0x0800
+#define NWK_MTO_RTG_REQ_DELAY_EVT            0x1000
+#define NWK_BROADCAST_MSG_EVT                0x2000
+#define NWK_CHILD_AGE_TIMER_EVT              0x4000
 // Event 0x8000 is Reserved for SYS_EVENT_MSG
+#define NWK_JOIN_SECURITY_TIMEOUT_EVT        0x10000
 
 //NWK PACKET: FIELD IDENTIFIERS
 #define NWK_CMD_ID                  0

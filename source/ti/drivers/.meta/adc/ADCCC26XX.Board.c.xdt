@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,13 +91,12 @@ ADCCC26XX_Object adcCC26xxObjects[`countDef`];
 const ADCCC26XX_HWAttrs adcCC26xxHWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
     % let inst = instances[i];
-    % let devicePinName, packagePin, auxIn, pin;
+    % let packagePin, auxIn, pin;
     % if (inst.internalSignal === "None") {
-    %     devicePinName = inst.adc.adcPin.$solution.devicePinName;
     %     packagePin = parseInt(inst.adc.adcPin.$solution.packagePinName);
     %     auxIn = system.deviceData.devicePins[packagePin].attributes.alias_name;
     %     auxIn = "ADC_COMPB_IN_" + auxIn.replace("_", "IO");
-    %     pin = "IOID_" + devicePinName.substring(4);
+    %     pin = inst.adcPinInstance.$name;
     % }
     % else {
     %     pin = "PIN_UNASSIGNED";

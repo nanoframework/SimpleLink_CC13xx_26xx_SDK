@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,9 +39,14 @@
 
 /* get Common /ti/drivers utility functions */
 let Common = system.getScript("/ti/drivers/Common.js");
+let logWarning = Common.logWarning;
 
 /* generic configuration parameters for Button instances */
 let config = [
+    {
+        name: "$hardware",
+        getDisabledOptions: getDisabledOptions
+    },
     {
         name: "autoHwConfig",
         displayName: "Use Provided Button Configuration",
@@ -58,26 +63,32 @@ let config = [
         onChange : onAutoHwConfigChanged
     },
     {
-        name: "hwConfig",
+        name: "polarity",
         displayName: "Button Configuration",
         description: "Specify the hardware configuration of the physical"
         + " button.",
         longDescription:"Specify whether the button is connected to ground or"
-        + " Vcc when pushed, and whether there is an external pull up/down"
-        + " network attached. If a 'no pull' setting is selected, internal pull"
-        + " settings will be used. e.g. 'Active High Pull Down' should be set"
-        + " for a button that has a pull down resistor connected and is"
-        + " connected to Vcc when pushed. 'Active Low No Pull' should be set"
-        + " for a button that has no pull up/down and is connected to ground"
-        + " when pushed.",
+        + " Vcc when pushed. 'Active High' should be set for a button that is"
+        + " connected to Vcc when pushed. 'Active Low' should be set for a"
+        + " button that is connected to ground when pushed.",
         options: [
-            {name : "Active Low Pull Up"},
-            {name : "Active Low No Pull"},
-            {name : "Active High Pull Down"},
-            {name : "Active High No Pull"},
-            {name : "None"}
+            {name : "Active Low"},
+            {name : "Active High"}
         ],
-        default : "Active Low No Pull"
+        default : "Active Low"
+    },
+    {
+        name: "pull",
+        displayName: "Pull Resistor",
+        description: "Specify which pull configuration is needed.",
+        longDescription: "Choose whether the GPIO hardware should pull"
+        + " the pin. If you have an external pullup resistor, choose 'External'"
+        + " and the GPIO pullup will be disabled.",
+        options: [
+            {name : "Internal"},
+            {name : "External"}
+        ],
+        default : "Internal"
     }
 ];
 
@@ -89,64 +100,24 @@ function onHardwareChanged(inst, ui) {
      * Select the correct button hwConfig if autoHwConfig is true and
      * a config is provided in available in components settings.
      */
-    let trigger = "NA";
-    let pull = "NA";
 
     if (inst.$hardware) {
         ui.autoHwConfig.hidden = false;
     }
     else {
         ui.autoHwConfig.hidden = true;
+        inst.autoHwConfig = false;
     }
 
-    if (inst.autoHwConfig) {
-        if (inst.$hardware &&
-            inst.$hardware.settings &&
-            inst.$hardware.settings.DIN) {
+    if (inst.autoHwConfig && inst.$hardware) {
+        ui.pull.readOnly = true;
+        ui.polarity.readOnly = true;
 
-            if (inst.$hardware.settings.DIN.pull) {
-                /* Read GPIO internal pull if one exists */
-                pull = inst.$hardware.settings.DIN.pull;
-            }
-
-            if (inst.$hardware.settings.DIN.interruptTrigger) {
-                /* Read GPIO interrupt trigger if one exists */
-                trigger = inst.$hardware.settings.DIN.interruptTrigger;
-            }
-
-            if (pull == "None") {
-                /* External pull up/down, infer from edge */
-                if (trigger == "Rising Edge") {
-                    inst.hwConfig = "Active High Pull Down";
-                    ui.hwConfig.readOnly = true;
-                }
-                else if (trigger == "Falling Edge") {
-                    inst.hwConfig = "Active Low Pull Up";
-                    ui.hwConfig.readOnly = true;
-                }
-            }
-            else if (pull == "Pull Up" && trigger == "Falling Edge") {
-                inst.hwConfig = "Active Low No Pull";
-                ui.hwConfig.readOnly = true;
-            }
-            else if (pull == "Pull Down" && trigger == "Rising Edge") {
-                inst.hwConfig = "Active High No Pull";
-                ui.hwConfig.readOnly = true;
-            }
-            else {
-                /* Invalid GPIO settings specified */
-                inst.hwConfig = "None";
-                ui.hwConfig.readOnly = false;
-            }
-        }
-        else {
-            /* HW config not provided */
-            inst.hwConfig = "None";
-            ui.hwConfig.readOnly = false;
-        }
-    }
-    else {
-        ui.hwConfig.readOnly = false;
+        inst.pull = inst.$hardware.settings.DIN.pull;
+        inst.polarity = inst.$hardware.settings.DIN.polarity;
+    } else {
+        ui.pull.readOnly = false;
+        ui.polarity.readOnly = false;
     }
 }
 
@@ -167,20 +138,55 @@ function onAutoHwConfigChanged(inst, ui) {
  */
 function validate(inst, validation)
 {
-    Common.validateNames(inst, validation);
+    if (inst.gpioPin.interruptTrigger !== "None") {
+        logWarning(validation, inst.gpioPin, "interruptTrigger",
+            "The Button driver will configure interrupts automatically " +
+            "when you call Button_open(). You do not need to configure this" +
+            " manually unless you need interrupts for another reason."
+        );
+    }
+}
 
-    /* A hwConfig of "None" means autoHwConfig can't be used */
-    if (inst.hwConfig == "None") {
-        let msg = "No button config was found, please set manually.";
-        Common.logWarning(validation, inst, "hwConfig", msg);
+
+/*
+ *  ======== getDisabledOptions ========
+ * Eliminates all components that do not have a settings.DIN.pull/polarity configurable.
+ * This means we have to do less validation in the hardware config and also presents
+ * the error to the user much more gracefully.
+ */
+function getDisabledOptions(inst, components)
+{
+    let invalidComponents = [];
+
+    for (let i = 0; i < components.length; i++) {
+        let settings = components[i].settings;
+        if (!settings || !settings.DIN || !settings.DIN.pull || !settings.DIN.polarity) {
+            invalidComponents.push({
+                component: components[i],
+                reason: "Button hardware must have settings.DIN.pull and settings.DIN.polarity"
+            });
+        }
     }
 
-    /* If no hardware is selected, user must select their own GPIO */
-    if (!inst.$hardware) {
-        let msg = "No board hardware selected. Please select the GPIO pin"
-        +  " with hardware attached.";
-        Common.logInfo(validation, inst, "$hardware", msg);
-    }
+    return (invalidComponents);
+}
+
+/*
+ *  ======== pinmuxRequirements ========
+ *  Returns peripheral pin requirements of the specified instance
+ */
+function pinmuxRequirements(inst)
+{
+    let buttonRequirements = {
+        name: "button",
+        hidden: true,
+        displayName: "Button",
+        interfaceName: "GPIO",
+        canShareWith: "Button",
+        signalTypes: ["DIN"]
+    };
+
+    return ([buttonRequirements]);
 }
 
 /*
@@ -189,49 +195,23 @@ function validate(inst, validation)
  */
 function moduleInstances(inst)
 {
-    /* Update GPIO instance with hwConfig */
-    let args;
-    switch(inst.hwConfig) {
-        case "Active Low No Pull":
-            args = {
-                $hardware: inst.$hardware,
-                mode : "Input",
-                pull : "Pull Up",
-                interruptTrigger : "Falling Edge"
-            };
-            break;
-        case "Active Low Pull Up":
-            args = {
-                $hardware: inst.$hardware,
-                mode : "Input",
-                pull : "None",
-                interruptTrigger : "Falling Edge"
-            };
-            break;
-        case "Active High No Pull":
-            args = {
-                $hardware: inst.$hardware,
-                mode : "Input",
-                pull : "Pull Down",
-                interruptTrigger : "Rising Edge"
-            };
-            break;
-        case "Active High Pull Down":
-            args = {
-                $hardware: inst.$hardware,
-                mode : "Input",
-                pull : "None",
-                interruptTrigger : "Rising Edge"
-            };
-            break;
-    }
+    let shortName = inst.$name.replace("CONFIG_", "");
 
     let gpio = [{
         name: "gpioPin",
-        displayName: "GPIO Pin",
-        description: "This Button is driven by a GPIO",
+        displayName: "GPIO",
+        description: "Default configuration",
         moduleName: "/ti/drivers/GPIO",
-        requiredArgs: args
+        requiredArgs: {
+            /* Can't be changed by the user */
+            parentInterfaceName: "GPIO",
+            parentSignalName: "button",
+            parentSignalDisplayName: "Button GPIO"
+        },
+        args: {
+            /* Sets default but user can reconfigure */
+            $name: "CONFIG_GPIO_" + shortName + "_INPUT"
+        }
     }];
 
     return(gpio);
@@ -293,6 +273,7 @@ The [__Button driver__][1] provides a simple interface to control Buttons.
     config: Common.addNameConfig(config, "/ti/drivers/apps/Button", "CONFIG_BUTTON_"),
     validate: validate,
     modules: Common.autoForceModules(["Board"]),
+    pinmuxRequirements: pinmuxRequirements,
     moduleInstances: moduleInstances,
     filterHardware: filterHardware,
     onHardwareChanged : onHardwareChanged,

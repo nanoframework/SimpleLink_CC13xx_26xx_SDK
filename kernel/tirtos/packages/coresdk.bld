@@ -70,6 +70,7 @@ var ccOpts = {
     "ti.targets.arm.elf.M4"           : " -ms -g ",
     "ti.targets.arm.elf.M4F"          : " -ms -g ",
 
+    "ti.targets.arm.clang.M0"         : "",
     "ti.targets.arm.clang.M4"         : "",
     "ti.targets.arm.clang.M4F"        : "",
     "ti.targets.arm.clang.M33"        : "",
@@ -77,9 +78,11 @@ var ccOpts = {
 
     "gnu.targets.arm.M4"              : " -g ",
     "gnu.targets.arm.M4F"             : " -g ",
+    "gnu.targets.arm.M33F"            : " -g ",
 
     "iar.targets.arm.M4"               : "",
     "iar.targets.arm.M4F"              : "",
+    "iar.targets.arm.M33F"             : "",
 };
 
 var posixIncs = "";

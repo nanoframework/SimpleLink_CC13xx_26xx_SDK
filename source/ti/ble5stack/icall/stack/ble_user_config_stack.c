@@ -6,7 +6,7 @@
         Controller and Host.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -182,7 +182,7 @@ void setBleUserConfig( icall_userCfg_t *userCfg )
 
       if(pTxPowerTblEntries && pTxPwrTable)
       {
-        for(int i = 0; i < userCfg->boardConfig->txPwrTbl->numTxPwrVals; i++)
+        for(int i = 0; i < userCfg->boardConfig->txPwrTbl->numTxPwrVals;i++)
         {
           pTxPowerTblEntries[i].Pout              = RF_BLE_txPowerTable[i].power;
           pTxPowerTblEntries[i].txPwrVal          = (uint16_t)(RF_BLE_txPowerTable[i].value.rawValue & 0xFFFF);

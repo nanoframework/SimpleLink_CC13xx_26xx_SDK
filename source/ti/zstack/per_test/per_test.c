@@ -208,7 +208,7 @@ void PERTest_init(Semaphore_Handle appSem, uint8_t stEnt, CUI_clientHandle_t gCu
 
     //Set poll rate
     zstack_sysConfigWriteReq.has_pollRate = TRUE;
-    zstack_sysConfigWriteReq.pollRate = PER_TEST_POLL_RATE;
+    zstack_sysConfigWriteReq.pollRate = POLL_RATE;
     zstack_sysConfigWriteReq.pollRateType = POLL_RATE_TYPE_DEFAULT;
 
     //Set the APS ACK wait time

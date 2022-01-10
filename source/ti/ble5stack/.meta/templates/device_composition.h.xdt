@@ -124,7 +124,7 @@ extern struct bt_mesh_model SIG_models`elemIndex`[];
 %}
 extern struct bt_mesh_cfg_srv cfg_srv;
 extern struct bt_mesh_model root_models[];
-extern const struct bt_mesh_comp comp;
+extern struct bt_mesh_comp comp;
 %if(modelCbStruct.length > 0){
 
 // Models bt_mesh_model_cb

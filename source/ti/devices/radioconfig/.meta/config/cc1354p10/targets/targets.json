@@ -1,6 +1,31 @@
 {
     "targets": {
-        "Default": "target_cc2654r10-launchxl.json",
-        "Target": "target_cc2654r10-launchxl.json"
+        "Default": "target_lp_cc1354p10_1.json.json:LP_EM_CC1354P10_1",
+        "VirtualTarget": [
+            {
+                "_name": "LP_EM_CC1354P10_1",
+                "Target": [
+                    "target_lp_cc1354p10_1.json",
+                    "target_lp_cc1354p10_1_highPA.json",
+                    "target_lp_cc1354p10_1_2_4_ghz.json"
+                ]
+            },
+            {
+                "_name": "LP_EM_CC1354P10_6",
+                "Target": [
+                    "target_lp_cc1354p10_6.json",
+                    "target_lp_cc1354p10_6_highPA.json",
+                    "target_lp_cc1354p10_6_2_4_ghz.json"
+                ]
+            },
+            {
+                "_name": "LP_CC1354P10_1_RGZ",
+                "Target": [
+                    "target_lp_cc1354p10_1_rgz.json",
+                    "target_lp_cc1354p10_1_rgz_highPA.json",
+                    "target_lp_cc1354p10_1_rgz_2_4_ghz.json"
+                ]
+            }
+        ]
     }
 }

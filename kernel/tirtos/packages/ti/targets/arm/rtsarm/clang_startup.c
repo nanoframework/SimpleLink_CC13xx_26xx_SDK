@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 by Texas Instruments Incorporated.
+ *  Copyright 2021 by Texas Instruments Incorporated.
  *
  */
 
@@ -57,7 +57,7 @@ void _system_post_cinit(void)
     xdc_runtime_Startup_exec__E();
 }
 /*
- *  @(#) ti.targets.arm.rtsarm; 1, 0, 0,; 9-3-2020 14:59:48; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
+ *  @(#) ti.targets.arm.rtsarm; 1, 0, 0,; 7-28-2021 07:05:52; /db/ztree/library/trees/xdctargets/xdctargets-w20/src/ xlibrary
 
  */
 

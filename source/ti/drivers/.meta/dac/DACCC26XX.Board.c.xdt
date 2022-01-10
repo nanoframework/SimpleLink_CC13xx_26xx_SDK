@@ -76,13 +76,11 @@ DACCC26XX_Object dacCC26xxObjects[`countDef`];
 const DACCC26XX_HWAttrs dacCC26xxHWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
     % let inst = instances[i];
-    % let devicePinName, packagePin, auxOut, pin;
+    % let packagePin, auxOut;
     %
-    % devicePinName = inst.dac.dacPin.$solution.devicePinName;
     % packagePin = parseInt(inst.dac.dacPin.$solution.packagePinName);
     % auxOut = system.deviceData.devicePins[packagePin].attributes.alias_name;
     % auxOut = "AUXDAC_COMPA_IN_" + auxOut.replace("_", "IO");
-    % pin = "IOID_" + devicePinName.substring(4);
     %
     /* `inst.$name` */
     % if (inst.$hardware) {
@@ -91,7 +89,7 @@ const DACCC26XX_HWAttrs dacCC26xxHWAttrs[`countDef`] = {
     %    }
     % }
     {
-        .pinDAC           = `pin`,
+        .outputPin        = `inst.dacPinInstance.$name`,
         .dacCompAInput    = `auxOut`,
         .dacVrefSource    = `map[inst.voltageRefSource]`,
         .dacPrecharge     = `inst.preCharge`,

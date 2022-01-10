@@ -60,27 +60,29 @@ const rfCommon = system.getScript("/ti/easylink/rf_config/"
  *          - codeExportConfig: Exported code names to be passed to
  *                              radioConfig.codeExportConfig
  *              - cmdPropRadioDivSetup: Name of the generated
- *                      rfc_CMD_PROP_RADIO_DIV_SETUP_t command
+ *                      rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t command
  */
 
-// Object containing 2GFSK, 250kbps settings for the CC26X2R1_LAUNCHXL
+// Object containing 2GFSK, 250kbps settings for the LP_CC2652PSIP
 // Left empty because there are no overrides from the common settings
 const devSpecific2Gfsk250Kbps24GHzSettings = {
     args: {
         codeExportConfig: {
-            cmdList_prop: ["cmdPropRadioDivSetup"],
-            cmdPropRadioDivSetup: "RF_cmdPropRadioDivSetup_2_4G_fsk_250kbps"
+            cmdList_prop: ["cmdPropRadioDivSetupPa"],
+            cmdPropRadioDivSetupPa: "RF_cmdPropRadioDivSetup_2_4G_fsk_250kbps",
+            paExport: "combined"
         }
     }
 };
 
-// Object containing 2GFSK, 100kbps settings for the CC26X2R1_LAUNCHXL
+// Object containing 2GFSK, 100kbps settings for the LP_CC2652PSIP
 // Left empty because there are no overrides from the common settings
 const devSpecific2Gfsk100Kbps24GHzSettings = {
     args: {
         codeExportConfig: {
-            cmdList_prop: ["cmdPropRadioDivSetup"],
-            cmdPropRadioDivSetup: "RF_cmdPropRadioDivSetup_2_4G_fsk_100kbps"
+            cmdList_prop: ["cmdPropRadioDivSetupPa"],
+            cmdPropRadioDivSetupPa: "RF_cmdPropRadioDivSetup_2_4G_fsk_100kbps",
+            paExport: "combined"
         }
     }
 };
@@ -95,15 +97,15 @@ const devSpecific2Gfsk100Kbps24GHzSettings = {
  *      - args: Phy setting arguments to be passed to the radio config module
  *          - codeExportConfig: Exported code names to be passed to
  *                              radioConfig.codeExportConfig
- *              - cmdBle5RadioSetup: Name of the generated
- *                      rfc_CMD_PROP_RADIO_DIV_SETUP_t command
+ *          - cmdBle5RadioSetupPa: Name of the generated
+ *                                 rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t command
  */
-
-// Object containing BLE settings for the CC26X2R1_LAUNCHXL
+// Object containing BLE settings for the LP_CC2652PSIP
 const devSpecificBleSettings = {
     args: {
         highPA: true,
         txPowerHi: "10",
+        phyType: "bt5le1mp10",
         codeExportConfig: {
             cmdList_ble: ["cmdBle5RadioSetupPa"],
             cmdBle5RadioSetupPa: "RF_ble_cmdRadioSetup",
@@ -124,7 +126,7 @@ const devSpecificBleSettings = {
  *       configuration
  */
 
-// Array containing all the proprietary phy settings for the CC26X2R1_LAUNCHXL
+// Array containing all the proprietary phy settings for the LP_CC2652PSIP
 const defaultPropPhyList = [
     rfCommon.mergeRfSettings(devSpecific2Gfsk100Kbps24GHzSettings,
         rfCommon.common2Gfsk100Kbps24GHzSettings),
@@ -132,9 +134,9 @@ const defaultPropPhyList = [
         rfCommon.common2Gfsk250Kbps24GHzSettings)
 ];
 
-// Array containing all the BLE phy settings for the CC26X2R1_LAUNCHXL
+// Array containing all the BLE phy settings for the LP_CC2652PSIP
 const defaultBlePhyList = [
-    rfCommon.mergeRfSettings(devSpecificBleSettings, rfCommon.commonBleSettings)
+    rfCommon.mergeRfSettings(rfCommon.commonBleSettings, devSpecificBleSettings)
 ];
 
 // Reserved for future use

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,18 +61,6 @@ let timerConfig = [
 ];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - Timer instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base Timer properties and methods
  */
@@ -80,7 +68,7 @@ let base = {
     displayName         : "Timer",
     description         : "Timer Driver",
     longDescription     : `
-The [__Timer driver__][1] allows you to manage a Timer peripheral via simple 
+The [__Timer driver__][1] allows you to manage a Timer peripheral via simple
 and portable APIs.
 
 * [Usage Synopsis][2]
@@ -94,8 +82,7 @@ and portable APIs.
 `,
     defaultInstanceName : "CONFIG_TIMER_",
     config              : Common.addNameConfig(timerConfig, "/ti/drivers/Timer", "CONFIG_TIMER_"),
-    modules             : Common.autoForceModules(["Board", "Power"]),
-    validate            : validate
+    modules             : Common.autoForceModules(["Board", "Power"])
 };
 
 /* get family-specific Timer module */

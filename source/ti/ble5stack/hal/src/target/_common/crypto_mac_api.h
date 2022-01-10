@@ -5,7 +5,7 @@
  @brief Header for Crypto proxy for stack's interface to the crypto driver.
 
  Group: WCS, LPC/BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -56,7 +56,7 @@ extern "C"
  * INCLUDES
  */
 
-#if !defined(CC13X2R1_LAUNCHXL) && !defined(CC26X2R1_LAUNCHXL) && !defined(CC2652RB_LAUNCHXL) && !defined(CC13X2P1_LAUNCHXL) && !defined(CC13X2P_2_LAUNCHXL) && !defined(CC13X2P_4_LAUNCHXL) && !defined(CC2652PSIP_LP) && !defined (CC2652RSIP_LP) && !defined (CC2652R7_LP) && !defined (CC1352P7_1_LP) && !defined (CC1352P7_4_LP)
+#if !defined(CC13X2R1_LAUNCHXL) && !defined(CC26X2R1_LAUNCHXL) && !defined(CC2652RB_LAUNCHXL) && !defined(CC13X2P1_LAUNCHXL) && !defined(CC13X2P_2_LAUNCHXL) && !defined(CC13X2P_4_LAUNCHXL) && !defined(CC2652PSIP_LP) && !defined (CC2652RSIP_LP) && !defined (CC2652R7_LP) && !defined (CC1352P7_1_LP) && !defined (CC1352P7_4_LP) && !defined (CC2651P3_LP) && !defined (CC2651R3_LP)
 #include <ti/drivers/crypto/CryptoCC26XX.h>
 #else
 #include <ti/drivers/AESCCM.h>
@@ -76,7 +76,7 @@ extern uint32_t *macCryptoDrvTblPtr;
  * CONSTANTS
  */
 
-#if !defined(CC13X2R1_LAUNCHXL) && !defined(CC26X2R1_LAUNCHXL) && !defined(CC2652RB_LAUNCHXL) && !defined(CC13X2P1_LAUNCHXL) && !defined(CC13X2P_2_LAUNCHXL) && !defined(CC13X2P_4_LAUNCHXL) && !defined(CC2652PSIP_LP) && !defined (CC2652RSIP_LP) && !defined (CC2652R7_LP) && !defined (CC1352P7_1_LP) && !defined (CC1352P7_4_LP)
+#if !defined(CC13X2R1_LAUNCHXL) && !defined(CC26X2R1_LAUNCHXL) && !defined(CC2652RB_LAUNCHXL) && !defined(CC13X2P1_LAUNCHXL) && !defined(CC13X2P_2_LAUNCHXL) && !defined(CC13X2P_4_LAUNCHXL) && !defined(CC2652PSIP_LP) && !defined (CC2652RSIP_LP) && !defined (CC2652R7_LP) && !defined (CC1352P7_1_LP) && !defined (CC1352P7_4_LP) && !defined (CC2651P3_LP) && !defined (CC2651R3_LP)
 // Crypto proxy index for crypto driver API
 #define CRYPTOCC26XX_CLOSE              0
 #define CRYPTOCC26XX_INIT               1

@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       osc.h
-*  Revised:        2020-12-11 09:56:37 +0100 (Fri, 11 Dec 2020)
-*  Revision:       59847
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the system oscillator control.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -99,6 +99,7 @@ extern "C"
     #define OSC_HPOSC_Debug_InitFreqOffsetParams NOROM_OSC_HPOSC_Debug_InitFreqOffsetParams
     #define OSC_HPOSCInitializeSingleInsertionFreqOffsParams NOROM_OSC_HPOSCInitializeSingleInsertionFreqOffsParams
     #define OSC_HPOSCRelativeFrequencyOffsetGet NOROM_OSC_HPOSCRelativeFrequencyOffsetGet
+    #define OSC_CapArrayAdjustWorkaround_Boot NOROM_OSC_CapArrayAdjustWorkaround_Boot
     #define OSC_AdjustXoscHfCapArray        NOROM_OSC_AdjustXoscHfCapArray
     #define OSC_HPOSCRelativeFrequencyOffsetToRFCoreFormatConvert NOROM_OSC_HPOSCRelativeFrequencyOffsetToRFCoreFormatConvert
     #define OSC_HPOSCRtcCompensate          NOROM_OSC_HPOSCRtcCompensate
@@ -603,6 +604,22 @@ extern int32_t OSC_HPOSCRelativeFrequencyOffsetGet( int32_t tempDegC );
 
 //*****************************************************************************
 //
+//! \brief Special XOSC_HF workaround adjustment for CC13x2 / CC26x2 XOSC_CAPARRAY_DELTA setting in CCFG (Customer configuration)
+//!
+//! Implements a workaround for devices with an unfortunate XOSH_HF CAPARRAY factory configuration (FCFG1 setting).
+//! The workaround is done only if both enabled and needed (enabled by setting CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND = 0)
+//! The factory configuration works fine on its own but does not comply with the requirements of the CCFG:XOSC_CAPARRAY_DELTA mechanism.
+//! Without this workaround, there will be a larger jump in capacitance (and frequency) between XOSC_CAPARRAY_DELTA setting 7 and 8.
+//!
+//! \return None
+//!
+//! \sa OSC_AdjustXoscHfCapArray()
+//
+//*****************************************************************************
+extern void OSC_CapArrayAdjustWorkaround_Boot( void );
+
+//*****************************************************************************
+//
 //! \brief Adjust the XOSC HF cap array relative to the factory setting
 //!
 //! The cap array factory setting (FCFG) can be converted to a number in the range 0 - 63.
@@ -745,6 +762,10 @@ extern void OSC_HPOSCRtcCompensate( int32_t relFreqOffset );
     #ifdef ROM_OSC_HPOSCRelativeFrequencyOffsetGet
         #undef  OSC_HPOSCRelativeFrequencyOffsetGet
         #define OSC_HPOSCRelativeFrequencyOffsetGet ROM_OSC_HPOSCRelativeFrequencyOffsetGet
+    #endif
+    #ifdef ROM_OSC_CapArrayAdjustWorkaround_Boot
+        #undef  OSC_CapArrayAdjustWorkaround_Boot
+        #define OSC_CapArrayAdjustWorkaround_Boot ROM_OSC_CapArrayAdjustWorkaround_Boot
     #endif
     #ifdef ROM_OSC_AdjustXoscHfCapArray
         #undef  OSC_AdjustXoscHfCapArray

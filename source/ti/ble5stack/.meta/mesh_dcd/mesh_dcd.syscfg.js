@@ -148,6 +148,34 @@ const config = {
 							default      : 20
 						},
 						{
+							name         : 'trans_msg_seg_retrans_attempts',
+							displayName  : 'Transport Message Segment Retransmit Attempts',
+							hidden		 : true,
+							description  : "Maximum number of transport message segment retransmit attempts.",
+							longDescription: "Maximum number of transport message segment retransmit attempts \
+	                        for outgoing segment message. Value ranges between 1 to 8",
+							default      : 4
+						},
+						{
+							name         : 'trans_msg_seg_retrans_int_unicast',
+							displayName  : 'Transport message segment retransmit interval for unicast messages',
+							hidden		 : true,
+							description  : "Maximum time (in ms) of retransmit segment message to unicast address.",
+							longDescription: "Maximum time (in ms) of retransmit segment message to unicast address. \
+                            Valur ranges between 200 to 500 (ms). ",
+							default      : 400
+						},
+						{
+							name         : 'trans_msg_seg_retrans_int_group',
+							displayName  : 'Transport message segment retransmit interval for group messages',
+							hidden		 : true,
+							description  : "Maximum time (in ms) of retransmit segment message to group address.",
+							longDescription: "Maximum time (in ms) of retransmit segment message to group address. \
+                            Valid ranges between 20 to 200 (ms)",
+							default      : 50
+						},
+
+						{
 							name: "mesh_hb_pub",
 							displayName: "Heartbeat Publication Parameters",
 							longDescription: "The Heartbeat Publication state is a composite state that controls sending of periodical Heartbeat transport control messages",
@@ -451,6 +479,15 @@ function validate(inst, validation)
 	}
 	if(inst.relay_retransmit_int_ms>320 || inst.relay_retransmit_int_ms<10 || inst.relay_retransmit_int_ms%10 != 0 ){
         validation.logError("Must be greater than 0, less than or equal to 320, and a multiple of 10.",inst,"relay_retransmit_int_ms");
+	}
+	if(inst.trans_msg_seg_retrans_attempts>8 || inst.trans_msg_seg_retrans_attempts<1){
+        validation.logError("Must be greater than 1, less than or equal to 8",inst,"trans_msg_seg_retrans_attempts");
+	}
+	if(inst.trans_msg_seg_retrans_int_unicast>500 || inst.trans_msg_seg_retrans_int_unicast<200){
+        validation.logError("Must be greater than 200, less than or equal to 500",inst,"trans_msg_seg_retrans_int_unicast");
+	}
+	if(inst.trans_msg_seg_retrans_int_group>200 || inst.trans_msg_seg_retrans_int_group<20){
+        validation.logError("Must be greater than 20, less than or equal to 200",inst,"trans_msg_seg_retrans_int_group");
 	}
     //Health Server parameters
     // The max possible size is 65,532 because max_faults field is uint16_t and 3 bytes are occupied by test_id and opcode.

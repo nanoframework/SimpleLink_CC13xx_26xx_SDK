@@ -5,7 +5,7 @@
  @brief Icall and Osal API directly map the function to function jump table
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -193,7 +193,7 @@
 
 #define MAP_osal_rand                                   OsalPort_rand
 
-#define MAP_ICall_getTicks                              Clock_getTicks
+#define MAP_ICall_getTicks                              ClockP_getSystemTicks
 #define MAP_ICall_setTimer                              OsalPort_setTimer
 #define MAP_ICall_stopTimer                             OsalPort_stopTimer
 #define MAP_ICall_getTickPeriod()                       ClockP_getSystemTickPeriod()

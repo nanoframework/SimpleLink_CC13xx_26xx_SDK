@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       osc.c
-*  Revised:        2020-12-11 09:56:37 +0100 (Fri, 11 Dec 2020)
-*  Revision:       59847
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for setting up the system Oscillators
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,8 @@
     #define OSC_HPOSCInitializeSingleInsertionFreqOffsParams NOROM_OSC_HPOSCInitializeSingleInsertionFreqOffsParams
     #undef  OSC_HPOSCRelativeFrequencyOffsetGet
     #define OSC_HPOSCRelativeFrequencyOffsetGet NOROM_OSC_HPOSCRelativeFrequencyOffsetGet
+    #undef  OSC_CapArrayAdjustWorkaround_Boot
+    #define OSC_CapArrayAdjustWorkaround_Boot NOROM_OSC_CapArrayAdjustWorkaround_Boot
     #undef  OSC_AdjustXoscHfCapArray
     #define OSC_AdjustXoscHfCapArray        NOROM_OSC_AdjustXoscHfCapArray
     #undef  OSC_HPOSCRelativeFrequencyOffsetToRFCoreFormatConvert
@@ -170,7 +172,7 @@ OSCClockSourceGet(uint32_t ui32SrcClk)
                                             DDI_0_OSC_STAT0_SCLK_HF_SRC_M,
                                             DDI_0_OSC_STAT0_SCLK_HF_SRC_S);
     }
-    return (ui32ClockSource);
+    return ( ui32ClockSource );
 }
 
 //*****************************************************************************
@@ -318,20 +320,85 @@ OSCHF_SwitchToRcOscTurnOffXosc( void )
 
 //*****************************************************************************
 //
+// Internal functions called from one of the two functions below
+//
+//*****************************************************************************
+static void
+InternCapArrayAdjustWithBaseline7001F( int32_t capArrayDelta )
+{
+    int32_t     capArrayIndex       ;
+    uint32_t    row                 ;
+    uint32_t    col                 ;
+
+    capArrayIndex = 36 + capArrayDelta ; // index = 36 corresponds to row/col 7/001F (which corresponds to 6.1pF)
+    if ( capArrayIndex <  0 ) capArrayIndex =  0 ;
+    if ( capArrayIndex > 63 ) capArrayIndex = 63 ;
+    row = 0xF >> ( 3 - ( capArrayIndex >> 4 ));
+    col = 0xFFFF >> ( 15 - ( capArrayIndex & 0xF ));
+    HWREG( AUX_DDI0_OSC_BASE + DDI_0_OSC_O_ANABYPASSVAL1 ) = (( row << DDI_0_OSC_ANABYPASSVAL1_XOSC_HF_ROW_Q12_S    ) |
+                                                              ( col << DDI_0_OSC_ANABYPASSVAL1_XOSC_HF_COLUMN_Q12_S )   );
+}
+
+static uint32_t
+SpecialCapArrayWorkaroundEnabledAndNeeded( void )
+{
+    if ((( HWREG( CCFG_BASE + CCFG_O_SIZE_AND_DIS_FLAGS ) & CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND ) == 0      ) &&
+        ((( HWREG( FCFG1_BASE + FCFG1_O_CONFIG_OSC_TOP ) >> FCFG1_CONFIG_OSC_TOP_XOSC_HF_COLUMN_Q12_S ) & 0x000FFFF1 ) == 0x000701F0 )    )
+    {
+        return ( 1 );
+    } else {
+        return ( 0 );
+    }
+}
+
+//*****************************************************************************
+//
+// Workaround function to be called at boot
+// Must be called after SetupAfterColdResetWakeupFromShutDownCfg2()
+//
+//*****************************************************************************
+void
+OSC_CapArrayAdjustWorkaround_Boot( void )
+{
+    uint32_t    ccfg_ModeConfReg    ;
+    int32_t     ccfg_CapArrayDelta  ;
+
+    if ( SpecialCapArrayWorkaroundEnabledAndNeeded() ) {
+        // Workaround for chip settings like 0x701F0 and 0x701FE which get readjusted with baseline 7001F/6.1pF
+        ccfg_CapArrayDelta = 0 ;
+        ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
+        if (( ccfg_ModeConfReg & CCFG_MODE_CONF_XOSC_CAP_MOD ) == 0 ) {
+            // CCFG CapArrayDelta is enabled get sign-extended delta
+            ccfg_CapArrayDelta =
+                (((int32_t)( ccfg_ModeConfReg << ( 32 - CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_W - CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S )))
+                                              >> ( 32 - CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_W ));
+        }
+        InternCapArrayAdjustWithBaseline7001F( ccfg_CapArrayDelta );
+    }
+}
+
+//*****************************************************************************
+//
 // Adjust the XOSC HF cap array relative to the factory setting
 //
 //*****************************************************************************
 void
 OSC_AdjustXoscHfCapArray( int32_t capArrDelta )
 {
-   // read the MODE_CONF register in CCFG
-   uint32_t ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
-   // Clear CAP_MODE and the CAPARRAY_DELATA field
-   ccfg_ModeConfReg &= ~( CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M | CCFG_MODE_CONF_XOSC_CAP_MOD_M );
-   // Insert new delta value
-   ccfg_ModeConfReg |= ((((uint32_t)capArrDelta) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S ) & CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M );
-   // Update the HW register with the new delta value
-   DDI32RegWrite(AUX_DDI0_OSC_BASE, DDI_0_OSC_O_ANABYPASSVAL1, SetupGetTrimForAnabypassValue1( ccfg_ModeConfReg ));
+    if ( SpecialCapArrayWorkaroundEnabledAndNeeded() ) {
+        // Workaround for chip settings like 0x701F0 and 0x701FE which get readjusted with baseline 7001F/6.1pF
+        InternCapArrayAdjustWithBaseline7001F( capArrDelta );
+    } else
+    {
+        // Read the MODE_CONF register in CCFG
+        uint32_t ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
+        // Clear CAP_MODE and the CAPARRAY_DELATA field
+        ccfg_ModeConfReg &= ~( CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M | CCFG_MODE_CONF_XOSC_CAP_MOD_M );
+        // Insert new delta value
+        ccfg_ModeConfReg |= ((((uint32_t)capArrDelta) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S ) & CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M );
+        // Update the HW register with the new delta value
+        DDI32RegWrite(AUX_DDI0_OSC_BASE, DDI_0_OSC_O_ANABYPASSVAL1, SetupGetTrimForAnabypassValue1( ccfg_ModeConfReg ));
+    }
 }
 
 //*****************************************************************************
@@ -571,7 +638,7 @@ OSC_HPOSCInitializeSingleInsertionFreqOffsParams( uint32_t measFieldAddress )
     {
         /* Coefficients for SW-TCXO */
         .pu0b = {44, 44, 27, 20},
-        .pu0c = {7322, -5021, -209, -104861}
+        .pu0c = {8183, -2546, -210, -104866}
     };
 
     /* Retrieve insertions from FCFG */
@@ -763,6 +830,7 @@ uint32_t OSCHF_DebugGetCrystalStartupTime( void )
 
    // Start operation in sync with the LF clock
    HWREG( AON_RTC_BASE + AON_RTC_O_SYNCLF );
+
    OSCHF_TurnOnXosc();
    while ( ! OSCHF_AttemptToSwitchToXosc() ) {
       HWREG( AON_RTC_BASE + AON_RTC_O_SYNCLF );

@@ -50,10 +50,10 @@
 //
 // Introduction
 //
-// This file contains fields used by Boot ROM, startup code, and SW radio 
+// This file contains fields used by Boot ROM, startup code, and SW radio
 // stacks to configure chip behavior.
 //
-// Fields are documented in more details in hw_ccfg.h and CCFG.html in 
+// Fields are documented in more details in hw_ccfg.h and CCFG.html in
 // DriverLib documentation (doc_overview.html -> CPU Domain Memory Map -> CCFG).
 //
 // PLEASE NOTE:
@@ -70,7 +70,7 @@
 // #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION     0x3  // LF RCOSC
 // //---- Use default values for all others ----
 // #include "<project-path>/source/ti/devices/<device>/startup_files/ccfg.c"
-// 
+//
 //*****************************************************************************
 
 //*****************************************************************************
@@ -192,7 +192,7 @@
 
 #ifndef SET_CCFG_MODE_CONF_XOSC_CAP_MOD
 // #define SET_CCFG_MODE_CONF_XOSC_CAP_MOD              0x0        // Apply cap-array delta
-#define SET_CCFG_MODE_CONF_XOSC_CAP_MOD                 0x1        // Don't apply cap-array delta 
+#define SET_CCFG_MODE_CONF_XOSC_CAP_MOD                 0x1        // Don't apply cap-array delta
 #endif
 
 #ifndef SET_CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA
@@ -409,63 +409,63 @@
 //
 //*****************************************************************************
 #define DEFAULT_CCFG_EXT_LF_CLK          ( \
-	 ((((uint32_t)( SET_CCFG_EXT_LF_CLK_DIO                          )) << CCFG_EXT_LF_CLK_DIO_S                          ) | ~CCFG_EXT_LF_CLK_DIO_M                          ) & \
-	 ((((uint32_t)( SET_CCFG_EXT_LF_CLK_RTC_INCREMENT                )) << CCFG_EXT_LF_CLK_RTC_INCREMENT_S                ) | ~CCFG_EXT_LF_CLK_RTC_INCREMENT_M                ) )
+     ((((uint32_t)( SET_CCFG_EXT_LF_CLK_DIO                          )) << CCFG_EXT_LF_CLK_DIO_S                          ) | ~CCFG_EXT_LF_CLK_DIO_M                          ) & \
+     ((((uint32_t)( SET_CCFG_EXT_LF_CLK_RTC_INCREMENT                )) << CCFG_EXT_LF_CLK_RTC_INCREMENT_S                ) | ~CCFG_EXT_LF_CLK_RTC_INCREMENT_M                ) )
 
 #define DEFAULT_CCFG_MODE_CONF_1         ( \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_TCXO_TYPE                   )) << CCFG_MODE_CONF_1_TCXO_TYPE_S                   ) | ~CCFG_MODE_CONF_1_TCXO_TYPE_M                   ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_TCXO_MAX_START              )) << CCFG_MODE_CONF_1_TCXO_MAX_START_S              ) | ~CCFG_MODE_CONF_1_TCXO_MAX_START_M              ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_VMIN               )) << CCFG_MODE_CONF_1_ALT_DCDC_VMIN_S               ) | ~CCFG_MODE_CONF_1_ALT_DCDC_VMIN_M               ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN          )) << CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_S          ) | ~CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_M          ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_IPEAK              )) << CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_S              ) | ~CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_M              ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_DELTA_IBIAS_INIT            )) << CCFG_MODE_CONF_1_DELTA_IBIAS_INIT_S            ) | ~CCFG_MODE_CONF_1_DELTA_IBIAS_INIT_M            ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET          )) << CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET_S          ) | ~CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET_M          ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_1_XOSC_MAX_START              )) << CCFG_MODE_CONF_1_XOSC_MAX_START_S              ) | ~CCFG_MODE_CONF_1_XOSC_MAX_START_M              ) )
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_TCXO_TYPE                   )) << CCFG_MODE_CONF_1_TCXO_TYPE_S                   ) | ~CCFG_MODE_CONF_1_TCXO_TYPE_M                   ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_TCXO_MAX_START              )) << CCFG_MODE_CONF_1_TCXO_MAX_START_S              ) | ~CCFG_MODE_CONF_1_TCXO_MAX_START_M              ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_VMIN               )) << CCFG_MODE_CONF_1_ALT_DCDC_VMIN_S               ) | ~CCFG_MODE_CONF_1_ALT_DCDC_VMIN_M               ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN          )) << CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_S          ) | ~CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_M          ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_ALT_DCDC_IPEAK              )) << CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_S              ) | ~CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_M              ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_DELTA_IBIAS_INIT            )) << CCFG_MODE_CONF_1_DELTA_IBIAS_INIT_S            ) | ~CCFG_MODE_CONF_1_DELTA_IBIAS_INIT_M            ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET          )) << CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET_S          ) | ~CCFG_MODE_CONF_1_DELTA_IBIAS_OFFSET_M          ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_1_XOSC_MAX_START              )) << CCFG_MODE_CONF_1_XOSC_MAX_START_S              ) | ~CCFG_MODE_CONF_1_XOSC_MAX_START_M              ) )
 
 #define DEFAULT_CCFG_SIZE_AND_DIS_FLAGS  ( \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG         )) << CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_S         ) | ~CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_M         ) & \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS        )) << CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_S        ) | ~CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_M        ) & \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO             )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO_S             ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO_M             ) & \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM            )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM_S            ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM_M            ) & \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING_S ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING_M ) & \
-	 ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR         )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR_S         ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR_M         ) )
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG         )) << CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_S         ) | ~CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_M         ) & \
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS        )) << CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_S        ) | ~CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_M        ) & \
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO             )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO_S             ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_TCXO_M             ) & \
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM            )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM_S            ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM_M            ) & \
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING_S ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING_M ) & \
+     ((((uint32_t)( SET_CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR         )) << CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR_S         ) | ~CCFG_SIZE_AND_DIS_FLAGS_DIS_XOSC_OVR_M         ) )
 
 #define DEFAULT_CCFG_MODE_CONF           ( \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA         )) << CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA_S         ) | ~CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA_M         ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_DCDC_RECHARGE                 )) << CCFG_MODE_CONF_DCDC_RECHARGE_S                 ) | ~CCFG_MODE_CONF_DCDC_RECHARGE_M                 ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_DCDC_ACTIVE                   )) << CCFG_MODE_CONF_DCDC_ACTIVE_S                   ) | ~CCFG_MODE_CONF_DCDC_ACTIVE_M                   ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_EXT_LOAD                 )) << CCFG_MODE_CONF_VDDR_EXT_LOAD_S                 ) | ~CCFG_MODE_CONF_VDDR_EXT_LOAD_M                 ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_VDDS_BOD_LEVEL                )) << CCFG_MODE_CONF_VDDS_BOD_LEVEL_S                ) | ~CCFG_MODE_CONF_VDDS_BOD_LEVEL_M                ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_SCLK_LF_OPTION                )) << CCFG_MODE_CONF_SCLK_LF_OPTION_S                ) | ~CCFG_MODE_CONF_SCLK_LF_OPTION_M                ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC            )) << CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC_S            ) | ~CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC_M            ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_RTC_COMP                      )) << CCFG_MODE_CONF_RTC_COMP_S                      ) | ~CCFG_MODE_CONF_RTC_COMP_M                      ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_FREQ                     )) << CCFG_MODE_CONF_XOSC_FREQ_S                     ) | ~CCFG_MODE_CONF_XOSC_FREQ_M                     ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_CAP_MOD                  )) << CCFG_MODE_CONF_XOSC_CAP_MOD_S                  ) | ~CCFG_MODE_CONF_XOSC_CAP_MOD_M                  ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_HF_COMP                       )) << CCFG_MODE_CONF_HF_COMP_S                       ) | ~CCFG_MODE_CONF_HF_COMP_M                       ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA           )) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S           ) | ~CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M           ) & \
-	 ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_CAP                      )) << CCFG_MODE_CONF_VDDR_CAP_S                      ) | ~CCFG_MODE_CONF_VDDR_CAP_M                      ) )
+     ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA         )) << CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA_S         ) | ~CCFG_MODE_CONF_VDDR_TRIM_SLEEP_DELTA_M         ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_DCDC_RECHARGE                 )) << CCFG_MODE_CONF_DCDC_RECHARGE_S                 ) | ~CCFG_MODE_CONF_DCDC_RECHARGE_M                 ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_DCDC_ACTIVE                   )) << CCFG_MODE_CONF_DCDC_ACTIVE_S                   ) | ~CCFG_MODE_CONF_DCDC_ACTIVE_M                   ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_EXT_LOAD                 )) << CCFG_MODE_CONF_VDDR_EXT_LOAD_S                 ) | ~CCFG_MODE_CONF_VDDR_EXT_LOAD_M                 ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_VDDS_BOD_LEVEL                )) << CCFG_MODE_CONF_VDDS_BOD_LEVEL_S                ) | ~CCFG_MODE_CONF_VDDS_BOD_LEVEL_M                ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_SCLK_LF_OPTION                )) << CCFG_MODE_CONF_SCLK_LF_OPTION_S                ) | ~CCFG_MODE_CONF_SCLK_LF_OPTION_M                ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC            )) << CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC_S            ) | ~CCFG_MODE_CONF_VDDR_TRIM_SLEEP_TC_M            ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_RTC_COMP                      )) << CCFG_MODE_CONF_RTC_COMP_S                      ) | ~CCFG_MODE_CONF_RTC_COMP_M                      ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_FREQ                     )) << CCFG_MODE_CONF_XOSC_FREQ_S                     ) | ~CCFG_MODE_CONF_XOSC_FREQ_M                     ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_CAP_MOD                  )) << CCFG_MODE_CONF_XOSC_CAP_MOD_S                  ) | ~CCFG_MODE_CONF_XOSC_CAP_MOD_M                  ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_HF_COMP                       )) << CCFG_MODE_CONF_HF_COMP_S                       ) | ~CCFG_MODE_CONF_HF_COMP_M                       ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA           )) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S           ) | ~CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M           ) & \
+     ((((uint32_t)( SET_CCFG_MODE_CONF_VDDR_CAP                      )) << CCFG_MODE_CONF_VDDR_CAP_S                      ) | ~CCFG_MODE_CONF_VDDR_CAP_M                      ) )
 
 #define DEFAULT_CCFG_VOLT_LOAD_0         ( \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP45               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP45_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP45_M               ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP25               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP25_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP25_M               ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP5                )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP5_S                ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP5_M                ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TM15               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TM15_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TM15_M               ) )
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP45               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP45_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP45_M               ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP25               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP25_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP25_M               ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TP5                )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TP5_S                ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TP5_M                ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_0_VDDR_EXT_TM15               )) << CCFG_VOLT_LOAD_0_VDDR_EXT_TM15_S               ) | ~CCFG_VOLT_LOAD_0_VDDR_EXT_TM15_M               ) )
 
 #define DEFAULT_CCFG_VOLT_LOAD_1         ( \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP125              )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP125_S              ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP125_M              ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP105              )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP105_S              ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP105_M              ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP85               )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP85_S               ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP85_M               ) & \
-	 ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP65               )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP65_S               ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP65_M               ) )
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP125              )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP125_S              ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP125_M              ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP105              )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP105_S              ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP105_M              ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP85               )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP85_S               ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP85_M               ) & \
+     ((((uint32_t)( SET_CCFG_VOLT_LOAD_1_VDDR_EXT_TP65               )) << CCFG_VOLT_LOAD_1_VDDR_EXT_TP65_S               ) | ~CCFG_VOLT_LOAD_1_VDDR_EXT_TP65_M               ) )
 
 #define DEFAULT_CCFG_RTC_OFFSET          ( \
-	 ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P0                  )) << CCFG_RTC_OFFSET_RTC_COMP_P0_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P0_M                  ) & \
-	 ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P1                  )) << CCFG_RTC_OFFSET_RTC_COMP_P1_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P1_M                  ) & \
-	 ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P2                  )) << CCFG_RTC_OFFSET_RTC_COMP_P2_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P2_M                  ) )
+     ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P0                  )) << CCFG_RTC_OFFSET_RTC_COMP_P0_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P0_M                  ) & \
+     ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P1                  )) << CCFG_RTC_OFFSET_RTC_COMP_P1_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P1_M                  ) & \
+     ((((uint32_t)( SET_CCFG_RTC_OFFSET_RTC_COMP_P2                  )) << CCFG_RTC_OFFSET_RTC_COMP_P2_S                  ) | ~CCFG_RTC_OFFSET_RTC_COMP_P2_M                  ) )
 
 #define DEFAULT_CCFG_FREQ_OFFSET         ( \
-	 ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P0                  )) << CCFG_FREQ_OFFSET_HF_COMP_P0_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P0_M                  ) & \
-	 ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P1                  )) << CCFG_FREQ_OFFSET_HF_COMP_P1_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P1_M                  ) & \
-	 ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P2                  )) << CCFG_FREQ_OFFSET_HF_COMP_P2_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P2_M                  ) )
+     ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P0                  )) << CCFG_FREQ_OFFSET_HF_COMP_P0_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P0_M                  ) & \
+     ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P1                  )) << CCFG_FREQ_OFFSET_HF_COMP_P1_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P1_M                  ) & \
+     ((((uint32_t)( SET_CCFG_FREQ_OFFSET_HF_COMP_P2                  )) << CCFG_FREQ_OFFSET_HF_COMP_P2_S                  ) | ~CCFG_FREQ_OFFSET_HF_COMP_P2_M                  ) )
 
 #define DEFAULT_CCFG_IEEE_MAC_0          SET_CCFG_IEEE_MAC_0
 #define DEFAULT_CCFG_IEEE_MAC_1          SET_CCFG_IEEE_MAC_1
@@ -473,33 +473,33 @@
 #define DEFAULT_CCFG_IEEE_BLE_1          SET_CCFG_IEEE_BLE_1
 
 #define DEFAULT_CCFG_BL_CONFIG           ( \
-	 ((((uint32_t)( SET_CCFG_BL_CONFIG_BOOTLOADER_ENABLE             )) << CCFG_BL_CONFIG_BOOTLOADER_ENABLE_S             ) | ~CCFG_BL_CONFIG_BOOTLOADER_ENABLE_M             ) & \
-	 ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_LEVEL                      )) << CCFG_BL_CONFIG_BL_LEVEL_S                      ) | ~CCFG_BL_CONFIG_BL_LEVEL_M                      ) & \
-	 ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_PIN_NUMBER                 )) << CCFG_BL_CONFIG_BL_PIN_NUMBER_S                 ) | ~CCFG_BL_CONFIG_BL_PIN_NUMBER_M                 ) & \
-	 ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_ENABLE                     )) << CCFG_BL_CONFIG_BL_ENABLE_S                     ) | ~CCFG_BL_CONFIG_BL_ENABLE_M                     ) )
+     ((((uint32_t)( SET_CCFG_BL_CONFIG_BOOTLOADER_ENABLE             )) << CCFG_BL_CONFIG_BOOTLOADER_ENABLE_S             ) | ~CCFG_BL_CONFIG_BOOTLOADER_ENABLE_M             ) & \
+     ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_LEVEL                      )) << CCFG_BL_CONFIG_BL_LEVEL_S                      ) | ~CCFG_BL_CONFIG_BL_LEVEL_M                      ) & \
+     ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_PIN_NUMBER                 )) << CCFG_BL_CONFIG_BL_PIN_NUMBER_S                 ) | ~CCFG_BL_CONFIG_BL_PIN_NUMBER_M                 ) & \
+     ((((uint32_t)( SET_CCFG_BL_CONFIG_BL_ENABLE                     )) << CCFG_BL_CONFIG_BL_ENABLE_S                     ) | ~CCFG_BL_CONFIG_BL_ENABLE_M                     ) )
 
 #define DEFAULT_CCFG_ERASE_CONF          ( \
-	 ((((uint32_t)( SET_CCFG_ERASE_CONF_CHIP_ERASE_DIS_N             )) << CCFG_ERASE_CONF_CHIP_ERASE_DIS_N_S             ) | ~CCFG_ERASE_CONF_CHIP_ERASE_DIS_N_M             ) & \
-	 ((((uint32_t)( SET_CCFG_ERASE_CONF_BANK_ERASE_DIS_N             )) << CCFG_ERASE_CONF_BANK_ERASE_DIS_N_S             ) | ~CCFG_ERASE_CONF_BANK_ERASE_DIS_N_M             ) )
+     ((((uint32_t)( SET_CCFG_ERASE_CONF_CHIP_ERASE_DIS_N             )) << CCFG_ERASE_CONF_CHIP_ERASE_DIS_N_S             ) | ~CCFG_ERASE_CONF_CHIP_ERASE_DIS_N_M             ) & \
+     ((((uint32_t)( SET_CCFG_ERASE_CONF_BANK_ERASE_DIS_N             )) << CCFG_ERASE_CONF_BANK_ERASE_DIS_N_S             ) | ~CCFG_ERASE_CONF_BANK_ERASE_DIS_N_M             ) )
 
 #define DEFAULT_CCFG_CCFG_TI_OPTIONS     ( \
-	 ((((uint32_t)( SET_CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE            )) << CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE_S            ) | ~CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE_M            ) )
+     ((((uint32_t)( SET_CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE            )) << CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE_S            ) | ~CCFG_CCFG_TI_OPTIONS_TI_FA_ENABLE_M            ) )
 
 #define DEFAULT_CCFG_CCFG_TAP_DAP_0      ( \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE           )) << CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_S           ) | ~CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_M           ) & \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE       )) << CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE_S       ) | ~CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE_M       ) & \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE          )) << CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_S          ) | ~CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_M          ) )
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE           )) << CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_S           ) | ~CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_M           ) & \
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE       )) << CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE_S       ) | ~CCFG_CCFG_TAP_DAP_0_PWRPROF_TAP_ENABLE_M       ) & \
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE          )) << CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_S          ) | ~CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_M          ) )
 
 #define DEFAULT_CCFG_CCFG_TAP_DAP_1      ( \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE        )) << CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE_S        ) | ~CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE_M        ) & \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE        )) << CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE_S        ) | ~CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE_M        ) & \
-	 ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE           )) << CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE_S           ) | ~CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE_M           ) )
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE        )) << CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE_S        ) | ~CCFG_CCFG_TAP_DAP_1_PBIST2_TAP_ENABLE_M        ) & \
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE        )) << CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE_S        ) | ~CCFG_CCFG_TAP_DAP_1_PBIST1_TAP_ENABLE_M        ) & \
+     ((((uint32_t)( SET_CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE           )) << CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE_S           ) | ~CCFG_CCFG_TAP_DAP_1_AON_TAP_ENABLE_M           ) )
 
 #define DEFAULT_CCFG_IMAGE_VALID_CONF    SET_CCFG_IMAGE_VALID_CONF_IMAGE_VALID
 
-#define DEFAULT_CCFG_CCFG_PROT_31_0      SET_CCFG_CCFG_PROT_31_0  
-#define DEFAULT_CCFG_CCFG_PROT_63_32     SET_CCFG_CCFG_PROT_63_32 
-#define DEFAULT_CCFG_CCFG_PROT_95_64     SET_CCFG_CCFG_PROT_95_64 
+#define DEFAULT_CCFG_CCFG_PROT_31_0      SET_CCFG_CCFG_PROT_31_0
+#define DEFAULT_CCFG_CCFG_PROT_63_32     SET_CCFG_CCFG_PROT_63_32
+#define DEFAULT_CCFG_CCFG_PROT_95_64     SET_CCFG_CCFG_PROT_95_64
 #define DEFAULT_CCFG_CCFG_PROT_127_96    SET_CCFG_CCFG_PROT_127_96
 
 //*****************************************************************************
@@ -521,7 +521,7 @@ const ccfg_t __ccfg __attribute__((section(".ccfg"))) __attribute__((used)) =
     DEFAULT_CCFG_MODE_CONF_1        , // 0x50003FAC  sector in FLASH.
     DEFAULT_CCFG_SIZE_AND_DIS_FLAGS , // 0x50003FB0  Independent of FLASH size)
     DEFAULT_CCFG_MODE_CONF          , // 0x50003FB4
-    DEFAULT_CCFG_VOLT_LOAD_0        , // 0x50003FB8 
+    DEFAULT_CCFG_VOLT_LOAD_0        , // 0x50003FB8
     DEFAULT_CCFG_VOLT_LOAD_1        , // 0x50003FBC
     DEFAULT_CCFG_RTC_OFFSET         , // 0x50003FC0
     DEFAULT_CCFG_FREQ_OFFSET        , // 0x50003FC4

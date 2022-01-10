@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -209,4 +209,10 @@ var cc32xxTargets = [
 
 var cc26x4Targets = [
     "ti.targets.arm.clang.M33F",
+    "gnu.targets.arm.M33F",
+    "iar.targets.arm.M33F",
+];
+
+var cc23xxTargets = [
+    "ti.targets.arm.clang.M0",
 ];

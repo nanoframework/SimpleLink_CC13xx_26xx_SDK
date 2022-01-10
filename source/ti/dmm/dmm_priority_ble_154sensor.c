@@ -5,7 +5,7 @@
  @brief Dual Mode Manager Global Priority for 15.4 Sensor and BLE Stack
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

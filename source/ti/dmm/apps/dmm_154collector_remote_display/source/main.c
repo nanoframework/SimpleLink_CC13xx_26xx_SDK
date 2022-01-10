@@ -5,7 +5,7 @@
  @brief Main entry of the 15.4 & BLE remote display sample application.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -56,6 +56,7 @@
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 #include <ti/sysbios/hal/Hwi.h>
+#include <ti/drivers/GPIO.h>
 
 #include <icall.h>
 #include "bcomdef.h"
@@ -83,7 +84,6 @@ icall_userCfg_t user0Cfg = BLE_USER_CFG;
 #endif // USE_DEFAULT_USER_CFG
 
 #ifdef DMM_OAD
-#include <ti/drivers/GPIO.h>
 #include <profiles/oad/cc26xx/mark_switch_factory_img.h>
 #endif
 
@@ -275,6 +275,8 @@ int main()
   /* Register Application callback to trap asserts raised in the Stack */
   RegisterAssertCback(AssertHandler);
 
+  /* GPIO init must be called prior to Board_initGeneral for proper pin configuration */
+  GPIO_init();
   Board_initGeneral();
 
 #ifdef DMM_OAD

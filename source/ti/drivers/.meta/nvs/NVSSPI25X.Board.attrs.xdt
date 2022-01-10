@@ -135,7 +135,7 @@ static const NVSSPI25X_HWAttrs nvsSPI25XHWAttrs[`localInstances.length`] = {
     % }
     % if (inst.externalFlash.spiFlashDevice.slaveSelectManager == "NVS") {
         /* GPIO driver pin index */
-        .spiCsnGpioIndex = `inst.externalFlash.spiFlashDevice.slaveSelectGpioInstance.$name`,
+        .spiCsnGpioIndex = `inst.externalFlash.spiFlashDevice.slaveSelectPinInstance.$name`,
     % }
     % else {
         /* SPI driver manages SPI flash CS */

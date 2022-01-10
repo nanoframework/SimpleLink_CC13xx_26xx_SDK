@@ -231,11 +231,11 @@ function onDeviceTypeChange(inst, ui)
     else if(inst.deviceType === "zr") // || inst.deviceType === "zc")
     {
         inst.powerModeCapabilities = "alwaysOn";
-        ui.powerModeCapabilities.readOnly = false;
-        ui.powerModeCapabilities.hidden = false;
+        ui.powerModeCapabilities.readOnly = true;
+        ui.powerModeCapabilities.hidden = true;
         inst.powerModeOperation = "alwaysOn";
         ui.powerModeOperation.readOnly = true;
-        ui.powerModeOperation.hidden = false;
+        ui.powerModeOperation.hidden = true;
         ui.minPollPeriod.hidden = true;
         ui.pollPeriod.hidden = true;
         ui.queuedMessagePollPeriod.hidden = true;

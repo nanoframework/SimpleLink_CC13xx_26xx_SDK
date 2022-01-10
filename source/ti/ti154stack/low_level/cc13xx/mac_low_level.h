@@ -5,7 +5,7 @@
  @brief Describe the purpose and contents of the file.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -59,6 +59,13 @@
  *                                            Defines
  * ------------------------------------------------------------------------------------------------
  */
+
+/*! Clock tick period in microseconds */
+#define CLOCK_TICK_PERIOD     (MAP_ICall_getTickPeriod())
+
+/*! Ticks per one millisecond  */
+#define TICKPERIOD_MS_US      (1000/(CLOCK_TICK_PERIOD))
+
 #define MAC_SYMBOL_TIMER_DEFAULT_ROLLOVER  (((uint32) MAC_A_BASE_SUPERFRAME_DURATION) << 14)
 
 /* 15,728,640 symbols or 314.57 Seconds */

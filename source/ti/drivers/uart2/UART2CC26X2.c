@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,10 +42,10 @@
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/dpl/SemaphoreP.h>
 
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26X2.h>
 #include <ti/drivers/dma/UDMACC26XX.h>
-#include <ti/drivers/pin/PINCC26XX.h>
 
 #include <ti/drivers/uart2/UART2CC26X2.h>
 #include <ti/drivers/uart2/UART2Support.h>
@@ -57,8 +57,6 @@
 #include DeviceFamily_constructPath(inc/hw_types.h)
 #include DeviceFamily_constructPath(driverlib/uart.h)
 #include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
-#include DeviceFamily_constructPath(driverlib/ioc.h)
-#include DeviceFamily_constructPath(driverlib/aon_ioc.h)
 
 #if defined(__IAR_SYSTEMS_ICC__)
 #include <intrinsics.h>
@@ -75,21 +73,13 @@
 #define RX_CONTROL_OPTS  (UDMA_SIZE_8 | UDMA_SRC_INC_NONE | UDMA_DST_INC_8 | \
             UDMA_ARB_4 | UDMA_MODE_BASIC)
 
-/* Allocate space for DMA control. */
-ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart0RxControlTableEntry, UDMA_CHAN_UART0_RX);
-ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart0TxControlTableEntry, UDMA_CHAN_UART0_TX);
-ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart1RxControlTableEntry, UDMA_CHAN_UART1_RX);
-ALLOCATE_CONTROL_TABLE_ENTRY(dmaUart1TxControlTableEntry, UDMA_CHAN_UART1_TX);
-
 /* Static functions */
-static void UART2CC26X2_eventCallback(UART2_Handle handle, uint32_t event,
-        uint32_t data, void *userArg);
-static uint_fast16_t UART2CC26X2_getPowerMgrId(uint32_t baseAddr);
+static void UART2CC26X2_eventCallback(UART2_Handle handle, uint32_t event, uint32_t data, void *userArg);
 static void UART2CC26X2_hwiIntFxn(uintptr_t arg);
 static void UART2CC26X2_initHw(UART2_Handle handle);
-static bool UART2CC26X2_initIO(UART2_Handle handle);
-static int  UART2CC26X2_postNotifyFxn(unsigned int eventType, uintptr_t eventArg,
-        uintptr_t clientArg);
+static void UART2CC26X2_initIO(UART2_Handle handle);
+static void UART2CC26X2_finalizeIO(UART2_Handle handle);
+static int  UART2CC26X2_postNotifyFxn(unsigned int eventType, uintptr_t eventArg, uintptr_t clientArg);
 static void UART2CC26X2_readCallback(UART2_Handle handle);
 static void UART2CC26X2_readTimeout(uintptr_t arg);
 static void UART2CC26X2_writeTimeout(uintptr_t arg);
@@ -310,7 +300,7 @@ void UART2_close(UART2_Handle handle)
                                       UART_CTL_RXE);
 
     /* Deallocate pins */
-    PIN_close(object->hPin);
+    UART2CC26X2_finalizeIO(handle);
 
     HwiP_destruct(&(object->hwi));
     SemaphoreP_destruct(&(object->writeSem));
@@ -326,7 +316,7 @@ void UART2_close(UART2_Handle handle)
     Power_unregisterNotify(&object->postNotify);
 
     /* Release power dependency - i.e. potentially power down serial domain. */
-    Power_releaseDependency(object->powerMgrId);
+    Power_releaseDependency(hwAttrs->powerId);
 
     object->state.opened = false;
 }
@@ -433,12 +423,6 @@ UART2_Handle UART2_open(uint_least8_t index, UART2_Params *params)
     object->writeInUse           = false;
     object->udmaHandle           = NULL;
 
-    /* Determine the Power resource Id from the UART base address */
-    object->powerMgrId = UART2CC26X2_getPowerMgrId(hwAttrs->baseAddr);
-    if (object->powerMgrId >= PowerCC26X2_NUMRESOURCES) {
-        return (NULL);
-    }
-
     /* Set the event mask to 0 if the callback is NULL to simplify checks */
     if (object->eventCallback == NULL) {
         object->eventCallback = UART2CC26X2_eventCallback;
@@ -446,22 +430,15 @@ UART2_Handle UART2_open(uint_least8_t index, UART2_Params *params)
     }
 
     /* Register power dependency - i.e. power up and enable clock for UART. */
-    Power_setDependency(object->powerMgrId);
+    Power_setDependency(hwAttrs->powerId);
 
     RingBuf_construct(&object->rxBuffer, hwAttrs->rxBufPtr, hwAttrs->rxBufSize);
     RingBuf_construct(&object->txBuffer, hwAttrs->txBufPtr, hwAttrs->txBufSize);
 
     UARTDisable(hwAttrs->baseAddr);
 
-    /* Configure IOs, make sure it was successful */
-    if (!UART2CC26X2_initIO(handle)) {
-        /* Another driver or application already using these pins. */
-        /* Release power dependency */
-        Power_releaseDependency(object->powerMgrId);
-        /* Mark the module as available */
-        object->state.opened = false;
-        return (NULL);
-    }
+    /* Configure IOs */
+    UART2CC26X2_initIO(handle);
 
     /* Always succeeds */
     object->udmaHandle = UDMACC26XX_open();
@@ -499,16 +476,8 @@ UART2_Handle UART2_open(uint_least8_t index, UART2_Params *params)
             &(clkParams));
 
     /* Set rx src and tx dst addresses in open, since these won't change */
-    if (hwAttrs->baseAddr == UART0_BASE) {
-        object->rxDmaEntry = &dmaUart0RxControlTableEntry;
-        object->txDmaEntry = &dmaUart0TxControlTableEntry;
-    }
-    else {
-        object->rxDmaEntry = &dmaUart1RxControlTableEntry;
-        object->txDmaEntry = &dmaUart1TxControlTableEntry;
-    }
-    object->rxDmaEntry->pvSrcEndAddr = (void *)(hwAttrs->baseAddr + UART_O_DR);
-    object->txDmaEntry->pvDstEndAddr = (void *)(hwAttrs->baseAddr + UART_O_DR);
+    hwAttrs->dmaRxTableEntryPri->pvSrcEndAddr = (void *)(hwAttrs->baseAddr + UART_O_DR);
+    hwAttrs->dmaTxTableEntryPri->pvDstEndAddr = (void *)(hwAttrs->baseAddr + UART_O_DR);
 
     /* UART opened successfully */
     return (handle);
@@ -574,7 +543,7 @@ void UART2Support_dmaStartRx(UART2_Handle handle)
     UART2CC26X2_Object        *object = handle->object;
     UART2CC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
     UDMACC26XX_HWAttrs  const *hwAttrsUdma = object->udmaHandle->hwAttrs;
-    volatile tDMAControlTable *rxDmaEntry = object->rxDmaEntry;
+    volatile tDMAControlTable *rxDmaEntry = hwAttrs->dmaRxTableEntryPri;
     unsigned char             *dstAddr;
 
     if (object->state.rxEnabled == false) {
@@ -668,7 +637,7 @@ void UART2Support_dmaStartTx(UART2_Handle handle)
         if (object->txSize > UDMA_XFER_SIZE_MAX) {
             object->txSize = UDMA_XFER_SIZE_MAX;
         }
-        txDmaEntry = object->txDmaEntry;
+        txDmaEntry = hwAttrs->dmaTxTableEntryPri;
         txDmaEntry->pvSrcEndAddr = srcAddr + object->txSize - 1;
 
         txDmaEntry->ui32Control = TX_CONTROL_OPTS;
@@ -872,23 +841,6 @@ static void UART2CC26X2_eventCallback(UART2_Handle handle, uint32_t event,
 }
 
 /*
- *  ======== UART2CC26X2_getPowerMgrId ========
- */
-static uint_fast16_t UART2CC26X2_getPowerMgrId(uint32_t baseAddr)
-{
-    switch (baseAddr) {
-        case UART0_BASE:
-            return (PowerCC26XX_PERIPH_UART0);
-#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2)
-        case UART1_BASE:
-            return (PowerCC26X2_PERIPH_UART1);
-#endif
-        default:
-            return ((uint_fast16_t)(~0U));
-    }
-}
-
-/*
  *  ======== UART2CC26X2_hwiIntFxn ========
  *  Hwi function that processes UART interrupts.
  */
@@ -1046,7 +998,7 @@ static void UART2CC26X2_initHw(UART2_Handle handle)
      * for CTS and/or RTS.
      */
     if (UART2CC26X2_isFlowControlEnabled(hwAttrs) &&
-        (hwAttrs->ctsPin != PIN_UNASSIGNED)) {
+        (hwAttrs->ctsPin != GPIO_INVALID_INDEX)) {
         uartEnableCTS(hwAttrs->baseAddr);
     }
     else {
@@ -1054,7 +1006,7 @@ static void UART2CC26X2_initHw(UART2_Handle handle)
     }
 
     if (UART2CC26X2_isFlowControlEnabled(hwAttrs) &&
-        (hwAttrs->rtsPin != PIN_UNASSIGNED)) {
+        (hwAttrs->rtsPin != GPIO_INVALID_INDEX)) {
         uartEnableRTS(hwAttrs->baseAddr);
     }
     else {
@@ -1084,70 +1036,51 @@ static void UART2CC26X2_initHw(UART2_Handle handle)
 /*
  *  ======== UART2CC26X2_initIO ========
  */
-static bool UART2CC26X2_initIO(UART2_Handle handle)
+static void UART2CC26X2_initIO(UART2_Handle handle)
 {
-    UART2CC26X2_Object        *object = handle->object;
     UART2CC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
-    PIN_Config                 uartPinTable[5];
-    uint32_t                   pinCount = 0;
 
-    /* Build local list of pins, allocate through PIN driver and map ports */
-    uartPinTable[pinCount++] = hwAttrs->rxPin | PIN_INPUT_EN;
-
-    /*
-     *  Make sure UART_TX pin is driven high after calling PIN_open(...) until
-     *  we've set the correct peripheral muxing in PINCC26XX_setMux(...).
-     *  This is to avoid falling edge glitches when configuring the
-     *  UART_TX pin.
-     */
-    uartPinTable[pinCount++] = hwAttrs->txPin | PIN_INPUT_DIS | PIN_PUSHPULL |
-            PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
-
-    if (UART2CC26X2_isFlowControlEnabled(hwAttrs)) {
-        if (hwAttrs->ctsPin != PIN_UNASSIGNED) {
-            uartPinTable[pinCount++] = hwAttrs->ctsPin | PIN_INPUT_EN;
-        }
-
-        if (hwAttrs->rtsPin != PIN_UNASSIGNED) {
-            /* Avoiding glitches on the RTS, see comment for TX pin above. */
-            uartPinTable[pinCount++] = hwAttrs->rtsPin | PIN_INPUT_DIS |
-                    PIN_PUSHPULL | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
-        }
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->txPin, hwAttrs->txPinMux);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->rxPin, hwAttrs->rxPinMux);
     }
 
-    /* Terminate pin list */
-    uartPinTable[pinCount] = PIN_TERMINATE;
-
-    /* Open and assign pins through pin driver */
-    object->hPin = PIN_open(&object->pinState, uartPinTable);
-
-    if (!object->hPin) {
-        return (false);
-    }
-
-    /* Set IO muxing for the UART pins */
-    PINCC26XX_setMux(object->hPin, hwAttrs->rxPin,
-            (hwAttrs->baseAddr == UART0_BASE ?
-                    IOC_PORT_MCU_UART0_RX : IOC_PORT_MCU_UART1_RX));
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin,
-            (hwAttrs->baseAddr == UART0_BASE ?
-                    IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX));
-
-    if (UART2CC26X2_isFlowControlEnabled(hwAttrs)) {
-        if (hwAttrs->ctsPin != PIN_UNASSIGNED) {
-            PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin,
-                    (hwAttrs->baseAddr == UART0_BASE ?
-                            IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS));
+    if (UART2CC26X2_isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(hwAttrs->ctsPin, hwAttrs->ctsPinMux);
         }
-
-        if (hwAttrs->rtsPin != PIN_UNASSIGNED) {
-            PINCC26XX_setMux(object->hPin, hwAttrs->rtsPin,
-                    (hwAttrs->baseAddr == UART0_BASE ?
-                            IOC_PORT_MCU_UART0_RTS : IOC_PORT_MCU_UART1_RTS));
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(hwAttrs->rtsPin, hwAttrs->rtsPinMux);
         }
     }
+}
 
-    return (true);
+/*
+ *  ======== UART2CC26X2_finalizeIO ========
+ */
+static void UART2CC26X2_finalizeIO(UART2_Handle handle)
+{
+    UART2CC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
+
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->txPin);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->rxPin);
+    }
+
+    if (UART2CC26X2_isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->ctsPin);
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->rtsPin);
+        }
+    }
 }
 
 /*
@@ -1174,8 +1107,9 @@ static void UART2CC26X2_readCallback(UART2_Handle handle)
     unsigned char      *srcAddr;
     int                 available;
 
-    while (((available = RingBuf_getPointer(&object->rxBuffer, &srcAddr)) > 0)
-           && (object->readCount > 0)) {
+    do {
+        available = RingBuf_getPointer(&object->rxBuffer, &srcAddr);
+
         if (available > object->readCount) {
             available = object->readCount;
         }
@@ -1184,22 +1118,18 @@ static void UART2CC26X2_readCallback(UART2_Handle handle)
 
         RingBuf_getConsume(&object->rxBuffer, available);
 
-        /* Restart the DMA since we cleared space in the ring buffer */
-        UART2Support_dmaStopRx(handle);
-        UART2Support_dmaStartRx(handle);
-
         object->readCount -= available;
         object->bytesRead += available;
 
-        if ((object->state.readReturnMode == UART2_ReadReturnMode_PARTIAL) ||
-                (object->readCount == 0)) {
-            object->readInUse = false;
+    } while (available && object->readCount);
 
-            object->readCallback(handle, (void *)object->readBuf,
-                    object->bytesRead, object->userArg,
-                    UART2_STATUS_SUCCESS);
-            break;
-        }
+    /* Restart the DMA since we cleared space in the ring buffer */
+    UART2Support_dmaStopRx(handle);
+    UART2Support_dmaStartRx(handle);
+
+    if ((object->state.readReturnMode == UART2_ReadReturnMode_PARTIAL) || (object->readCount == 0)) {
+        object->readInUse = false;
+        object->readCallback(handle, (void *)object->readBuf, object->bytesRead, object->userArg, UART2_STATUS_SUCCESS);
     }
 }
 

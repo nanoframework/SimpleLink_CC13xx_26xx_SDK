@@ -5,7 +5,7 @@
  @brief OAD image header definition file.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -73,9 +73,9 @@
 
 #define SOFTWARE_VER            {'0', '0', '0', '1'}
 
-#if defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC26X2X7)
+#if defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC26X1)
 #define    OAD_WIRELESS_TECH_TIMAC  OAD_WIRELESS_TECH_TIMAC_2_4G     //!< Wireless protocol type BLE/TI-MAC/ZIGBEE etc. */
-#elif defined(DeviceFamily_CC13X2) || defined(DeviceFamily_CC13X2X7)
+#elif defined(DeviceFamily_CC13X2) || defined(DeviceFamily_CC13X2X7) || defined(DeviceFamily_CC13X1)
 #define    OAD_WIRELESS_TECH_TIMAC  OAD_WIRELESS_TECH_TIMAC_SUBG     //!< Wireless protocol type BLE/TI-MAC/ZIGBEE etc. */
 #endif
 

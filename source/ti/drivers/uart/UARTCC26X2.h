@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -182,7 +182,7 @@
  *  };
  *  @endcode
  *
- * If the RTS and CTS pins are set to ::PIN_UNASSIGNED, or flowControl is set
+ * If the RTS and CTS pins are set to ::GPIO_INVALID_INDEX, or flowControl is set
  * to UARTCC26X2_FLOWCONTROL_NONE, the flow control is disabled.
  * An example is shown in the ::UARTCC26X2_HWAttrs description.
  *
@@ -354,7 +354,7 @@
 #include <ti/drivers/dpl/SwiP.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/UART.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/utils/RingBuf.h>
 
 #ifdef __cplusplus
@@ -507,8 +507,8 @@ extern const UART_FxnTable UARTCC26X2_fxnTable;
  *          .flowControl  = UARTCC26X2_FLOWCTRL_NONE,
  *          .rxPin        = IOID_2,
  *          .txPin        = IOID_3,
- *          .ctsPin       = PIN_UNASSIGNED,
- *          .rtsPin       = PIN_UNASSIGNED,
+ *          .ctsPin       = GPIO_INVALID_INDEX,
+ *          .rtsPin       = GPIO_INVALID_INDEX,
  *          .txIntFifoThr = UARTCC26X2_FIFO_THRESHOLD_1_8,
  *          .rxIntFifoThr = UARTCC26X2_FIFO_THRESHOLD_4_8,
  *          .errorFxn     = NULL
@@ -521,10 +521,10 @@ extern const UART_FxnTable UARTCC26X2_fxnTable;
  *          .ringBufPtr   = uartCC26X2RingBuffer[1],
  *          .ringBufSize  = sizeof(uartCC26X2RingBuffer[1]),
  *          .flowControl  = UARTCC26X2_FLOWCTRL_NONE,
- *          .rxPin        = PIN_UNASSIGNED,
- *          .txPin        = PIN_UNASSIGNED,
- *          .ctsPin       = PIN_UNASSIGNED,
- *          .rtsPin       = PIN_UNASSIGNED,
+ *          .rxPin        = GPIO_INVALID_INDEX,
+ *          .txPin        = GPIO_INVALID_INDEX,
+ *          .ctsPin       = GPIO_INVALID_INDEX,
+ *          .rtsPin       = GPIO_INVALID_INDEX,
  *          .txIntFifoThr = UARTCC26X2_FIFO_THRESHOLD_1_8,
  *          .rxIntFifoThr = UARTCC26X2_FIFO_THRESHOLD_4_8,
  *          .errorFxn     = NULL
@@ -634,10 +634,6 @@ typedef struct {
     SemaphoreP_Struct    writeSem;         /* UART write semaphore*/
     unsigned int         writeTimeout;     /* Timeout for write semaphore */
     UART_Callback        writeCallback;    /* Pointer to write callback */
-
-    /* PIN driver state object and handle */
-    PIN_State            pinState;
-    PIN_Handle           hPin;
 
     /* For Power management */
     Power_NotifyObj      postNotify;

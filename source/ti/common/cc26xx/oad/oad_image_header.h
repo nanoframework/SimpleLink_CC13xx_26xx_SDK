@@ -5,7 +5,7 @@
  @brief This file contains the image header definition and structures.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -305,10 +305,11 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
 /** @} End OAD_WIRELESS_TECH */
 
 #if defined(DeviceFamily_CC26X2) || defined (DeviceFamily_CC26X2_V2) || \
-    defined(DeviceFamily_CC26X2X7)
+    defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC26X1)
   #define OAD_IMG_ID_VAL                    {'C', 'C', '2', '6', 'x', '2', 'R', '1'}
 #elif defined (DeviceFamily_CC13X2) ||                                        \
       defined (DeviceFamily_CC13X2X7) ||                                      \
+      defined (DeviceFamily_CC13X1) ||                                        \
       defined (DeviceFamily_CC13X2_V1) ||                                     \
       defined (DeviceFamily_CC13X2_V2)
   #define OAD_IMG_ID_VAL                    {'C', 'C', '1', '3', 'x', '2', 'R', '1'}
@@ -505,7 +506,7 @@ extern uint32_t _sign_fnPtr;     //!< Variable for Pointer to BIM Function
 
 #define ECDSA_KEY_LEN                32    //!< Length of the ECDSA security key
 
-#define ECDSA_SHA_TEMPWORKZONE_LEN   ECDSA_KEY_LEN*6  //!< space for six buffers finalHash, reverseHash, pubkeyX, pubKeyY, sign1, sign2
+#define ECDSA_SHA_TEMPWORKZONE_LEN   ECDSA_KEY_LEN*6  //!< space for six buffers hash, reverseHash, pubkeyX, pubKeyY, sign1, sign2
 
 /*!
  * Version of BIM this image is intended to work with

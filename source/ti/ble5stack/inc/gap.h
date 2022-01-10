@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -136,11 +136,24 @@ extern "C"
  * complete as @ref gapDeviceInitDoneEvent_t.
  */
 #define GAP_DEVICE_INIT_DONE_EVENT            0x00
+/// @cond NODOC
 /**
  * Sent when the Advertising Data or SCAN_RSP Data has been updated. This event
- * is sent as an OSAL message defined as @ref gapAdvDataUpdateEvent_t.
+ * is sent as an OSAL message defined as @ref GapAdv_dataUpdateEvent_t.
+ * This event sent only when using BLE3_CMD compilation flag.
  */
 #define GAP_ADV_DATA_UPDATE_DONE_EVENT        0x02
+/**
+ * Sent when the GAP_MakeDiscoverable command is being used.
+ * This event sent only when using BLE3_CMD compilation flag.
+ */
+#define GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT  0x03
+/**
+ * Sent when the GAP_EndDiscoverable command is being used.
+ * This event sent only when using BLE3_CMD compilation flag.
+ */
+#define GAP_ADV_END_DISCOVERABLE_DONE_EVENT  0x04
+/// @endcond NODOC
 /**
  * Sent after a link has been established as  @ref gapEstLinkReqEvent_t.
  */
@@ -837,6 +850,8 @@ typedef enum
 #define GAP_ADTYPE_SIMPLE_PAIRING_HASHC_256     0x1D
 /// Simple Pairing Randomizer R-256
 #define GAP_ADTYPE_SIMPLE_PAIRING_RANDR_256     0x1E
+/// Service Solicitation: list of 32-bit Service UUIDs
+#define GAP_ADTYPE_SERVICES_LIST_32BIT          0x1F
 /// Service Data - 32-bit UUID
 #define GAP_ADTYPE_SERVICE_DATA_32BIT           0x20
 /// Service Data - 128-bit UUID

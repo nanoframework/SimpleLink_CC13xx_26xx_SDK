@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,8 +41,8 @@
 /* TI-RTOS drivers */
 #include <ti/drivers/ADC.h>
 #include <ti/drivers/adc/ADCCC26XX.h>
-#include <ti/drivers/PIN.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/gpio/GPIOCC26XX.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 
@@ -59,8 +59,9 @@
 
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
     #include DeviceFamily_constructPath(driverlib/aux_wuc.h)
-#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
-    DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
+#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 || \
+       DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+       DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
     #define AUX_EVCTL_EVTOMCUFLAGS_ADC_DONE         AUX_EVCTL_EVTOMCUFLAGS_AUX_ADC_DONE
     #define AUX_EVCTL_EVTOMCUFLAGS_ADC_IRQ          AUX_EVCTL_EVTOMCUFLAGS_AUX_ADC_IRQ
 #endif
@@ -125,12 +126,14 @@ static SemaphoreP_Struct adcSemaphore;
 /*
  *  ======== ADCCC26XX_close ========
  */
-void ADCCC26XX_close(ADC_Handle handle){
-    ADCCC26XX_Object        *object;
+void ADCCC26XX_close(ADC_Handle handle) {
+    ADCCC26XX_HWAttrs const *hwAttrs;
+    ADCCC26XX_Object  *object;
 
     DebugP_assert(handle);
 
     object = handle->object;
+    hwAttrs = handle->hwAttrs;
 
     uint32_t key = HwiP_disable();
 
@@ -139,6 +142,9 @@ void ADCCC26XX_close(ADC_Handle handle){
         if (adcInstance == 0) {
             SemaphoreP_destruct(&adcSemaphore);
         }
+
+        /* Deallocate pins */
+        GPIO_resetConfig(hwAttrs->adcDIO);
         DebugP_log0("ADC: Object closed");
     }
     else {
@@ -146,11 +152,6 @@ void ADCCC26XX_close(ADC_Handle handle){
     }
     object->isOpen = false;
     HwiP_restore(key);
-
-    /* Deallocate pins */
-    if (object->pinHandle){
-        PIN_close(object->pinHandle);
-    }
 }
 
 
@@ -428,7 +429,6 @@ void ADCCC26XX_init(ADC_Handle handle){
 ADC_Handle ADCCC26XX_open(ADC_Handle handle, ADC_Params *params){
     ADCCC26XX_Object            *object;
     ADCCC26XX_HWAttrs           const *hwAttrs;
-    PIN_Config                  adcPinTable[2];
 
     DebugP_assert(handle);
 
@@ -467,24 +467,7 @@ ADC_Handle ADCCC26XX_open(ADC_Handle handle, ADC_Params *params){
     HwiP_restore(key);
 
     /* Reserve the DIO defined in the hwAttrs */
-    uint8_t i = 0;
-
-    /* Add pin to measure on */
-    adcPinTable[i++] = hwAttrs->adcDIO |
-                        PIN_NOPULL |
-                        PIN_INPUT_DIS |
-                        PIN_GPIO_OUTPUT_DIS |
-                        PIN_IRQ_DIS |
-                        PIN_DRVSTR_MIN;
-
-    /* Terminate pin list */
-    adcPinTable[i] = PIN_TERMINATE;
-    object->pinHandle = PIN_open(&object->pinState, adcPinTable);
-    if (!object->pinHandle){
-        DebugP_log0("ADC: Error! Already in use.");
-        object->isOpen = false;
-        return NULL;
-    }
+    GPIO_setConfig(hwAttrs->adcDIO, GPIO_CFG_NO_DIR);
 
     DebugP_log0("ADC: Object opened");
 

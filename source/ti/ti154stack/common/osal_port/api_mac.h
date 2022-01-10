@@ -5,7 +5,7 @@
  @brief TI-15.4 Stack API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -890,6 +890,17 @@ typedef enum
     /*! Diagnostics PIB - Transmit Security fail counter */
     ApiMac_attribute_diagTxSecureFail = 0xF3
 } ApiMac_attribute_uint32_t;
+
+typedef enum
+{
+    /*! Coex Fake PIB stuct */
+    ApiMac_coexAttribute_coexMetrics = 0xF9
+} ApiMac_coexAttribute_struct_t;
+
+typedef enum
+{
+    ApiMac_macAttribute_macStatistics = 0xFA
+} ApiMac_macStatistics_struct_t;
 
 /*! Standard PIB Get and Set Attributes - these attributes are array of bytes */
 typedef enum
@@ -2698,6 +2709,38 @@ extern ApiMac_status_t ApiMac_mlmeGetReqArray(
 
 /*!
  * @brief       This direct execute function retrieves an attribute value from
+ *              the MAC Coex PIB.
+ *
+ * @param       pibAttribute - The attribute identifier
+ * @param       pValue - pointer to the attribute value
+ *
+ * @return      The status of the request, as follows:<BR>
+ *              [ApiMac_status_success](@ref ApiMac_status_success)
+ *               - Operation successful<BR>
+ *              [ApiMac_status_unsupportedAttribute]
+ *              (@ref ApiMac_status_unsupportedAttribute) - Attribute not found
+ */
+extern ApiMac_status_t ApiMac_mlmeGetCoexReqStruct(
+             ApiMac_coexAttribute_struct_t pibAttribute, void *pValue);
+
+/*!
+ * @brief       This direct execute function retrieves an attribute value from
+ *              the MAC Statistics PIB.
+ *
+ * @param       pibAttribute - The attribute identifier
+ * @param       pValue - pointer to the attribute value
+ *
+ * @return      The status of the request, as follows:<BR>
+ *              [ApiMac_status_success](@ref ApiMac_status_success)
+ *               - Operation successful<BR>
+ *              [ApiMac_status_unsupportedAttribute]
+ *              (@ref ApiMac_status_unsupportedAttribute) - Attribute not found
+ */
+extern ApiMac_status_t ApiMac_mlmeGetMacStatsReqStruct(
+        ApiMac_macStatistics_struct_t pibAttribute, void *pValue);
+
+/*!
+ * @brief       This direct execute function retrieves an attribute value from
  *              the MAC Frequency Hopping PIB.
  *
  * @param       pibAttribute - The attribute identifier
@@ -2960,7 +3003,10 @@ extern ApiMac_status_t ApiMac_mlmeSetReqBool(
  * @param       pibAttribute - The attribute identifier
  * @param       value - the attribute value
  *
- * @return      The status of the request
+ * @return      The status of the request. Note, in the case of
+ *              setting ApiMac_attribute_logicalChannel, a return status
+ *              of ApiMac_status_noResources indicates the radio was
+ *              unable to successfully set the channel.
  */
 extern ApiMac_status_t ApiMac_mlmeSetReqUint8(
                 ApiMac_attribute_uint8_t pibAttribute,
@@ -3004,6 +3050,48 @@ extern ApiMac_status_t ApiMac_mlmeSetReqUint32(
 extern ApiMac_status_t ApiMac_mlmeSetReqArray(
                 ApiMac_attribute_array_t pibAttribute,
                 uint8_t *pValue);
+
+/*!
+ * @brief       This direct execute function sets an attribute value
+ *              in the MAC Coex PIB.
+ *
+ * @param       pibAttribute - The attribute identifier
+ * @param       pValue - pointer to the attribute value
+ *
+ * @return      The status of the request, as follows:<BR>
+ *              [ApiMac_status_success](@ref ApiMac_status_success)
+ *               - Operation successful<BR>
+ *              [ApiMac_status_unsupportedAttribute]
+ *              (@ref ApiMac_status_unsupportedAttribute) - Attribute not found
+ */
+extern ApiMac_status_t ApiMac_mlmeSetCoexReqStruct(
+                ApiMac_coexAttribute_struct_t pibAttribute, void *pValue);
+
+/*!
+ * @brief       This direct execute function sets an attribute value
+ *              in the MAC Statistics PIB.
+ *
+ * @param       pibAttribute - The attribute identifier
+ * @param       pValue - pointer to the attribute value
+ *
+ * @return      The status of the request, as follows:<BR>
+ *              [ApiMac_status_success](@ref ApiMac_status_success)
+ *               - Operation successful<BR>
+ *              [ApiMac_status_unsupportedAttribute]
+ *              (@ref ApiMac_status_unsupportedAttribute) - Attribute not found
+ */
+extern ApiMac_status_t ApiMac_mlmeSetMacStatsReqStruct(
+                       ApiMac_macStatistics_struct_t pibAttribute, void *pValue);
+
+/*!
+ * @brief       This enables or disables coex in the MAC.
+ *
+ * @param       enabled - true if enabling Coex, false if disabling
+ *
+ * @return      The status of the request, as follows:<BR>
+ *              [ApiMac_status_success](@ref ApiMac_status_success)
+ */
+extern ApiMac_status_t ApiMac_mlmeEnableCoex(bool enabled);
 
 /*!
  * @brief       This direct execute function sets an attribute value

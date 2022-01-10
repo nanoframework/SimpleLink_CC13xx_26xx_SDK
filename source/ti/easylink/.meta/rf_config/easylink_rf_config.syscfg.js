@@ -662,7 +662,8 @@ function validate(inst, validation)
         }
 
         // If this is a P board, need to check for PA settings
-        if(inst.rfDesign.includes("CC1352P"))
+        if(inst.rfDesign.includes("CC1352P") ||
+            inst.rfDesign.includes("LP_CC2652PSIP"))
         {
             // Verify combined PA table
             if(radioConfigInst.codeExportConfig.paExport !== "combined")

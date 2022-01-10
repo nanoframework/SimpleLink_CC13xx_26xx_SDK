@@ -5,7 +5,7 @@
  @brief This module contains utility functions for sign verification
 
  Group: CMCU
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -60,10 +60,13 @@ extern "C"
 #include "crc32.h"
 
 
-  /*********************************************************************
+/*********************************************************************
  * GLOBAL VARIABLES
  */
 /* ECC ROM global window size and workzone buffer. */
+#if !defined(DeviceFamily_CC26X2) && !defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC13X2X7) && !defined(DeviceFamily_CC26X2X7)
+extern uint32_t *eccRom_workzone;
+#else
 extern uint8_t eccRom_windowSize;
 extern uint32_t *eccRom_workzone;
 
@@ -83,8 +86,7 @@ extern uint32_t NIST_Curve_P256_a;
 extern uint32_t NIST_Curve_P256_b;
 extern uint32_t NIST_Curve_P256_Gx;
 extern uint32_t NIST_Curve_P256_Gy;
-
-//extern uint8_t finalHash[32];
+#endif /* !DeviceFamily_CC26X2 && !DeviceFamily_CC13X2 && !DeviceFamily_CC13X2X7 && !DeviceFamily_CC26X2X7*/
 
 /*********************************************************************
  * MACROS

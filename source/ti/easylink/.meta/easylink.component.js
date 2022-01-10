@@ -39,7 +39,7 @@ let topModules;
 const categoryName = "RF Stacks";
 const deviceId = system.deviceData.deviceId;
 
-if(deviceId.match(/CC2652(P|R)(1)|CC13.2.1/))
+if(deviceId.match(/CC2652(P|R)(1)|CC13.2.1/) && !deviceId.match(/CC2652RB/))
 { // CC13x2
     topModules = [
         {

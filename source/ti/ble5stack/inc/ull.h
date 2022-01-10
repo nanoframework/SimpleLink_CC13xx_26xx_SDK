@@ -6,7 +6,7 @@
         BLE Stack.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -308,17 +308,6 @@ void ull_monitorRegisterCB(pfnMonitorIndCB_t pfnMonitorIndicationCB,
  *          FAILURE - Failed to enter ULL_STATE_MONITORING
  */
 bStatus_t ull_monitorStart(uint8_t channel);
-
-/*********************************************************************
- * @fn      ull_monitorStop
- *
- * @brief   Exit ULL_STATE_SMONITORING
- *
- * @param   none
- *
- * @return  none
- */
-void      ull_monitorStop(void);
 
 #endif /* FEATURE_MONITOR */
 

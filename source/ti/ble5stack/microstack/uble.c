@@ -7,7 +7,7 @@
         interfacing between Micro BLE Stack and the application.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -344,6 +344,63 @@ bStatus_t uble_stackInit(ubleAddrType_t addrType, uint8 *pStaticAddr,
   qEvtMsg = port_queueCreate("qEvtMsg");
 
   return SUCCESS;
+}
+
+/**
+ * @fn          uble_timeCompare
+ *
+ * @brief       This function determines if the first time parameter is greater
+ *              than the second time parameter, taking timer counter wrap into
+ *              account. If so, TRUE is returned.
+ *
+ * @param       time1 - First time.
+ * @param       time2 - Second time.
+ *
+ * @return      TRUE:  When first parameter is greater than second.
+ *              FALSE: When first parmaeter is less than or equal to
+ *                     the second.
+ */
+uint8 uble_timeCompare(uint32 time1, uint32 time2)
+{
+  if ( time1 > time2 )
+  {
+    // check if time1 is greater than time2 due to wrap; that is, time2 is
+    // actually greater than time1
+    // Note: LL_MAX_OVERLAP_TIME_LIMIT value is 8 minutes which is ~half of the
+    // 17 minutes overlap of the RF.
+    return ( (uint8)((time1-time2) <= UBLE_MAX_OVERLAP_TIME_LIMIT) );
+  }
+  else // time2 >= time1
+  {
+    // check if time2 is greater than time1 due to wrap; that is, time1 is
+    // actually greater than time2
+    // Note: LL_MAX_OVERLAP_TIME_LIMIT value is 8 minutes which is ~half of the
+    // 17 minutes overlap of the RF.
+    return( (uint8)((time2-time1) > UBLE_MAX_OVERLAP_TIME_LIMIT) );
+  }
+}
+
+/**
+ * @fn          uble_timeDelta
+ *
+ * @brief       This function determines the difference between two time
+ *              parameters, taking timer counter wrap into account.
+ *
+ * @param       time1 - First time.
+ * @param       time2 - Second time.
+ *
+ * @return      Difference between time1 and time2.
+ */
+uint32 uble_timeDelta(uint32 time1, uint32 time2)
+{
+  if ( time1 >= time2 )
+  {
+    return( time1 - time2 );
+  }
+  else // time2 > time1
+  {
+    return( (UBLE_MAX_32BIT_TIME - (time2 - time1)) + 1 );
+  }
 }
 
 /**

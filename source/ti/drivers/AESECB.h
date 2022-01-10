@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@
  *  blocks of ciphertext can be decrypted individually and out of order.
  *  Encrypting the same plaintext using the same key yields identical ciphertext.
  *  This raises several security issues. For this reason, it is not recommended
- *  that ECB be used unless interfacing with unupdatable legacy systems
+ *  that ECB be used unless interfacing with legacy systems that can't be updated
  *  or where a standard specifies its use. Better alternatives would be an
  *  authenticated encryption with associated data (AEAD) mode such as
  *  CCM or GCM.
@@ -64,9 +64,9 @@
  *      - Call AESECB_open() to open an instance of the driver
  *      - Initialize a CryptoKey. These opaque datastructures are representations
  *        of keying material and its storage. Depending on how the keying material
- *        is stored (RAM or flash, key store, key blob), the CryptoKey must be
+ *        is stored (RAM or flash, key store), the CryptoKey must be
  *        initialized differently. The AESECB API can handle all types of CryptoKey.
- *        However, not all device-specific implementions support all types of CryptoKey.
+ *        However, not all device-specific implementations support all types of CryptoKey.
  *        Devices without a key store will not support CryptoKeys with keying material
  *        stored in a key store for example.
  *        All devices support plaintext CryptoKeys.
@@ -78,7 +78,7 @@
  *  The AESECB_oneStepEncrypt and AESECB_oneStepDecrypt functions do an ECB operation in a single call.
  *  They will always be the most highly optimized routines with the least overhead and the fastest
  *  runtime. Since ECB plaintext blocks are simply encrypted with the block cipher block by block,
- *  there is no difference in the ciphertext between encrypting two blocks in one go or encypting
+ *  there is no difference in the ciphertext between encrypting two blocks in one go or encrypting
  *  each block individually.
  *
  *  ## After the ECB operation completes #
@@ -108,8 +108,10 @@
  *  operation.key               = &cryptoKey;
  *  operation.input             = plaintext;
  *  operation.output            = ciphertext;
+ *  // Input length must be a non-zero multiple of block-size (16 bytes)
+ *  // for one-step operations. The user or application should take care of
+ *  // necessary padding.
  *  operation.inputLength       = sizeof(plaintext);
- *  operation.iv                = iv;
  *
  *  encryptionResult = AESECB_oneStepEncrypt(handle, &operation);
  *
@@ -120,11 +122,11 @@
  *
  *  ## Examples
  *
- *  ### Encyption of multiple plaintext blocks in blocking mode #
+ *  ### Encryption of multiple plaintext blocks in blocking mode #
  *  @code
  *
  *  #include <ti/drivers/AESECB.h>
- *  #include <ti/drivers/types/cryptoKey/CryptoKey_Plaintext.h>
+ *  #include <ti/drivers/cryptouils/cryptokey/CryptoKeyPlaintext.h>
  *
  *  ...
  *
@@ -135,7 +137,7 @@
  *                         0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
  *                         0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
  *                         0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51};
- *  uint8_t ciphertext[sizof(plaintext)];
+ *  uint8_t ciphertext[sizeof(plaintext)];
  *  uint8_t keyingMaterial[16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
  *                                0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
  *
@@ -153,6 +155,9 @@
  *      operation.key               = &cryptoKey;
  *      operation.input             = plaintext;
  *      operation.output            = ciphertext;
+ *      // Input length must be a non-zero multiple of block-size (16 bytes)
+ *      // for one-step operations. The user or application should take care of
+ *      // necessary padding.
  *      operation.inputLength       = sizeof(plaintext);
  *
  *  encryptionResult = AESECB_oneStepEncrypt(handle, &operation);
@@ -228,6 +233,9 @@
  *      operation.key               = &cryptoKey;
  *      operation.input             = plaintext;
  *      operation.output            = ciphertext;
+ *      // Input length must be a non-zero multiple of block-size (16 bytes)
+ *      // for one-step operations. The user or application should take care of
+ *      // necessary padding.
  *      operation.inputLength       = sizeof(plaintext);
  *
  *      decryptionResult = AESECB_oneStepDecrypt(handle, &operation);
@@ -240,6 +248,174 @@
  *
  *  }
  *
+ *  @endcode
+ *
+ *  ### Multi-step ECB encryption in blocking mode #
+ *  @code
+ *
+ *  #include <ti/drivers/AESECB.h>
+ *  #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+ *
+ *  #define AES_BLOCK_SIZE  16      // bytes
+ *
+ *  ...
+ *
+ *  AESECB_Handle handle;
+ *  CryptoKey cryptoKey;
+ *  int_fast16_t encryptionResult;
+ *  int_fast16_t setupEncryptionResult;
+ *  int_fast16_t finalizeEncryptionResult;
+ *  uint8_t plaintext[] = {0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
+ *                         0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
+ *                         0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
+ *                         0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51};
+ *  uint8_t ciphertext[sizeof(plaintext)];
+ *  uint8_t keyingMaterial[16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+ *                                0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
+ *
+ *  handle = AESECB_open(0, NULL);
+ *
+ *  if (handle == NULL) {
+ *      // handle error
+ *  }
+ *
+ *  CryptoKeyPlaintext_initKey(&cryptoKey, keyingMaterial, sizeof(keyingMaterial));
+ *
+ *  setupEncryptionResult = AESECB_setupEncrypt(handle, &cryptoKey);
+ *  if (setupEncryptionResult != AESECB_STATUS_SUCCESS) {
+ *      // handle error
+ *  }
+ *
+ *  AESECB_Operation operation;
+ *  AESECB_Operation_init(&operation);
+ *
+ *  operation.key               = &cryptoKey;
+ *  operation.input             = plaintext;
+ *  operation.output            = ciphertext;
+ *  // Input length must be a non-zero multiple of block-size (16 bytes) for calling
+ *  // #AESECB_addData(). The user or application should take care of necessary padding
+ *  // if the final block of data is being added for the entire segmented operation.
+ *  operation.inputLength       = AES_BLOCK_SIZE;
+ *
+ *  encryptionResult = AESECB_addData(handle, &operation);
+ *  if (encryptionResult != AESECB_STATUS_SUCCESS) {
+ *      // handle error
+ *  }
+ *
+ *  operation.input             = plaintext + AES_BLOCK_SIZE;
+ *  operation.output            = ciphertext + AES_BLOCK_SIZE;
+ *  // Input length must either be a non-zero multiple of block-size (16 bytes)
+ *  // for calling #AESECB_finalize(), or it could be zero in case of finalizing without
+ *  // any more data. The user or application should take care of necessary padding
+ *  // for the last block of data.
+ *  operation.inputLength       = AES_BLOCK_SIZE;
+ *
+ *  finalizeEncryptionResult = AESECB_finalize(handle, &operation);
+ *  if (finalizeEncryptionResult != AESECB_STATUS_SUCCESS) {
+ *      // handle error
+ *  }
+ *
+ *  // The resultant ciphertext should be:
+ *  // 0x3a, 0xd7, 0x7b, 0xb4, 0x0d, 0x7a, 0x36, 0x60,
+ *  // 0xa8, 0x9e, 0xca, 0xf3, 0x24, 0x66, 0xef, 0x97,
+ *  // 0xf5, 0xd3, 0xd5, 0x85, 0x03, 0xb9, 0x69, 0x9d,
+ *  // 0xe7, 0x85, 0x89, 0x5a, 0x96, 0xfd, 0xba, 0xaf
+ *
+ *
+ *  AESECB_close(handle);
+ *
+ *  }
+ *
+ *  @endcode
+ *
+ *  ### Multi-step ECB decryption in callback mode #
+ *  @code
+ *
+ *  #include <ti/drivers/AESECB.h>
+ *  #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+ *
+ *  #define AES_BLOCK_SIZE  16      // bytes
+ *
+ *  ...
+ *  uint8_t ciphertext[]                    = {0xf3, 0xee, 0xd1, 0xbd, 0xb5, 0xd2, 0xa0, 0x3c,
+ *                                             0x06, 0x4b, 0x5a, 0x7e, 0x3d, 0xb1, 0x81, 0xf8};
+ *  uint8_t keyingMaterial[32]              = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe,
+ *                                             0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
+ *                                             0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7,
+ *                                             0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
+ *  uint8_t plaintext[sizeof(ciphertext)];
+ *
+ *  // The plaintext should be the following after the decryption operation:
+ *  // 0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96,
+ *  // 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a,
+ *
+ *
+ *  void ecbCallback(AESECB_Handle handle,
+ *                   int_fast16_t returnValue,
+ *                   AESECB_Operation *operation,
+ *                   AESECB_OperationType operationType) {
+ *
+ *      if (returnValue != AESECB_STATUS_SUCCESS) {
+ *          // handle error
+ *      }
+ *  }
+ *
+ *  AESECB_Operation operation;
+ *
+ *  void ecbStartFunction(void) {
+ *      AESECB_Handle handle;
+ *      AESECB_Params params;
+ *      CryptoKey cryptoKey;
+ *      int_fast16_t decryptionResult;
+ *      int_fast16_t setupDecryptionResult;
+ *      int_fast16_t finalizeDecryptionResult;
+ *
+ *      AESECB_Params_init(&params);
+ *      params.returnBehavior = AESECB_RETURN_BEHAVIOR_CALLBACK;
+ *      params.callbackFxn = ecbCallback;
+ *
+ *      handle = AESECB_open(0, &params);
+ *
+ *      if (handle == NULL) {
+ *          // handle error
+ *      }
+ *
+ *      CryptoKeyPlaintext_initKey(&cryptoKey, keyingMaterial, sizeof(keyingMaterial));
+ *
+ *      setupDecryptionResult = AESECB_setupDecrypt(handle, &cryptoKey);
+ *      if (setupDecryptionResult != AESECB_STATUS_SUCCESS) {
+ *          // handle error
+ *      }
+ *
+ *      AESECB_Operation_init(&operation);
+ *
+ *      operation.key               = &cryptoKey;
+ *      operation.input             = plaintext;
+ *      operation.output            = ciphertext;
+ *      // Input length must be a non-zero multiple of block-size (16 bytes) for calling
+ *      // #AESECB_addData(). The user or application should take care of necessary padding
+ *      // if the final block of data is being added for the entire segmented operation.
+ *      operation.inputLength       = AES_BLOCK_SIZE;
+ *
+ *      decryptionResult = AESECB_addData(handle, &operation);
+ *      if (decryptionResult != AESECB_STATUS_SUCCESS) {
+ *          // handle error
+ *      }
+ *
+ *      // do other things while ECB operation completes in the background
+ *
+ *      // Input length must either be a non-zero multiple of block-size (16 bytes)
+ *      // for calling #AESECB_finalize(), or it could be zero in case of finalizing without
+ *      // any more data as shown in this example. There's no more data involved and padding
+ *      // is not applicable for this finalization operation.
+ *      operation.inputLength       = 0;
+ *
+ *      finalizeDecryptionResult = AESECB_finalize(handle, &operation);
+ *      if (finalizeDecryptionResult != AESECB_STATUS_SUCCESS) {
+ *          // handle error
+ *      }
+ *
+ *  }
  *
  *  @endcode
  */
@@ -330,9 +506,9 @@ typedef AESECB_Config *AESECB_Handle;
  * @brief   The way in which ECB function calls return after performing an
  * encryption + authentication or decryption + verification operation.
  *
- * Not all ECB operations exhibit the specified return behavor. Functions that do not
+ * Not all ECB operations exhibit the specified return behavior. Functions that do not
  * require significant computation and cannot offload that computation to a background thread
- * behave like regular functions. Which functions exhibit the specfied return behavior is not
+ * behave like regular functions. Which functions exhibit the specified return behavior is not
  * implementation dependent. Specifically, a software-backed implementation run on the same
  * CPU as the application will emulate the return behavior while not actually offloading
  * the computation to the background thread.
@@ -377,21 +553,39 @@ typedef enum {
  *          and a message.
  */
 typedef struct {
-   CryptoKey                *key;                       /*!< A previously initialized CryptoKey */
-   uint8_t                  *input;                     /*!<
-                                                         *   - Encryption: The plaintext buffer to be encrypted
-                                                         *   in the ECB operation.
-                                                         *   - Decryption: The ciphertext to be decrypted.
-                                                         */
-   uint8_t                  *output;                    /*!<
-                                                         *   - Encryption: The output ciphertext buffer that the encrypted plaintext
-                                                         *   is copied to.
-                                                         *   - Decryption: The plaintext derived from the decrypted
-                                                         *   ciphertext is copied here.
-                                                         */
-   size_t                   inputLength;                /*!< Length of the input and output in bytes. Must be a multiple of the
-                                                         *   AES block size (16 bytes)
-                                                         */
+   CryptoKey                *key;                        /*!< A previously initialized CryptoKey */
+   uint8_t                  *input;                      /*!<
+                                                          *   - Encryption: A pointer to the plaintext buffer.
+                                                          *   - Decryption: A pointer to the ciphertext buffer.
+                                                          *
+                                                          *   Both input and output buffers should be of the size
+                                                          *   \c inputLength in bytes each.
+                                                          */
+   uint8_t                  *output;                     /*!<
+                                                          *   - Encryption: A pointer to the buffer to store the
+                                                          *     resulting ciphertext.
+                                                          *   - Decryption: A pointer to the buffer to store the
+                                                          *   resulting plaintext.
+                                                          *
+                                                          *   Both input and output buffers should be of the size
+                                                          *   \c inputLength in bytes each.
+                                                          */
+   size_t                   inputLength;                 /*!<
+                                                          *   - One-step operation: Total length of the input in
+                                                          *     bytes.
+                                                          *   - Multi-step / Segmented operation: Length of the
+                                                          *     input in bytes for that #AESECB_addData()
+                                                          *     or #AESECB_finalize() call.
+                                                          *
+                                                          *   The output will be the same length as the input.
+                                                          *
+                                                          *   Must be a non-zero multiple of block-size (16 bytes).
+                                                          *   May be 0 only when calling #AESECB_finalize() to
+                                                          *   finalize a multi-step operation without additional
+                                                          *   data.
+                                                          *   The user or application should take care of
+                                                          *   necessary padding.
+                                                          */
 } AESECB_Operation;
 
 /*!
@@ -400,22 +594,26 @@ typedef struct {
 typedef enum {
     AESECB_OPERATION_TYPE_ENCRYPT = 1,
     AESECB_OPERATION_TYPE_DECRYPT = 2,
+    AESECB_OPERATION_TYPE_ENCRYPT_SEGMENTED = 3,
+    AESECB_OPERATION_TYPE_DECRYPT_SEGMENTED = 4,
+    AESECB_OPERATION_TYPE_FINALIZE_ENCRYPT_SEGMENTED = 5,
+    AESECB_OPERATION_TYPE_FINALIZE_DECRYPT_SEGMENTED = 6
 } AESECB_OperationType;
 
 /*!
  *  @brief  The definition of a callback function used by the AESECB driver
  *          when used in ::AESECB_RETURN_BEHAVIOR_CALLBACK
  *
- *  @param  handle Handle of the client that started the ECB operation.
+ *  @param  handle        Handle of the client that started the ECB operation.
  *
- *  @param  returnValue  The result of the CCM operation. May contain an error code.
- *                       Informs the application of why the callback function was
- *                       called.
+ *  @param  returnValue   The result of the ECB operation. May contain an error code.
+ *                        Informs the application of why the callback function was
+ *                        called.
  *
- *  @param  operation A pointer to an operation struct.
+ *  @param  operation     A pointer to an operation struct.
  *
  *  @param  operationType This parameter determines which operation the
- *          callback refers to.
+ *                        callback refers to.
  */
 typedef void (*AESECB_CallbackFxn) (AESECB_Handle handle,
                                     int_fast16_t returnValue,
@@ -425,10 +623,10 @@ typedef void (*AESECB_CallbackFxn) (AESECB_Handle handle,
 /*!
  *  @brief  ECB Parameters
  *
- *  ECB Parameters are used to with the AESECB_open() call. Default values for
- *  these parameters are set using AESECB_Params_init().
+ *  ECB Parameters are used with the #AESECB_open() call. Default values for
+ *  these parameters are set using #AESECB_Params_init().
  *
- *  @sa     AESECB_Params_init()
+ *  @sa     #AESECB_Params_init()
  */
 typedef struct {
     AESECB_ReturnBehavior   returnBehavior;             /*!< Blocking, callback, or polling return behavior */
@@ -442,9 +640,9 @@ typedef struct {
 } AESECB_Params;
 
 /*!
- *  @brief Default AESECB_Params structure
+ *  @brief Default #AESECB_Params structure
  *
- *  @sa     AESECB_Params_init()
+ *  @sa     #AESECB_Params_init()
  */
 extern const AESECB_Params AESECB_defaultParams;
 
@@ -459,9 +657,9 @@ extern const AESECB_Params AESECB_defaultParams;
 void AESECB_init(void);
 
 /*!
- *  @brief  Function to initialize the AESECB_Params struct to its defaults
+ *  @brief  Function to initialize the #AESECB_Params struct to its defaults
  *
- *  @param  params      An pointer to AESECB_Params structure for
+ *  @param  params      An pointer to #AESECB_Params structure for
  *                      initialization
  *
  *  Defaults values are:
@@ -475,38 +673,38 @@ void AESECB_Params_init(AESECB_Params *params);
 /*!
  *  @brief  This function opens a given ECB peripheral.
  *
- *  @pre    ECB controller has been initialized using AESECB_init()
+ *  @pre    ECB controller has been initialized using #AESECB_init()
  *
- *  @param  index         Logical peripheral number for the ECB indexed into
+ *  @param  [in] index    Logical peripheral number for the ECB indexed into
  *                        the AESECB_config table
  *
- *  @param  params        Pointer to an parameter block, if NULL it will use
+ *  @param  [in] params   Pointer to an parameter block, if NULL it will use
  *                        default values.
  *
- *  @return An AESECB_Handle on success or a NULL on an error or if it has been
+ *  @return An #AESECB_Handle on success or a NULL on an error or if it has been
  *          opened already.
  *
- *  @sa     AESECB_init()
- *  @sa     AESECB_close()
+ *  @sa     #AESECB_init()
+ *  @sa     #AESECB_close()
  */
 AESECB_Handle AESECB_open(uint_least8_t index, const AESECB_Params *params);
 
 /*!
  *  @brief  Function to close an ECB peripheral specified by the ECB handle
  *
- *  @pre    AESECB_open() has to be called first.
+ *  @pre    #AESECB_open() or #AESECB_construct()
  *
- *  @param  handle An ECB handle returned from AESECB_open()
+ *  @param  [in] handle An ECB handle returned from #AESECB_open() or #AESECB_construct()
  *
  *  @sa     AESECB_open()
  */
 void AESECB_close(AESECB_Handle handle);
 
 /*!
- *  @brief  Function to initialize an AESECB_Operation struct to its defaults
+ *  @brief  Function to initialize an #AESECB_Operation struct to its defaults
  *
- *  @param  operationStruct     An pointer to AESECB_Operation structure for
- *                              initialization
+ *  @param  [in] operationStruct     An pointer to #AESECB_Operation structure for
+ *                                  initialization
  *
  *  Defaults values are all zeros.
  */
@@ -518,16 +716,15 @@ void AESECB_Operation_init(AESECB_Operation *operationStruct);
  *  @note   None of the buffers provided as arguments may be altered by the application during an ongoing operation.
  *          Doing so can yield corrupted ciphertext or incorrect authentication.
  *
- *  @pre    AESECB_open() and AESECB_Operation_init() have to be called first.
+ *  @pre    #AESECB_open() or #AESECB_construct(), and AESECB_Operation_init() have to be called first.
  *
- *  @param  [in] handle                 An ECB handle returned from AESECB_open()
+ *  @param  [in] handle                 An ECB handle returned from #AESECB_open() or #AESECB_construct()
  *
  *  @param  [in] operation              A pointer to a struct containing the parameters required to perform the operation.
  *
  *  @retval #AESECB_STATUS_SUCCESS               The operation succeeded.
  *  @retval #AESECB_STATUS_ERROR                 The operation failed.
  *  @retval #AESECB_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
- *  @retval #AESECB_STATUS_CANCELED              The operation was canceled.
  *
  *  @sa     AESECB_oneStepDecrypt()
  */
@@ -539,33 +736,112 @@ int_fast16_t AESECB_oneStepEncrypt(AESECB_Handle handle, AESECB_Operation *opera
  *  @note   None of the buffers provided as arguments may be altered by the application during an ongoing operation.
  *          Doing so can yield corrupted plaintext or incorrectly failed verification.
  *
- *  @pre    AESECB_open() and AESECB_Operation_init() have to be called first.
+ *  @pre    #AESECB_open() or #AESECB_construct(), and AESECB_Operation_init() have to be called first.
  *
- *  @param  [in] handle                 An ECB handle returned from AESECB_open()
+ *  @param  [in] handle                 An ECB handle returned from #AESECB_open() or #AESECB_construct()
  *
  *  @param  [in] operation              A pointer to a struct containing the parameters required to perform the operation.
  *
  *  @retval #AESECB_STATUS_SUCCESS               The operation succeeded.
  *  @retval #AESECB_STATUS_ERROR                 The operation failed.
  *  @retval #AESECB_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
- *  @retval #AESECB_STATUS_CANCELED              The operation was canceled.
  *
  *  @sa     AESECB_oneStepEncrypt()
  */
 int_fast16_t AESECB_oneStepDecrypt(AESECB_Handle handle, AESECB_Operation *operation);
 
 /*!
+ *  @brief  Function to prepare a segmented AESECB encryption operation.
+ *
+ *  This functions sets up a segmented AESECB encryption operation.
+ *
+ *  @pre    #AESECB_open() or #AESECB_construct()
+ *
+ *  @param  [in] handle     An ECB handle returned from #AESECB_open()
+ *                          or #AESECB_construct()
+ *
+ *  @param  [in] key        A previously initialized CryptoKey.
+ *
+ *  @retval #AESECB_STATUS_SUCCESS                  The operation succeeded.
+ *  @retval #AESECB_STATUS_ERROR                    The operation failed.
+ *
+ *  @post   #AESECB_addData()
+ */
+int_fast16_t AESECB_setupEncrypt(AESECB_Handle handle, const CryptoKey *key);
+
+/*!
+ *  @brief  Function to prepare a segmented AESECB decryption operation.
+ *
+ *  This functions sets up a segmented AESECB decryption operation.
+ *
+ *  @pre    #AESECB_open() or #AESECB_construct()
+ *
+ *  @param  [in] handle     An ECB handle returned from #AESECB_open()
+ *                          or #AESECB_construct()
+ *
+ *  @param  [in] key        A previously initialized CryptoKey.
+ *
+ *  @retval #AESECB_STATUS_SUCCESS                  The operation succeeded.
+ *  @retval #AESECB_STATUS_ERROR                    The operation failed.
+ *
+ *  @post   #AESECB_addData()
+ */
+int_fast16_t AESECB_setupDecrypt(AESECB_Handle handle, const CryptoKey *key);
+
+/*!
+ *  @brief  Encrypts or decrypts segment of @a data with a @a length
+ *
+ *  #AESECB_addData() may be called an arbitrary number times before finishing the operation with
+ *  #AESECB_finalize(). Note that this function is called for use with segmented operations. For
+ *  segmented operations, @c inputLength will govern the input/output lengths and
+ *  must be a AES block size multiple (16-bytes).
+ *
+ *  @pre    #AESECB_setupEncrypt() or #AESECB_setupDecrypt()
+ *
+ *  @param  [in] handle         An ECB handle returned from #AESECB_open() or #AESECB_construct()
+ *
+ *  @param  [in] operation      Pointer to ECB operation structure()
+ *
+ *  @retval #AESECB_STATUS_SUCCESS               The operation succeeded.
+ *  @retval #AESECB_STATUS_ERROR                 The operation failed.
+ *  @retval #AESECB_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
+ *
+ *  @post   #AESECB_addData() or #AESECB_finalize()
+ */
+int_fast16_t AESECB_addData(AESECB_Handle handle,
+                            AESECB_Operation * operation);
+
+/*!
+ *  @brief  Finalize the AES transaction. If new data needs to be added,
+ *  @c inputLength will be used to govern how many bytes will be written.
+ *
+ *  @pre    #AESECB_addData()
+ *
+ *  @param  [in] handle         An ECB handle returned from #AESECB_open() or #AESECB_construct()
+ *
+ *  @param  [in] operation      Pointer to ECB operation structure()
+ *
+ *  @retval #AESECB_STATUS_SUCCESS              In ::AESECB_RETURN_BEHAVIOR_BLOCKING and
+ *                                              ::AESECB_RETURN_BEHAVIOR_POLLING, this means the ECB
+ *                                              was generated successfully. In ::AESECB_RETURN_BEHAVIOR_CALLBACK,
+ *                                              this means the operation started successfully.
+ *  @retval #AESECB_STATUS_ERROR                The operation failed.
+ *  @retval #AESECB_STATUS_RESOURCE_UNAVAILABLE  The required hardware resource was not available. Try again later.
+ */
+int_fast16_t AESECB_finalize(AESECB_Handle handle,
+                             AESECB_Operation * operation);
+
+/*!
  *  @brief Cancels an ongoing AESECB operation.
  *
  *  Asynchronously cancels an AESECB operation. Only available when using
- *  AESECB_RETURN_BEHAVIOR_CALLBACK or AESECB_RETURN_BEHAVIOR_BLOCKING.
- *  The operation will terminate as though an error occured. The
+ *  AESECB_RETURN_BEHAVIOR_CALLBACK.
+ *  The operation will terminate as though an error occurred. The
  *  return status code of the operation will be AESECB_STATUS_CANCELED.
  *
- *  @param  handle Handle of the operation to cancel
+ *  @param  [in] handle Handle of the operation to cancel
  *
- *  @retval #AESECB_STATUS_SUCCESS               The operation was canceled.
- *  @retval #AESECB_STATUS_ERROR                 The operation was not canceled. There may be no operation to cancel.
+ *  @retval #AESECB_STATUS_SUCCESS               The operation was canceled, or the requested operation had already completed.
  */
 int_fast16_t AESECB_cancelOperation(AESECB_Handle handle);
 

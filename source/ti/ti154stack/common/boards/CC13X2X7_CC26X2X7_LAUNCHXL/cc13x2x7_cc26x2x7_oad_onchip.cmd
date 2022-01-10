@@ -5,7 +5,7 @@
  @brief Linker configuration file for 15.4 OAD on cc13x2/cc26x2 devices
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

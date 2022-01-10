@@ -1,0 +1,1 @@
+this folder has pictures for the quick start guide except the visio created one

@@ -296,20 +296,6 @@
                     "longDescription": ""
                 },
                 {
-                    "name": "txPower169",
-                    "displayName": "TX Power (dBm)",
-                    "description": "TX Power",
-                    "default": "10",
-                    "hidden": true
-                },
-                {
-                    "name": "txPower433",
-                    "displayName": "TX Power (dBm)",
-                    "description": "TX Power",
-                    "default": "10",
-                    "hidden": true
-                },
-                {
                     "name": "whitening",
                     "displayName": "Whitening",
                     "description": "Whitening",

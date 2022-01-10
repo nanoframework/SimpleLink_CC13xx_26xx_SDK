@@ -33,7 +33,6 @@
         <file name="package/package.xdc.inc"/>
         <file name=".meta/Common.js"/>
         <file name=".meta/JSON.syscfg.js"/>
-        <file name=".meta/RTOS.syscfg.js"/>
         <file name=".meta/tiutils.component.js"/>
         <file name="package.bld"/>
         <file name="package/package.cfg.xdc.inc"/>

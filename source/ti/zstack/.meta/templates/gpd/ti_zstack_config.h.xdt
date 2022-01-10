@@ -103,6 +103,10 @@ extern "C"
 #define GPD_CHANNEL            `zstack.gpdRf.channel`
 #endif
 
+#ifndef TXPOWER
+#define TXPOWER                     `zstack.gpdRf.txPower`
+#endif
+
 #ifndef DEVICE_ID
 #define DEVICE_ID              `zstack.gpdNetwork.gpdType`
 #endif

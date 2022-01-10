@@ -36,6 +36,14 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
  * available may depend on other features that have been enabled in the stack */
 #define CONFIG_BT_MESH 1
 
+% if(ble.useExtAdv)
+% {
+/* ------------------------------------------------------------------------- */
+// Extended Advertise
+/* ------------------------------------------------------------------------- */
+#define ZEPHYR_ADV_EXT
+
+% }
 % if(ble.staticProv)
 % {
 /* ------------------------------------------------------------------------- */
@@ -84,6 +92,20 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
  * the same time. */
 #define CONFIG_BT_MESH_SUBNET_COUNT `ble.subnetCount`
 
+/* Macros to initialize app_keys and subnet_keys */
+#define ZEPHYR_APP_KEYS_INITIATOR \
+% let i = 0;
+% for (i = 0; i < ble.appKeyCount; i++)
+% {
+    {.app_idx = BT_MESH_KEY_UNUSED, .net_idx = BT_MESH_KEY_UNUSED}, \
+% }
+
+#define ZEPHYR_SBUNET_KEYS_INITIATOR \
+% for (i = 0; i < ble.subnetCount; i++)
+% {
+    {.net_idx = BT_MESH_KEY_UNUSED}, \
+% }
+
 /* Number of messages that are cached for the network. This helps prevent
  * unnecessary decryption operations and unnecessary relays. This option is
  * similar to the replay protection list, but has a different purpose. */
@@ -127,9 +149,6 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 /* Maximum number of simultaneous incoming multi-segment and/or reliable
  * messages. */
 #define CONFIG_BT_MESH_RX_SEG_MSG_COUNT `ble.maxNumSegMsgRX`
-
-/* Maximum size for Transport layer RX SDUs */
-#define CONFIG_BT_MESH_RX_SDU_MAX `ble.maxSizeRXSdu`
 
 /* Maximum incoming Upper Transport Access PDU length. This determines also
 * how many segments incoming segmented messages can have. Each segment can
@@ -176,6 +195,9 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 #define CONFIG_BT_MESH_PROV 1
 % }
 
+/* Configures the timeout for re-transmitting provisioning packets */
+#define CONFIG_BT_MESH_PB_ADV_RETRANS_TIMEOUT `ble.provTimeout`
+
 %if(ble.advbearer)
 % {
 /* Enable this option to allow the device to be provisioned over the
@@ -201,6 +223,8 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 
 /* Enable this option to be able to act as a Relay Node. */
 #define CONFIG_BT_MESH_RELAY 1
+
+#define CONFIG_BT_MESH_RELAY_ENABLED 1
 /* ------------------------------------------------------------------------- */
 
 % }
@@ -245,9 +269,10 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 /* ------------------------------------------------------------------------- */
 // Friend
 /* ------------------------------------------------------------------------- */
-
 /* Enable this option to be able to act as a Friend Node. */
 #define CONFIG_BT_MESH_FRIEND 1
+
+#define CONFIG_BT_MESH_FRIEND_ENABLED 1
 
 /* Receive Window in milliseconds supported by the Friend node. */
 #define CONFIG_BT_MESH_FRIEND_RECV_WIN `ble.recieveWindow`
@@ -346,6 +371,27 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 #define ERPC_REMOVE__bt_mesh_lpn_set_cb
 #define ERPC_REMOVE__bt_mesh_lpn_poll
 % }
+
+/* ------------------------------------------------------------------------- */
+// Configuration Server
+/* ------------------------------------------------------------------------- */
+#define CONFIG_BT_MESH_DEFAULT_TTL                      `ble.default_ttl`
+#define CONFIG_BT_MESH_NETWORK_TRANSMIT_COUNT           `ble.net_transmit_count`
+#define CONFIG_BT_MESH_NETWORK_TRANSMIT_INTERVAL        `ble.net_transmit_int_ms`
+#define CONFIG_BT_MESH_RELAY_RETRANSMIT_COUNT           `ble.relay_retransmit_count`
+#define CONFIG_BT_MESH_RELAY_RETRANSMIT_INTERVAL        `ble.relay_retransmit_int_ms`
+#define CONFIG_BT_MESH_TX_SEG_RETRANS_COUNT             `ble.trans_msg_seg_retrans_attempts`
+#define CONFIG_BT_MESH_TX_SEG_RETRANS_TIMEOUT_UNICAST   `ble.trans_msg_seg_retrans_int_unicast`
+#define CONFIG_BT_MESH_TX_SEG_RETRANS_TIMEOUT_GROUP     `ble.trans_msg_seg_retrans_int_group`
+%if(ble.proxy)
+%{
+#define CONFIG_BT_MESH_GATT_PROXY_ENABLED 1
+%}
+%if(ble.beaconState)
+%{
+#define CONFIG_BT_MESH_BEACON_ENABLED 1
+%}
+
 /* ------------------------------------------------------------------------- */
 
 

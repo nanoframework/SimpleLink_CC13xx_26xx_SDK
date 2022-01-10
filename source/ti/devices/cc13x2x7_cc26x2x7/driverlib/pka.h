@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       pka.h
-*  Revised:        2021-01-06 11:22:00 +0100 (Wed, 06 Jan 2021)
-*  Revision:       59986
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    PKA header file.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

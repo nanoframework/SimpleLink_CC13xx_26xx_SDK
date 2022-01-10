@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -449,6 +449,55 @@ extern "C"
 #define GAPBOND_KEYDIST_MLINK                    0x80
 /** @} End GAPBondMgr_Key_Distr */
 
+/**
+ * GAP Bond Manager NV layout
+ *
+ * The NV definitions:
+ *     BLE_NVID_GAP_BOND_START - starting NV ID
+ *     gapBond_maxBonds - Maximum number of bonding allowed (32 is max for
+ *                        number of NV IDs allocated in bcomdef.h).
+ *
+ * A single bonding entry consists of 6 components (NV items):
+ *     Bond Record - defined as gapBondRec_t and uses GAP_BOND_REC_ID_OFFSET
+ *         for an NV ID
+ *     local LTK Info - defined as gapBondLTK_t and uses
+ *         GAP_BOND_LOCAL_LTK_OFFSET for an NV ID
+ *     device LTK Info - defined as gapBondLTK_t and uses
+ *         GAP_BOND_DEV_LTK_OFFSET for an NV ID
+ *     device IRK - defined as "uint8_t devIRK[KEYLEN]" and uses
+ *         GAP_BOND_DEV_IRK_OFFSET for an NV ID
+ *     device CSRK - defined as "uint8_t devCSRK[KEYLEN]" and uses
+ *        GAP_BOND_DEV_CSRK_OFFSET for an NV ID
+ *     device Sign Counter - defined as a uint32_t and uses
+ *        GAP_BOND_DEV_SIGN_COUNTER_OFFSET for an NV ID
+ *
+ * When the device is initialized for the first time, all (gapBond_maxBonds) NV
+ * items are created and initialized to all 0xFF's. A bonding record of all
+ * 0xFF's indicates that the bonding record is empty and free to use.
+ *
+ * The calculation for each bonding records NV IDs:
+ *    MAIN_RECORD_NV_ID = ((bondIdx * GAP_BOND_REC_IDS) +
+ *                         BLE_NVID_GAP_BOND_START)
+ *    LOCAL_LTK_NV_ID = (((bondIdx * GAP_BOND_REC_IDS) +
+ *                       GAP_BOND_LOCAL_LTK_OFFSET) + BLE_NVID_GAP_BOND_START)
+ *
+ */
+
+#define GAP_BOND_REC_ID_OFFSET              0 //!< NV ID for the main bonding record
+#define GAP_BOND_LOCAL_LTK_OFFSET           1 //!< NV ID for the bonding record's local LTK information
+#define GAP_BOND_DEV_LTK_OFFSET             2 //!< NV ID for the bonding records' device LTK information
+#define GAP_BOND_DEV_IRK_OFFSET             3 //!< NV ID for the bonding records' device IRK
+#define GAP_BOND_DEV_CSRK_OFFSET            4 //!< NV ID for the bonding records' device CSRK
+#define GAP_BOND_DEV_SIGN_COUNTER_OFFSET    5 //!< NV ID for the bonding records' device Sign Counter
+#define GAP_BOND_REC_IDS                    6
+
+// Bonded State Flags
+#define GAP_BONDED_STATE_AUTHENTICATED                  0x01
+#define GAP_BONDED_STATE_SERVICE_CHANGED                0x02
+#define GAP_BONDED_STATE_CAR                            0x04
+#define GAP_BONDED_STATE_SECURECONNECTION               0x08
+#define GAP_BONDED_STATE_RPA_ONLY                       0x10
+
 /** @} End GAPBondMgr_Constants */
 
 /**
@@ -709,6 +758,44 @@ typedef struct gapBondOOBData
     uint8 rand[KEYLEN];                 //calculated/received random number
 } gapBondOOBData_t;
 
+/// @brief Structure of NV data for the connected device's encryption information
+typedef struct
+{
+  uint8_t   LTK[KEYLEN];              // Long Term Key (LTK)
+  uint16_t  div;  //lint -e754        // LTK eDiv
+  uint8_t   rand[B_RANDOM_NUM_SIZE];  // LTK random number
+  uint8_t   keySize;                  // LTK key size
+} gapBondLTK_t;
+
+/// @brief Structure of NV data for the connected device's address information
+typedef struct
+{
+  /**
+   * Peer's address
+   *
+   * If identity information exists for this bond, this will be an
+   * identity address
+   */
+  uint8_t               addr[B_ADDR_LEN];
+  /**
+   * Peer's address type
+   */
+  GAP_Peer_Addr_Types_t addrType;
+  /**
+   * State flags of bond
+   *
+   * @ref GAP_BONDED_STATE_FLAGS
+   */
+  uint8_t               stateFlags;
+} gapBondRec_t;
+
+/// @brief Structure of NV data for the connected device's characteristic configuration
+typedef struct
+{
+  uint16_t attrHandle;  // attribute handle
+  uint8_t  value;       // attribute value for this device
+} gapBondCharCfg_t;
+
 /** @} End GAPBondMgr_Structs */
 /*-------------------------------------------------------------------
  * API's
@@ -879,6 +966,51 @@ extern bStatus_t GAPBondMgr_SCSetRemoteOOBParameters(gapBondOOBData_t *remoteOob
  */
 extern bStatus_t GAPBondMgr_GenerateEccKeys( void );
 
+/**
+ * @brief   Read bond record from NV
+ *
+ * @param   pBondRec - basic bond record
+ * @param   pLocalLTK - LTK used by this device during pairing
+ * @param   pDevLTK - LTK used by the peer device during pairing
+ * @param   pIRK - IRK used by the peer device during pairing
+ * @param   pSRK - SRK used by the peer device during pairing
+ * @param   signCounter - Sign counter used by the peer device during pairing
+ * @param   charCfg - GATT characteristic configuration
+ *
+ * @return  SUCCESS if bond was extracted
+ *          bleGAPNotFound if there is no bond record
+ */
+extern uint8_t gapBondMgrReadBondRec(GAP_Peer_Addr_Types_t addrType,
+                                     uint8_t *pDevAddr,
+                                     gapBondRec_t* pBondRec,
+                                     gapBondLTK_t* pLocalLtk,
+                                     gapBondLTK_t* pDevLtk,
+                                     uint8_t* pIRK,
+                                     uint8_t* pSRK,
+                                     uint32_t signCount,
+                                     gapBondCharCfg_t* charCfg);
+
+/**
+ * @brief   Import bond record to NV
+ *
+ * @param   pBondRec - basic bond record
+ * @param   pLocalLTK - LTK used by the device that has the same public address as current device
+ * @param   pDevLTK - LTK used by the peer device during pairing
+ * @param   pIRK - IRK used by the peer device during pairing
+ * @param   pSRK - SRK used by the peer device during pairing
+ * @param   signCounter - Sign counter used by the peer device during pairing
+ * @param   charCfg - GATT characteristic configuration
+ *
+ * @return  SUCCESS if bond was imported
+ * @        bleNoResources if there are no empty slots
+ */
+extern uint8_t gapBondMgrImportBond(gapBondRec_t* pBondRec,
+                              gapBondLTK_t* pLocalLtk,
+                              gapBondLTK_t* pDevLtk,
+                              uint8_t* pIRK,
+                              uint8_t* pSRK,
+                              uint32_t signCount,
+                              gapBondCharCfg_t* charCfg);
 /*-------------------------------------------------------------------
 -------------------------------------------------------------------*/
 #ifdef __cplusplus

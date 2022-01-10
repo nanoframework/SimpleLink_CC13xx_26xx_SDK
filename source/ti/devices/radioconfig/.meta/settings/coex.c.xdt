@@ -41,6 +41,19 @@ if (CoExConfig === null) {
     return null;
 }
 
+let configType;
+let protocol;
+
+// Protocol dependant code
+if ("cmdIeeeRxConfig" in CoExConfig) {
+    configType = "rfc_ieeeCoExConfig_t";
+    protocol = "IEEE 802.15.4-2006";
+}
+else {
+    configType = "rfCoreHal_bleCoExConfig_t";
+    protocol = "BLE";
+}
+
 let code = "";
 for (let [key, value] of Object.entries(CoExConfig)) {
     if (typeof value === 'object') {
@@ -55,9 +68,9 @@ for (let [key, value] of Object.entries(CoExConfig)) {
 code = code.slice(0,-2); // Remove last command and newline
 %%}
 // *********************************************************************************
-//   BLE/WiFi Co-Existence configuration
+//   `protocol`/WiFi Co-Existence configuration
 // *********************************************************************************
- rfCoreHal_bleCoExConfig_t coexConfig = 
- {
+`configType` coexConfig = 
+{
 `code`
- };
+};

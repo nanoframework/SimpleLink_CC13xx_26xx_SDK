@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,6 +74,8 @@ extern "C" {
 #define DeviceFamily_ID_CC13X4_CC26X4          15
 #define DeviceFamily_ID_CC13X4                 16
 #define DeviceFamily_ID_CC26X4                 17
+#define DeviceFamily_ID_CC26X3                 18
+#define DeviceFamily_ID_CC23X0                 19
 
 /*
  * DeviceFamily_PARENT_XYZ values.
@@ -82,10 +84,11 @@ extern "C" {
  * compilation. DeviceFamily_PARENT is set to one of these values based
  * on the top-level DeviceFamily_XYZ define.
  */
-#define DeviceFamily_PARENT_CC13X0_CC26X0      1
-#define DeviceFamily_PARENT_CC13X2_CC26X2      2
-#define DeviceFamily_PARENT_CC13X1_CC26X1      3
-#define DeviceFamily_PARENT_CC13X4_CC26X4      4
+#define DeviceFamily_PARENT_CC13X0_CC26X0           1
+#define DeviceFamily_PARENT_CC13X2_CC26X2           2
+#define DeviceFamily_PARENT_CC13X1_CC26X1           3
+#define DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4    4
+#define DeviceFamily_PARENT_CC23X0                  6
 
 /*
  * Lookup table that sets DeviceFamily_ID, DeviceFamily_DIRECTORY, and
@@ -116,7 +119,7 @@ extern "C" {
 #elif defined(DeviceFamily_CC13X4)
     #define DeviceFamily_ID             DeviceFamily_ID_CC13X4
     #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
-    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4
 
 #elif defined(DeviceFamily_CC26X0)
     #define DeviceFamily_ID             DeviceFamily_ID_CC26X0
@@ -143,10 +146,23 @@ extern "C" {
     #define DeviceFamily_DIRECTORY      cc13x2x7_cc26x2x7
     #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
 
+#elif defined(DeviceFamily_CC26X3)
+    /* The CC2653 is very similar to CC26X4 from a software point of view,
+     * so we use the same directory and parent defines.
+     */
+    #define DeviceFamily_ID             DeviceFamily_ID_CC26X3
+    #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4
+
 #elif defined(DeviceFamily_CC26X4)
     #define DeviceFamily_ID             DeviceFamily_ID_CC26X4
     #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
-    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4
+
+#elif defined(DeviceFamily_CC23X0)
+    #define DeviceFamily_ID             DeviceFamily_ID_CC23X0
+    #define DeviceFamily_DIRECTORY      cc23x0
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC23XX
 
 #elif defined(DeviceFamily_CC13X1_CC26X1)
     #define DeviceFamily_ID             DeviceFamily_ID_CC13X1_CC26X1
@@ -166,7 +182,7 @@ extern "C" {
 #elif defined(DeviceFamily_CC13X4_CC26X4)
     #define DeviceFamily_ID             DeviceFamily_ID_CC13X4_CC26X4
     #define DeviceFamily_DIRECTORY      cc13x4_cc26x4
-    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X2_CC26X2
+    #define DeviceFamily_PARENT         DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4
 
 #elif defined(DeviceFamily_CC3200)
     #define DeviceFamily_ID             DeviceFamily_ID_CC3200
@@ -185,7 +201,9 @@ extern "C" {
     + defined(DeviceFamily_CC13X2) + defined(DeviceFamily_CC13X2X7)         \
     + defined(DeviceFamily_CC26X0) + defined(DeviceFamily_CC26X0R2)         \
     + defined(DeviceFamily_CC26X1) + defined(DeviceFamily_CC26X2)           \
-    + defined(DeviceFamily_CC26X2X7)                                        \
+    + defined(DeviceFamily_CC26X2X7) + defined(DeviceFamily_CC26X3)         \
+    + defined(DeviceFamily_CC26X4) + defined(DeviceFamily_CC13X4)           \
+    + defined(DeviceFamily_CC23X0)                                          \
     + defined(DeviceFamily_CC3200) + defined(DeviceFamily_CC3220)           \
     ) > 1
     #error More then one DeviceFamily has been defined!

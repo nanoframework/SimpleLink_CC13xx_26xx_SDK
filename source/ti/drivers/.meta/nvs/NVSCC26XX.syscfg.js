@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@ let SECTORSIZE;
 let NVS_SECTORSIZE_MAP = [
     {prefix: "CC13.4",   sector_size: 0x800},
     {prefix: "CC26.4",   sector_size: 0x800},
+    {prefix: "CC2653",   sector_size: 0x800},
     {prefix: "CC13",     sector_size: 0x2000},
     {prefix: "CC26",     sector_size: 0x2000}
 ];

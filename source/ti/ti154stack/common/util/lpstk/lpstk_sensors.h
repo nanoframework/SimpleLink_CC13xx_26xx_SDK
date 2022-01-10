@@ -5,7 +5,7 @@
  @brief Common API layer to interface with sensors in the LPSTK
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -96,30 +96,27 @@ typedef struct
     float   temperature;
     float         lux;
     Lpstk_Accelerometer accelerometer;
-    float    halleffectMagFlux;
+    bool    halleffectSwitchValue;
 } Lpstk_Sensors;
 
 void Lpstk_initHumidityAndTempSensor(float hHiLim, float hLoLim,
                                      float tHiLim, float tLoLim,
                                      GPIO_CallbackFxn hdc2010Callback);
 void Lpstk_initLightSensor(float hHiLim, float hLoLim,GPIO_CallbackFxn opt3001Callback);
-void Lpstk_initHallEffectSensor();
 void Lpstk_initSensorControllerAccelerometer(SCIF_VFPTR scTaskAlertCallback);
 
 uint8_t Lpstk_openHumidityTempSensor(void);
 uint8_t Lpstk_openLightSensor(void);
-uint8_t Lpstk_openHallEffectSensor(void);
 uint8_t Lpstk_openAccelerometerSensor(void);
 
 bool Lpstk_readTemperatureSensor(float *temperature);
 bool Lpstk_readHumiditySensor(float *humidity);
 bool Lpstk_readLightSensor(float *lux);
-bool Lpstk_readHallEffectSensor(float *flux);
+bool Lpstk_readHallEffectSensor(bool *switchValue);
 void Lpstk_readAccelerometerSensor(Lpstk_Accelerometer *accel);
 
 void Lpstk_shutdownHumidityTempSensor(void);
 void Lpstk_shutdownLightSensor(void);
-void Lpstk_shutdownHallEffectSensor(void);
 void Lpstk_shutdownAccelerometerSensor(void);
 
 

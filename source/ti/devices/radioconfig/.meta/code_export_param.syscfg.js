@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -158,7 +158,7 @@ const config = [
         name: "useMulti",
         displayName: "Use Multi-Protocol Patch",
         description: "Use multi-protocol versus single-protocol patches",
-        hidden: Common.isDeviceClass10() || Common.isDeviceClass3(),
+        hidden: Common.isDeviceClass10(),
         default: false
     },
     // Stack specific override

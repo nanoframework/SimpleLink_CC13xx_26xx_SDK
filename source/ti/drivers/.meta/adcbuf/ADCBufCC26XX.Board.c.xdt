@@ -103,39 +103,16 @@ ADCBuf`driver`_Object adcbufCC26XXbjects[`countDef`];
  *  ======== ADCBuf Channel Lut ========
  */
 % for (let i = 0; i < instances.length; i++) {
-    % let j;
     % let inst = instances[i];
-    % let arraySize = Number(inst.channels);
-    % if (inst.batteryChannel) arraySize ++;
-    % if (inst.decouplingChannel) arraySize ++;
-    % if (inst.groundChannel) arraySize ++;
-ADCBuf`driver`_AdcChannelLutEntry adcBufCC26XXChannelLut`i`[`arraySize`] = {
-    % for (j = 0; j < inst.channels; j++) {
-    %   let channel = inst["adcBufChannel" + j];
-    %   let adcPin = channel.adc.adcPin.$solution.devicePinName;
-    %   let dioNum = "IOID_" + adcPin.substring(4);
-    %   let packagePin = parseInt(channel.adc.adcPin.$solution.packagePinName);
-    %   let auxInput = system.deviceData.devicePins[packagePin].attributes.alias_name;
-    %   auxInput = "ADC_COMPB_IN_" + auxInput.replace("_", "IO");
-    /* `channel.$name` */
-    % if (inst.$hardware) {
-    %    if (inst.$hardware.displayName) {
-    /* `inst.$hardware.displayName` */
-    %    }
-    % }
-    {`dioNum`, `auxInput`},
-    % }
-    % if (inst.batteryChannel) {
-    /* `inst.adcBufChannelBattery.$name` */
-    {PIN_UNASSIGNED, ADC_COMPB_IN_VDDS},
-    % }
-    % if (inst.decouplingChannel) {
-    /* `inst.adcBufChannelDecoupling.$name` */
-    {PIN_UNASSIGNED, ADC_COMPB_IN_DCOUPL},
-    % }
-    % if (inst.groundChannel) {
-    /* `inst.adcBufChannelGround.$name` */
-    {PIN_UNASSIGNED, ADC_COMPB_IN_VSS},
+    % let finalChannels = ADCBuf.getChannels(inst);
+    % let numChannels = finalChannels.size;
+ADCBuf`driver`_AdcChannelLutEntry adcBufCC26XXChannelLut`i`[`numChannels`] = {
+    % for (let channel of finalChannels) {
+    /* `channel.name` */
+    %   if (channel.comment) {
+    /* `channel.comment` */
+    %   }
+    { `channel.dio`, `channel.comp` },
     % }
 };
 

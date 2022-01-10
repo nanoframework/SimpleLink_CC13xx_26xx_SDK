@@ -431,7 +431,9 @@ const deviceToBoard = {
   CC2652P1FSIP: "LP_CC2652PSIP",
   CC2652R1FSIP: "LP_CC2652RSIP",
   CC2652R7: "LP_CC2652R7",
-  CC1352P7: "LP_CC1352P7"
+  CC1352P7: "LP_CC1352P7",
+  CC2651P3: "LP_CC2651P3",
+  CC2651R3: "LP_CC2651R3"
 };
 
 // Settings for ti/devices/CCFG module
@@ -447,6 +449,8 @@ const bleCentralCCFGSettings = {
   LP_CC2652R7_CCFG_SETTINGS: {},
   LP_CC1352P7_1_CCFG_SETTINGS: {},
   LP_CC1352P7_4_CCFG_SETTINGS: {},
+  LP_CC2651P3_CCFG_SETTINGS: {},
+  LP_CC2651R3_CCFG_SETTINGS: {},
   LP_CC2652RB_CCFG_SETTINGS: {
     srcClkLF: "Derived from HF XOSC"
   }
@@ -991,6 +995,10 @@ function device2DeviceFamily(deviceId)
     {
         driverString = "DeviceFamily_MSP432P401x";
     }
+    else if(deviceId.match(/CC26.1/))
+    {
+        driverString = "DeviceFamily_CC26X1";
+    }
     else
     {
         driverString = "";
@@ -1026,7 +1034,7 @@ function getBoardOrLaunchPadName(convertToBoard)
     }
 
     // Check if this is a standalone device without a LaunchPad
-    if(convertToBoard && !name.includes("LAUNCHXL"))
+    if(convertToBoard && !name.includes("LAUNCHXL") && !name.includes("LP_"))
     {
         // Find the LaunchPad name in deviceToBoard dictionary
         let key = null;
@@ -1126,6 +1134,16 @@ function getRadioScript(rfDesign, deviceId)
     {
         radioSettings = system.getScript("/ti/ble5stack/rf_config/"
             + "LP_CC2652R7_rf_defaults.js");
+    }
+    else if(deviceId === "CC2651P3RGZ")
+    {
+        radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+            + "LP_CC2651P3_rf_defaults.js");
+    }
+    else if(deviceId === "CC2651R3RGZ")
+    {
+        radioSettings = system.getScript("/ti/ble5stack/rf_config/"
+            + "LP_CC2651R3_rf_defaults.js");
     }
     return(radioSettings);
 }

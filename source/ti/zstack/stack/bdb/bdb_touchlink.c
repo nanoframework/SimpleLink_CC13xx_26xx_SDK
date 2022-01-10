@@ -1076,7 +1076,7 @@ static void *touchLink_BeaconIndCB ( void *param )
 
 
             if ( ((pBeacon->LQI   > discoveredTouchlinkNwk.chosenRouterLinkQuality) &&
-                    (pBeacon->depth < MAX_NODE_DEPTH)) ||
+                    (pBeacon->depth <= MAX_NODE_DEPTH)) ||
                     ((pBeacon->LQI   == discoveredTouchlinkNwk.chosenRouterLinkQuality) &&
                             (pBeacon->depth < discoveredTouchlinkNwk.chosenRouterDepth)) )
             {
@@ -1146,7 +1146,7 @@ static void *touchLink_NwkDiscoveryCnfCB ( void *param )
     // No parent to join in
     bdbCommissioningProcedureState.bdbCommissioningState = BDB_PARENT_LOST;
     NLME_OrphanStateSet( );
-    bdb_ZedAttemptRecoverNwk( );
+    bdb_recoverNwk( );
 #endif
   }
 

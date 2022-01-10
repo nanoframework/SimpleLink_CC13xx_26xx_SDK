@@ -70,8 +70,8 @@ const pinSelectionAntenna = {
     displayName: "No. of Antenna Switch Control Pins",
     description: "Number of pins to use for antenna switching",
     longDescription: `
-Option to select number of pins to use for custom antenna switching, 
-if no predefined hardware module is selected. 
+Option to select number of pins to use for custom antenna switching,
+if no predefined hardware module is selected.
 `
 };
 
@@ -82,16 +82,15 @@ const coex = {
         longDescription: `
 Enable the use of external pin signaling to communicate with another RF capable
 device, for the devices to coexist in the same frequency band.
-The coexistence (coex) feature is a wired signal interface between a BLE device
-and a Wi-Fi device:
+The coexistence (coex) feature is a wired signal interface between a BLE or IEEE
+15.4 device and a Wi-Fi device:
 
 \`\`\`
 Coex slave              Coex master
 +---------+             +---------+
-|         |   Signals   |         |
-|   BLE   | <----/----> |  Wi-Fi  | 
-|         |      n      |         |
-+---------+             +---------+
+|  BLE /  |   Signals   |  Wi-Fi  |
+|IEEE 15.4| <----/----> |         |
++---------+      n      +---------+
 \`\`\`
 
 Resources:
@@ -105,6 +104,22 @@ Resources:
     },
     configGroup: {
         displayName: "RF Coexistence Configuration"
+    },
+    phy: {
+        displayName: "Coex PHY",
+        description: "Select PHY for coex slave",
+        longDescription: `
+This specifies the PHY that will be used alongside Wi-Fi for the coex
+functionality.
+`,
+        ble: {
+            displayName: "BLE",
+            description: "BLE and Wi-Fi coexistence"
+        },
+        ieee_15_4: {
+            displayName: "IEEE 802.15.4",
+            description: "IEEE 802.15.4 and Wi-Fi coexistence"
+        }
     },
     mode: {
         displayName: "Coex Mode",
@@ -124,12 +139,17 @@ is coexisting with. The following signals are enabled for the different modes:
 |Coex Mode       | REQUEST | PRIORITY | GRANT |
 |----------------|:-------:|:--------:|:-----:|
 | 3-Wire         | x       | x        | x     |
+| 2-Wire         | x       |          | x     |
 | 1-Wire REQUEST | x       |          |       |
 | 1-Wire GRANT   |         |          | x     |
 `,
         threeWire: {
             displayName: "3-Wire",
             description: "Use pins for REQUEST, PRIORITY and GRANT signals"
+        },
+        twoWire: {
+            displayName: "2-Wire",
+            description: "Use pins for REQUEST and GRANT signals"
         },
         oneWireRequest: {
             displayName: "1-Wire REQUEST",
@@ -164,6 +184,38 @@ This option is used to specify how the signal level should be interpreted.
 | High       | Low         |
 `
     },
+    grantLatencyTime: {
+        displayName: "Coex GRANT Latency Time",
+        description: "Coex GRANT Response Latency Time to Request Signal (us)",
+        longDescription: `
+The Coex GRANT Latency Time is used to synchronize assertion of the REQUEST signal with the expected time
+(in us) it takes for the coex master to respond with the GRANT signal. The GRANT signal will still be sampled
+by the coex slave at a fixed time before the RF activity, but the REQUEST signal is asserted at a time T1
+before the RF activity that will take into account the coex master response latency.
+
+\`\`\`
+REQUEST assert time = RF activity start time - coexGrantLatencyTime - T3
+\`\`\`
+
+\`\`\`
+               |-------T1------|
+               |--glt--|--T3---|
+               .       .  |-tg-|
+               .       .  .    .____
+RF     ________._______.__.____| tx |___________
+               ._______.__.____________
+REQ    ________|       .  .            |________
+       ________________.  .
+GRANT                  |__._____________________
+                          ^
+                          tg: Grant Sample Point
+Legend:
+  T1:  Time from REQUEST is asserted to RF activity
+  T3:  Time period where GRANT signal is expected to be safe to sample
+  tg:  GRANT Sample Point, fixed time 1-2us before RF activity
+  glt: GRANT Latency Time
+\`\`\``
+    },
     defaultPriority: {
         displayName: "Default Priority",
         description: "Priority level used when time-shared PRIORITY signal indicates request priority",
@@ -178,23 +230,23 @@ __Coex Mode__ description for more information on what this signal is used for.
         displayName: "Assert REQUEST Signal For RX",
         description: "Specify if REQUEST signal is asserted for RX commands",
         longDescription: `
-If this option is _disabled_, the BLE device is configured to not assert the
+If this option is _disabled_, the device is configured to not assert the
 REQUEST signal (and subsequently disregard any of the other coex signals)
 when the scheduled RF activity is an RX command.
 
 Note: If an RX command is chained with a TX command, the REQUEST signal
 will be asserted in time for the TX activity and will _remain asserted_
-until the end of the command chain, even if the following command is an RX. 
+until the end of the command chain, even if the following command is an RX.
 
 \`\`\`
               _______________
 REQ  ________|               |__
-        ____    ____    ____   
+        ____    ____    ____
 RF   __| rx |__| tx |__| rx |___
 \`\`\`
 `
     },
-    useCaseConfigGroup: {
+    useCaseConfigGroupBle: {
         displayName: "BLE Use Case Configuration",
         ini: {
             displayName: "Connection Establishment"
@@ -216,7 +268,7 @@ const intPriority = {
 };
 
 const swiPriority = {
-    description: "RF driver software interrupt priority"  
+    description: "RF driver software interrupt priority"
 };
 
 const xoscNeeded = {
@@ -275,6 +327,14 @@ handles a command termination event.
         description: `
 Global event triggered when change to coex
 configuration is requested.
+`
+    },
+    tempNotifyFail: {
+        description: `
+Global event triggered when registration of
+temperature notification was unsuccessful.
+Functional only when temperature compensation
+is enabled.
 `
     }
 };

@@ -1,0 +1,9 @@
+.vs/
+foo.log
+common.sdf
+Debug
+Release
+host_*_test
+bbb_*_test
+objs
+

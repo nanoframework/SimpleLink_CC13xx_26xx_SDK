@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,8 @@
 #include <ti/drivers/power/PowerCC26XX.h>
 #include <ti/drivers/Temperature.h>
 
+#include <ti/devices/DeviceFamily.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,9 +91,41 @@ extern "C" {
 /*! The retry wait time (usec) when checking to see if XOSC_LF is stable. */
 #define PowerCC26X2_RETRYWAITXOSC_LF    5000
 
-#define PowerCC26X2_PERIPH_PKA          PowerCC26XX_NUMRESOURCES /*!< Resource ID: PKA Module */
+/* Power peripheral IDs.
+ * See PowerCC26XX.h for peripheral IDs. Some are redefined here for compatibility.
+ */
 
-#define PowerCC26X2_PERIPH_UART1        PowerCC26XX_NUMRESOURCES + 1 /*!< Resource ID: UART1 */
+/* The PKA and UART1 peripherals are not available on CC13X1 and CC26X1 devices */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+
+/*!< Resource ID: PKA Module */
+#define PowerCC26X2_PERIPH_PKA          PowerCC26XX_PERIPH_PKA
+
+/*!< Resource ID: UART1 */
+#define PowerCC26X2_PERIPH_UART1        PowerCC26XX_PERIPH_UART1
+
+#endif
+
+/* The peripherals below are only available on CC13X4 and CC26X4 devices */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+
+/*!< Resource ID: UART2 */
+#define PowerCC26X2_PERIPH_UART2        PowerCC26XX_PERIPH_UART2
+
+/*!< Resource ID: UART3 */
+#define PowerCC26X2_PERIPH_UART3        PowerCC26XX_PERIPH_UART3
+
+/*!< Resource ID: SSI2 */
+#define PowerCC26X2_PERIPH_SSI2         PowerCC26XX_PERIPH_SSI2
+
+/*!< Resource ID: SSI3 */
+#define PowerCC26X2_PERIPH_SSI3         PowerCC26XX_PERIPH_SSI3
+
+/*!< Resource ID: I2C1 */
+#define PowerCC26X2_PERIPH_I2C1         PowerCC26XX_PERIPH_I2C1
+
+#endif
 
 /*! The temperature delta in degrees C before the RTC is re-compensated when
  *  SCLK_LF is derived from SCLK_HF and SCLK_HF is supplied by HPOSC.
@@ -99,7 +133,7 @@ extern "C" {
 #define PowerCC26X2_HPOSC_RTC_COMPENSATION_DELTA 3
 
 /* \cond */
-#define PowerCC26X2_NUMRESOURCES   (PowerCC26XX_NUMRESOURCES + 2) /* Number of resources in database */
+#define PowerCC26X2_NUMRESOURCES PowerCC26XX_NUMRESOURCES
 /* \endcond */
 
 /* \cond */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ let config = [
  */
 function validate(inst, validation)
 {
-    Common.validateNames(inst, validation);
+
 
     /* callbackFunction must be valid C identifier */
     if (!Common.isCName(inst.errorFxn)) {

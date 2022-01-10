@@ -68,6 +68,7 @@ const config = {
             name: "bondPairing",
             displayName: "Pairing Mode",
             default: "GAPBOND_PAIRING_MODE_WAIT_FOR_REQ",
+            readOnly: false,
             longDescription: Docs.bondPairingLongDescription,
             options: [
                 { displayName: "Pairing is not allowed",     name: "GAPBOND_PAIRING_MODE_NO_PAIRING"   },

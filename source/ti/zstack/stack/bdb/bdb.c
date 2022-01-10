@@ -144,6 +144,8 @@ uint8_t bdbSecureRejoinAttempts = 0;
 
 bool bdb_performingTCRejoin = FALSE;
 
+bool bdb_acceptNewTrustCenterLinkKey = FALSE;
+
  /*********************************************************************
  * EXTERNAL VARIABLES
  */
@@ -682,10 +684,11 @@ void bdb_TCProcessJoiningList(void)
             }
         }
 
-        //Expired device either is legacy device not using the TCLK entry or got
-        //removed from the network because of timeout, eitherway it is not using
-        //TCLK entry neither the Security user in the address manager, so free the entry
-        //in both tables.
+        // If we are here, a joining device has been expired due to timeout either because it is a
+        // legacy device (does not perform key exchange), it is an Z3.0 device that did not perform
+        // key exchange intentionally, or it is a Z3.0 device that has failed to perform key exchange.
+        // Depending on our TC settings, below we decide if this joiner should be removed from the
+        // security manager
 
         uint16_t keyNvIndex;
         uint16_t index;
@@ -699,9 +702,13 @@ void bdb_TCProcessJoiningList(void)
         //Look up nwkAddr before it is cleared by ZDSecMgrAddrClear
         AddrMgrNwkAddrLookup(tempJoiningDescNode->bdbJoiningNodeEui64, &nwkAddr);
 
-        //Erase all the keys that got expired and did not update the key, except for those using an install code as long as TC is not mandating the key update.
-        //These devices will keep their install code and may send APS encrypted msgs to TC.
-        if(isTCLKExchangeRequired || (TCLKDevEntry.keyAttributes != ZG_PROVISIONAL_KEY) )
+        // If TC is mandating key exchange, remove devices that have not successfully performed key exchange.
+        // Keep entries for ZG_PROVISIONAL_KEY so install code derived key is maintained, so joiner can reattempt join
+        // If we got here and have a ZG_VERIFIED_KEY (unexpected), do not remove this entry either
+        if( (isTCLKExchangeRequired == true) &&
+            (TCLKDevEntry.keyAttributes != ZG_PROVISIONAL_KEY) &&
+            (TCLKDevEntry.keyAttributes != ZG_VERIFIED_KEY)
+          )
         {
           //Remove the entry in address manager
           ZDSecMgrAddrClear(tempJoiningDescNode->bdbJoiningNodeEui64);
@@ -928,9 +935,10 @@ void bdb_StartCommissioning(uint8_t mode)
     }
 #endif
 
-    //If we are on the network and got requested to do nwk steering, we do not need to wait other process,
-    // just send permit joining and report the application
-    if((bdbAttributes.bdbNodeIsOnANetwork) && (mode & BDB_COMMISSIONING_MODE_NWK_STEERING))
+    //If finished initialization, we are on the network, and got requested to do nwk steering,
+    // we do not need to wait other process, just sent permit joining and report the application
+    if( ((bdbAttributes.bdbNodeIsOnANetwork) && (mode & BDB_COMMISSIONING_MODE_NWK_STEERING)) &&
+        !(bdbAttributes.bdbCommissioningMode & BDB_COMMISSIONING_MODE_INITIALIZATION) )
     {
       bdb_nwkSteeringDeviceOnNwk();
       bdb_reportCommissioningState(BDB_COMMISSIONING_STATE_STEERING_ON_NWK, TRUE);
@@ -1245,28 +1253,22 @@ void bdb_NetworkRestoredResumeState(void)
 #endif
 }
 
-#if ZG_BUILD_ENDDEVICE_TYPE
+#if ZG_BUILD_JOINING_TYPE
  /*********************************************************************
- * @fn          bdb_ZedAttemptRecoverNwk
+ * @fn          bdb_recoverNwk
  *
- * @brief       Instruct the ZED to try to rejoin its previous network
+ * @brief       Instruct a joiner to try to rejoin its previous network
  *
  * @return      success if the attempt is being executed
  *              False if device do not have nwk parameters to perform this action
  */
-uint8_t bdb_ZedAttemptRecoverNwk(void)
+uint8_t bdb_recoverNwk(void)
 {
-  if(ZG_DEVICE_ENDDEVICE_TYPE)
+  if(bdbAttributes.bdbNodeIsOnANetwork)
   {
-    if(bdbAttributes.bdbNodeIsOnANetwork)
+    if(ZDOInitDevice(0) == ZDO_INITDEV_RESTORED_NETWORK_STATE)
     {
-      if(bdbCommissioningProcedureState.bdbCommissioningState == BDB_PARENT_LOST)
-      {
-        if(ZDOInitDevice(0) == ZDO_INITDEV_RESTORED_NETWORK_STATE)
-        {
-          return ZSuccess;
-        }
-      }
+      return ZSuccess;
     }
   }
   return ZFailure;
@@ -1663,8 +1665,16 @@ void bdb_reportCommissioningState(uint8_t bdbCommissioningState,bool didSuccess)
             nwk_SetCurrentPollRateType(POLL_RATE_DISABLED | POLL_RATE_TYPE_JOIN_REJOIN,FALSE);
             bdbAttributes.bdbCommissioningMode &= ~BDB_COMMISSIONING_MODE_PARENT_LOST;
             bdbAttributes.bdbCommissioningStatus = BDB_COMMISSIONING_NETWORK_RESTORED;
-            //Update ZDApp state
-            ZDApp_ChangeState( DEV_NWK_SEC_REJOIN_CURR_CHANNEL );
+            //Update ZDApp state to type of rejoin device performed
+            if(bdb_performingTCRejoin == TRUE)
+            {
+              ZDApp_ChangeState( DEV_NWK_TC_REJOIN_CURR_CHANNEL );
+            }
+            else
+            {
+              ZDApp_ChangeState( DEV_NWK_SEC_REJOIN_CURR_CHANNEL );
+            }
+
 
             bdb_NetworkRestoredResumeState();
           }
@@ -1825,6 +1835,7 @@ ZStatus_t bdb_rejoinNwk(void)
          (bdbSecureRejoinAttempts < zgBdbMaxSecureRejoinAttempts)) &&
            (ZDApp_RestoreNwkKey( TRUE ) == TRUE) )
     {
+      bdb_performingTCRejoin = FALSE;
       rejoinStatus = NLME_ReJoinRequest( ZDO_UseExtendedPANID, _NIB.nwkLogicalChannel);
       bdbSecureRejoinAttempts++;
     }
@@ -2235,6 +2246,11 @@ void bdb_nwkJoiningFormation(bool isJoining)
 }
 
 #if (ZG_BUILD_JOINING_TYPE)
+void bdb_changeTCExchangeState( uint8_t bdbTCExchangeState )
+{
+  bdbCommissioningProcedureState.bdbTCExchangeState = bdbTCExchangeState;
+}
+
  /*********************************************************************
  * @fn          bdb_tcLinkKeyExchangeAttempt
  *
@@ -2258,6 +2274,7 @@ void bdb_tcLinkKeyExchangeAttempt(bool didSuccess, uint8_t bdbTCExchangeState)
   }
   else
   {
+    bdb_acceptNewTrustCenterLinkKey = FALSE;
     bdbEventStatus = BDB_MSG_EVENT_FAIL;
   }
   bdb_SendMsg(bdb_TaskID,BDB_COMMISSIONING_STATE_TC_LINK_KEY_EXCHANGE,bdbEventStatus,1, &dummy);
@@ -2309,6 +2326,9 @@ void bdb_requestTCLinkKey(void)
 
   req.dstAddr = destAddr.addr.shortAddr;
   req.keyType = KEY_TYPE_TC_LINK;
+
+  // joiner is requesting a key, so we expect an incoming response
+  bdb_acceptNewTrustCenterLinkKey = TRUE;
 
   APSME_RequestKeyReq(&req);
 
@@ -2951,7 +2971,11 @@ static void bdb_ProcessNodeDescRsp(zdoIncomingMsg_t *pMsg)
 
         StackComplianceRev = NDRsp.nodeDesc.ServerMask >> STACK_COMPLIANCE_CURRENT_REV_POS;
 
+#if defined ( APP_TP2_TEST_MODE )
+        if( guEnableKeyExchange && StackComplianceRev >= STACK_COMPL_REV_21 )
+#else
         if( StackComplianceRev >= STACK_COMPL_REV_21 )
+#endif
         {
           bdb_tcLinkKeyExchangeAttempt(TRUE,BDB_REQ_TC_LINK_KEY);
         }
@@ -2965,7 +2989,10 @@ static void bdb_ProcessNodeDescRsp(zdoIncomingMsg_t *pMsg)
 
           if(entryIndex < gZDSECMGR_TC_DEVICE_MAX)
           {
-            TCLKDevEntry.keyAttributes = ZG_NON_R21_NWK_JOINED;
+            if( TCLKDevEntry.keyAttributes != ZG_PROVISIONAL_KEY )
+            {
+              TCLKDevEntry.keyAttributes = ZG_NON_R21_NWK_JOINED;
+            }
 
             //Save the KeyAttribute for joining device that it has joined non-R21 nwk
             osal_nv_write_ex(ZCD_NV_EX_TCLK_TABLE, entryIndex,

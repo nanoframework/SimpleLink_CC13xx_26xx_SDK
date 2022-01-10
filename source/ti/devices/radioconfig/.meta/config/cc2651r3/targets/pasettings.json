@@ -1,71 +1,79 @@
 {
     "patables": {
         "RfDesign": {
-            "_name": "CC2642EM-7ID",
+            "_name": "CC26x1-R3EM-7ID",
             "FrequencyRange": {
                 "Min": "2400",
                 "Max": "2484",
                 "PaSettingTable": {
                     "PaSetting": [
                         {
+                            "_text": "6.5",
+                            "Value": "0x003F"
+                        },
+                        {
+                            "_text": "6",
+                            "Value": "0x7A2B"
+                        },
+                        {
                             "_text": "5",
-                            "Value": "7217"
+                            "Value": "0x701F"
                         },
                         {
                             "_text": "4",
-                            "Value": "4E63"
+                            "Value": "0x3A17"
                         },
                         {
                             "_text": "3",
-                            "Value": "385D"
+                            "Value": "0x3A64"
                         },
                         {
                             "_text": "2",
-                            "Value": "3259"
+                            "Value": "0x325F"
                         },
                         {
                             "_text": "1",
-                            "Value": "2856"
+                            "Value": "0x2C5C"
                         },
                         {
                             "_text": "0",
-                            "Value": "2853"
+                            "Value": "0x2659"
                         },
                         {
                             "_text": "-3",
-                            "Value": "1893"
+                            "Value": "0x1697"
                         },
                         {
                             "_text": "-5",
-                            "Value": "12D6"
+                            "Value": "0x1693"
                         },
                         {
                             "_text": "-6",
-                            "Value": "10D4"
+                            "Value": "0x1292"
                         },
                         {
                             "_text": "-9",
-                            "Value": "0AD0"
+                            "Value": "0x0CD3"
                         },
                         {
                             "_text": "-10",
-                            "Value": "0ACF"
+                            "Value": "0x0AD1"
                         },
                         {
                             "_text": "-12",
-                            "Value": "0ACC"
+                            "Value": "0x0ACF"
                         },
                         {
                             "_text": "-15",
-                            "Value": "06CA"
+                            "Value": "0x06CD"
                         },
                         {
                             "_text": "-18",
-                            "Value": "06C8"
+                            "Value": "0x06CA"
                         },
                         {
                             "_text": "-20",
-                            "Value": "04C6"
+                            "Value": "0x04C8"
                         }
                     ]
                 }

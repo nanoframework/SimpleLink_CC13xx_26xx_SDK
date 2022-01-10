@@ -1,11 +1,27 @@
 {
     "devicelist": {
-        "version": "2.21.0",
+        "version": "2.23.0",
         "DeviceGroup": [
             {
                 "Name": "Sub-1 GHz",
                 "Description": "Texas Instruments RF devices for the Sub 1 GHz ISM band.",
                 "Device": [
+                    {
+                        "DeviceName": {
+                            "_family": "Thor",
+                            "$": "CC1354R10"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC1314R10"
+                        },
+                        "Brief": "Sub-1GHz",
+                        "DeviceType": "Wireless MCU"
+                    },
                     {
                         "DeviceName": {
                             "_family": "Agama",
@@ -57,7 +73,7 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC2672P"
+                            "$": "CC2672P3"
                         },
                         "Brief": "Dual Band",
                         "DeviceType": "Wireless MCU"
@@ -65,7 +81,7 @@
                     {
                         "DeviceName": {
                             "_family": "Agama",
-                            "$": "CC2672R"
+                            "$": "CC2672R3"
                         },
                         "Brief": "Dual Band",
                         "DeviceType": "Wireless MCU"

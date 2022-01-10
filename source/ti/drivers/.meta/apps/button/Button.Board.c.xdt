@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,6 @@
 
     /* CONFIG_XXXCOUNT string, derived from defaultInstanceName */
     let countDef = Button.defaultInstanceName + "COUNT";
-
 %%}
 /*
  *  =============================== Button ===============================
@@ -68,7 +67,17 @@ static const Button_HWAttrs ButtonHWAttrs[`countDef`] = {
     %    }
     % }
     {
-        .gpioIndex = `inst.gpioPin.$name`
+        .gpioIndex = `inst.gpioPin.$name`,
+%   if (inst.polarity === "Active Low") {
+        .pullMode = Button_PULL_UP,
+%   } else {
+        .pullMode = Button_PULL_DOWN,
+%   }
+%   if (inst.pull === "Internal") {
+        .internalPullEnabled = 1,
+%   } else {
+        .internalPullEnabled = 0,
+%   }
     },
 % }
 };

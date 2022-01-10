@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2020-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,32 +37,11 @@
 "use strict";
 
 /*
- *  ======== modules ========
- *  Express dependencies for other modules
- */
-function modules(inst)
-{
-    let modules = new Array();
-
-    modules.push({
-        name: "rtos",
-        displayName: "RTOS",
-        moduleName: "/ti/utils/RTOS"
-    });
-
-    return (modules);
-}
-
-/*
  *  ======== exports ========
  */
 exports = {
     displayName: "Interrupt",
-    moduleStatic: {
-        modules: modules,
-    },
     templates: {
-        "/ti/utils/osal/Config.c.xdt":
-            "/ti/utils/osal/Interrupt.Config.c.xdt"
+        "/ti/utils/osal/Config.c.xdt": "/ti/utils/osal/Interrupt.Config.c.xdt"
     }
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 #include <ti/drivers/uart/UARTCC26XX.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(inc/hw_memmap.h)
@@ -68,8 +68,9 @@ int_fast32_t UARTCC26XX_writePolling(UART_Handle handle, const void *buf,
 void         UARTCC26XX_writeCancel(UART_Handle handle);
 
 /* UARTCC26XX internal functions */
-static void  UARTCC26XX_initHw(UART_Handle handle);
-static bool  UARTCC26XX_initIO(UART_Handle handle);
+static void UARTCC26XX_initHw(UART_Handle handle);
+static void UARTCC26XX_initIO(UART_Handle handle);
+static void UARTCC26XX_finalizeIO(UART_Handle handle);
 static int uartPostNotify(unsigned int eventType, uintptr_t eventArg, uintptr_t clientArg);
 
 /* UART function table for UARTCC26XX implementation */
@@ -167,10 +168,6 @@ static const uint8_t rxFifoBytes[6] = {
 };
 
 /*
- *  ======================== PIN driver objects ================================
- */
-
-/*
  *  ================================= Macro ====================================
  *  TODO: Move me
  */
@@ -185,7 +182,7 @@ static const uint8_t rxFifoBytes[6] = {
  * Function for checking whether flow control is enabled.
  */
 static inline bool isFlowControlEnabled(UARTCC26XX_HWAttrsV2 const  *hwAttrs) {
-    return ((hwAttrs->ctsPin != PIN_UNASSIGNED) && (hwAttrs->rtsPin != PIN_UNASSIGNED));
+    return ((hwAttrs->ctsPin != GPIO_INVALID_INDEX) && (hwAttrs->rtsPin != GPIO_INVALID_INDEX));
 }
 
 /*
@@ -439,14 +436,12 @@ static void writeTxFifoFlush(UARTCC26XX_Object  *object, UARTCC26XX_HWAttrsV2 co
     UARTIntDisable(hwAttrs->baseAddr, UART_INT_TX);
     HwiP_restore(key);
 
-    /* 1. Ensure TX IO will stay high when connected to GPIO */
-    PIN_setOutputEnable(object->hPin, hwAttrs->txPin, 1);
-    PIN_setOutputValue(object->hPin, hwAttrs->txPin, 1);
-    /* 2. Disconntect tx from IO, and set it as "GPIO" */
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin, IOC_PORT_GPIO);
-    /* 3. Disconnect cts */
-    PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin, IOC_PORT_GPIO);
-    /*4. Wait for TX FIFO to become empty.
+    /* 1. Re-mux TX as a GPIO and ensure it will stay high */
+    GPIO_setConfig(hwAttrs->txPin, GPIO_CFG_OUTPUT | GPIO_CFG_OUT_HIGH);
+    /* 2. Disconnect cts */
+    GPIO_setConfig(hwAttrs->ctsPin, GPIO_CFG_INPUT);
+
+    /* 3. Wait for TX FIFO to become empty.
      *    CALLBACK: Idle until the TX FIFO is empty, i.e. no longer busy.
      *    BLOCKING: Periodically check if TX is busy emptying the FIFO.
      *              Must be handled at TX FIFO empty clock timeout:
@@ -466,14 +461,14 @@ static void writeTxFifoFlush(UARTCC26XX_Object  *object, UARTCC26XX_HWAttrsV2 co
     /* 5. Revert to active pins before returning */
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX));
+    GPIO_setMux(hwAttrs->txPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX));
     if(isFlowControlEnabled(hwAttrs)) {
-        PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS));
+        GPIO_setMux(hwAttrs->ctsPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS));
     }
 #else
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin, IOC_PORT_MCU_UART0_TX);
+    GPIO_setMux(hwAttrs->txPin, IOC_PORT_MCU_UART0_TX);
     if(isFlowControlEnabled(hwAttrs)) {
-        PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin, IOC_PORT_MCU_UART0_CTS);
+        GPIO_setMux(hwAttrs->ctsPin, IOC_PORT_MCU_UART0_CTS);
     }
 #endif
 }
@@ -832,22 +827,7 @@ UART_Handle UARTCC26XX_open(UART_Handle handle, UART_Params *params)
     UARTCC26XX_initHw(handle);
 
     /* Configure IOs, make sure it was successful */
-    if(!UARTCC26XX_initIO(handle)) {
-        /* Trying to use UART driver when some other driver or application
-        *  has already allocated these pins, error!
-        */
-        DebugP_log0("Could not allocate pins, already in use.");
-        /* Disable UART */
-        UARTDisable(hwAttrs->baseAddr);
-        /* Release power dependency - i.e. potentially power down serial domain. */
-        Power_releaseDependency(hwAttrs->powerMngrId);
-        /* Mark the module as available */
-        key = HwiP_disable();
-        object->opened = false;
-        HwiP_restore(key);
-        /* Signal back to application that UART driver was not succesfully opened */
-        return (NULL);
-    }
+    UARTCC26XX_initIO(handle);
 
     /* Create Hwi object for this UART peripheral. */
     HwiP_Params_init(&(paramsUnion.hwiParams));
@@ -940,7 +920,7 @@ void UARTCC26XX_close(UART_Handle handle)
                                       UART_CTL_RXE);
 
     /* Deallocate pins */
-    PIN_close(object->hPin);
+    UARTCC26XX_finalizeIO(handle);
 
     /* Release power dependency - i.e. potentially power down serial domain. */
     Power_releaseDependency(hwAttrs->powerMngrId);
@@ -1610,60 +1590,69 @@ static void UARTCC26XX_initHw(UART_Handle handle) {
  *  @pre    Function assumes that the UART handle is pointing to a hardware
  *          module which has already been opened.
  */
-static bool UARTCC26XX_initIO(UART_Handle handle) {
+static void UARTCC26XX_initIO(UART_Handle handle) {
     /* Locals */
-    UARTCC26XX_Object               *object;
-    UARTCC26XX_HWAttrsV2 const     *hwAttrs;
-    PIN_Config                      uartPinTable[5];
-    uint32_t i = 0;
-
-    /* Get the pointer to the object and hwAttrs */
-    object = handle->object;
-    hwAttrs = handle->hwAttrs;
-
-    /* Build local list of pins, allocate through PIN driver and map HW ports */
-    uartPinTable[i++] = hwAttrs->rxPin | PIN_INPUT_EN;
-    /* Make sure UART_TX pin is driven high after calling PIN_open(...) until
-    *  we've set the correct peripheral muxing in PINCC26XX_setMux(...)
-    *  This is to avoid falling edge glitches when configuring the UART_TX pin.
-    */
-    uartPinTable[i++] = hwAttrs->txPin | PIN_INPUT_DIS | PIN_PUSHPULL |
-            PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
-    if (isFlowControlEnabled(hwAttrs)) {
-        uartPinTable[i++] = hwAttrs->ctsPin | PIN_INPUT_EN;
-        /* Avoiding glitches on the RTS, see comment for TX pin above. */
-        uartPinTable[i++] = hwAttrs->rtsPin | PIN_INPUT_DIS | PIN_PUSHPULL |
-                PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH;
-    }
-    /* Terminate pin list */
-    uartPinTable[i++] = PIN_TERMINATE;
-
-    /* Open and assign pins through pin driver */
-    object->hPin = PIN_open(&object->pinState, uartPinTable);
-
-    /* Are pins already allocated */
-    if (!object->hPin) {
-        return false;
-    }
+    UARTCC26XX_HWAttrsV2 const *hwAttrs = handle->hwAttrs;
 
     /* Set IO muxing for the UART pins */
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2)
-    PINCC26XX_setMux(object->hPin, hwAttrs->rxPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RX : IOC_PORT_MCU_UART1_RX));
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX));
-    if (isFlowControlEnabled(hwAttrs)) {
-        PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS));
-        PINCC26XX_setMux(object->hPin, hwAttrs->rtsPin, (hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RTS : IOC_PORT_MCU_UART1_RTS));
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->txPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_TX : IOC_PORT_MCU_UART1_TX);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->rxPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RX : IOC_PORT_MCU_UART1_RX);
+    }
+    if (isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(
+                hwAttrs->ctsPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_CTS : IOC_PORT_MCU_UART1_CTS
+            );
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(
+                hwAttrs->rtsPin, hwAttrs->baseAddr == UART0_BASE ? IOC_PORT_MCU_UART0_RTS : IOC_PORT_MCU_UART1_RTS
+            );
+        }
     }
 #else
-    PINCC26XX_setMux(object->hPin, hwAttrs->rxPin, IOC_PORT_MCU_UART0_RX);
-    PINCC26XX_setMux(object->hPin, hwAttrs->txPin, IOC_PORT_MCU_UART0_TX);
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->txPin, IOC_PORT_MCU_UART0_TX);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->rxPin, IOC_PORT_MCU_UART0_RX);
+    }
     if (isFlowControlEnabled(hwAttrs)) {
-        PINCC26XX_setMux(object->hPin, hwAttrs->ctsPin, IOC_PORT_MCU_UART0_CTS);
-        PINCC26XX_setMux(object->hPin, hwAttrs->rtsPin, IOC_PORT_MCU_UART0_RTS);
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(hwAttrs->ctsPin, IOC_PORT_MCU_UART0_CTS);
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_setMux(hwAttrs->rtsPin, IOC_PORT_MCU_UART0_RTS);
+        }
     }
 #endif
-    /* Success */
-    return true;
+}
+
+static void UARTCC26XX_finalizeIO(UART_Handle handle)
+{
+    UARTCC26XX_HWAttrsV2 const *hwAttrs = handle->hwAttrs;
+
+    if (hwAttrs->txPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->txPin);
+    }
+    if (hwAttrs->rxPin != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->rxPin);
+    }
+
+    if (isFlowControlEnabled(hwAttrs))
+    {
+        if (hwAttrs->ctsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->ctsPin);
+        }
+        if (hwAttrs->rtsPin != GPIO_INVALID_INDEX) {
+            GPIO_resetConfig(hwAttrs->rtsPin);
+        }
+    }
 }
 
 /*

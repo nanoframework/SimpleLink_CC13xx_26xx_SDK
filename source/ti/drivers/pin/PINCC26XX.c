@@ -46,13 +46,13 @@
 #include DeviceFamily_constructPath(inc/hw_ioc.h)
 #include DeviceFamily_constructPath(inc/hw_ints.h)
 #include DeviceFamily_constructPath(inc/hw_ccfg.h)
-#include DeviceFamily_constructPath(driverlib/driverlib_release.h)
 #include DeviceFamily_constructPath(driverlib/chipinfo.h)
 
 #if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
     #include DeviceFamily_constructPath(inc/hw_aon_sysctl.h)
-#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
-    DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
+#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 || \
+       DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+       DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
     #include DeviceFamily_constructPath(inc/hw_aon_pmctl.h)
 #endif
 
@@ -102,6 +102,9 @@ static SemaphoreP_Struct pinSemaphore;
 /// Hardware attribute structure populated in board.c to set HWI and SWI priorities
 extern const PINCC26XX_HWAttrs PINCC26XX_hwAttrs;
 
+// Defaults to true, set to false by the weak GPIO_init();
+static bool isGPIOIncluded = true;
+
 // I/O SWI service routine that posts the callback in a SWI context
 static void PIN_swi(uintptr_t arg0, uintptr_t arg1){
 
@@ -130,6 +133,13 @@ static void PIN_swi(uintptr_t arg0, uintptr_t arg1){
             }
         }
     }
+}
+
+// I/O HWI service routine
+// This special bypass is used by the GPIO driver, if both drivers are included
+void PIN_hwi_bypass(uint32_t eventMask) {
+    // Include all GPIO's currently triggered in the SWI
+    SwiP_or(&(pinSwi), eventMask);
 }
 
 // I/O HWI service routine
@@ -263,6 +273,15 @@ uint32_t PINCC26XX_getPinCount(){
     return pinCount;
 }
 
+/* Deliberate no-op. GPIO must be initialised before PIN for correct operation,
+ * so we use this weak definition to accomplish this without unconditionally
+ * including GPIO in every application
+ */
+__attribute__((weak)) void GPIO_init()
+{
+    isGPIOIncluded = false;
+}
+
 PIN_Status PIN_init(const PIN_Config pinConfig[]) {
     uint32_t i;
     uint32_t pinConfigMask = 0;            // Works as long as # pins <=32
@@ -273,8 +292,8 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
     // Its ok if Power init has already been called.
     Power_init();
 
-    // Make sure we are using correct version of Driverlib
-    DRIVERLIB_ASSERT_CURR_RELEASE();
+    // GPIO_init() must complete first and is safe to call multiple times.
+    GPIO_init();
 
     /* pinLowerBound is initialized to 0 by default.
      * All cases where this is not the case are handled here.
@@ -291,6 +310,7 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
             break;
         case CHIP_TYPE_CC1352:
         case CHIP_TYPE_CC1352R7:
+        case CHIP_TYPE_CC2672R3:
             pinLowerBound = 3;
             reservedPinMask |= 0x07;
             break;
@@ -300,6 +320,7 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
         case CHIP_TYPE_CC2652P:
         case CHIP_TYPE_CC1352P7:
         case CHIP_TYPE_CC2652P7:
+        case CHIP_TYPE_CC2672P3:
             if (ChipInfo_GetPackageType() == PACKAGE_7x7 ||
                 ChipInfo_GetPackageType() == PACKAGE_5x5) {
                 pinLowerBound = 5;
@@ -377,7 +398,7 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
                 // Setup all pins in pinConfig as instructed
                 PINCC26XX_setIoCfg(PIN_BM_ALL, pinConfig[pinGpioConfigTable[i]]);
             }
-            else {
+            else if (!isGPIOIncluded) {
                 // Setup all pins not in pinConfig to default configuration:
                 // GPIO, input buffer disable, GPIO output disable, low GPIO output, no pull, no IRQ, no wakeup
                 PINCC26XX_setIoCfg(PIN_BM_ALL, PIN_ID(i) | PINCC26XX_NOPULL);
@@ -391,7 +412,13 @@ PIN_Status PIN_init(const PIN_Config pinConfig[]) {
     // Setup HWI handler
     HwiP_Params_init(&hwiParams);
     hwiParams.priority = PINCC26XX_hwAttrs.intPriority;
-    HwiP_construct(&pinHwi, INT_AON_GPIO_EDGE, PIN_hwi, &hwiParams);
+
+    /* Note: If GPIO is included, we do not need this HwiP. GPIO will already have constructed
+     * a HwiP on INT_AON_GPIO_EDGE, and there is explicit callback forwarding logic in GPIO_hwiIntFxn.
+     */
+    if (!isGPIOIncluded) {
+        HwiP_construct(&pinHwi, INT_AON_GPIO_EDGE, PIN_hwi, &hwiParams);
+    }
 
     // Setup SWI handler
     SwiP_Params_init(&(swiParams));

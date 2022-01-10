@@ -120,7 +120,8 @@ __Decoupling__, or __Ground__ channel(s).
         boardh: "/ti/drivers/adcbuf/ADCBufCC26XX.Board.h.xdt"
     },
 
-    _getPinResources : _getPinResources
+    _getPinResources: _getPinResources,
+    getChannels: getChannels
 };
 
 /*
@@ -279,6 +280,58 @@ function moduleInstances(inst)
     }
 
     return (modInstances);
+}
+
+function getChannels(inst)
+{
+    let finalChannels = [];
+
+    for (let i = 0; i < inst.channels; i++) {
+        let channel = inst["adcBufChannel" + i];
+        /* Generate COMPB index using device metadata */
+        let packagePin = parseInt(channel.adc.adcPin.$solution.packagePinName);
+        let auxInput = system.deviceData.devicePins[packagePin].attributes.alias_name;
+        auxInput = "ADC_COMPB_IN_" + auxInput.replace("_", "IO");
+
+        let comment = "";
+        if (inst.$hardware && inst.$hardware.displayName) {
+            comment = inst.$hardware.displayName;
+        }
+
+        finalChannels.push({
+            name: channel.$name,
+            comment: comment,
+            dio: channel["adcPinInstance" + i].$name,
+            comp: auxInput
+        });
+    }
+
+    if (inst.batteryChannel) {
+        finalChannels.push({
+            "name": inst.adcBufChannelBattery.$name,
+            "comment": "",
+            "dio": "GPIO_INVALID_INDEX",
+            "comp": "ADC_COMPB_IN_VDDS"
+        });
+    }
+    if (inst.decouplingChannel) {
+        finalChannels.push({
+            name: inst.adcBufChannelDecoupling.$name,
+            comment: "",
+            dio: "GPIO_INVALID_INDEX",
+            comp: "ADC_COMPB_IN_DCOUPL"
+        });
+    }
+    if (inst.groundChannel) {
+        finalChannels.push({
+            name: inst.adcBufChannelGround.$name,
+            comment: "",
+            dio: "GPIO_INVALID_INDEX",
+            comp: "ADC_COMPB_IN_VSS"
+        });
+    }
+
+    return finalChannels;
 }
 
 /*

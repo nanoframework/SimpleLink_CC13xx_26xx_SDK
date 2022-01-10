@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       ioc.c
-*  Revised:        2020-11-05 14:55:36 +0100 (Thu, 05 Nov 2020)
-*  Revision:       59280
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for the IOC.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -665,7 +665,6 @@ IOCPinTypeI2c(uint32_t ui32Base, uint32_t ui32Data, uint32_t ui32Clk)
     IOCPortConfigureSet(ui32Data, IOC_PORT_MCU_I2C_MSSDA, ui32IOConfig);
     IOCPortConfigureSet(ui32Clk, IOC_PORT_MCU_I2C_MSSCL, ui32IOConfig);
 }
-
 
 //*****************************************************************************
 //

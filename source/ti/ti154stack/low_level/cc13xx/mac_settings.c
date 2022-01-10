@@ -5,7 +5,7 @@
  @brief This file contains CM0 radio command variables.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -88,35 +88,12 @@ void rfSetConfigIeee(macRfCfg_ieee_t *pRfCfg)
     memcpy(&RF_cmdFsTx, pRfCfg->pRfFs, sizeof(rfc_CMD_FS_t));
     memcpy(&RF_cmdIEEETx, pRfCfg->pRfTx, sizeof(rfc_CMD_IEEE_TX_t));
     RF_cmdIEEETx.startTrigger.pastTrig = 1;
-    RF_cmdIEEETx.condition.rule = COND_NEVER;
 
     memcpy(&RF_cmdIEEERx, pRfCfg->pRfRx, sizeof(rfc_CMD_IEEE_RX_t));
-    RF_cmdIEEERx.condition.rule = COND_NEVER;
     RF_cmdIEEERx.rxConfig.bAutoFlushCrc = 0x1;
-    RF_cmdIEEERx.rxConfig.bAutoFlushIgn = 0x0;
     RF_cmdIEEERx.rxConfig.bIncludePhyHdr = 0x1;
-    RF_cmdIEEERx.rxConfig.bIncludeCrc = 0x0;
-    RF_cmdIEEERx.rxConfig.bAppendRssi = 0x1;
     RF_cmdIEEERx.rxConfig.bAppendCorrCrc = 0x0;
-    RF_cmdIEEERx.rxConfig.bAppendSrcInd = 0x0;
     RF_cmdIEEERx.rxConfig.bAppendTimestamp = 0x1;
-    RF_cmdIEEERx.frameFiltOpt.maxFrameVersion = 0x3;
-    RF_cmdIEEERx.frameTypes.bAcceptFt0Beacon = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt1Data = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt2Ack = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt3MacCmd = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt4Reserved = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt5Reserved = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt6Reserved = 0x1;
-    RF_cmdIEEERx.frameTypes.bAcceptFt7Reserved = 0x1;
-    RF_cmdIEEERx.ccaOpt.ccaEnEnergy = 0x0;
-    RF_cmdIEEERx.ccaOpt.ccaEnCorr = 0x0;
-    RF_cmdIEEERx.ccaOpt.ccaEnSync = 0x0;
-    RF_cmdIEEERx.ccaOpt.ccaCorrOp = 0x1;
-    RF_cmdIEEERx.ccaOpt.ccaSyncOp = 0x1;
-    RF_cmdIEEERx.ccaOpt.ccaCorrThr = 0x0;
-    RF_cmdIEEERx.ccaRssiThr = 0x64;
-    RF_cmdIEEERx.endTrigger.triggerType = 0x1;
 
     memcpy(&RF_cmdIEEECsma, pRfCfg->pRfCs, sizeof(rfc_CMD_IEEE_CSMA_t));
     RF_cmdIEEECsma.pNextOp = (rfc_radioOp_t *)&RF_cmdIEEETx;
@@ -125,7 +102,6 @@ void rfSetConfigIeee(macRfCfg_ieee_t *pRfCfg)
     RF_cmdIEEECsma.macMaxBE = 5;
     RF_cmdIEEECsma.macMaxCSMABackoffs = 4;
     RF_cmdIEEECsma.csmaConfig.initCW = 1;
-    RF_cmdIEEECsma.NB = 0;
     RF_cmdIEEECsma.BE = 3;
     RF_cmdIEEECsma.endTrigger.triggerType = 0x1;
 
@@ -171,7 +147,7 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
     pRfMode = pRfCfg->pRfMode;
     pRfPowerTable = pRfCfg->pRfPowerTable;
     memset(&RF_cmdPropRadioDivSetup, 0, sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t));
-    if(chipType == CHIP_TYPE_CC1352P)
+    if(chipType == CHIP_TYPE_CC1352P || chipType == CHIP_TYPE_CC1352P7)
     {
         setupLength = sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t);
     }
@@ -181,17 +157,13 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
     }
     memcpy(&RF_cmdPropRadioDivSetup, pRfCfg->pRfSetup, setupLength);
     RF_cmdPropRadioDivSetup.startTrigger.pastTrig = 1;
-    RF_cmdPropRadioDivSetup.formatConf.bBitReversal = 0;
     RF_cmdPropRadioDivSetup.formatConf.bMsbFirst = 1;
-    RF_cmdPropRadioDivSetup.formatConf.whitenMode = 7;
-    RF_cmdPropRadioDivSetup.intFreq = 0x8000;
 
     memcpy(&RF_cmdFsRx, pRfCfg->pRfFs, sizeof(rfc_CMD_FS_t));
     RF_cmdFsRx.startTrigger.pastTrig = 1;
 
     memcpy(&RF_cmdFsTx, pRfCfg->pRfFs, sizeof(rfc_CMD_FS_t));
     RF_cmdFsTx.startTrigger.pastTrig = 1;
-
 
     memcpy(&RF_cmdPropTxAdv, pRfCfg->pRfTx, sizeof(rfc_CMD_PROP_TX_ADV_t));
     RF_cmdPropTxAdv.startTrigger.triggerType = TRIG_NOW;
@@ -208,13 +180,7 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
 
     memcpy(&RF_cmdPropRxAdv, pRfCfg->pRfRx, sizeof(rfc_CMD_PROP_RX_ADV_t));
     RF_cmdPropRxAdv.startTrigger.pastTrig = 1;
-    RF_cmdPropRxAdv.pktConf.bFsOff = 0x0,
-    RF_cmdPropRxAdv.pktConf.bRepeatOk = 0x0;
-    RF_cmdPropRxAdv.pktConf.bRepeatNok = 0x0;
     RF_cmdPropRxAdv.pktConf.bUseCrc = 0x1;
-    RF_cmdPropRxAdv.pktConf.bCrcIncSw = 0x0;
-    RF_cmdPropRxAdv.pktConf.bCrcIncHdr = 0x0;
-    RF_cmdPropRxAdv.pktConf.endType = 0x0;
     RF_cmdPropRxAdv.pktConf.filterOp = 0x1;
     RF_cmdPropRxAdv.rxConf.bAutoFlushIgnored = 0x0;
     RF_cmdPropRxAdv.rxConf.bAutoFlushCrcErr = 0x1;
@@ -225,14 +191,10 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
     RF_cmdPropRxAdv.rxConf.bAppendStatus = 0x0;
     RF_cmdPropRxAdv.maxPktLen = macCfg.macMaxFrameSize;
     RF_cmdPropRxAdv.hdrConf.numHdrBits = 0x10;
-    RF_cmdPropRxAdv.hdrConf.lenPos = 0x0;
     RF_cmdPropRxAdv.hdrConf.numLenBits = 0xB;
     RF_cmdPropRxAdv.lenOffset = 0xFC;
 #ifdef RFCORE49
     RF_cmdPropRxAdv.endTrigger.triggerType = 0x4;
-    RF_cmdPropRxAdv.endTrigger.bEnaCmd = 0x0;
-    RF_cmdPropRxAdv.endTrigger.triggerNo = 0x0;
-    RF_cmdPropRxAdv.endTrigger.pastTrig = 0x0;
     RF_cmdPropRxAdv.endTime = 1680000000;   //7 minutes
 #endif
 
@@ -242,13 +204,11 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
     RF_cmdPropCs.startTrigger.pastTrig = 1;
     RF_cmdPropCs.condition.rule = COND_STOP_ON_TRUE;
     RF_cmdPropCs.csConf.bEnaRssi = 0x1;
-    RF_cmdPropCs.csConf.bEnaCorr = 0x0;
     RF_cmdPropCs.csConf.busyOp = 0x1;
     RF_cmdPropCs.csConf.idleOp = 0x1;
     RF_cmdPropCs.rssiThr = -83;
     RF_cmdPropCs.corrPeriod = 640;
     RF_cmdPropCs.corrConfig.numCorrInv = 0x03;
-    RF_cmdPropCs.corrConfig.numCorrBusy = 0x00;
     RF_cmdPropCs.csEndTrigger.triggerType = TRIG_REL_START;
     RF_cmdPropCs.csEndTime = 8000; /* 2 ms timeout as a fallback */
 
@@ -258,7 +218,6 @@ void rfSetConfigSubG(macRfCfg_prop_t *pRfCfg)
     RF_cmdPropCsSlotted.startTrigger.pastTrig = 1;
     RF_cmdPropCsSlotted.condition.rule = COND_STOP_ON_TRUE;
     RF_cmdPropCsSlotted.csConf.bEnaRssi = 0x1;
-    RF_cmdPropCsSlotted.csConf.bEnaCorr = 0x0; /* CC13xx sub-G can only support CCA mode 1 */
     RF_cmdPropCsSlotted.csConf.busyOp = 0x1;
     RF_cmdPropCsSlotted.csConf.idleOp = 0x1;
     RF_cmdPropCsSlotted.rssiThr = -83; /* -83 dBm */

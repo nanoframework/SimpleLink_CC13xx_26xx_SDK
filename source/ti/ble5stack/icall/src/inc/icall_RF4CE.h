@@ -5,7 +5,7 @@
  @brief Indirect function Call dispatcher interface definition
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

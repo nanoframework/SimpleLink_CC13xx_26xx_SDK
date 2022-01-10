@@ -67,9 +67,6 @@ const devSpecificSlLr5KbpsSettings = {
     args: {
         freqBand: "868", // options: 868 or 433
         phyType868: "slr5kbps2gfsk", // phyType suffix must match freqBand
-        carrierFrequency: 868.00,
-        whitening: `No whitener, dynamically IEEE 802.15.4g compatible \
-16/32-bit CRC`,
         codeExportConfig: {
             cmdList_prop: ["cmdPropRadioDivSetup"],
             cmdPropRadioDivSetup: "RF_cmdPropRadioDivSetup_slr5kbps2gfsk"
@@ -82,9 +79,6 @@ const devSpecific2Gfsk50KbpsSettings = {
     args: {
         freqBand: "868", // options: 868 or 433
         phyType868: "2gfsk50kbps154g", // phyType suffix must match freqBand
-        carrierFrequency: 868.00,
-        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
-16/32-bit CRC`,
         codeExportConfig: {
             cmdList_prop: ["cmdPropRadioDivSetup"],
             cmdPropRadioDivSetup: "RF_cmdPropRadioDivSetup_2gfsk50kbps154g"
@@ -97,9 +91,6 @@ const devSpecific2Gfsk200KbpsSettings = {
     args: {
         freqBand: "868",
         phyType868: "2gfsk200kbps154g", // phyType sfx must match freqBand
-        carrierFrequency: 915.00,
-        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
-16/32-bit CRC`,
         codeExportConfig: {
             cmdList_prop: ["cmdPropRadioDivSetup"],
             cmdPropRadioDivSetup: "RF_cmdPropRadioDivSetup_2gfsk200kbps154g"

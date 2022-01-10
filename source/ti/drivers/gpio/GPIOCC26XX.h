@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,10 +29,10 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/** ============================================================================
+/*! ============================================================================
  *  @file       GPIOCC26XX.h
  *
- *  @brief      GPIO driver implementation for CC26xx/CC13xx devices
+ *  @brief      GPIO driver implementation for CC26xx devices
  *
  *  The GPIO header file should be included in an application as follows:
  *  @code
@@ -43,222 +43,92 @@
  *  Refer to @ref GPIO.h for a complete description of the GPIO
  *  driver APIs provided and examples of their use.
  *
- *  ### CC26XX GPIO Driver Configuration #
+ *  The definitions in this file should not be used directly. All GPIO_CFG
+ *  macros should be used as-is from GPIO.h.
  *
- *  In order to use the GPIO APIs, the application is required
- *  to provide 3 structures in the ti_drivers_config.c file:
- *
- *  1.  An array of @ref GPIO_PinConfig elements that defines the
- *  initial configuration of each pin used by the application. A
- *  pin is referenced in the application by its corresponding index in this
- *  array. The pin type (that is, INPUT/OUTPUT), its initial state (that is
- *  OUTPUT_HIGH or LOW), interrupt behavior (RISING/FALLING edge, etc.)
- *  (see @ref GPIO_PinConfigSettings), and
- *  device specific pin identification (see @ref GPIOCC26XX_PinConfigIds)
- *  are configured in each element of this array.
- *  Below is an CC26XX device specific example of the GPIO_PinConfig array:
- *  @code
- *  //
- *  // Array of Pin configurations
- *  // NOTE: The order of the pin configurations must coincide with what was
- *  //       defined in CC2650_LAUNCH.h
- *  // NOTE: Pins not used for interrupts should be placed at the end of the
- *  //       array.  Callback entries can be omitted from callbacks array to
- *  //       reduce memory usage.
- *  //
- *  GPIO_PinConfig gpioPinConfigs[] = {
- *      // Input pins
- *      GPIOCC26XX_DIO_13 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_RISING,  // Button 0
- *      GPIOCC26XX_DIO_14 | GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_RISING,  // Button 1
- *
- *      // Output pins
- *      GPIOCC26XX_DIO_07 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,     //  Green LED
- *      GPIOCC26XX_DIO_06 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,     //  Red LED
- *  };
- *  @endcode
- *
- *  2.  An array of @ref GPIO_CallbackFxn elements that is used to store
- *  callback function pointers for GPIO pins configured with interrupts.
- *  The indexes for these array elements correspond to the pins defined
- *  in the @ref GPIO_PinConfig array. These function pointers can be defined
- *  statically by referencing the callback function name in the array
- *  element, or dynamically, by setting the array element to NULL and using
- *  GPIO_setCallback() at runtime to plug the callback entry.
- *  Pins not used for interrupts can be omitted from the callback array to
- *  reduce memory usage (if they are placed at the end of the @ref
- *  GPIO_PinConfig array). The callback function syntax should match the
- *  following:
- *  @code
- *  void (*GPIO_CallbackFxn)(unsigned int index);
- *  @endcode
- *  The index parameter is the same index that was passed to
- *  GPIO_setCallback(). This allows the same callback function to be used
- *  for multiple GPIO interrupts, by using the index to identify the GPIO
- *  that caused the interrupt.
- *  Below is an CC26XX device specific example of the @ref GPIO_CallbackFxn
- *  array:
- *  @code
- *  //
- *  // Array of callback function pointers
- *  // NOTE: The order of the pin configurations must coincide with what was
- *  //       defined in CC2650_LAUNCH.h
- *  // NOTE: Pins not used for interrupts can be omitted from callbacks array to
- *  //       reduce memory usage (if placed at end of gpioPinConfigs array).
- *  //
- *  GPIO_CallbackFxn gpioCallbackFunctions[] = {
- *      NULL,  //  Button 0
- *      NULL,  //  Button 1
- *  };
- *  @endcode
- *
- *  3.  The device specific GPIOCC26XX_Config structure that tells the GPIO
- *  driver where the two aforementioned arrays are and the number of elements
- *  in each. The interrupt priority of all pins configured to generate
- *  interrupts is also specified here. Values for the interrupt priority are
- *  device-specific. You should be well-acquainted with the interrupt
- *  controller used in your device before setting this parameter to a
- *  non-default value. The sentinel value of (~0) (the default value) is
- *  used to indicate that the lowest possible priority should be used.
- *  Below is an example of an initialized GPIOCC26XX_Config
- *  structure:
- *  @code
- *  const GPIOCC26XX_Config GPIOCC26XX_config = {
- *      .pinConfigs = (GPIO_PinConfig *)gpioPinConfigs,
- *      .callbacks = (GPIO_CallbackFxn *)gpioCallbackFunctions,
- *      .numberOfPinConfigs = sizeof(gpioPinConfigs)/sizeof(GPIO_PinConfig),
- *      .numberOfCallbacks = sizeof(gpioCallbackFunctions)/sizeof(GPIO_CallbackFxn),
- *      .intPriority = (~0)
- *  };
- *  @endcode
- *
- *  ============================================================================
+ *  There are no additional configuration values or platform-specific
+ *  functions for GPIOCC26XX.
  */
 
 #ifndef ti_drivers_GPIOCC26XX__include
 #define ti_drivers_GPIOCC26XX__include
 
-#include <stdint.h>
-
 #include <ti/drivers/GPIO.h>
-#include <ti/devices/DeviceFamily.h>
 
-#include DeviceFamily_constructPath(driverlib/ioc.h)
+#include <ti/devices/DeviceFamily.h>
+#include DeviceFamily_constructPath(inc/hw_ioc.h)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*!
- *  @brief  GPIO device specific driver configuration structure
+/* Alternative mux values are defined in hw_ioc.h */
+#define GPIO_MUX_GPIO_INTERNAL              IOC_IOCFG0_PORT_ID_GPIO
+
+/* We don't define this value on purpose - any unsupported values will cause a
+ * compile-time error. If your compiler tells you that this macro is missing,
+ * you are trying to use an unsupported option.
  *
- *  The device specific GPIOCC26XX_Config structure that tells the GPIO
- *  driver where the two aforementioned arrays are and the number of elements
- *  in each. The interrupt priority of all pins configured to generate
- *  interrupts is also specified here. Values for the interrupt priority are
- *  device-specific. You should be well-acquainted with the interrupt
- *  controller used in your device before setting this parameter to a
- *  non-default value. The sentinel value of (~0) (the default value) is
- *  used to indicate that the lowest possible priority should be used.
- *
- *  Below is an example of an initialized GPIOCC26XX_Config
- *  structure:
- *  @code
- *  const GPIOCC26XX_Config GPIOCC26XX_config = {
- *      .pinConfigs = (GPIO_PinConfig *)gpioPinConfigs,
- *      .callbacks = (GPIO_CallbackFxn *)gpioCallbackFunctions,
- *      .numberOfPinConfigs = sizeof(gpioPinConfigs)/sizeof(GPIO_PinConfig),
- *      .numberOfCallbacks = sizeof(gpioCallbackFunctions)/sizeof(GPIO_CallbackFxn),
- *      .intPriority = (~0)
- *  };
- *  @endcode
+ * See below for which options are unsupported.
  */
-typedef struct {
-    /*! Pointer to the board's GPIO_PinConfig array */
-    GPIO_PinConfig  *pinConfigs;
+#undef GPIOCC26XX_CFG_OPTION_NOT_SUPPORTED
 
-    /*! Pointer to the board's GPIO_CallbackFxn array */
-    GPIO_CallbackFxn  *callbacks;
+/* Low and high value interrupts are not available on CC26XX hardware */
+#define GPIO_CFG_INT_LOW_INTERNAL           GPIOCC26XX_CFG_OPTION_NOT_SUPPORTED
+#define GPIO_CFG_INT_HIGH_INTERNAL          GPIOCC26XX_CFG_OPTION_NOT_SUPPORTED
 
-    /*! Number of GPIO_PinConfigs defined */
-    uint32_t numberOfPinConfigs;
+/* Support for DO_NOT_CONFIG would break a major initialisation optimisation */
+#define GPIO_CFG_DO_NOT_CONFIG_INTERNAL     GPIOCC26XX_CFG_OPTION_NOT_SUPPORTED
 
-    /*! Number of GPIO_Callbacks defined */
-    uint32_t numberOfCallbacks;
+/* See GPIO.h for details about these configuration values */
 
-    /*!
-     *  Interrupt priority used for call back interrupts.
-     *
-     *  intPriority is the interrupt priority, as defined by the
-     *  underlying OS.  It is passed unmodified to the underlying OS's
-     *  interrupt handler creation code, so you need to refer to the OS
-     *  documentation for usage.  If the driver uses the ti.dpl
-     *  interface instead of making OS calls directly, then the HwiP port
-     *  handles the interrupt priority in an OS specific way.  In the case
-     *  of the SYS/BIOS port, intPriority is passed unmodified to Hwi_create().
-     *
-     *  Setting ~0 will configure the lowest possible priority
-     */
-    uint32_t intPriority;
-} GPIOCC26XX_Config;
+/* General options remapped directly to IOC defines */
+#define GPIO_CFG_NO_DIR_INTERNAL            (IOC_IOCFG0_IOMODE_NORMAL | GPIOCC26XX_CFG_PIN_IS_INPUT_INTERNAL)
+#define GPIO_CFG_INPUT_INTERNAL             (IOC_IOCFG0_IOMODE_NORMAL | IOC_IOCFG0_IE | GPIOCC26XX_CFG_PIN_IS_INPUT_INTERNAL)
+#define GPIO_CFG_OUTPUT_INTERNAL            (IOC_IOCFG0_IOMODE_NORMAL | IOC_IOCFG0_IE | GPIOCC26XX_CFG_PIN_IS_OUTPUT_INTERNAL)
+#define GPIO_CFG_OUTPUT_OPEN_DRAIN_INTERNAL (IOC_IOCFG0_IOMODE_OPENDR | IOC_IOCFG0_IE | GPIOCC26XX_CFG_PIN_IS_OUTPUT_INTERNAL)
+#define GPIO_CFG_OUT_OPEN_SOURCE_INTERNAL   (IOC_IOCFG0_IOMODE_OPENSRC | IOC_IOCFG0_IE | GPIOCC26XX_CFG_PIN_IS_OUTPUT_INTERNAL)
 
-/*!
- *  \defgroup GPIOCC26XX_PinConfigIds GPIO pin identification macros used to configure GPIO pins
- *  @{
- */
-/**
- *  @name Device specific GPIO port/pin identifiers to be used within the board's GPIO_PinConfig table.
- *  @{
-*/
-#define GPIOCC26XX_EMPTY_PIN  0xffff   /*!< @hideinitializer */
+#define GPIO_CFG_PULL_NONE_INTERNAL         IOC_IOCFG0_PULL_CTL_DIS
+#define GPIO_CFG_PULL_UP_INTERNAL           IOC_IOCFG0_PULL_CTL_UP
+#define GPIO_CFG_PULL_DOWN_INTERNAL         IOC_IOCFG0_PULL_CTL_DWN
 
-#define GPIOCC26XX_DIO_00    IOID_0    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_01    IOID_1    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_02    IOID_2    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_03    IOID_3    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_04    IOID_4    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_05    IOID_5    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_06    IOID_6    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_07    IOID_7    /*!< @hideinitializer */
+#define GPIO_CFG_INT_NONE_INTERNAL          IOC_IOCFG0_EDGE_DET_NONE
+#define GPIO_CFG_INT_FALLING_INTERNAL       IOC_IOCFG0_EDGE_DET_NEG
+#define GPIO_CFG_INT_RISING_INTERNAL        IOC_IOCFG0_EDGE_DET_POS
+#define GPIO_CFG_INT_BOTH_EDGES_INTERNAL    IOC_IOCFG0_EDGE_DET_BOTH
 
-#define GPIOCC26XX_DIO_08    IOID_8    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_09    IOID_9    /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_10    IOID_10   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_11    IOID_11   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_12    IOID_12   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_13    IOID_13   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_14    IOID_14   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_15    IOID_15   /*!< @hideinitializer */
+#define GPIO_CFG_INT_ENABLE_INTERNAL        IOC_IOCFG0_EDGE_IRQ_EN
+#define GPIO_CFG_INT_DISABLE_INTERNAL       0
 
-#define GPIOCC26XX_DIO_16    IOID_16   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_17    IOID_17   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_18    IOID_18   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_19    IOID_19   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_20    IOID_20   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_21    IOID_21   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_22    IOID_22   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_23    IOID_23   /*!< @hideinitializer */
+/* Value inversion is stored in the low bit of IOMODE */
+#define GPIO_CFG_INVERT_OFF_INTERNAL        0
+#define GPIO_CFG_INVERT_ON_INTERNAL         IOC_IOCFG0_IOMODE_INV
 
-#define GPIOCC26XX_DIO_24    IOID_24   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_25    IOID_25   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_26    IOID_26   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_27    IOID_27   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_28    IOID_28   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_29    IOID_29   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_30    IOID_30   /*!< @hideinitializer */
-#define GPIOCC26XX_DIO_31    IOID_31   /*!< @hideinitializer */
+#define GPIO_CFG_HYSTERESIS_OFF_INTERNAL    0
+#define GPIO_CFG_HYSTERESIS_ON_INTERNAL     IOC_IOCFG0_HYST_EN
 
-/** @} */
-/** @} end of GPIOCC26XX_PinConfigIds group */
+#define GPIO_CFG_SLEW_NORMAL_INTERNAL       0
+#define GPIO_CFG_SLEW_REDUCED_INTERNAL      IOC_IOCFG0_SLEW_RED
 
-/*!
- *  @brief     Un-oonfigure a GPIO pin
+#define GPIO_CFG_DRVSTR_LOW_INTERNAL        IOC_IOCFG0_IOSTR_AUTO
+#define GPIO_CFG_DRVSTR_MED_INTERNAL        IOC_IOCFG0_IOSTR_MED
+#define GPIO_CFG_DRVSTR_HIGH_INTERNAL       IOC_IOCFG0_IOSTR_MAX
+
+/* We can hide some settings inside the MUX byte if they are not part of the
+ * IOC config, since the mux is applied separately. On CC26XX this is the
+ * lowest 8 bits.
  *
- *  Disables pin interrupt, clears callback, restores pin to default setting,
- *  removes pin from PIN object
- *
- *  @param      index    GPIO index
+ * Do not use these values when calling GPIO_setConfig. They are for
+ * internal use only, to provide support for driver functionality that does
+ * not map directly into the IO config registers.
  */
-extern void GPIOCC26xx_release(int index);
+#define GPIO_CFG_OUTPUT_DEFAULT_HIGH_INTERNAL   0x1
+#define GPIO_CFG_OUTPUT_DEFAULT_LOW_INTERNAL    0
+
+/* Whether GPIO hardware should have the output enable bit set for this pin */
+#define GPIOCC26XX_CFG_PIN_IS_INPUT_INTERNAL    0x2
+#define GPIOCC26XX_CFG_PIN_IS_OUTPUT_INTERNAL   0
 
 #ifdef __cplusplus
 }

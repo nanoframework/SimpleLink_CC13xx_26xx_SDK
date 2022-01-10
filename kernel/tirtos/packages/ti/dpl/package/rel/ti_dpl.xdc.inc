@@ -3,9 +3,6 @@ package/build.cfg
 package/package.xdc.inc
 ./package.bld
 .meta
-package/package.cfg.xdc.inc
-lib/ticlang/m4/dpl_cc13x1.a
-package/package_ti.dpl.c
 ./ClockP_tirtos.c
 ./DebugP_tirtos.c
 ./HwiP_tirtos.c
@@ -14,6 +11,9 @@ package/package_ti.dpl.c
 ./SwiP_tirtos.c
 ./SystemP_tirtos.c
 ./PowerCC26X2_tirtos.c
+package/package.cfg.xdc.inc
+lib/ticlang/m4/dpl_cc13x1.a
+package/package_ti.dpl.c
 lib/ccs/m4/dpl_cc13x1.a
 lib/gcc/m4/dpl_cc13x1.a
 lib/iar/m4/dpl_cc13x1.a

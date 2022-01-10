@@ -8,7 +8,7 @@
         Note: Linker defines are located in the IAR IDE project using
         --config_def in Options->Linker->Extra Options.
 
-        CCxxxx:            Device Name (e.g. CC2650)
+        CCxxxx:            Device Name (e.g. DeviceFamily_CC13X2)
 
         Exported Symbols
         Note: Can be used as externs in C code.
@@ -16,7 +16,7 @@
         STACK_TOP: Location of the top of RAM.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -63,18 +63,11 @@ define symbol FLASH_BASE            = 0x00000000;
 define symbol RAM_BASE              = 0x20000000;
 define symbol ROM_BASE              = 0x10000000;
 
-if ( isdefinedsymbol(CC2650) )
-{
-  define symbol RAM_SIZE            = 0x00005000; // 20K
-  define symbol FLASH_SIZE          = 0x00020000; // 128K
-  define symbol ROM_SIZE            = 0x0001C000; // 115K
-}
-else if ( isdefinedsymbol(CC2642) || isdefinedsymbol(CC13X2) || isdefinedsymbol(CC26X2) )
-{
-  define symbol RAM_SIZE            = 0x00014000; // 80K
-  define symbol FLASH_SIZE          = 0x00058000; // 352K
-  define symbol ROM_SIZE            = 0x00040000; // 256K
-}
+
+define symbol RAM_SIZE            = 0x00014000; // 80K
+define symbol FLASH_SIZE          = 0x00058000; // 352K
+define symbol ROM_SIZE            = 0x00040000; // 256K
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Memory Definitions
@@ -93,14 +86,8 @@ define symbol RAM_END           = RAM_BASE+RAM_SIZE-1;
 //
 define symbol WORD_SIZE             = 4;
 
-if ( isdefinedsymbol(CC2650) )
-{
-  define symbol PAGE_SIZE           = 0x1000;
-}
-else if ( isdefinedsymbol(CC2642) || isdefinedsymbol(CC13X2) || isdefinedsymbol(CC26X2) )
-{
-  define symbol PAGE_SIZE           = 0x2000;
-}
+define symbol PAGE_SIZE           = 0x2000;
+
 export symbol PAGE_SIZE;
 
 if (isdefinedsymbol(PAGE_ALIGN))
@@ -114,26 +101,12 @@ else
 
 define symbol FLASH_START           = FLASH_BASE;
 
-if ( isdefinedsymbol(CC2650) )
-{
-  define symbol PAGE_MASK           = 0xFFFFF000;
-}
-else if ( isdefinedsymbol(CC2642) || isdefinedsymbol(CC13X2) || isdefinedsymbol(CC26X2) )
-{
-  define symbol PAGE_MASK           = 0xFFFFE000;
-}
+define symbol PAGE_MASK           = 0xFFFFE000;
 
 // BIM is allocated at flash sector.
-if ( isdefinedsymbol(CC2650) )
-{
 define symbol FLASH_PAGE_BIMSTART   = FLASH_BASE + FLASH_SIZE - PAGE_SIZE;
 define symbol FLASH_PAGE_BIMEND     = FLASH_BASE + FLASH_SIZE; //0x0001FFFF;
-}
-else
-{
-  define symbol FLASH_PAGE_BIMSTART   = FLASH_BASE + FLASH_SIZE - PAGE_SIZE;
-  define symbol FLASH_PAGE_BIMEND     = FLASH_BASE + FLASH_SIZE; //0x0001FFFF;
-}
+
 
 // leaving 4 bytes of buffer between CCFG and veify function pointer 
 define symbol FLASH_FNPTR_START    = 0x00057fa0; 

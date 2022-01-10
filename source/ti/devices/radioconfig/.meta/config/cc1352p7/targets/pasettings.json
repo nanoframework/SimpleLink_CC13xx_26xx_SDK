@@ -2,7 +2,7 @@
     "patables": {
         "RfDesign": [
             {
-                "_name": "CC1352PEM-XD4251-XD24",
+                "_name": "LP-CC1352P7-4",
                 "FrequencyRange": [
                     {
                         "Min": "420",
@@ -86,64 +86,68 @@
                         "PaSettingTable": {
                             "PaSetting": [
                                 {
+                                    "_text": "5.5",
+                                    "Value": "0x003F"
+                                },
+                                {
                                     "_text": "5",
-                                    "Value": "7217"
+                                    "Value": "0x762E"
                                 },
                                 {
                                     "_text": "4",
-                                    "Value": "4E63"
+                                    "Value": "0x8220"
                                 },
                                 {
                                     "_text": "3",
-                                    "Value": "385D"
+                                    "Value": "0x486F"
                                 },
                                 {
                                     "_text": "2",
-                                    "Value": "3259"
+                                    "Value": "0x3E66"
                                 },
                                 {
                                     "_text": "1",
-                                    "Value": "2856"
+                                    "Value": "0x3261"
                                 },
                                 {
                                     "_text": "0",
-                                    "Value": "2853"
+                                    "Value": "0x2C5D"
                                 },
                                 {
                                     "_text": "-3",
-                                    "Value": "1893"
+                                    "Value": "0x1899"
                                 },
                                 {
                                     "_text": "-5",
-                                    "Value": "12D6"
+                                    "Value": "0x1695"
                                 },
                                 {
                                     "_text": "-6",
-                                    "Value": "10D4"
+                                    "Value": "0x1693"
                                 },
                                 {
                                     "_text": "-9",
-                                    "Value": "0AD0"
+                                    "Value": "0x0CD4"
                                 },
                                 {
                                     "_text": "-10",
-                                    "Value": "0ACF"
+                                    "Value": "0x0AD3"
                                 },
                                 {
                                     "_text": "-12",
-                                    "Value": "0ACC"
+                                    "Value": "0x0AD0"
                                 },
                                 {
                                     "_text": "-15",
-                                    "Value": "06CA"
+                                    "Value": "0x06CD"
                                 },
                                 {
                                     "_text": "-18",
-                                    "Value": "06C8"
+                                    "Value": "0x04CA"
                                 },
                                 {
                                     "_text": "-20",
-                                    "Value": "04C6"
+                                    "Value": "0x04C8"
                                 }
                             ]
                         }
@@ -151,7 +155,7 @@
                 ]
             },
             {
-                "_name": "CC1352PEM-XD7793-XD24",
+                "_name": "LP-CC1352P7-1",
                 "FrequencyRange": [
                     {
                         "Min": "770",
@@ -179,7 +183,7 @@
                                 },
                                 {
                                     "_text": "12",
-                                    "Value": "0xA410"
+                                    "Value": "0x895E"
                                 },
                                 {
                                     "_text": "11",
@@ -249,77 +253,73 @@
                         }
                     },
                     {
-                        "Min": "169",
-                        "Max": "170",
+                        "Min": "2360",
+                        "Max": "2500",
                         "PaSettingTable": {
                             "PaSetting": [
                                 {
-                                    "_text": "10",
+                                    "_text": "5.5",
                                     "Value": "0x003F"
                                 },
                                 {
-                                    "_text": "9",
-                                    "Value": "0x3819"
-                                },
-                                {
-                                    "_text": "8",
-                                    "Value": "0x265B"
-                                },
-                                {
-                                    "_text": "7",
-                                    "Value": "0x180C"
-                                },
-                                {
-                                    "_text": "6",
-                                    "Value": "0x1852"
-                                },
-                                {
                                     "_text": "5",
-                                    "Value": "0x1894"
+                                    "Value": "0x762E"
                                 },
                                 {
                                     "_text": "4",
-                                    "Value": "0x0EDE"
+                                    "Value": "0x8220"
                                 },
                                 {
                                     "_text": "3",
-                                    "Value": "0x0EDB"
+                                    "Value": "0x486F"
                                 },
                                 {
                                     "_text": "2",
-                                    "Value": "0x0ED8"
+                                    "Value": "0x3E66"
                                 },
                                 {
                                     "_text": "1",
-                                    "Value": "0x0ED6"
+                                    "Value": "0x3261"
                                 },
                                 {
                                     "_text": "0",
-                                    "Value": "0x0ED4"
-                                },
-                                {
-                                    "_text": "-1",
-                                    "Value": "0x0E8A"
-                                },
-                                {
-                                    "_text": "-2",
-                                    "Value": "0x0E89"
+                                    "Value": "0x2C5D"
                                 },
                                 {
                                     "_text": "-3",
-                                    "Value": "0x0E88"
+                                    "Value": "0x1899"
                                 },
                                 {
-                                    "_text": "-7",
-                                    "Value": "0x08CA"
+                                    "_text": "-5",
+                                    "Value": "0x1695"
                                 },
                                 {
-                                    "_text": "-11",
-                                    "Value": "0x08C7"
+                                    "_text": "-6",
+                                    "Value": "0x1693"
                                 },
                                 {
-                                    "_text": "-13",
-                                    "Value": "0x08C6"
+                                    "_text": "-9",
+                                    "Value": "0x0CD4"
+                                },
+                                {
+                                    "_text": "-10",
+                                    "Value": "0x0AD3"
+                                },
+                                {
+                                    "_text": "-12",
+                                    "Value": "0x0AD0"
+                                },
+                                {
+                                    "_text": "-15",
+                                    "Value": "0x06CD"
+                                },
+                                {
+                                    "_text": "-18",
+                                    "Value": "0x04CA"
+                                },
+                                {
+                                    "_text": "-20",
+                                    "Value": "0x04C8"
                                 }
                             ]
                         }
@@ -327,7 +327,7 @@
                 ]
             },
             {
-                "_name": "CC1352PEM-XD7793-XD24-PA7793",
+                "_name": "LP-CC1352P7-1_20dBm",
                 "FrequencyRange": {
                     "Min": "770",
                     "Max": "930",
@@ -373,81 +373,85 @@
                 }
             },
             {
-                "_name": "CC2652REM-7ID",
+                "_name": "LP-CC1352P7-2",
                 "FrequencyRange": {
                     "Min": "2360",
                     "Max": "2500",
                     "PaSettingTable": {
                         "PaSetting": [
                             {
+                                "_text": "5.5",
+                                "Value": "0x003F"
+                            },
+                            {
                                 "_text": "5",
-                                "Value": "7217"
+                                "Value": "0x762E"
                             },
                             {
                                 "_text": "4",
-                                "Value": "4E63"
+                                "Value": "0x8220"
                             },
                             {
                                 "_text": "3",
-                                "Value": "385D"
+                                "Value": "0x486F"
                             },
                             {
                                 "_text": "2",
-                                "Value": "3259"
+                                "Value": "0x3E66"
                             },
                             {
                                 "_text": "1",
-                                "Value": "2856"
+                                "Value": "0x3261"
                             },
                             {
                                 "_text": "0",
-                                "Value": "2853"
+                                "Value": "0x2C5D"
                             },
                             {
                                 "_text": "-3",
-                                "Value": "1893"
+                                "Value": "0x1899"
                             },
                             {
                                 "_text": "-5",
-                                "Value": "12D6"
+                                "Value": "0x1695"
                             },
                             {
                                 "_text": "-6",
-                                "Value": "10D4"
+                                "Value": "0x1693"
                             },
                             {
                                 "_text": "-9",
-                                "Value": "0AD0"
+                                "Value": "0x0CD4"
                             },
                             {
                                 "_text": "-10",
-                                "Value": "0ACF"
+                                "Value": "0x0AD3"
                             },
                             {
                                 "_text": "-12",
-                                "Value": "0ACC"
+                                "Value": "0x0AD0"
                             },
                             {
                                 "_text": "-15",
-                                "Value": "06CA"
+                                "Value": "0x06CD"
                             },
                             {
                                 "_text": "-18",
-                                "Value": "06C8"
+                                "Value": "0x04CA"
                             },
                             {
                                 "_text": "-20",
-                                "Value": "04C6"
+                                "Value": "0x04C8"
                             }
                         ]
                     }
                 }
             },
             {
-                "_name": "CC1352PEM-XD7793-XD24-PA24",
+                "_name": "LP-CC1352P7-2_20dBm",
                 "FrequencyRange": {
-                    "Min": "2400",
-                    "Max": "2483",
+                    "Min": "2360",
+                    "Max": "2500",
                     "PaSettingTable": {
                         "PaSetting": [
                             {
@@ -490,36 +494,46 @@
                 }
             },
             {
-                "_name": "CC1352PEM-XD4251-XD24-PA24_10dBm",
+                "_name": "CC1352-P7EM-XD7793-XD24-PA24_10dBm",
                 "FrequencyRange": {
                     "Min": "2360",
                     "Max": "2500",
                     "PaSettingTable": {
                         "PaSetting": [
                             {
-                                "_text": "10",
+                                "_text": "11",
                                 "Value": "0xFFFF",
                                 "TxHighPa": "0x104F66"
                             },
                             {
-                                "_text": "9",
+                                "_text": "10",
                                 "Value": "0xFFFF",
                                 "TxHighPa": "0x103F5F"
                             },
                             {
-                                "_text": "8",
+                                "_text": "9",
                                 "Value": "0xFFFF",
                                 "TxHighPa": "0x10335A"
                             },
                             {
+                                "_text": "8",
+                                "Value": "0xFFFF",
+                                "TxHighPa": "0x143661"
+                            },
+                            {
                                 "_text": "7",
                                 "Value": "0xFFFF",
-                                "TxHighPa": "0x14285F"
+                                "TxHighPa": "0x144F2A"
                             },
                             {
                                 "_text": "6",
                                 "Value": "0xFFFF",
-                                "TxHighPa": "0x144F2A"
+                                "TxHighPa": "0x144F26"
+                            },
+                            {
+                                "_text": "5.1",
+                                "Value": "0xFFFF",
+                                "TxHighPa": "0x144722"
                             }
                         ]
                     }

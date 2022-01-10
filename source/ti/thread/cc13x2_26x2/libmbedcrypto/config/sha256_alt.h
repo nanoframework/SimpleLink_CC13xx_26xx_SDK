@@ -5,7 +5,7 @@
  @brief SHA256 specific alternate implementation items.
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

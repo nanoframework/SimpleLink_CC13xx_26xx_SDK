@@ -5,7 +5,7 @@
  @brief Header for ECC proxy for stack's interface to the ECC driver.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -53,7 +53,13 @@ extern "C"
 #endif
   
 #include <ti/drivers/ECDH.h>
+
+#if !defined(DeviceFamily_CC26X1)
 #include <ti/drivers/ecdh/ECDHCC26X2.h>
+#else
+#include <ti/drivers/ecdh/ECDHCC26X1.h>
+#endif
+
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 #include <ti/drivers/cryptoutils/ecc/ECCParams.h>
 #include <ti/drivers/cryptoutils/sharedresources/CryptoResourceCC26XX.h>

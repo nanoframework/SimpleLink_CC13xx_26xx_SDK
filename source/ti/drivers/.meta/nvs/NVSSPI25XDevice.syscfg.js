@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -142,16 +142,20 @@ function validate(inst, validation) {
 
 }
 
-/*
- *  ======== gpioInit ========
- */
-function gpioInit() {
-    return ({
-        comment: "%l    /* SPI Flash Slave Select GPIO Instance */",
-        mode: "Output",
-        outputType: "Standard",
-        initialOutputState: "High"
-    });
+function pinmuxRequirements(inst)
+{
+    let requirements = [];
+    if (inst.slaveSelectManager == "NVS") {
+        requirements.push({
+            name: "slaveSelect",
+            hidden: true,
+            displayName: "Slave Select",
+            interfaceName: "GPIO",
+            signalTypes: ["DOUT"]
+        });
+    }
+
+    return requirements;
 }
 
 /*
@@ -163,10 +167,19 @@ function moduleInstances(inst) {
     if (inst.slaveSelectManager == "NVS") {
         modules.push(
             {
-                name: "slaveSelectGpioInstance",
+                name: "slaveSelectPinInstance",
                 displayName: "Slave Select GPIO Instance",
                 moduleName: "/ti/drivers/GPIO",
-                args: gpioInit(),
+                args: {
+                    mode: "Output",
+                    outputType: "Standard",
+                    initialOutputState: "High"
+                },
+                requiredArgs: {
+                    parentInterfaceName: "GPIO",
+                    parentSignalName: "slaveSelect",
+                    parentSignalDisplayName: "Button GPIO"
+                },
                 hardware: inst.$hardware ? inst.$hardware.subComponents.SELECT : null
             }
         );
@@ -247,6 +260,7 @@ exports = {
     filterHardware: filterHardware,
     sharedModuleInstances: sharedModuleInstances,
     moduleInstances: moduleInstances,
+    pinmuxRequirements: pinmuxRequirements,
     onHardwareChanged: onHardwareChanged,
     validate: validate
 };

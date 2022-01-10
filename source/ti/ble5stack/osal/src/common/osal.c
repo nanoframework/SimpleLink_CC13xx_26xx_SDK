@@ -8,7 +8,7 @@
         systems).
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -1707,7 +1707,7 @@ void osal_set_icall_hook(osal_icallMsg_hook_t param)
 void osal_run_system( void )
 {
   uint8 idx = 0;
-
+ halIntState_t intState;
 #ifdef USE_ICALL
   uint32 next_timeout_prior = osal_next_timeout();
 #else /* USE_ICALL */
@@ -1798,7 +1798,6 @@ void osal_run_system( void )
   if (idx < tasksCnt)
   {
     uint16 events;
-    halIntState_t intState;
 
     HAL_ENTER_CRITICAL_SECTION(intState);
     events = tasksEvents[idx];
@@ -1843,8 +1842,6 @@ void osal_run_system( void )
    * TODO: reconsider the above statement.
    */
   {
-    halIntState_t intState;
-
     uint32 next_timeout_post = osal_next_timeout();
     if (next_timeout_post != next_timeout_prior)
     {

@@ -1,10 +1,10 @@
 /*
- *  Copyright 2020 by Texas Instruments Incorporated.
+ *  Copyright 2021 by Texas Instruments Incorporated.
  *
  */
 
 /*
- * Copyright (c) 2017-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2017-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,12 +54,12 @@ metaonly module M33F inherits IM {
 
     override readonly config ITarget2.Command cc = {
         cmd: "$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep",
-        opts: "-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -mabi=aapcs -g"
+        opts: "-march=armv8-m.main+dsp -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -mabi=aapcs -g"
     };
 
     readonly config ITarget2.Command ccBin = {
         cmd: "bin/arm-none-eabi-gcc -c -MD -MF $@.dep",
-        opts: "-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -mabi=aapcs -g"
+        opts: "-march=armv8-m.main+dsp -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -mabi=aapcs -g"
     };
 
     override config ITarget2.Options ccOpts = {
@@ -80,16 +80,16 @@ metaonly module M33F inherits IM {
 
     override readonly config ITarget2.Command asm = {
         cmd: "$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler-with-cpp",
-        opts: "-march=armv8-m.main -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 "
+        opts: "-march=armv8-m.main+dsp -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 "
     };
 
     readonly config ITarget2.Command asmBin = {
         cmd: "bin/arm-none-eabi-gcc -c -x assembler-with-cpp",
-        opts: "-march=armv8-m.main -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 "
+        opts: "-march=armv8-m.main+dsp -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 "
     };
 
     override config ITarget2.Options lnkOpts = {
-        prefix: "-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -nostartfiles -Wl,-static -Wl,--gc-sections ",
+        prefix: "-march=armv8-m.main+dsp -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -nostartfiles -Wl,-static -Wl,--gc-sections ",
         suffix: "-L$(packageBase)/libs/install-native/$(GCCTARG)/lib/thumb/v8-m/hard -Wl,--start-group -lgcc -lc -lm -Wl,--end-group --specs=nano.specs -Wl,-Map=$(XDCCFGDIR)/$@.map"
     };
 
@@ -104,7 +104,7 @@ metaonly module M33F inherits IM {
     override config string bspLib = "nosys";
 }
 /*
- *  @(#) gnu.targets.arm; 1, 0, 0,; 9-3-2020 14:50:59; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
+ *  @(#) gnu.targets.arm; 1, 0, 0,; 7-28-2021 06:57:32; /db/ztree/library/trees/xdctargets/xdctargets-w20/src/ xlibrary
 
  */
 

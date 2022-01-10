@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       hw_ccfg_h
-*  Revised:        2019-04-01 09:23:38 +0200 (Mon, 01 Apr 2019)
-*  Revision:       55513
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 * Copyright (c) 2015 - 2017, Texas Instruments Incorporated
 * All rights reserved.
@@ -243,14 +243,32 @@
 #define CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_M                      0xFFFF0000
 #define CCFG_SIZE_AND_DIS_FLAGS_SIZE_OF_CCFG_S                              16
 
-// Field:  [15:4] DISABLE_FLAGS
+// Field:  [15:5] DISABLE_FLAGS
 //
 // Reserved for future use. Software should not rely on the value of a
 // reserved. Writing any other value than the reset/default value may result in
 // undefined behavior.
-#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_W                             12
-#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_M                     0x0000FFF0
-#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_S                              4
+#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_W                             11
+#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_M                     0x0000FFE0
+#define CCFG_SIZE_AND_DIS_FLAGS_DISABLE_FLAGS_S                              5
+
+// Field:     [4] DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND
+//
+// The default CAPARRAY setting is good as long as no CAPARRAY_DELTA adjustment
+// is added but the CAPARRAY setting will give an un-linear behavior if the
+// workaround is not enabled. The workaround is disabled by default to avoid
+// unexpected changes upon software updates.
+//
+// 0: The CAPARRAY_DELTA workaround is enabled.
+// 1: The CAPARRAY_DELTA workaround is disabled.
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND \
+                                                                    0x00000010
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND_BITN \
+                                                                             4
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND_M \
+                                                                    0x00000010
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND_S \
+                                                                             4
 
 // Field:     [3] DIS_TCXO
 //

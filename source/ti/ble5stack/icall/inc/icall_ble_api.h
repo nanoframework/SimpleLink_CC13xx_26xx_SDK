@@ -5,7 +5,7 @@
  @brief Redefinition of all BLE APIs when ICALL_LITE is in use
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -237,6 +237,7 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define HCI_LE_SetConnectionlessIqSamplingEnableCmd(...)  (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetConnectionlessIqSamplingEnableCmd , ##__VA_ARGS__))
 #define HCI_LE_SetExtScanRspData(...)                     (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetExtScanRspData , ##__VA_ARGS__))
 #define HCI_LE_SetExtAdvData(...)                         (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetExtAdvData , ##__VA_ARGS__))
+#define HCI_LE_SetAdvStatus(...)                          (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_LE_SetAdvStatus , ##__VA_ARGS__))
 
 /* HCI Extented API */
 /********************/
@@ -285,6 +286,8 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define HCI_EXT_SetExtScanChannels(...)                            (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetExtScanChannels , ##__VA_ARGS__))
 #define HCI_EXT_SetQOSParameters(...)                              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetQOSParameters , ##__VA_ARGS__))
 #define HCI_EXT_SetQOSDefaultParameters(...)                       (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetQOSDefaultParameters , ##__VA_ARGS__))
+#define HCI_EXT_SetHostDefChanClassificationCmd(...)               (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetHostDefChanClassificationCmd , ##__VA_ARGS__))
+#define HCI_EXT_SetHostConnChanClassificationCmd(...)              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_HCI_EXT_SetHostConnChanClassificationCmd , ##__VA_ARGS__))
 
 /* HCI API Cont'd */
 /******************/
@@ -487,6 +490,8 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 // GATT Server API
 #define GATT_SendRsp(...)                              (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_SendRsp   , ##__VA_ARGS__))
 #define GATT_GetNextHandle(...)                        (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_GetNextHandle   , ##__VA_ARGS__))
+#define GATT_ServiceNumAttrs(...)                      (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_ServiceNumAttrs  , ##__VA_ARGS__))
+#define GATT_FindHandle(...)                           (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_FindHandle  , ##__VA_ARGS__))
 
 #define GATT_PrepareWriteReq(connHandle, pReq, taskID) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_PrepareWriteReq, connHandle, pReq, ICall_getLocalMsgEntityId(ICALL_SERVICE_CLASS_BLE_MSG, taskID)))
 #define GATT_ExecuteWriteReq(connHandle, pReq, taskID) (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GATT_ExecuteWriteReq, connHandle, pReq, ICall_getLocalMsgEntityId(ICALL_SERVICE_CLASS_BLE_MSG, taskID)))
@@ -498,9 +503,7 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 #define GATT_VerifyWritePermissions(...)               (AssertHandler(0,0))
 #define GATT_ServiceChangedInd(...)                    (AssertHandler(0,0))// =>need taskId
 #define GATT_FindHandleUUID(...)                       (AssertHandler(0,0))
-#define GATT_FindHandle(...)                           (AssertHandler(0,0))
 #define GATT_FindNextAttr(...)                         (AssertHandler(0,0))
-#define GATT_ServiceNumAttrs(...)                      (AssertHandler(0,0))
 #define GATT_ServiceEncKeySize(...)                    (AssertHandler(0,0))
 
 // GATT Server Sub-Procedure APIs

@@ -50,8 +50,6 @@ typedef uint32_t k_ticks_t;
 
 #define K_TICKS_FOREVER ((k_ticks_t) -1)
 
-#ifndef CONFIG_LEGACY_TIMEOUT_API
-
 /**
  * @brief Kernel timeout type
  *
@@ -81,8 +79,12 @@ typedef struct {
  */
 #define K_TIMEOUT_EQ(a, b) ((a).ticks == (b).ticks)
 
-#define Z_TIMEOUT_NO_WAIT ((k_timeout_t) {})
+#define Z_TIMEOUT_NO_WAIT ((k_timeout_t) {0})
+#if defined(__cplusplus) && ((__cplusplus - 0) < 202002L)
+#define Z_TIMEOUT_TICKS(t) ((k_timeout_t) { (t) })
+#else
 #define Z_TIMEOUT_TICKS(t) ((k_timeout_t) { .ticks = (t) })
+#endif
 #define Z_FOREVER Z_TIMEOUT_TICKS(K_TICKS_FOREVER)
 
 #ifdef CONFIG_TIMEOUT_64BIT
@@ -106,21 +108,6 @@ typedef struct {
  * the same value in both spaces!  Clever, huh?
  */
 #define Z_TICK_ABS(t) (K_TICKS_FOREVER - 1 - (t))
-
-#else
-
-/* Legacy timeout API */
-typedef int32_t k_timeout_t;
-#define K_TIMEOUT_EQ(a, b) ((a) == (b))
-#define Z_TIMEOUT_NO_WAIT 0
-#define Z_TIMEOUT_TICKS(t) k_ticks_to_ms_ceil32(t)
-#define Z_FOREVER K_TICKS_FOREVER
-#define Z_TIMEOUT_MS(t) (t)
-#define Z_TIMEOUT_US(t) ((999 + (t)) / 1000)
-#define Z_TIMEOUT_NS(t) ((999999 + (t)) / 1000000)
-#define Z_TIMEOUT_CYC(t) k_cyc_to_ms_ceil32(MAX((t), 0))
-
-#endif
 
 /** @} */
 
@@ -168,20 +155,8 @@ extern void z_enable_sys_clock(void);
 
 #endif
 
-#define __ticks_to_ms(t) __DEPRECATED_MACRO \
-	k_ticks_to_ms_floor64((uint64_t)(t))
 #define z_ms_to_ticks(t) \
 	((int32_t)k_ms_to_ticks_ceil32((uint32_t)(t)))
-#define __ticks_to_us(t) __DEPRECATED_MACRO \
-	((int32_t)k_ticks_to_us_floor32((uint32_t)(t)))
-#define z_us_to_ticks(t) __DEPRECATED_MACRO \
-	((int32_t)k_us_to_ticks_ceil32((uint32_t)(t)))
-#define sys_clock_hw_cycles_per_tick() __DEPRECATED_MACRO \
-	((int)k_ticks_to_cyc_floor32(1U))
-#define SYS_CLOCK_HW_CYCLES_TO_NS64(t) __DEPRECATED_MACRO \
-	k_cyc_to_ns_floor64((uint64_t)(t))
-#define SYS_CLOCK_HW_CYCLES_TO_NS(t) __DEPRECATED_MACRO \
-	((uint32_t)k_cyc_to_ns_floor64(t))
 
 /* added tick needed to account for tick in progress */
 #define _TICK_ALIGN 1

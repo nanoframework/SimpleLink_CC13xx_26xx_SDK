@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,10 @@
 
 #include <ti/devices/DeviceFamily.h>
 
-#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 ||\
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0 ||\
      DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 ||\
-     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 ||\
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
 
     #include <ti/drivers/TRNG.h>
     #include <ti/drivers/trng/TRNGCC26XX.h>
@@ -62,9 +63,10 @@ static uint32_t state[STATE_SIZE_IN_WORDS];
  */
 int_fast16_t Random_seedAutomatic(void) {
 
-#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
-     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 || \
-     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0 ||\
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1 ||\
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 ||\
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
 
     TRNGCC26XX_Object object = {0};
     TRNG_Params params;

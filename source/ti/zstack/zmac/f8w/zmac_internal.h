@@ -58,6 +58,7 @@ extern "C"
  ********************************************************************************************************/
 
 #include "mac_api.h"
+#include "ti_zstack_config.h"
 
 /********************************************************************************************************
  *                                                DEFINES
@@ -159,6 +160,10 @@ enum
   ZMacDeviceEntry                       = MAC_DEVICE_ENTRY,
   ZMacSecurityLevelEntry                = MAC_SECURITY_LEVEL_ENTRY,
 #endif /* FEATURE_MAC_SECURITY */
+
+#ifdef IEEE_COEX_ENABLED
+  ZMacCoexPIBMetrics                    = MAC_COEX_METRICS,
+#endif /* IEEE_COEX_ENABLED */
 
   // Junk
   ZMacACLDefaultSecurityMaterialLength  = 0,     // not implemented

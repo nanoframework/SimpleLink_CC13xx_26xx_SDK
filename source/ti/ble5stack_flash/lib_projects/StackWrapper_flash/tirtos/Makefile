@@ -1,0 +1,22 @@
+IAR_PATH="C:\Program Files (x86)\IAR Systems\EWARM-8.50.9\common\bin\IarBuild.exe"
+EWP_PATH="$(CURDIR)\iar\stack_wrapper_flash.ewp"
+VARFILE="$(CURDIR)\iar\stack_wrapper_flash.custom_argvars"
+
+
+26p3: clean_26p3 Stack_Wrapper_flash_26p3
+
+26r3: clean_26r3 Stack_Wrapper_flash_26r3
+
+all: 26p3 26r3
+
+Stack_Wrapper_flash_26p3:
+	$(IAR_PATH) $(EWP_PATH) -build Stack_Wrapper_26p3 -varfile $(VARFILE)
+
+Stack_Wrapper_flash_26r3:
+	$(IAR_PATH) $(EWP_PATH) -build Stack_Wrapper_26r3 -varfile $(VARFILE)
+
+clean_26p3:
+	$(IAR_PATH) $(EWP_PATH) -clean Stack_Wrapper_26p3 -varfile $(VARFILE)
+
+clean_26r3:
+	$(IAR_PATH) $(EWP_PATH) -clean Stack_Wrapper_26r3 -varfile $(VARFILE)

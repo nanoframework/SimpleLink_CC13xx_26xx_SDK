@@ -6276,6 +6276,579 @@
                         ]
                     },
                     {
+                        "_name": "CMD_BLE5_ADV_PER",
+                        "id": "0x1825",
+                        "Description": "Bluetooth 5 Periodic Advertiser Command",
+                        "Field": [
+                            {
+                                "_name": "commandNo",
+                                "ByteIndex": "0..1",
+                                "Description": "The command ID number 0x1825",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "status",
+                                "ByteIndex": "2..3",
+                                "Description": "An integer telling the status of the command. This value is\n  updated by the radio CPU during operation and may be read by the\n  system CPU at any time.",
+                                "Access": "RW"
+                            },
+                            {
+                                "_name": "pNextOp",
+                                "_type": "pointer",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5AdvPerNextOp",
+                                "ByteIndex": "4..7",
+                                "Description": "Pointer to the next operation to run after this operation is done",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "startTime",
+                                "ByteIndex": "8..11",
+                                "Description": "Absolute or relative start time (depending on the value of <code>startTrigger<\/code>)",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "startTrigger",
+                                "ByteIndex": "12..12",
+                                "BitField": [
+                                    {
+                                        "_name": "triggerType",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "The type of trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bEnaCmd",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "0: No alternative trigger command<br>\n  1: CMD_TRIGGER can be used as an alternative trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "triggerNo",
+                                        "BitIndex": "5..6",
+                                        "BitDescription": "The trigger number of the CMD_TRIGGER command that triggers this action",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "pastTrig",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: A trigger in the past is never triggered, or for start of commands, give an error<br>\n  1: A trigger in the past is triggered as soon as possible",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Description": "Identification of the trigger that starts the operation",
+                                "Access": []
+                            },
+                            {
+                                "_name": "condition",
+                                "ByteIndex": "13..13",
+                                "BitField": [
+                                    {
+                                        "_name": "rule",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "Condition for running next command: Rule for how to proceed",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "nSkip",
+                                        "BitIndex": "4..7",
+                                        "BitDescription": "Number of skips + 1 if the rule involves skipping. 0: same, 1: next, 2: skip next, ...",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "channel",
+                                "ByteIndex": "14..14",
+                                "Description": "Channel to use<br>\n  0&ndash;39: BLE advertising\/data channel index<br>\n  60&ndash;207: Custom frequency; (2300 + <code>channel<\/code>) MHz<br>\n  255: Use existing frequency<br>\n  Others: <i>Reserved<\/i>",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "whitening",
+                                "ByteIndex": "15..15",
+                                "BitField": [
+                                    {
+                                        "_name": "init",
+                                        "BitIndex": "0..6",
+                                        "BitDescription": "If <code>bOverride<\/code> = 1 or custom frequency is used:<br>\n  0: Do not use whitening<br>\n  Other value: Initialization for 7-bit LFSR whitener",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bOverride",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: Use default whitening for BLE advertising\/data channels<br>\n  1: Override whitening initialization with value of init",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "phyMode",
+                                "ByteIndex": "16..16",
+                                "BitField": [
+                                    {
+                                        "_name": "mainMode",
+                                        "BitIndex": "0..1",
+                                        "BitDescription": "PHY to use:<br>\n  0: 1 Mbps<br>\n  1: 2 Mbps<br>\n  2: Coded<br>\n  3: <i>Reserved<\/i>",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "coding",
+                                        "BitIndex": "2..7",
+                                        "BitDescription": "Coding to use for TX if coded PHY is selected.\n  See the Technical Reference Manual for details.",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "rangeDelay",
+                                "ByteIndex": "17..17",
+                                "Description": "Number of RAT ticks to add to the listening time after T_IFS",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "txPower",
+                                "ByteIndex": "18..19",
+                                "Description": "Transmit power to use (overrides the one given in radio setup) <br>\n  0x0000: Use default TX power<br>\n  0xFFFF: 20-dBm PA only: Use TX power from <code>tx20Power<\/code> field (command\n  structure that includes <code>tx20Power<\/code> must be used)",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "pParams",
+                                "_type": "pointer",
+                                "Offset": "32",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5AdvPerPar",
+                                "ByteIndex": "20..23",
+                                "Description": "Pointer to command specific parameter structure",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "pOutput",
+                                "_type": "pointer",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5AdvPerOutput",
+                                "ByteIndex": "24..27",
+                                "Description": "Pointer to command specific output structure",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "tx20Power",
+                                "ByteIndex": "28..31",
+                                "Description": "If <code>txPower<\/code> = 0xFFFF:<br>\n  If <code>tx20Power<\/code> < 0x10000000: Transmit power to use for the 20-dBm PA;\n  overrides the one given in radio setup for the duration of the command. <br>\n  If <code>tx20Power<\/code> >= 0x10000000: Pointer to PA change override structure\n  as for CMD_CHANGE_PA ; permanently changes the PA and PA power set in radio setup.<br>\n  For other values of <code>txPower<\/code>, this field is not accessed by the radio\n  CPU and may be omitted from the structure.",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "__dummy0",
+                                "ByteIndex": "32..33"
+                            },
+                            {
+                                "_name": "__dummy1",
+                                "ByteIndex": "34..34"
+                            },
+                            {
+                                "_name": "auxPtrTargetType",
+                                "ByteIndex": "35..35"
+                            },
+                            {
+                                "_name": "auxPtrTargetTime",
+                                "ByteIndex": "36..39"
+                            },
+                            {
+                                "_name": "pAdvPkt",
+                                "_type": "pointer",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5AdvPerParAdvPkt",
+                                "ByteIndex": "40..43"
+                            },
+                            {
+                                "_name": "accessAddress",
+                                "ByteIndex": "44..47"
+                            },
+                            {
+                                "_name": "crcInit0",
+                                "ByteIndex": "48..48"
+                            },
+                            {
+                                "_name": "crcInit1",
+                                "ByteIndex": "49..49"
+                            },
+                            {
+                                "_name": "crcInit2",
+                                "ByteIndex": "50..50"
+                            }
+                        ]
+                    },
+                    {
+                        "_name": "CMD_BLE5_SCANNER_PER",
+                        "id": "0x1826",
+                        "Description": "Bluetooth 5 Periodic Scanner Command",
+                        "Field": [
+                            {
+                                "_name": "commandNo",
+                                "ByteIndex": "0..1",
+                                "Description": "The command ID number 0x1826",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "status",
+                                "ByteIndex": "2..3",
+                                "Description": "An integer telling the status of the command. This value is\n  updated by the radio CPU during operation and may be read by the\n  system CPU at any time.",
+                                "Access": "RW"
+                            },
+                            {
+                                "_name": "pNextOp",
+                                "_type": "pointer",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5ScannerPerNextOp",
+                                "ByteIndex": "4..7",
+                                "Description": "Pointer to the next operation to run after this operation is done",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "startTime",
+                                "ByteIndex": "8..11",
+                                "Description": "Absolute or relative start time (depending on the value of <code>startTrigger<\/code>)",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "startTrigger",
+                                "ByteIndex": "12..12",
+                                "BitField": [
+                                    {
+                                        "_name": "triggerType",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "The type of trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bEnaCmd",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "0: No alternative trigger command<br>\n  1: CMD_TRIGGER can be used as an alternative trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "triggerNo",
+                                        "BitIndex": "5..6",
+                                        "BitDescription": "The trigger number of the CMD_TRIGGER command that triggers this action",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "pastTrig",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: A trigger in the past is never triggered, or for start of commands, give an error<br>\n  1: A trigger in the past is triggered as soon as possible",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Description": "Identification of the trigger that starts the operation",
+                                "Access": []
+                            },
+                            {
+                                "_name": "condition",
+                                "ByteIndex": "13..13",
+                                "BitField": [
+                                    {
+                                        "_name": "rule",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "Condition for running next command: Rule for how to proceed",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "nSkip",
+                                        "BitIndex": "4..7",
+                                        "BitDescription": "Number of skips + 1 if the rule involves skipping. 0: same, 1: next, 2: skip next, ...",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "channel",
+                                "ByteIndex": "14..14",
+                                "Description": "Channel to use<br>\n  0&ndash;39: BLE advertising\/data channel index<br>\n  60&ndash;207: Custom frequency; (2300 + <code>channel<\/code>) MHz<br>\n  255: Use existing frequency<br>\n  Others: <i>Reserved<\/i>",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "whitening",
+                                "ByteIndex": "15..15",
+                                "BitField": [
+                                    {
+                                        "_name": "init",
+                                        "BitIndex": "0..6",
+                                        "BitDescription": "If <code>bOverride<\/code> = 1 or custom frequency is used:<br>\n  0: Do not use whitening<br>\n  Other value: Initialization for 7-bit LFSR whitener",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bOverride",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: Use default whitening for BLE advertising\/data channels<br>\n  1: Override whitening initialization with value of init",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "phyMode",
+                                "ByteIndex": "16..16",
+                                "BitField": [
+                                    {
+                                        "_name": "mainMode",
+                                        "BitIndex": "0..1",
+                                        "BitDescription": "PHY to use:<br>\n  0: 1 Mbps<br>\n  1: 2 Mbps<br>\n  2: Coded<br>\n  3: <i>Reserved<\/i>",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "coding",
+                                        "BitIndex": "2..7",
+                                        "BitDescription": "Coding to use for TX if coded PHY is selected.\n  See the Technical Reference Manual for details.",
+                                        "BitAccess": "W"
+                                    }
+                                ],
+                                "Access": []
+                            },
+                            {
+                                "_name": "rangeDelay",
+                                "ByteIndex": "17..17",
+                                "Description": "Number of RAT ticks to add to the listening time after T_IFS",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "txPower",
+                                "ByteIndex": "18..19",
+                                "Description": "Transmit power to use (overrides the one given in radio setup) <br>\n  0x0000: Use default TX power<br>\n  0xFFFF: 20-dBm PA only: Use TX power from <code>tx20Power<\/code> field (command\n  structure that includes <code>tx20Power<\/code> must be used)",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "pParams",
+                                "_type": "pointer",
+                                "Offset": "32",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5ScannerPerPar",
+                                "ByteIndex": "20..23",
+                                "Description": "Pointer to command specific parameter structure",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "pOutput",
+                                "_type": "pointer",
+                                "PtrType": "uint8_t*",
+                                "PtrName": "ble5ScannerPerOutput",
+                                "ByteIndex": "24..27",
+                                "Description": "Pointer to command specific output structure",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "tx20Power",
+                                "ByteIndex": "28..31",
+                                "Description": "If <code>txPower<\/code> = 0xFFFF:<br>\n  If <code>tx20Power<\/code> < 0x10000000: Transmit power to use for the 20-dBm PA;\n  overrides the one given in radio setup for the duration of the command. <br>\n  If <code>tx20Power<\/code> >= 0x10000000: Pointer to PA change override structure\n  as for CMD_CHANGE_PA ; permanently changes the PA and PA power set in radio setup.<br>\n  For other values of <code>txPower<\/code>, this field is not accessed by the radio\n  CPU and may be omitted from the structure.",
+                                "Access": "W"
+                            },
+                            {
+                                "_name": "pRxQ",
+                                "_type": "pointer",
+                                "PtrType": "dataQueue_t*",
+                                "PtrName": "ble5ScannerPerParRxQ",
+                                "ByteIndex": "32..35"
+                            },
+                            {
+                                "_name": "rxConfig",
+                                "ByteIndex": "36..36",
+                                "BitField": [
+                                    {
+                                        "_name": "bAutoFlushIgnored",
+                                        "BitIndex": "0..0",
+                                        "BitDescription": "If 1, automatically remove ignored packets from Rx queue",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAutoFlushCrcErr",
+                                        "BitIndex": "1..1",
+                                        "BitDescription": "If 1, automatically remove packets with CRC error from Rx queue",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAutoFlushEmpty",
+                                        "BitIndex": "2..2",
+                                        "BitDescription": "If 1, automatically remove empty packets from Rx queue",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bIncludeLenByte",
+                                        "BitIndex": "3..3",
+                                        "BitDescription": "If 1, include the received length byte in the stored packet; otherwise discard it",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bIncludeCrc",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "If 1, include the received CRC field in the stored packet; otherwise discard it",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAppendRssi",
+                                        "BitIndex": "5..5",
+                                        "BitDescription": "If 1, append an RSSI byte to the packet in the Rx queue",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAppendStatus",
+                                        "BitIndex": "6..6",
+                                        "BitDescription": "If 1, append a status word to the packet in the Rx queue",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAppendTimestamp",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "If 1, append a timestamp to the packet in the Rx queue",
+                                        "BitAccess": "W"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "scanConfig",
+                                "ByteIndex": "37..37",
+                                "BitField": [
+                                    {
+                                        "_name": "deviceAddrType",
+                                        "BitIndex": "2..2",
+                                        "BitDescription": "The type of the device address &ndash; public (0) or random (1)",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bStrictLenFilter",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "0: Accept any packet with a valid advertising packet length<br>\n  1: Discard messages with illegal length for the given packet type",
+                                        "BitAccess": "W"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "__dummy0",
+                                "ByteIndex": "38..47"
+                            },
+                            {
+                                "_name": "pDeviceAddress",
+                                "_type": "pointer",
+                                "PtrType": "uint16_t*",
+                                "PtrName": "ble5ScannerPerParDeviceAddress",
+                                "ByteIndex": "48..51"
+                            },
+                            {
+                                "_name": "accessAddress",
+                                "ByteIndex": "52..55"
+                            },
+                            {
+                                "_name": "crcInit0",
+                                "ByteIndex": "56..56"
+                            },
+                            {
+                                "_name": "crcInit1",
+                                "ByteIndex": "57..57"
+                            },
+                            {
+                                "_name": "crcInit2",
+                                "ByteIndex": "58..58"
+                            },
+                            {
+                                "_name": "maxWaitTimeForAuxCh",
+                                "ByteIndex": "60..61"
+                            },
+                            {
+                                "_name": "timeoutTrigger",
+                                "ByteIndex": "62..62",
+                                "BitField": [
+                                    {
+                                        "_name": "triggerType",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "The type of trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bEnaCmd",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "0: No alternative trigger command<br>\n  1: CMD_TRIGGER can be used as an alternative trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "triggerNo",
+                                        "BitIndex": "5..6",
+                                        "BitDescription": "The trigger number of the CMD_TRIGGER command that triggers this action",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "pastTrig",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: A trigger in the past is never triggered, or for start of commands, give an error<br>\n  1: A trigger in the past is triggered as soon as possible",
+                                        "BitAccess": "W"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "endTrigger",
+                                "ByteIndex": "63..63",
+                                "BitField": [
+                                    {
+                                        "_name": "triggerType",
+                                        "BitIndex": "0..3",
+                                        "BitDescription": "The type of trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bEnaCmd",
+                                        "BitIndex": "4..4",
+                                        "BitDescription": "0: No alternative trigger command<br>\n  1: CMD_TRIGGER can be used as an alternative trigger",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "triggerNo",
+                                        "BitIndex": "5..6",
+                                        "BitDescription": "The trigger number of the CMD_TRIGGER command that triggers this action",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "pastTrig",
+                                        "BitIndex": "7..7",
+                                        "BitDescription": "0: A trigger in the past is never triggered, or for start of commands, give an error<br>\n  1: A trigger in the past is triggered as soon as possible",
+                                        "BitAccess": "W"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "timeoutTime",
+                                "ByteIndex": "64..67"
+                            },
+                            {
+                                "_name": "endTime",
+                                "ByteIndex": "68..71"
+                            },
+                            {
+                                "_name": "rxStartTime",
+                                "ByteIndex": "72..75"
+                            },
+                            {
+                                "_name": "rxListenTime",
+                                "ByteIndex": "76..77"
+                            },
+                            {
+                                "_name": "channelNo",
+                                "ByteIndex": "78..78"
+                            },
+                            {
+                                "_name": "phyMode",
+                                "ByteIndex": "79..79"
+                            },
+                            {
+                                "_name": "auxChRes",
+                                "ByteIndex": "72..72",
+                                "CodeGen": {
+                                    "Action": "DISABLE_FIELD",
+                                    "ValComment": "The value must be integrated as part of the previous field"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "_name": "CMD_BLE5_SCANNER",
                         "id": "0x1827",
                         "Description": "Bluetooth 5 Scanner Command",
@@ -6624,6 +7197,12 @@
                                         "_name": "bExclusiveSid",
                                         "BitIndex": "5..5",
                                         "BitDescription": "0: Set <code>adiStatus.state<\/code> to 0 when command starts so that all\n  valid SIDs are accepted<br>\n  1: Do not modify adiStatus.state when command starts<br>",
+                                        "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bAcceptSyncInfo",
+                                        "BitIndex": "6..6",
+                                        "BitDescription": "0: Perform normal filtering<br>\n  1: Accept packets with SyncInfo present in the extended header, or non-connectable\n  non-scannable adv ext ind with aux ptr, even if they would normally be filtered out",
                                         "BitAccess": "W"
                                     }
                                 ]

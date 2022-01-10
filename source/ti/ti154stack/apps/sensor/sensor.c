@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 Sensor Example Application
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -1507,8 +1507,7 @@ static void processSensorMsgEvt(void)
 #ifdef LPSTK
     if(sensor.frameControl & Smsgs_dataFields_hallEffectSensor)
     {
-        memcpy(&sensor.hallEffectSensor, &hallEffectSensor,
-                               sizeof(Smsgs_hallEffectSensorField_t));
+        sensor.hallEffectSensor.fluxLevel = hallEffectSensor.fluxLevel;
     }
     if(sensor.frameControl & Smsgs_dataFields_accelSensor)
     {
@@ -1550,7 +1549,7 @@ static void readSensors(void)
     Lpstk_Accelerometer accel;
     humiditySensor.temp = (uint16_t)Lpstk_getTemperature();
     humiditySensor.humidity = (uint16_t)Lpstk_getHumidity();
-    hallEffectSensor.flux = Lpstk_getMagFlux();
+    hallEffectSensor.fluxLevel = Lpstk_getHallEffectSwitch();
     lightSensor.rawData = (uint16_t)Lpstk_getLux();
     Lpstk_getAccelerometer(&accel);
     accelerometerSensor.xAxis = accel.x;
@@ -1690,9 +1689,7 @@ static bool sendSensorMessage(ApiMac_sAddr_t *pDstAddr, Smsgs_sensorMsg_t *pMsg)
 #ifdef LPSTK
         if(pMsg->frameControl & Smsgs_dataFields_hallEffectSensor)
         {
-            pBuf = Util_bufferUint32(pBuf,
-                                     (uint32_t)pMsg->hallEffectSensor.flux);
-
+            *pBuf++ = (uint8_t)pMsg->hallEffectSensor.fluxLevel;
         }
         if(pMsg->frameControl & Smsgs_dataFields_accelSensor)
         {

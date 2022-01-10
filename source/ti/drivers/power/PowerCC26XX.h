@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,8 @@
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/dpl/ClockP.h>
 #include <ti/drivers/Power.h>
+
+#include <ti/devices/DeviceFamily.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -142,8 +144,48 @@ typedef uint8_t PowerCC26XX_Resource; /* Resource identifier */
 #define PowerCC26XX_DOMAIN_SYSBUS  18
 /*!< Resource ID: System Bus Power Domain */
 
+/* The PKA and UART1 peripherals are not available on CC13X1 and CC26X1 devices */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+
+/*!< Resource ID: PKA Module */
+#define PowerCC26XX_PERIPH_PKA      19
+
+/*!< Resource ID: UART1 */
+#define PowerCC26XX_PERIPH_UART1    20
+
+#endif
+
+/* The peripherals below are only available on CC13X4 and CC26X4 devices */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+
+/*!< Resource ID: UART2 */
+#define PowerCC26XX_PERIPH_UART2    21
+
+/*!< Resource ID: UART3 */
+#define PowerCC26XX_PERIPH_UART3    22
+
+/*!< Resource ID: SSI2 */
+#define PowerCC26XX_PERIPH_SSI2     23
+
+/*!< Resource ID: SSI3 */
+#define PowerCC26XX_PERIPH_SSI3     24
+
+/*!< Resource ID: I2C1 */
+#define PowerCC26XX_PERIPH_I2C1     25
+
+#endif
+
 /* \cond */
-#define PowerCC26XX_NUMRESOURCES   19 /* Number of resources in database */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X0_CC26X0)
+#define PowerCC26XX_NUMRESOURCES 19 /* Number of resources in database */
+#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X1_CC26X1)
+#define PowerCC26XX_NUMRESOURCES 19 /* Number of resources in database */
+#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2)
+#define PowerCC26XX_NUMRESOURCES 21 /* Number of resources in database */
+#elif (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+#define PowerCC26XX_NUMRESOURCES 26 /* Number of resources in database */
+#endif
 /* \endcond */
 
 /* \cond */

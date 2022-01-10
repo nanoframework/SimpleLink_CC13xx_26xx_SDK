@@ -1671,18 +1671,18 @@ zstack_ZStatusValues Zstackapi_bdbTouchlinkGetAllowStealingReq(
 }
 
 
-#if (ZG_BUILD_ENDDEVICE_TYPE)
+#if (ZG_BUILD_JOINING_TYPE)
 /**
- * Call to send a Zstackapi_bdbZedAttemptRecoverNwkReq
+ * Call to send a Zstackapi_bdbRecoverNwkReq
  *
  * Public function defined in zstackapi.h
  */
-zstack_ZStatusValues Zstackapi_bdbZedAttemptRecoverNwkReq(
-    uint8_t appServiceTaskId, zstack_bdbZedAttemptRecoverNwkRsp_t *pRsp)
+zstack_ZStatusValues Zstackapi_bdbRecoverNwkReq(
+    uint8_t appServiceTaskId, zstack_bdbRecoverNwkRsp_t *pRsp)
 {
     // Build and send the message, then wait of the response message
     return( sendReqRsp(appServiceTaskId, zstackmsg_CmdIDs_BDB_ZED_ATTEMPT_RECOVER_NWK_REQ,
-                              NULL,pRsp, sizeof(zstackmsg_bdbZedAttemptRecoverNwkReq_t)) );
+                              NULL,pRsp, sizeof(zstackmsg_bdbRecoverNwkReq_t)) );
 }
 #endif
 

@@ -5,7 +5,7 @@
  @brief Main entry of the MAC-CoProcessor application
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -50,6 +50,7 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 #include <xdc/runtime/Error.h>
+#include <ti/drivers/GPIO.h>
 
 #ifdef OSAL_PORT2TIRTOS
 #include "macTask.h"
@@ -189,7 +190,6 @@ int main()
      Initialization for board related stuff, such as LEDs
      following TI-RTOS convention
      */
-
     Board_init();
 
 #if defined(POWER_MEAS)

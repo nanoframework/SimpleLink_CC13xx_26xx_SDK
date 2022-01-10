@@ -38,9 +38,10 @@
 #include <ti/drivers/dpl/HwiP.h>
 
 /* TI-RTOS drivers */
+#include <ti/drivers/ADC.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/DAC.h>
 #include <ti/drivers/dac/DACCC26X2.h>
-#include <ti/drivers/ADC.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(driverlib/aux_dac.h)
@@ -82,7 +83,6 @@ DAC_Handle DAC_open(uint_least8_t index, DAC_Params *params) {
     DAC_Handle              handle;
     DACCC26XX_Object        *object;
     DACCC26XX_HWAttrs       const *hwAttrs;
-    PIN_Config              dacPinTable[2];
 
     /* Get handle and the object */
     handle = (DAC_Handle)&(DAC_config[index]);
@@ -106,35 +106,16 @@ DAC_Handle DAC_open(uint_least8_t index, DAC_Params *params) {
 
     /* Initialize DAC Object*/
     object->isOpen = (bool)true;
+    HwiP_restore(key);
 
-    if(params != NULL) {
+    if (params != NULL) {
         object->currCode = params->initCode;
     }
     else {
         object->currCode = 0;
     }
 
-    HwiP_restore(key);
-
-    /* Reserve the DIO defined in the hwAttrs */
-    uint8_t i = 0;
-
-    /* Add pin to measure on */
-    dacPinTable[i++] = hwAttrs->pinDAC |
-                        PIN_NOPULL |
-                        PIN_INPUT_DIS |
-                        PIN_GPIO_OUTPUT_DIS |
-                        PIN_IRQ_DIS |
-                        PIN_DRVSTR_MIN;
-
-    /* Terminate pin list */
-    dacPinTable[i] = PIN_TERMINATE;
-    object->pinHandle = PIN_open(&object->pinState, dacPinTable);
-    if (!object->pinHandle) {
-        /* Pin already in use. */
-        object->isOpen = (bool)false;
-        return NULL;
-    }
+    GPIO_setConfig(hwAttrs->outputPin, GPIO_CFG_NO_DIR);
 
     return handle;
 }
@@ -143,8 +124,8 @@ DAC_Handle DAC_open(uint_least8_t index, DAC_Params *params) {
  *  ======== DAC_close ========
  */
 void DAC_close(DAC_Handle handle) {
-
     DACCC26XX_Object *object = handle->object;
+    DACCC26XX_HWAttrs const *hwAttrs = handle->hwAttrs;
 
     uint32_t key = HwiP_disable();
 
@@ -168,9 +149,7 @@ void DAC_close(DAC_Handle handle) {
     HwiP_restore(key);
 
     /* Deallocate pins */
-    if (object->pinHandle){
-        PIN_close(object->pinHandle);
-    }
+    GPIO_resetConfig(hwAttrs->outputPin);
 }
 
 /*
@@ -277,6 +256,8 @@ int_fast16_t DAC_enable(DAC_Handle handle) {
 
     /* Determine DAC's output range */
     if(DAC_setRange(handle) != DAC_STATUS_SUCCESS) {
+        object->isEnabled = (bool)false;
+        SemaphoreP_post(&dacSemaphore);
         return status;
     }
 
@@ -288,6 +269,9 @@ int_fast16_t DAC_enable(DAC_Handle handle) {
 
     /* Enable the DAC's Sample Clock, the DAC's output buffer and the DAC, and connect output. */
     AUXDACEnable(hwAttrs->dacCompAInput);
+
+    /* Set power constraints to guarantee operation */
+    Power_setConstraint(PowerCC26XX_DISALLOW_STANDBY);
 
     /* Keep track of the DAC's current state as enabled. */
     object->isEnabled = (bool)true;
@@ -314,6 +298,9 @@ int_fast16_t DAC_disable(DAC_Handle handle) {
 
         /* Release the DAC HW semaphore */
         AUXSMPHRelease(AUX_SMPH_4);
+
+        /* Allow entering standby again after DAC has been disabled */
+        Power_releaseConstraint(PowerCC26XX_DISALLOW_STANDBY);
 
         /* Release the lock for this particular DAC handle */
         SemaphoreP_post(&dacSemaphore);

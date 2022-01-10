@@ -2,6 +2,14 @@
     "configFiles": {
         "path": [
             {
+                "_file": "device_definition.json",
+                "$": ".\/..\/config\/cc1314r10"
+            },
+            {
+                "_file": "device_description.json",
+                "$": ".\/..\/config\/cc1314r10"
+            },
+            {
                 "_file": "targets.json",
                 "$": ".\/..\/config\/cc1314r10\/targets"
             },
@@ -12,6 +20,14 @@
             {
                 "_file": "param_definition.json",
                 "$": ".\/..\/config\/cc1314r10"
+            },
+            {
+                "_file": "io_pin_definition.json",
+                "$": ".\/..\/config\/cc1352r\/targets"
+            },
+            {
+                "_file": "io_register_definition.json",
+                "$": ".\/..\/config\/cc1312r"
             },
             {
                 "_file": "param_cmd_mapping.json",

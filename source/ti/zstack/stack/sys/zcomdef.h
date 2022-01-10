@@ -265,6 +265,7 @@ extern "C"
 #define ZCD_NV_SAS_CURR_PRECFG_LINK_KEY   0x00D3
 
 #define ZCD_NV_USE_NVOCMP                 0x00FF
+#define ZCD_NV_5_30_SDK_MIGRATION         0x00FE
 
 // NV Items Reserved for Trust Center Link Key Table entries
 // 0x0101 - 0x01FF
@@ -456,8 +457,8 @@ typedef struct
  * Global System Messages
  */
 
-#define SPI_INCOMING_ZTOOL_PORT   0x21    // Raw data from ZTool Port (not implemented)
-#define SPI_INCOMING_ZAPP_DATA    0x22    // Raw data from the ZAPP port (see serialApp.c)
+// NOTE: Ensure that these IDs do not conflict with values in zstack_CmdIDs / zstackmsg.h
+
 #define MT_SYS_APP_MSG            0x23    // Raw data from an MT Sys message
 #define MT_SYS_APP_RSP_MSG        0x24    // Raw data output for an MT Sys message
 #define MT_SYS_OTA_MSG            0x25    // Raw data output for an MT OTA Rsp
@@ -467,10 +468,6 @@ typedef struct
 #define AF_DATA_CONFIRM_CMD       0xFD    // Data confirmation
 #define AF_REFLECT_ERROR_CMD      0xFE    // Reflected message error message
 #define AF_INCOMING_MSG_CMD       0x1A    // Incoming MSG type message
-#define AF_INCOMING_KVP_CMD       0x1B    // Incoming KVP type message
-#define AF_INCOMING_GRP_KVP_CMD   0x1C    // Incoming Group KVP type message
-
-//#define KEY_CHANGE                0xC0    // Key Events
 
 #define ZDO_NEW_DSTADDR           0xD0    // ZDO has received a new DstAddr for this app
 #define ZDO_STATE_CHANGE          0xD1    // ZDO has changed the device's network state

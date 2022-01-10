@@ -2,10 +2,10 @@
     "target": {
         "Name": "LP_CC2652PSIP-HIGH-PA",
         "Revision": [],
-        "Description": "CC2652PSIP LP. 7x7 VQFN48 package. External bias, differential output, 2.4 GHz band, high PA.",
+        "Description": "CC2652PSIP LP. 7x7 VQFN48 package. Internal bias, differential output, 2.4 GHz band, high PA.",
         "DeviceName": "CC2652PSIP",
         "DevicePackage": "MOT 7x7",
-        "FrontEnd": "XD",
+        "FrontEnd": "ID",
         "PaSettings": "pasettings.json",
         "RfDesign": "CC2652PSIP_10dBm",
         "DefaultCategory": "Settings",

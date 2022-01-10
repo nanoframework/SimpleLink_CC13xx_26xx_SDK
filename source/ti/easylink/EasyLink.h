@@ -161,7 +161,7 @@ extern "C"
 #include "ti_radio_config.h"
 
 //! \brief EasyLink API Version
-#define EASYLINK_API_VERSION "EasyLink-v4.10.00"
+#define EASYLINK_API_VERSION "EasyLink-v4.30.00"
 
 //! \brief defines the Tx/Rx Max Address Size
 #define EASYLINK_MAX_ADDR_SIZE              8
@@ -295,7 +295,8 @@ typedef struct
     union{
 #if ((defined LAUNCHXL_CC1352P1) || (defined LAUNCHXL_CC1352P_2) || \
      (defined LAUNCHXL_CC1352P_4)|| (defined LP_CC1352P7_1)      || \
-     (defined LP_CC1352P7_4))
+     (defined LP_CC1352P7_4)     || (defined CONFIG_LP_CC2652PSIP) || \
+     (defined CONFIG_CC2652P1FSIP))
         rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t *RF_pCmdPropRadioDivSetup;
 #else
         rfc_CMD_PROP_RADIO_DIV_SETUP_t *RF_pCmdPropRadioDivSetup;

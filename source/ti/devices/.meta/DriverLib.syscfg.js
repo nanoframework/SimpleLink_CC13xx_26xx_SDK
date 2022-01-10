@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,61 +73,76 @@ function getAttrs(deviceId, part)
         result.deviceDir  = "cc13x1_cc26x1";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC13X1";
+        result.libName = "cc13x1";
     }
     else if (deviceId.match(/CC26.1/)) {
         result.deviceDir = "cc13x1_cc26x1";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC26X1";
+        result.libName = "cc26x1";
     }
     else if (deviceId.match(/CC13.2.7/)) {
         result.deviceDir  = "cc13x2x7_cc26x2x7";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC13X2X7";
+        result.libName = "cc13x2x7";
     }
     else if (deviceId.match(/CC26.2.7/)) {
         result.deviceDir = "cc13x2x7_cc26x2x7";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC26X2X7";
+        result.libName = "cc26x2x7";
     }
     else if (deviceId.match(/CC13.2/)) {
         result.deviceDir  = "cc13x2_cc26x2";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC13X2";
+        result.libName = "cc13x2";
     }
     else if (deviceId.match(/CC26.2/)) {
         result.deviceDir = "cc13x2_cc26x2";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC26X2";
+        result.libName = "cc26x2";
     }
     else if (deviceId.match(/CC26.4/)) {
         result.deviceDir = "cc13x4_cc26x4";
         result.deviceGroup = "LPRF";
         result.deviceDefine = "DeviceFamily_CC26X4";
+        result.libName = "cc26x4";
     }
-    else if (deviceId.match(/CC13.0/)) { /* issue: remove, not suported?? */
-        result.deviceDir = "cc13x0";
+    else if (deviceId.match(/CC2653/)) {
+        /* The CC2653 is very similar to CC26X4 from a software point of view,
+         * so we use the same deviceDir and libName.
+         */
+        result.deviceDir = "cc13x4_cc26x4";
         result.deviceGroup = "LPRF";
-        result.deviceDefine = "DeviceFamily_CC13X0";
+        result.deviceDefine = "DeviceFamily_CC26X3";
+        result.libName = "cc26x4";
     }
-    else if (deviceId.match(/CC26.0R2/)) { /* issue: remove, not suported?? */
-        result.deviceDir = "cc26x0r2";
+    else if (deviceId.match(/CC13.4/)) {
+        result.deviceDir = "cc13x4_cc26x4";
         result.deviceGroup = "LPRF";
-        result.deviceDefine = "DeviceFamily_CC26X0R2";
+        result.deviceDefine = "DeviceFamily_CC13X4";
+        result.libName = "cc13x4";
     }
-    else if (deviceId.match(/CC26.0/)) { /* issue: remove, not suported?? */
-        result.deviceDir = "cc26x0";
+    else if (deviceId.match(/CC23.0/)) {
+        result.deviceDir = "cc23x0";
         result.deviceGroup = "LPRF";
-        result.deviceDefine = "DeviceFamily_CC26X0";
+        result.deviceDefine = "DeviceFamily_CC23X0";
+        result.libName = "cc23x0";
     }
     else if (deviceId.match(/CC32/)) {
         result.deviceDir = "cc32xx";
         result.deviceGroup = "WIFI";
         result.deviceDefine = "DeviceFamily_CC3220";
+        result.libName = "cc32xx";
     }
     else {
         result.deviceDir = "";
         result.deviceGroup = "";
         result.deviceDefine = "";
+        result.libName = "";
     }
 
     return (result);

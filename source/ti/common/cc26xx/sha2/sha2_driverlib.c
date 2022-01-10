@@ -6,7 +6,7 @@
         only driverlib APIs. Only SHA256 is supported.
 
  Group: CMCU
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -55,6 +55,10 @@
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(driverlib/sha2.h)
 #include DeviceFamily_constructPath(driverlib/prcm.h)
+
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
+#include DeviceFamily_constructPath(inc/hw_cpu_fpu.h)
+#endif
 
 #include "sha2_driverlib.h"
 
@@ -263,8 +267,13 @@ int_fast16_t SHA2_open()
      * the side effect from the SHA2ComputeFinalHash call of setting the CONTROL
      * special register. Lazy stacking is restored in SHA2_close().
      */
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
+    fpccrRestore = HWREG(CPU_FPU_BASE + CPU_FPU_O_FPCCR);
+    HWREG(CPU_FPU_BASE + CPU_FPU_O_FPCCR) = 0;
+#else
     fpccrRestore = HWREG(CPU_SCS_BASE + CPU_SCS_O_FPCCR);
     HWREG(CPU_SCS_BASE + CPU_SCS_O_FPCCR) = 0;
+#endif
 
     IntMasterEnable();
     return SHA2_STATUS_SUCCESS;
@@ -282,7 +291,12 @@ void SHA2_close()
     SHA2_object.isOpen = false;
 
     /* Restore the previous state of the FPCCR register. */
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
+    HWREG(CPU_FPU_BASE + CPU_FPU_O_FPCCR) = fpccrRestore;
+#else
     HWREG(CPU_SCS_BASE + CPU_SCS_O_FPCCR) = fpccrRestore;
+#endif
+
     IntMasterEnable();
 
     /* Disable the peripheral domains enabled by SHA2_open() */

@@ -9,7 +9,7 @@
             "+../main_freertos.c -> main_freertos.c",
             "+../../overview.rov.json -> overview.rov.json",
             "+../../../../../../../source/ti/boards/LP_CC2652R7/Board.html -> Board.html",
-            "+../../tirtos/ccs/cc13x2x7_cc26x2x7_freertos.cmd -> cc13x2x7_cc26x2x7_freertos.cmd"
+            "+cc13x2x7_cc26x2x7_freertos.cmd -> cc13x2x7_cc26x2x7_freertos.cmd"
         ]
     }
 ]

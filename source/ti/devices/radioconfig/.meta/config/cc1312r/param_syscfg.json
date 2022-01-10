@@ -97,7 +97,7 @@
                 },
                 {
                     "name": "2gfsk100kbps25dev915wsun2a",
-                    "displayName": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth)"
+                    "displayName": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk100kbps50dev915wsun2b",
@@ -114,6 +114,10 @@
                 {
                     "name": "2gfsk200kbps100dev915wsun4b",
                     "displayName": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
+                },
+                {
+                    "name": "2gfsk300kbps75dev915wsun5",
+                    "displayName": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth"
                 },
                 {
                     "name": "wbdsss480ksps30kbps",
@@ -959,7 +963,7 @@
             {
                 "file": "setting_tc140.json",
                 "name": "2gfsk100kbps25dev915wsun2a",
-                "description": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth)",
+                "description": "Wi-SUN mode #2a, 100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth",
                 "options": "ieee_15_4g"
             },
             {
@@ -984,6 +988,12 @@
                 "file": "setting_tc150.json",
                 "name": "2gfsk200kbps100dev915wsun4b",
                 "description": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
+            },
+            {
+                "file": "setting_tc154.json",
+                "name": "2gfsk300kbps75dev915wsun5",
+                "description": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth",
                 "options": "ieee_15_4g"
             },
             {

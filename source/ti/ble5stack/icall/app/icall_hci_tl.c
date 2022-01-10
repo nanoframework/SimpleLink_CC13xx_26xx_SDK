@@ -6,7 +6,7 @@
         packets into HCI function calls to the Stack.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -377,8 +377,6 @@ static uint8_t              host_tl_gapScannerInitialized;
 // Default - infinite advertising
 uint16_t advDuration = 0;
 uint8_t advHandleLegacy = 0xFF;
-uint8_t advUpdateApp = 0;
-uint8_t advLegacyState = 0;
 uint8_t advEventCntr = 0;
 uint8_t maxConnReached = 0;
 #endif
@@ -397,6 +395,8 @@ uint8_t sendEstEvt = 0;
 uint8_t maxNumReports = 0;
 uint8_t legacyConnCancel = 0;
 deviceInfo_t *deviceInfoArr = NULL;
+uint8_t makeDiscFlag = 0;
+uint8_t endDiscFlag = 0;
 #endif // BLE3_CMD
 
 #if defined(GAP_BOND_MGR)
@@ -475,6 +475,8 @@ static hciEntry_t hciTranslationTable[] =
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & (INIT_CFG))
   HCI_TRANSLATION_ENTRY(HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION,        IDX_CAST IDX_HCI_LE_SetHostChanClassificationCmd,          HU8PTR,  HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
 #endif // (defined(CTRL_CONFIG) && (CTRL_CONFIG & (INIT_CFG)))
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_HOST_DEFAULT_CHANNEL_CLASSIFICATION,    IDX_CAST IDX_HCI_EXT_SetHostDefChanClassificationCmd, HU8PTR,  HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
+  HCI_TRANSLATION_ENTRY(HCI_EXT_SET_HOST_CONNECTION_CHANNEL_CLASSIFICATION, IDX_CAST IDX_HCI_EXT_SetHostConnChanClassificationCmd,HU8PTR,  HNP,     HNP,     HNP,     HNP,     HNP,     HNP,     HNP),
 
 
   // V4.2 - Extended Data Length
@@ -3519,12 +3521,22 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
         // TODO
         break;
 
+#ifdef BLE3_CMD
+      case GAP_EVT_ADV_START_AFTER_ENABLE:
+      case GAP_EVT_ADV_END_AFTER_DISABLE:
+      {
+        // Do not use these events for BLE3 Commands
+        // for BLE3 use GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT and GAP_ADV_END_DISCOVERABLE_DONE_EVENT
+        break;
+      }
+#endif
       default:
         // The default values set above will be used
         break;
     }
 
 #ifdef BLE3_CMD
+    // This event will be sent only for extended advertising set
     if( advHandle != advHandleLegacy)
     {
 #endif
@@ -3550,35 +3562,8 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
       }
 #ifdef BLE3_CMD
     }
-    else
-    {
-      dataLen = 3;
-      dataOut = (uint8_t *)osal_mem_alloc(dataLen);
-      if( event == GAP_EVT_ADV_START_AFTER_ENABLE )
-      {
-        dataOut[0] = LO_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
-        dataOut[1] = HI_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
-        dataOut[2] = status;
-        if( advLegacyState == 0 )
-        {
-          HCI_TL_SendVSEvent(dataOut, dataLen);
-          advLegacyState = 1;
-        }
-        advUpdateApp = 0;
-      }
-      else if( event == GAP_EVT_ADV_END_AFTER_DISABLE )
-      {
-        dataOut[0] = LO_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
-        dataOut[1] = HI_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
-        dataOut[2] = status;
-        if( advLegacyState && (advUpdateApp == 0) )
-        {
-          HCI_TL_SendVSEvent(dataOut, dataLen);
-          advLegacyState = 0;
-        }
-      }
-    }
 #endif
+
     //Free the message and the payload
     if (dataOut)
     {
@@ -4291,8 +4276,8 @@ static uint8_t processExtMsgUTIL(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRsp
     case HCI_EXT_UTIL_NV_READ:
       {
         uint8_t *pBuf = pCmd->pData;
-        osalSnvId_t id  = pBuf[0];
-        osalSnvLen_t len = pBuf[1];
+        osalSnvId_t id  = BUILD_UINT16(pBuf[0], pBuf[1]);
+        osalSnvLen_t len = pBuf[2];
 
         // This has a limitation of only allowing a max data length because of the fixed buffer.
         if ((len < MAX_RSP_DATA_LEN) && (checkNVLen(id, len) == SUCCESS))
@@ -4300,7 +4285,7 @@ static uint8_t processExtMsgUTIL(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRsp
           stat = osal_snv_read(id, len, &rspBuf[RSP_PAYLOAD_IDX]);
           if (stat == SUCCESS)
           {
-            *pRspDataLen = pBuf[1];
+            *pRspDataLen = pBuf[2];
           }
         }
         else
@@ -4313,11 +4298,11 @@ static uint8_t processExtMsgUTIL(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRsp
     case HCI_EXT_UTIL_NV_WRITE:
       {
         uint8_t *pBuf = pCmd->pData;
-        osalSnvId_t id  = pBuf[0];
-        osalSnvLen_t len = pBuf[1];
+        osalSnvId_t id  = BUILD_UINT16(pBuf[0], pBuf[1]);
+        osalSnvLen_t len = pBuf[2];
         if (checkNVLen(id, len) == SUCCESS)
         {
-          stat = osal_snv_write(id, len, &pBuf[2]);
+          stat = osal_snv_write(id, len, &pBuf[3]);
         }
         else
         {
@@ -6025,7 +6010,11 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
 
 #if (HOST_CONFIG & PERIPHERAL_CFG)
     case HCI_EXT_GAP_SLAVE_SECURITY_REQ_UPDATE:
+#ifndef EXCLUDE_SM
       stat = GAP_SendSlaveSecurityRequest(BUILD_UINT16(pBuf[0], pBuf[1]), pBuf[2]);
+#else
+      stat = bleIncorrectMode;
+#endif // EXCLUDE_SM
       break;
 #endif // PERIPHERAL_CFG
 
@@ -6635,34 +6624,68 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       else
       {
         // Updating the advertising parameters
-        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PROPS, &eventProps);
-        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS_TYPE, &addrType);
+        stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PROPS, &eventProps);
+        if( stat != SUCCESS )
+        {
+          if( stat == bleNotReady )
+          {
+            // The advertising is already enabled
+            return bleAlreadyInRequestedMode;
+          }
+          return stat;
+        }
+
+        stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS_TYPE, &addrType);
+        if( stat != SUCCESS )
+        {
+          if( stat == bleNotReady )
+          {
+            return bleAlreadyInRequestedMode;
+          }
+          return stat;
+        }
 
         uint8_t addr[B_ADDR_LEN];
         osal_memcpy(addr, &pBuf[2], B_ADDR_LEN);
-        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS, addr);
-        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PRIMARY_CHANNEL_MAP, &chanMap);
-        stat |= GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_FILTER_POLICY, &fltPolicy);
+        stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PEER_ADDRESS, addr);
+        if( stat != SUCCESS )
+        {
+          if( stat == bleNotReady )
+          {
+            return bleAlreadyInRequestedMode;
+          }
+          return stat;
+        }
+
+        stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_PRIMARY_CHANNEL_MAP, &chanMap);
+        if( stat != SUCCESS )
+        {
+          if( stat == bleNotReady )
+          {
+            return bleAlreadyInRequestedMode;
+          }
+          return stat;
+        }
+
+        stat = GapAdv_setParam(advHandleLegacy, GAP_ADV_PARAM_FILTER_POLICY, &fltPolicy);
+        if( stat != SUCCESS )
+        {
+          if( stat == bleNotReady )
+          {
+            return bleAlreadyInRequestedMode;
+          }
+          return stat;
+        }
       }
 
-      if( stat != SUCCESS )
-      {
-        return stat;
-      }
       if( advNotice )
       {
         // Set event mask - Adv Notice Events enabled
-        stat = GapAdv_setEventMask(advHandleLegacy,
-                                   GAP_ADV_EVT_MASK_START_AFTER_ENABLE |
-                                   GAP_ADV_EVT_MASK_END_AFTER_DISABLE |
-                                   GAP_ADV_EVT_MASK_END );
+        stat = GapAdv_setEventMask(advHandleLegacy, GAP_ADV_EVT_MASK_END );
       }
       else
       {
-        // Set event mask - Adv Notice Events not enabled
-        stat = GapAdv_setEventMask(advHandleLegacy,
-                                   GAP_ADV_EVT_MASK_START_AFTER_ENABLE |
-                                   GAP_ADV_EVT_MASK_END_AFTER_DISABLE );
+        stat = GapAdv_setEventMask(advHandleLegacy, 0 );
       }
 
       // To enable adv notice event HCI_EXT_AdvEventNotice should be called before each GAP_MakeDiscoverable
@@ -6672,6 +6695,9 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       {
         return stat;
       }
+
+      // Enable this flag to mark that GapAdv_enable was called.
+      makeDiscFlag = 1;
 
       if( advDuration == 0 )
       {
@@ -6683,12 +6709,25 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
         // Time limeted advertising
         stat = GapAdv_enable(advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_DURATION, advDuration);
       }
+      if( (stat != SUCCESS) && (stat != bleInvalidRange) )
+      {
+        // With the above GapAdv_params we should not receive bleInvalidRange from the host
+        // We should not expected to receive GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT
+        makeDiscFlag = 0;
+      }
       break;
     }
 
     case HCI_EXT_GAP_END_DISC:
     {
+      // Enable this flag to mark that GapAdv_disable was called.
+      endDiscFlag = 1;
       stat = GapAdv_disable(advHandleLegacy);
+      if( (stat != SUCCESS)  && (stat != bleInternalError) )
+      {
+        // The error returned from the host. We should not expected to receive GAP_ADV_END_DISCOVERABLE_DONE_EVENT
+        endDiscFlag = 0;
+      }
       break;
     }
 
@@ -6719,7 +6758,6 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       }
 
       osal_memcpy(pData, &pBuf[2], dataLen);
-      advUpdateApp = 1;
 
       if( dataType == 1 )
       {
@@ -6752,10 +6790,12 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       if (!host_tl_gapScannerInitialized)
       {
         stat = GapScan_registerCb(host_tl_scanEvtCallback, 0);
-        if (!stat)
+        if (stat != SUCCESS)
         {
-          host_tl_gapScannerInitialized = 1;
+          stat = bleIncorrectMode;
+          break;
         }
+        host_tl_gapScannerInitialized = 1;
       }
 
       if( scanNotice )
@@ -6777,30 +6817,63 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       scanNotice = 0;
 
       // whitelist filter options
-      stat |= GapScan_setParam(SCAN_PARAM_FLT_POLICY, &whiteList);
+      stat = GapScan_setParam(SCAN_PARAM_FLT_POLICY, &whiteList);
+      if( stat == bleIncorrectMode )
+      {
+        stat = bleAlreadyInRequestedMode;
+        break;
+      }
+      else if( (stat != SUCCESS) && (stat != bleIncorrectMode) )
+      {
+        stat = bleIncorrectMode;
+        break;
+      }
 
       // Discovery mode
       if( discMode == 0x03 )
       {
         discMode = SCAN_FLT_DISC_DISABLE;
       }
-      stat |= GapScan_setParam(SCAN_PARAM_FLT_DISC_MODE, &discMode);
+      stat = GapScan_setParam(SCAN_PARAM_FLT_DISC_MODE, &discMode);
+      if( stat == bleIncorrectMode )
+      {
+        stat = bleAlreadyInRequestedMode;
+        break;
+      }
+      else if( (stat != SUCCESS) && (stat != bleIncorrectMode) )
+      {
+        stat = bleIncorrectMode;
+        break;
+      }
 
       // Get the phy scanning values
-      stat |= GapScan_getPhyParams(SCAN_PRIM_PHY_1M, &scanType, &scanInt, &scanWin);
-      // Update scan type
-      stat |= GapScan_setPhyParams(SCAN_PRIM_PHY_1M,(GapScan_ScanType_t)activeScan, scanInt, scanWin);
-
+      stat = GapScan_getPhyParams(SCAN_PRIM_PHY_1M, &scanType, &scanInt, &scanWin);
       if( stat != SUCCESS )
       {
-        stat = FAILURE;
-        return stat;
+        stat = bleIncorrectMode;
+		break;
+      }
+
+      // Update scan type
+      stat = GapScan_setPhyParams(SCAN_PRIM_PHY_1M,(GapScan_ScanType_t)activeScan, scanInt, scanWin);
+      if( stat != SUCCESS )
+      {
+        stat = bleIncorrectMode;
+        break;
       }
 
       stat = GapScan_enable(0, scanDuration, maxNumReports);
-      if( stat== SUCCESS )
+      if( stat == SUCCESS )
       {
         legacyScanFlag = 1;
+      }
+	  else
+      {
+        if( (stat != bleAlreadyInRequestedMode) && (stat != bleMemAllocError) )
+        {
+          stat = bleIncorrectMode;
+          break;
+        }
       }
       break;
     }
@@ -7789,7 +7862,7 @@ static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint16_t
 
         if (advEventCntr == 2)
         {
-          gapAdvDataUpdateEvent_t *pPkt = (gapAdvDataUpdateEvent_t *)pMsg;
+          GapAdv_dataUpdateEvent_t *pPkt = (GapAdv_dataUpdateEvent_t *)pMsg;
 
           pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_ADV_DATA_UPDATE_DONE_EVENT);
           pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_ADV_DATA_UPDATE_DONE_EVENT);
@@ -7801,6 +7874,42 @@ static uint8_t *processEventsGAP(gapEventHdr_t *pMsg, uint8_t *pOutMsg, uint16_t
         else
         {
           advEventCntr++;
+        }
+        break;
+      }
+
+      case GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT:
+      {
+        if( makeDiscFlag )
+        {
+          // This event is a response to GapAdv_enable
+          GapAv_setAdvStatusDoneEvent_t *pPkt = (GapAv_setAdvStatusDoneEvent_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_MAKE_DISCOVERABLE_DONE_EVENT);
+          pOutMsg[2] = pPkt->hdr.status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+
+          makeDiscFlag = 0;
+        }
+        break;
+      }
+
+      case GAP_ADV_END_DISCOVERABLE_DONE_EVENT:
+      {
+        if( endDiscFlag )
+        {
+          // This event is a response to GapAdv_disable
+          GapAv_setAdvStatusDoneEvent_t *pPkt = (GapAv_setAdvStatusDoneEvent_t*)pMsg;
+
+          pOutMsg[0] = LO_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
+          pOutMsg[1] = HI_UINT16(HCI_EXT_GAP_END_DISCOVERABLE_DONE_EVENT);
+          pOutMsg[2] = pPkt->hdr.status;
+          pBuf = pOutMsg;
+          msgLen = 3;
+
+          endDiscFlag = 0;
         }
         break;
       }
@@ -8600,7 +8709,7 @@ status_t BLE3ToAgama_setParam( uint16_t id, uint16_t value )
     }
 
     default:
-      stat = FAILURE;
+      stat = SUCCESS;
       break;
   }
 

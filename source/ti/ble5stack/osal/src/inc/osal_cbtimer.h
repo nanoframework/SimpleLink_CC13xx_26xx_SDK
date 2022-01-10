@@ -5,7 +5,7 @@
  @brief This file contains the Callback Timer definitions.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -74,7 +74,7 @@ extern "C"
  * MACROS
  */
 #if ( OSAL_CBTIMER_NUM_TASKS == 0 )
-  #error Callback Timer module shouldn't be included (no callback timer is needed)!
+  #error'Callback Timer module shouldnt be included (no callback timer is needed)!'
 #elif ( OSAL_CBTIMER_NUM_TASKS == 1 )
   #define OSAL_CBTIMER_PROCESS_EVENT( a )          ( a )
 #elif ( OSAL_CBTIMER_NUM_TASKS == 2 )

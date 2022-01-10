@@ -51,7 +51,7 @@
         NUM_SNV_PAGES:        Number of sectors used for Simple NV.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

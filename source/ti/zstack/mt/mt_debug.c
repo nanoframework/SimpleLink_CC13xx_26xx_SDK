@@ -66,6 +66,14 @@
 #include "zd_config.h"
 #endif
 
+/***************************************************************************************************
+ * EXTERNAL FUNCTIONS
+ ***************************************************************************************************/
+
+#if defined ( APP_TP2_TEST_MODE )
+extern void nwkListStatusAddToSortedList( uint16_t devAddr, uint8_t rxCost, uint8_t txCost,
+                                  linkStatusListItem_t *pList, uint8_t neighbors );
+#endif
 
 /***************************************************************************************************
  * LOCAL FUNCTIONs
@@ -79,7 +87,12 @@ static void MT_DebugSetThreshold(uint8_t *pBuf);
   static void MT_TP2_EnableApsSecurity(uint8_t *pBuf);
   static void MT_TP2_SetR20NodeDesc(uint8_t *pBuf);
   static void MT_TP2_SetEndDevTimeoutTo10s(uint8_t *pBuf);
+  static void MT_TP2_SetFragBlockSize(uint8_t *pBuf);
+  static void MT_TP2_SetZdoUseExtendedPanId(uint8_t *pBuf);
   #define EN_SECURITY                     0x40
+#if defined ( APP_TP2_TEST_MODE )
+  static void MT_TP2_SendLinkStatus(uint8_t *pBuf);
+#endif // APP_TP2_TEST_MODE
 #endif
 
 
@@ -119,8 +132,18 @@ uint8_t MT_DebugCommandProcessing(uint8_t *pBuf)
   case MT_DEBUG_TP2_SET_END_DEV_TIMEOUT_10S:
     MT_TP2_SetEndDevTimeoutTo10s(pBuf);
   break;
+  case MT_DEBUG_TP2_SET_FRAG_BLOCK_SIZE:
+    MT_TP2_SetFragBlockSize(pBuf);
+  break;
+  case MT_DEBUG_TP2_SET_ZDO_USEEXTPANID:
+    MT_TP2_SetZdoUseExtendedPanId(pBuf);
+  break;
+#if defined ( APP_TP2_TEST_MODE )
+  case MT_DEBUG_TP2_GU_SEND_LINKSTATUS:
+    MT_TP2_SendLinkStatus(pBuf);
+  break;
+#endif // APP_TP2_TEST_MODE
 #endif
-
 
     case MT_DEBUG_MAC_DATA_DUMP:
       MT_DebugMacDataDump();
@@ -246,10 +269,111 @@ static void MT_TP2_SetEndDevTimeoutTo10s(uint8_t *pBuf)
   MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_DBG), cmdId, 1, &retValue);
 }
 
+/***************************************************************************************************
+ * @fn      MT_TP2_SetFragBlockSize
+ *
+ * @brief   Sets the max fragmentation block size
+ *
+ * @param   pBuf - pointer to received buffer
+ *
+ * @return  void
+ ***************************************************************************************************/
+static void MT_TP2_SetFragBlockSize(uint8_t *pBuf)
+{
+  uint8_t retValue = ZSuccess;
+  uint8_t cmdId;
 
+  /* parse header */
+  cmdId = pBuf[MT_RPC_POS_CMD1];
+  pBuf += MT_RPC_FRAME_HDR_SZ;
 
+  // Sets aps maximum fragmentation block size
+  guApsMaxFragBlockSize = *pBuf;
 
-#endif
+  /* Build and send back the response */
+  MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_DBG), cmdId, 1, &retValue);
+}
+
+/***************************************************************************************************
+ * @fn      MT_TP2_SetZdoUseExtendedPanId
+ *
+ * @brief   Set the ZDO_UseExtendedPANID on device
+ *
+ * @param   pBuf - pointer to received buffer
+ *
+ * @return  void
+ ***************************************************************************************************/
+static void MT_TP2_SetZdoUseExtendedPanId(uint8_t *pBuf)
+{
+  uint8_t retValue = ZSuccess;
+  uint8_t cmdId;
+
+  /* parse header */
+  cmdId = pBuf[MT_RPC_POS_CMD1];
+  pBuf += MT_RPC_FRAME_HDR_SZ;
+
+  osal_cpyExtAddr( ZDO_UseExtendedPANID, pBuf );
+
+  /* Build and send back the response */
+  MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_DBG), cmdId, 1, &retValue);
+}
+
+#if defined ( APP_TP2_TEST_MODE )
+/***************************************************************************************************
+ * @fn      MT_TP2_SendLinkStatus
+ *
+ * @brief   Sends custom Link Status message
+ *
+ * @param   pBuf - pointer to received buffer
+ *
+ * @return  void
+ ***************************************************************************************************/
+static void MT_TP2_SendLinkStatus(uint8_t *pBuf)
+{
+  uint8_t retValue = ZSuccess;
+  uint8_t cmdId;
+  uint8_t i;
+  uint8_t neighbors;
+
+  /* parse header */
+  cmdId = pBuf[MT_RPC_POS_CMD1];
+  pBuf += MT_RPC_FRAME_HDR_SZ;
+
+  linkStatusListItem_t *pList;
+
+  /* Parse number of neighbors included in MT command */
+  neighbors = *pBuf++;
+
+  pList = OsalPort_malloc( neighbors * sizeof( linkStatusListItem_t ) );
+
+  if ( pList )
+  {
+    memset( pList, 0xFF, (2 * sizeof ( linkStatusListItem_t )) );
+
+    // Go through each entry in buffer ( devAddr, rxCost, txCost )
+    for ( i = 0; i < neighbors; i++ )
+    {
+      uint16_t devAddr;
+      devAddr = OsalPort_buildUint16( pBuf );
+      pBuf += 2;
+      nwkListStatusAddToSortedList( devAddr, pBuf[0], pBuf[1], pList, neighbors );
+      pBuf += 2;
+    }
+
+    NLME_SendLinkStatus( neighbors, (LS_OPTION_FIRST_FRAME | LS_OPTION_LAST_FRAME), pList );
+
+    OsalPort_free( pList );
+
+    // Reset Link Status timer so that we don't send it more often than necessary
+    NLME_SetLinkStatusTimer();
+  }
+
+  /* Build and send back the response */
+  MT_BuildAndSendZToolResponse(((uint8_t)MT_RPC_CMD_SRSP | (uint8_t)MT_RPC_SYS_DBG), cmdId, 1, &retValue);
+}
+#endif // APP_TP2_TEST_MODE
+
+#endif // APP_TP2
 
 
 /***************************************************************************************************

@@ -42,8 +42,8 @@
     /* get ti/drivers common utility functions */
     let Common = system.getScript("/ti/drivers/Common.js");
 
-    /* PIN module for pin instance DIO functions */
-    let PIN = system.getScript("/ti/drivers/PIN");
+    /* GPIO module for pin instance DIO functions */
+    let GPIO = system.getScript("/ti/drivers/GPIO");
 
     /* Custom design flag */
     const isCustomDesign = RF.isCustomDesign();
@@ -60,7 +60,7 @@
 
     for (let i = 0; i < devPinInstances.length; i++) {
         let symbol = RF.$static[`rfAntennaPinSymbol${i}`];
-        dio = PIN.getDIO(RF.$static[devPinInstances[i]]).replace("DIO", "DIO_");
+        dio = "DIO_" + GPIO.getDioForInst(RF.$static[devPinInstances[i]]);
         if (symbol.match(/SUB1GHZ/)) {
             rfPinName = 'Board_' + dio + '_RFSW';
         }

@@ -211,6 +211,12 @@
                                         "BitIndex": "10..10",
                                         "BitDescription": "0: Power up frequency synth<br>\n  1: Do not power up frequency synth",
                                         "BitAccess": "W"
+                                    },
+                                    {
+                                        "_name": "bSynthNarrowBand",
+                                        "BitIndex": "12..12",
+                                        "BitDescription": "0: Normal synth mode<br>\n  1: Narrow-band synth mode",
+                                        "BitAccess": "W"
                                     }
                                 ],
                                 "Description": "Configuration options",

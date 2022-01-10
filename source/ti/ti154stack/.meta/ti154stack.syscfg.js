@@ -388,10 +388,11 @@ function getLibs(inst)
         // Get device ID and toolchain to select appropriate libs
         const GenLibs = system.getScript("/ti/utils/build/GenLibs.syscfg.js");
         const toolchain = GenLibs.getToolchainDir();
+        const rtos = system.getRTOS();
 
         // Generate correct maclib library to link based on device, security
         // level, and frequency band selected
-        const basePath = "ti/ti154stack/library/tirtos/" + toolchain + "/bin/";
+        let basePath = "ti/ti154stack/lib/" + toolchain;
 
         let security;
         switch(inst.$static.secureLevel)
@@ -405,26 +406,39 @@ function getLibs(inst)
         if(board.includes("R7") || board.includes("P7"))
         {
             devType = Common.isSub1GHzDevice() ? "cc13x2x7" : "cc26x2x7";
+            basePath += "/m4f/";
+        }
+        else if(board.includes("R3") || board.includes("P3"))
+        {
+            devType = Common.isSub1GHzDevice() ? "cc13x1" : "cc26x1";
+            basePath += "/m4/";
         }
         else // cc13x2/cc26x2
         {
             devType = Common.isSub1GHzDevice() ? "cc13x2" : "cc26x2";
+            basePath += "/m4f/";
         }
         const freq = (inst.$static.freqBand === "freqBand24") ? "_2_4g" : "";
+        const rtosPath = (rtos === "tirtos7") ? "_tirtos7" : "";
 
-        const maclib = basePath + "maclib_" + security + devType + freq + ".a";
+        const maclibName = "maclib_" + security + devType + freq + rtosPath;
+        const maclib = basePath + maclibName + ".a";
         libs.push(maclib);
 
         if(system.modules["/ti/dmm/dmm"] === undefined)
         {
-            let macosallib;
+            let macosallib = basePath + "maclib_osal_" + rtos;
             if(board.includes("R7") || board.includes("P7"))
             {
-                macosallib = basePath + "maclib_osal_tirtos_cc13x2x7_26x2x7.a";
+                macosallib += "_cc13x2x7_26x2x7.a";
+            }
+            else if(board.includes("R3") || board.includes("P3"))
+            {
+                macosallib += "_cc13x1_26x1.a";
             }
             else // cc13x2/cc26x2
             {
-                macosallib = basePath + "maclib_osal_tirtos_cc13x2_26x2.a";
+                macosallib += "_cc13x2_26x2.a";
             }
             libs.push(macosallib);
         }
@@ -466,6 +480,14 @@ function moduleInstances(inst)
         dependencyModule.push({
             name: "ti154stackModule",
             moduleName: "/ti/ti154stack/ti154stack_config_mod.js"
+        });
+    }
+
+    if(system.getRTOS() === "tirtos7")
+    {
+        dependencyModule.push({
+            name: "ti154stackOpts",
+            moduleName: "/ti/ti154stack/ti154stack_config_opts.js"
         });
     }
 

@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -311,7 +311,6 @@ extern uint8 hciSmpTaskID;
 #define HCI_LE_REMOVE_DEVICE_FROM_PERIODIC_ADV_LIST       0x2048    //!< opcode of @ref HCI_LE_RemoveDeviceFromPeriodicAdvListCmd
 #define HCI_LE_CLEAR_PERIODIC_ADV_LIST                    0x2049    //!< opcode of @ref HCI_LE_ClearPeriodicAdvListCmd
 #define HCI_LE_READ_PERIODIC_ADV_LIST_SIZE                0x204A    //!< opcode of @ref HCI_LE_ReadPeriodicAdvListSizeCmd
-
 // @endcond // NODOC
 
 // V5.1
@@ -331,75 +330,80 @@ extern uint8 hciSmpTaskID;
 
 /// @endcond //NODOC
 // LE Vendor Specific LL Extension Commands
-#define HCI_EXT_SET_RX_GAIN                               0xFC00    //!< opcode of @ref HCI_EXT_SetRxGainCmd
-#define HCI_EXT_SET_TX_POWER                              0xFC01    //!< opcode of @ref HCI_EXT_SetTxPowerCmd
-#define HCI_EXT_ONE_PKT_PER_EVT                           0xFC02    //!< opcode of @ref HCI_EXT_OnePktPerEvtCmd
+#define HCI_EXT_SET_RX_GAIN                                 0xFC00    //!< opcode of @ref HCI_EXT_SetRxGainCmd
+#define HCI_EXT_SET_TX_POWER                                0xFC01    //!< opcode of @ref HCI_EXT_SetTxPowerCmd
+#define HCI_EXT_ONE_PKT_PER_EVT                             0xFC02    //!< opcode of @ref HCI_EXT_OnePktPerEvtCmd
 /// @cond CC254X
-#define HCI_EXT_CLK_DIVIDE_ON_HALT                        0xFC03    //!< opcode of @ref HCI_EXT_ClkDivOnHaltCmd
-#define HCI_EXT_DECLARE_NV_USAGE                          0xFC04    //!< opcode of @ref HCI_EXT_DeclareNvUsageCmd
+#define HCI_EXT_CLK_DIVIDE_ON_HALT                          0xFC03    //!< opcode of @ref HCI_EXT_ClkDivOnHaltCmd
+#define HCI_EXT_DECLARE_NV_USAGE                            0xFC04    //!< opcode of @ref HCI_EXT_DeclareNvUsageCmd
 /// @endcond // CC254X
-#define HCI_EXT_DECRYPT                                   0xFC05    //!< opcode of @ref HCI_EXT_DecryptCmd
-#define HCI_EXT_SET_LOCAL_SUPPORTED_FEATURES              0xFC06    //!< opcode of @ref HCI_EXT_SetLocalSupportedFeaturesCmd
-#define HCI_EXT_SET_FAST_TX_RESP_TIME                     0xFC07    //!< opcode of @ref HCI_EXT_SetFastTxResponseTimeCmd
-#define HCI_EXT_MODEM_TEST_TX                             0xFC08    //!< opcode of @ref HCI_EXT_ModemTestTxCmd
-#define HCI_EXT_MODEM_HOP_TEST_TX                         0xFC09    //!< opcode of @ref HCI_EXT_ModemHopTestTxCmd
-#define HCI_EXT_MODEM_TEST_RX                             0xFC0A    //!< opcode of @ref HCI_EXT_ModemTestRxCmd
-#define HCI_EXT_END_MODEM_TEST                            0xFC0B    //!< opcode of @ref HCI_EXT_EndModemTestCmd
+#define HCI_EXT_DECRYPT                                     0xFC05    //!< opcode of @ref HCI_EXT_DecryptCmd
+#define HCI_EXT_SET_LOCAL_SUPPORTED_FEATURES                0xFC06    //!< opcode of @ref HCI_EXT_SetLocalSupportedFeaturesCmd
+#define HCI_EXT_SET_FAST_TX_RESP_TIME                       0xFC07    //!< opcode of @ref HCI_EXT_SetFastTxResponseTimeCmd
+#define HCI_EXT_MODEM_TEST_TX                               0xFC08    //!< opcode of @ref HCI_EXT_ModemTestTxCmd
+#define HCI_EXT_MODEM_HOP_TEST_TX                           0xFC09    //!< opcode of @ref HCI_EXT_ModemHopTestTxCmd
+#define HCI_EXT_MODEM_TEST_RX                               0xFC0A    //!< opcode of @ref HCI_EXT_ModemTestRxCmd
+#define HCI_EXT_END_MODEM_TEST                              0xFC0B    //!< opcode of @ref HCI_EXT_EndModemTestCmd
 /// @cond NODOC
-#define HCI_EXT_SET_BDADDR                                0xFC0C    //!< opcode of @ref HCI_EXT_SetBDADDRCmd
+#define HCI_EXT_SET_BDADDR                                  0xFC0C    //!< opcode of @ref HCI_EXT_SetBDADDRCmd
 /// @endcond //NODOC
-#define HCI_EXT_SET_SCA                                   0xFC0D    //!< opcode of @ref HCI_EXT_SetSCACmd
-#define HCI_EXT_ENABLE_PTM                                0xFC0E    //!< opcode of @ref HCI_EXT_EnablePTMCmd
-#define HCI_EXT_SET_FREQ_TUNE                             0xFC0F    //!< opcode of @ref HCI_EXT_SetFreqTuneCmd
-#define HCI_EXT_SAVE_FREQ_TUNE                            0xFC10    //!< opcode of @ref HCI_EXT_SaveFreqTuneCmd
-#define HCI_EXT_SET_MAX_DTM_TX_POWER                      0xFC11    //!< opcode of @ref HCI_EXT_SetMaxDtmTxPowerCmd
+#define HCI_EXT_SET_SCA                                     0xFC0D    //!< opcode of @ref HCI_EXT_SetSCACmd
+#define HCI_EXT_ENABLE_PTM                                  0xFC0E    //!< opcode of @ref HCI_EXT_EnablePTMCmd
+#define HCI_EXT_SET_FREQ_TUNE                               0xFC0F    //!< opcode of @ref HCI_EXT_SetFreqTuneCmd
+#define HCI_EXT_SAVE_FREQ_TUNE                              0xFC10    //!< opcode of @ref HCI_EXT_SaveFreqTuneCmd
+#define HCI_EXT_SET_MAX_DTM_TX_POWER                        0xFC11    //!< opcode of @ref HCI_EXT_SetMaxDtmTxPowerCmd
 /// @cond CC254X
-#define HCI_EXT_MAP_PM_IO_PORT                            0xFC12    //!< opcode of @ref HCI_EXT_MapPmIoPortCmd
+#define HCI_EXT_MAP_PM_IO_PORT                              0xFC12    //!< opcode of @ref HCI_EXT_MapPmIoPortCmd
 /// @endcond //CC254X
-#define HCI_EXT_DISCONNECT_IMMED                          0xFC13    //!< opcode of @ref HCI_EXT_DisconnectImmedCmd
-#define HCI_EXT_PER                                       0xFC14    //!< opcode of @ref HCI_EXT_PacketErrorRateCmd
-#define HCI_EXT_PER_BY_CHAN                               0xFC15    //!< opcode of @ref HCI_EXT_PERbyChanCmd
+#define HCI_EXT_DISCONNECT_IMMED                            0xFC13    //!< opcode of @ref HCI_EXT_DisconnectImmedCmd
+#define HCI_EXT_PER                                         0xFC14    //!< opcode of @ref HCI_EXT_PacketErrorRateCmd
+#define HCI_EXT_PER_BY_CHAN                                 0xFC15    //!< opcode of @ref HCI_EXT_PERbyChanCmd
 /// @cond CC254X
-#define HCI_EXT_EXTEND_RF_RANGE                           0xFC16    //!< opcode of  @ref HCI_EXT_ExtendRfRangeCmd
+#define HCI_EXT_EXTEND_RF_RANGE                             0xFC16    //!< opcode of  @ref HCI_EXT_ExtendRfRangeCmd
 /// @endcond // CC254X
 /// @cond CC254X
-#define HCI_EXT_HALT_DURING_RF                            0xFC19    //!< opcode of @ref HCI_EXT_HaltDuringRfCmd
+#define HCI_EXT_HALT_DURING_RF                              0xFC19    //!< opcode of @ref HCI_EXT_HaltDuringRfCmd
 /// @endcond // CC254X
-#define HCI_EXT_OVERRIDE_SL                               0xFC1A    //!< opcode of @ref HCI_EXT_SetSlaveLatencyOverrideCmd
-#define HCI_EXT_BUILD_REVISION                            0xFC1B    //!< opcode of @ref HCI_EXT_BuildRevisionCmd
+#define HCI_EXT_OVERRIDE_SL                                 0xFC1A    //!< opcode of @ref HCI_EXT_SetSlaveLatencyOverrideCmd
+#define HCI_EXT_BUILD_REVISION                              0xFC1B    //!< opcode of @ref HCI_EXT_BuildRevisionCmd
 /// @cond CC254X
-#define HCI_EXT_DELAY_SLEEP                               0xFC1C    //!< opcode of @ref HCI_EXT_DelaySleepCmd
+#define HCI_EXT_DELAY_SLEEP                                 0xFC1C    //!< opcode of @ref HCI_EXT_DelaySleepCmd
 /// @endcond //CC254X
-#define HCI_EXT_RESET_SYSTEM                              0xFC1D    //!< opcode of @ref HCI_EXT_ResetSystemCmd
+#define HCI_EXT_RESET_SYSTEM                                0xFC1D    //!< opcode of @ref HCI_EXT_ResetSystemCmd
 /// @cond CC254X
-#define HCI_EXT_OVERLAPPED_PROCESSING                     0xFC1E    //!< opcode of @ref HCI_EXT_OverlappedProcessingCmd
+#define HCI_EXT_OVERLAPPED_PROCESSING                       0xFC1E    //!< opcode of @ref HCI_EXT_OverlappedProcessingCmd
 /// @endcond //CC254X
-#define HCI_EXT_NUM_COMPLETED_PKTS_LIMIT                  0xFC1F    //!< opcode of @ref HCI_EXT_NumComplPktsLimitCmd
+#define HCI_EXT_NUM_COMPLETED_PKTS_LIMIT                    0xFC1F    //!< opcode of @ref HCI_EXT_NumComplPktsLimitCmd
 /// @cond NODOC
-#define HCI_EXT_GET_CONNECTION_INFO                       0xFC20    //!< opcode of @ref HCI_EXT_GetConnInfoCmd
+#define HCI_EXT_GET_CONNECTION_INFO                         0xFC20    //!< opcode of @ref HCI_EXT_GetConnInfoCmd
 /// @endcond // NODOC
-#define HCI_EXT_SET_MAX_DATA_LENGTH                       0xFC21    //!< opcode of @ref HCI_EXT_SetMaxDataLenCmd
-#define HCI_EXT_SET_DTM_TX_PKT_CNT                        0xFC24    //!< opcode of @ref HCI_EXT_SetDtmTxPktCntCmd
+#define HCI_EXT_SET_MAX_DATA_LENGTH                         0xFC21    //!< opcode of @ref HCI_EXT_SetMaxDataLenCmd
+#define HCI_EXT_SET_DTM_TX_PKT_CNT                          0xFC24    //!< opcode of @ref HCI_EXT_SetDtmTxPktCntCmd
 /// @cond NODOC
-#define HCI_EXT_READ_RAND_ADDR                            0xFC25    //!< opcode of @ref HCI_ReadRandAddrCmd
+#define HCI_EXT_READ_RAND_ADDR                              0xFC25    //!< opcode of @ref HCI_ReadRandAddrCmd
 /// @endcond //NODOC
-#define HCI_EXT_ENHANCED_MODEM_TEST_TX                    0xFC27    //!< opcode of @ref HCI_EXT_EnhancedModemTestTxCmd
-#define HCI_EXT_ENHANCED_MODEM_HOP_TEST_TX                0xFC28    //!< opcode of @ref HCI_EXT_EnhancedModemHopTestTxCmd
-#define HCI_EXT_ENHANCED_MODEM_TEST_RX                    0xFC29    //!< opcode of @ref HCI_EXT_EnhancedModemTestRxCmd
+#define HCI_EXT_ENHANCED_MODEM_TEST_TX                      0xFC27    //!< opcode of @ref HCI_EXT_EnhancedModemTestTxCmd
+#define HCI_EXT_ENHANCED_MODEM_HOP_TEST_TX                  0xFC28    //!< opcode of @ref HCI_EXT_EnhancedModemHopTestTxCmd
+#define HCI_EXT_ENHANCED_MODEM_TEST_RX                      0xFC29    //!< opcode of @ref HCI_EXT_EnhancedModemTestRxCmd
 // @cond NODOC
-#define HCI_EXT_SET_PIN_OUTPUT                            0xFC2A    //!< opcode of @ref HCI_SetPinOutputCmd
-#define HCI_EXT_SET_LOCATIONING_ACCURACY                  0xFC2B    //!< opcode of @ref HCI_SetLocationingAccuracyCmd
-#define HCI_EXT_GET_ACTIVE_CONNECTION_INFO                0xFC2C    //!< opcode of @ref HCI_EXT_GetActiveConnInfoCmd
-#define HCI_EXT_COEX_ENABLE                               0xFC2E    //!< opcode of @ref HCI_EXT_CoexEnableCmd
+#define HCI_EXT_SET_PIN_OUTPUT                              0xFC2A    //!< opcode of @ref HCI_SetPinOutputCmd
+#define HCI_EXT_SET_LOCATIONING_ACCURACY                    0xFC2B    //!< opcode of @ref HCI_SetLocationingAccuracyCmd
+#define HCI_EXT_GET_ACTIVE_CONNECTION_INFO                  0xFC2C    //!< opcode of @ref HCI_EXT_GetActiveConnInfoCmd
+#define HCI_EXT_COEX_ENABLE                                 0xFC2E    //!< opcode of @ref HCI_EXT_CoexEnableCmd
 
-#define HCI_EXT_LL_TEST_MODE                              0xFC70    //!< opcode of @ref HCI_EXT_LLTestModeCmd
+#define HCI_EXT_LL_TEST_MODE                                0xFC70    //!< opcode of @ref HCI_EXT_LLTestModeCmd
 
-#define HCI_EXT_LE_SET_EXT_ADV_DATA                       0xFC71    //!< opcode of @ref HCI_EXT_LE_SetExtAdvDataCmd
-#define HCI_EXT_LE_SET_EXT_SCAN_RESPONSE_DATA             0xFC72    //!< opcode of @ref HCI_EXT_LE_SetExtScanRspDataCmd
-#define HCI_EXT_LE_SET_EXT_VIRTUAL_ADV_ADDRESS            0xFC73    //!< opcode of @ref HCI_EXT_SetVirtualAdvAddrCmd
-#define HCI_EXT_SET_SCAN_CHAN                             0xFC74    //!< opcode of @ref HCI_EXT_SetExtScanChannels
-#define HCI_EXT_SET_QOS_PARAMETERS                        0xFC75    //!< opcode of @ref HCI_EXT_SetQOSParameters
-#define HCI_EXT_SET_QOS_DEFAULT_PARAMETERS                0xFC76    //!< opcode of @ref HCI_EXT_SetQOSDefaultParameters
+#define HCI_EXT_LE_SET_EXT_ADV_DATA                         0xFC71    //!< opcode of @ref HCI_EXT_LE_SetExtAdvDataCmd
+#define HCI_EXT_LE_SET_EXT_SCAN_RESPONSE_DATA               0xFC72    //!< opcode of @ref HCI_EXT_LE_SetExtScanRspDataCmd
+#define HCI_EXT_LE_SET_EXT_VIRTUAL_ADV_ADDRESS              0xFC73    //!< opcode of @ref HCI_EXT_SetVirtualAdvAddrCmd
+#define HCI_EXT_SET_SCAN_CHAN                               0xFC74    //!< opcode of @ref HCI_EXT_SetExtScanChannels
+#define HCI_EXT_SET_QOS_PARAMETERS                          0xFC75    //!< opcode of @ref HCI_EXT_SetQOSParameters
+#define HCI_EXT_SET_QOS_DEFAULT_PARAMETERS                  0xFC76    //!< opcode of @ref HCI_EXT_SetQOSDefaultParameters
+#define HCI_LE_MAKE_DISCOVERABLE_DONE                       0xFC77    //!< opcode of @ref HCI_LE_SetAdvStatus
+#define HCI_LE_END_DISCOVERABLE_DONE                        0xFC78    //!< opcode of @ref HCI_LE_SetAdvStatus
+#define HCI_EXT_SET_HOST_DEFAULT_CHANNEL_CLASSIFICATION     0xFC79    //!< opcode of @ref HCI_EXT_SetHostDefChanClassificationCmd
+#define HCI_EXT_SET_HOST_CONNECTION_CHANNEL_CLASSIFICATION  0xFC7A    //!< opcode of @ref HCI_EXT_SetHostConnChanClassificationCmd
+
 // @endcond //NODOC
 
 /*
@@ -523,11 +527,15 @@ extern char *BLEEventCode_BleLogStrings[];
 #define HCI_EXT_ENHANCED_MODEM_HOP_TEST_TX_EVENT          0x0428    //!< event from @ref HCI_EXT_EnhancedModemHopTestTxCmd
 #define HCI_EXT_ENHANCED_MODEM_TEST_RX_EVENT              0x0429    //!< event from @ref HCI_EXT_EnhancedModemTestRxCmd
 // @cond NODOC
-#define HCI_EXT_SET_PIN_OUTPUT_EVENT                      0x042A    //!< event from @ref HCI_EXT_SetPinOutputCmd
-#define HCI_EXT_SET_LOCATIONING_ACCURACY_EVENT            0x042B    //!< event from @ref HCI_EXT_SetLocationingAccuracyCmd
-#define HCI_EXT_GET_ACTIVE_CONNECTION_INFO_EVENT          0x042C    //!< event from @ref HCI_EXT_GetActiveConnInfoCmd
-#define HCI_EXT_SET_VIRTUAL_ADV_ADDRESS_EVENT             0x042D    //!< event from @ref HCI_EXT_SetVirtualAdvAddrCmd
-#define HCI_EXT_COEX_ENABLE_EVENT                         0x042E    //!< event from @ref HCI_EXT_CoexEnableCmd
+#define HCI_EXT_SET_PIN_OUTPUT_EVENT                       0x042A    //!< event from @ref HCI_EXT_SetPinOutputCmd
+#define HCI_EXT_SET_LOCATIONING_ACCURACY_EVENT             0x042B    //!< event from @ref HCI_EXT_SetLocationingAccuracyCmd
+#define HCI_EXT_GET_ACTIVE_CONNECTION_INFO_EVENT           0x042C    //!< event from @ref HCI_EXT_GetActiveConnInfoCmd
+#define HCI_EXT_SET_VIRTUAL_ADV_ADDRESS_EVENT              0x042D    //!< event from @ref HCI_EXT_SetVirtualAdvAddrCmd
+#define HCI_EXT_COEX_ENABLE_EVENT                          0x042E    //!< event from @ref HCI_EXT_CoexEnableCmd
+#define HCI_EXT_SET_HOST_DEF_CHANNEL_CLASSIFICATION_EVENT  0x042F    //!< event from @ref HCI_EXT_CoexEnableCmd
+#define HCI_EXT_SET_HOST_CONN_CHANNEL_CLASSIFICATION_EVENT 0x0430    //!< event from @ref HCI_EXT_CoexEnableCmd
+
+
 
 #define HCI_EXT_LL_TEST_MODE_EVENT                        0x0470    //!< LL Test Mode
 // @endcond // NODOC

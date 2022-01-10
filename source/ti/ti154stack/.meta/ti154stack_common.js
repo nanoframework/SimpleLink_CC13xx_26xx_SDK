@@ -85,6 +85,12 @@ const ti154stackCCFGSettings = {
     },
     LP_CC2652R7_CCFG_SETTINGS: {
         forceVddr: false
+    },
+    LP_CC2651R3_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC2651P3_CCFG_SETTINGS: {
+        forceVddr: false
     }
 };
 
@@ -99,7 +105,9 @@ const deviceToBoard = {
     CC2652R1FSIP: "LP_CC2652RSIP",
     CC2652P1FSIP: "LP_CC2652PSIP",
     CC2652R1: "CC26X2R1_LAUNCHXL",
-    CC2652RB: "LP_CC2652RB"
+    CC2652RB: "LP_CC2652RB",
+    CC2651R3: "LP_CC2651R3",
+    CC2651P3: "LP_CC2651P3"
 };
 
 const currBoardName = getDeviceOrLaunchPadName(true);
@@ -169,6 +177,11 @@ const supportedMigrations = {
         CC2652R1FSIP: () => isMigrationValidProject(),
         LP_CC2652RSIP: () => isMigrationValidProject()
     },
+    /* Represents PSIP board and device */
+    "CC2652P.*SIP": {
+        CC2652P1FSIP: {},
+        LP_CC2652PSIP: {}
+    },
     CC2652RB: {
         CC2652RB1FRGZ: {},
         LP_CC2652RB: {}
@@ -176,6 +189,14 @@ const supportedMigrations = {
     CC2652R7: {
         CC2652R7RGZ: {},
         LP_CC2652R7: {}
+    },
+    CC2651P3: {
+        CC2651P3RGZ: {},
+        LP_CC2651P3: {}
+    },
+    CC2651R3: {
+        CC2651R3RGZ: {},
+        LP_CC2651R3: {}
     }
 };
 
@@ -567,7 +588,8 @@ function is433MHzDevice(inst, boardName = null)
 function isHighPADevice(boardName = null)
 {
     const board = getLaunchPadFromDevice(boardName);
-    return(board.includes("CC1352P") || board.includes("CC2652PSIP"));
+    return(board.includes("CC1352P") || board.includes("CC2652PSIP")
+        || board.includes("CC2651P"));
 }
 
 /*!

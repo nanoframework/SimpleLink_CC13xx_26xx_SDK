@@ -44,8 +44,7 @@
 #define ti_drivers_dac_DACCC26X2__include
 
 #include <ti/drivers/DAC.h>
-#include <ti/drivers/PIN.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 
@@ -77,14 +76,13 @@ typedef enum {
  */
 typedef struct {
     /*!< Pin used for DAC output */
-    PIN_Id              pinDAC;
+    uint_least8_t       outputPin;
     /*!< DAC voltage reference source */
     DAC_VrefSource      dacVrefSource;
     /*!< Internal signal routed to COMPA_IN */
     uint8_t             dacCompAInput;
     /*!< Flag to determine precharge state when DCOUPL has been selected as voltage reference */
     bool                dacPrecharge;
-
 } DACCC26XX_HWAttrs;
 
 /*!
@@ -95,10 +93,6 @@ typedef struct {
 typedef struct {
     /*!< Flag to determine current state of the DAC's output */
     bool                isEnabled;
-    /*!< Pin state object */
-    PIN_State           pinState;
-    /*!< Pin handle */
-    PIN_Handle          pinHandle;
     /*!< Flag if the instance is in use */
     bool                isOpen;
     /*!< Current DAC code set */

@@ -120,6 +120,10 @@
                     "displayName": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
+                    "name": "2gfsk300kbps75dev915wsun5",
+                    "displayName": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth"
+                },
+                {
                     "name": "wbdsss480ksps30kbps",
                     "displayName": "WB-DSSS, 30 kbps (480 ksps), 195 kHz Deviation, 2-GFSK, 784 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:8"
                 },
@@ -488,8 +492,7 @@
                     "name": "highPA",
                     "displayName": "High PA",
                     "description": "Select if the High Power Amplifier on the device should be used",
-                    "default": false,
-                    "hidden": false
+                    "default": false
                 },
                 {
                     "name": "txPower169",
@@ -1039,6 +1042,12 @@
                 "file": "setting_tc750.json",
                 "name": "2gfsk200kbps100dev915wsun4b",
                 "description": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth",
+                "options": "ieee_15_4g"
+            },
+            {
+                "file": "setting_tc754.json",
+                "name": "2gfsk300kbps75dev915wsun5",
+                "description": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth",
                 "options": "ieee_15_4g"
             },
             {

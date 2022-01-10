@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,18 +53,6 @@ swiPriority.displayName = "Crypto interrupt Swi handler priority";
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - SHA2 instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base SHA2 properties and methods
  */
@@ -85,7 +73,6 @@ with negligible probability of collision.
 [3]: /drivers/doxygen/html/_s_h_a2_8h.html#ti_drivers_SHA2_Examples "C usage examples"
 [4]: /drivers/syscfg/html/ConfigDoc.html#SHA2_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     defaultInstanceName : "CONFIG_SHA2_",
     config              : Common.addNameConfig(config, "/ti/drivers/SHA2", "CONFIG_SHA2_"),
     modules: Common.autoForceModules(["Board", "Power"])

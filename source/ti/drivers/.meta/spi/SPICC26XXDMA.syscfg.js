@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -150,10 +150,29 @@ function pinmuxRequirements(inst)
             break;
     }
 
+    let SPI_DEVICE_INTERFACE_MAP = [
+        {prefix: "CC13.4",   interfaceName: "SPI"},
+        {prefix: "CC26.4",   interfaceName: "SPI"},
+        {prefix: "CC2653",   interfaceName: "SPI"},
+        {prefix: "CC13",     interfaceName: "SSI"},
+        {prefix: "CC26",     interfaceName: "SSI"}
+    ];
+
+    let interfaceName;
+
+    for (let i = 0; i < SPI_DEVICE_INTERFACE_MAP.length; i++) {
+        let sdim = SPI_DEVICE_INTERFACE_MAP[i];
+
+        if (system.deviceData.deviceId.match(sdim.prefix)) {
+            interfaceName = sdim.interfaceName;
+            break;
+        }
+    }
+
     let spi = {
         name: "spi",
         displayName: "SPI Peripheral",
-        interfaceName: "SSI",
+        interfaceName: interfaceName,
         canShareWith: "SPI",
         resources: [
             {
@@ -224,51 +243,64 @@ function pinmuxRequirements(inst)
 function moduleInstances(inst)
 {
     let pinInstances = new Array();
+    let shortName = inst.$name.replace("CONFIG_", "");
 
     pinInstances.push(
         {
             name: "sclkPinInstance",
-            displayName: "SPI Clock PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "SPI Clock configuration when not in use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: { parentMod: "/ti/drivers/SPI",
-                    parentInterfaceName: "spi",
-                    parentSignalName: "sclkPin",
-                    parentSignalDisplayName: "SCLK",
-                    mode: "Output",
-                    outputState: "Low",
-                    pull: "None" }
+            requiredArgs: {
+                parentInterfaceName: "spi",
+                parentSignalName: "sclkPin",
+                parentSignalDisplayName: "SCLK"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_SCLK",
+                initialOutputState: "Low",
+                mode: "Output",
+                pull: "None"
+            }
         }
     );
 
     pinInstances.push(
         {
             name: "misoPinInstance",
-            displayName: "SPI MISO PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "SPI MISO configuration when not in use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: { parentMod: "/ti/drivers/SPI",
-                    parentInterfaceName: "spi",
-                    parentSignalName: "misoPin",
-                    parentSignalDisplayName: "MISO",
-                    mode: "Input",
-                    pull: "None" }
+            requiredArgs: {
+                parentInterfaceName: "spi",
+                parentSignalName: "misoPin",
+                parentSignalDisplayName: "MISO"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_MISO",
+                mode: "Input",
+                pull: "None"
+            }
         }
     );
 
     pinInstances.push(
         {
             name: "mosiPinInstance",
-            displayName: "SPI MOSI PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "SPI MOSI configuration when not in use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: { parentMod: "/ti/drivers/SPI",
-                    parentInterfaceName: "spi",
-                    parentSignalName: "mosiPin",
-                    parentSignalDisplayName: "MOSI",
-                    mode: "Output",
-                    outputState: "Low",
-                    pull: "None" }
+            requiredArgs: {
+                parentInterfaceName: "spi",
+                parentSignalName: "mosiPin",
+                parentSignalDisplayName: "MOSI"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_MOSI",
+                initialOutputState: "Low",
+                mode: "Output",
+                pull: "None"
+            }
         }
     );
 
@@ -276,16 +308,20 @@ function moduleInstances(inst)
         pinInstances.push(
             {
                 name: "ssPinInstance",
-                displayName: "SPI CS PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "SPI CS configuration when not in use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/SPI",
-                        parentInterfaceName: "spi",
-                        parentSignalName: "ssPin",
-                        parentSignalDisplayName: "SS",
-                        mode: "Output",
-                        outputState: inst.mode.match("high") ? "Low" : "High",
-                        pull: "None" }
+                requiredArgs: {
+                    parentInterfaceName: "spi",
+                    parentSignalName: "ssPin",
+                    parentSignalDisplayName: "SS"
+                },
+                args: {
+                    $name: "CONFIG_GPIO_" + shortName + "_SS",
+                    initialOutputState: inst.mode.match("high") ? "Low" : "High",
+                    mode: "Output",
+                    pull: "None"
+                }
             }
         );
     }

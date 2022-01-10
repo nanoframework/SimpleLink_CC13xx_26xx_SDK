@@ -1,4 +1,4 @@
-include "../../../../../LP_CC2652R7/ble5stack/simple_mesh_node_oad_offchip_iar/tirtos/iar/cc26x2x7_app_and_stack_agama.icf";
+include "cc13x2x7_cc26x2x7_app_and_stack_agama_oad.icf";
 
 if (isdefinedsymbol(ROM_TIMACDataAddr)) {
     place at address mem:ROM_TIMACDataAddr {section .data_RAM_BASE_ADDR };

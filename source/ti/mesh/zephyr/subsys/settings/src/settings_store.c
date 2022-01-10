@@ -14,6 +14,10 @@
 #include <logging/log.h>
 #include "sys/__assert.h"
 
+#ifdef __IAR_SYSTEMS_ICC__
+#pragma section="settings_handler_static_area"
+#endif /* __IAR_SYSTEMS_ICC__ */
+
 LOG_MODULE_DECLARE(settings, CONFIG_SETTINGS_LOG_LEVEL);
 
 sys_slist_t settings_load_srcs;

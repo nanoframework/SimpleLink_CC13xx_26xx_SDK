@@ -60,6 +60,73 @@ for the device
 
 **Range:** Channel 11-26`;
 
+const coexDescription = `
+Enable the Thread/Wi-Fi coexistence interface
+`;
+
+const coexLongDescription = `
+Enable the TI-OpenThread interface for controlling the Thread/Wi-Fi coexistence
+module. This only enables the TI-OpenThread API for controlling CoEx request
+priority. The configuration of the coexistence interface is handled by the RF
+module.
+
+Ensure that the IEEE 802.15.4 CoEx PHY is selected in the RF coexistence
+configuration.
+`;
+
+const coexPriorityDescription = `
+Sets the global TI-OpenThread priority configuration
+`;
+
+const coexPriorityLongDescription = `
+Sets the global command priority configuration used by TI-OpenThread. This is
+used in 3-Wire and greater CoEx to control the priority request per-command.
+
+The API enabled by this configuration may be used to modify the priority of
+radio operations at runtime according to application requirements.
+`;
+
+const coexPriorityDefaultDescription = `
+The command level priority request is not modified from the default
+`;
+
+const coexPriorityHighDescription = `
+The priority line will be asserted for every command until set otherwise
+`;
+
+const coexPriorityLowDescription = `
+The priority line will be deasserted for every command until set otherwise
+`;
+
+
+const coexRequestDescription = `
+Sets the global TI-OpenThread request configuration
+`;
+
+const coexRequestLongDescription = `
+Sets the global command request configuration used by TI-OpenThread. This
+configuration controls the behavior of the request signal during receive
+operations. Normal operation will not assert the request line for receive
+operations. This is used in 2-Wire and greater CoEx.
+
+The API enabled by this configuration may be used to modify the behavior of the
+request line at runtime according to application requirements.
+`;
+
+const coexRequestDefaultDescription = `
+The command level request is not modified from the default
+`;
+
+const coexRequestAssertRxDescription = `
+The request line will be asserted for receive operations until set otherwise
+`;
+
+const coexRequestNoAssertRxDescription = `
+The request line will not be asserted for receive operations until set
+otherwise
+`;
+
+
 const txpowerDescription = `The default transmit power in dBm`;
 
 const txpowerLongDescription = `The default transmit power in dBm\
@@ -100,13 +167,13 @@ function moduleInstances(inst)
     var boardName = RadioConfig.getBoardName();
 
     /* Special handling for the P-4 2.4GHz front end characterization settings */
-    if(boardName.match(/LAUNCHXL-CC1352P-4/))
+    if(boardName.match(/(LP_|LAUNCHXL-)CC1352P(7)?-4/))
     {
         radioConfigArgs.phyType = "ieee154p10";
     }
 
     // Add high PA options if present
-    if(deviceId.match(/CC(2652R|1352R1)/))
+    if(deviceId.match(/CC(2652R|2674R|1352R1)/))
     {
         cmdList.push("cmdRadioSetup");
         // set TX power to the max value, this config is not important because
@@ -115,7 +182,7 @@ function moduleInstances(inst)
         // paEnable = false; to force normal PA options
         radioConfigArgs.txPower = RfDesign.getTxPowerOptions(2405, false)[0].name;
     }
-    else if(deviceId.match(/CC(2652P|1352P)/))
+    else if(deviceId.match(/CC(2652P|2674P|1352P)/))
     {
         cmdList.push("cmdRadioSetupPa");
         radioConfigArgs.highPA = true;
@@ -144,11 +211,21 @@ function moduleInstances(inst)
 function getTxPowerConfigOptions()
 {
     let txPowerValueList = [];
+    let phyName = "";
     const tmp = system.getScript("/ti/devices/radioconfig/settings/ieee_15_4");
     const rfSettings = _.cloneDeep(tmp.config);
 
+    if(deviceId.match(/CC2652P1FSIP/))
+    {
+        phyName = "ieee154p10";
+    }
+    else
+    {
+        phyName = "ieee154";
+    }
+
     // Get the command handler for this phy instance
-    const cmdHandler = CmdHandler.get(RadioConfig.PHY_IEEE_15_4, "ieee154");
+    const cmdHandler = CmdHandler.get(RadioConfig.PHY_IEEE_15_4, phyName);
     const freq = cmdHandler.getFrequency();
 
     // Regular PA options
@@ -169,6 +246,21 @@ function getTxPowerConfigOptions()
     txPowerValueList = _.orderBy(txPowerValueList, "name", "desc");
 
     return(txPowerValueList);
+}
+
+/*
+ *  ======== onCoexEnableChanged ========
+ *  Called when config coexEnable changes
+ *
+ *  @param inst   - Module instance object containing config that changed
+ *  @param ui     - User Interface state object
+ */
+function onCoexEnableChanged(inst, ui) {
+    const {coexEnable: enabled} = inst;
+
+    // show configuration
+    ui["coexPriority"].hidden = !enabled;
+    ui["coexRequest"].hidden  = !enabled;
 }
 
 /*!
@@ -210,6 +302,71 @@ const rfModule = {
             longDescription: txpowerLongDescription,
             options: getTxPowerConfigOptions(),
             default: 0
+        },
+        {
+            name: "coexEnable",
+            displayName: "Enable Coexistence",
+            description: coexDescription,
+            longDescription: coexLongDescription,
+            default: false,
+            onChange: onCoexEnableChanged
+        },
+        {
+            name: "coexConfigGroup",
+            displayName: "TI-OpenThread Coexistence Configuration",
+            collapsed: false,
+            config: [
+                {
+                    name: "coexPriority",
+                    displayName: "Priority Request",
+                    description: coexPriorityDescription,
+                    longDescription: coexPriorityLongDescription,
+                    hidden: true,
+                    default: "default",
+                    options: [
+                        {
+                            name: "default",
+                            displayName: "Default",
+                            description: coexPriorityDefaultDescription
+                        },
+                        {
+                            name: "high",
+                            displayName: "High",
+                            description: coexPriorityHighDescription
+                        },
+                        {
+                            name: "low",
+                            displayName: "Low",
+                            description: coexPriorityLowDescription
+                        }
+                    ],
+                },
+                {
+                    name: "coexRequest",
+                    displayName: "Request Behavior",
+                    description: coexRequestDescription,
+                    longDescription: coexRequestLongDescription,
+                    hidden: true,
+                    default: "default",
+                    options: [
+                        {
+                            name: "default",
+                            displayName: "Default",
+                            description: coexRequestDefaultDescription
+                        },
+                        {
+                            name: "assertRx",
+                            displayName: "Assert RX",
+                            description: coexRequestAssertRxDescription
+                        },
+                        {
+                            name: "noAssertRx",
+                            displayName: "No Assert RX",
+                            description: coexRequestNoAssertRxDescription
+                        }
+                    ]
+                }
+            ]
         }
     ],
     moduleInstances: moduleInstances

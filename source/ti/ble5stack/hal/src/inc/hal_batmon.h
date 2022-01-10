@@ -5,7 +5,7 @@
  @brief This file contains the declarations for the HAL BATMON subsytstem.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

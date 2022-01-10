@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,22 +68,22 @@
 #define SCRATCH_KEY_OFFSET 512
 #define SCRATCH_KEY_SIZE 96
 
-#define SCRATCH_PRIVATE_KEY ((uint8_t *)(PKA_RAM_BASE               \
+#define SCRATCH_PRIVATE_KEY ((uint32_t *)(PKA_RAM_BASE               \
                                          + SCRATCH_KEY_OFFSET))
-#define SCRATCH_PUBLIC_X ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_X ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_KEY_OFFSET          \
                                       + 1 * SCRATCH_KEY_SIZE))
-#define SCRATCH_PUBLIC_Y ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_Y ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_KEY_OFFSET          \
                                       + 2 * SCRATCH_KEY_SIZE))
 
 #define SCRATCH_BUFFER_OFFSET 1024
 #define SCRATCH_BUFFER_SIZE 256
 
-#define SCRATCH_BUFFER_0 ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_BUFFER_0 ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + 0 * SCRATCH_BUFFER_SIZE))
-#define SCRATCH_BUFFER_2 ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_BUFFER_2 ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + 1 * SCRATCH_BUFFER_SIZE))
 
@@ -128,7 +128,7 @@ int_fast16_t ECJPAKECC26X2_generatePublicKeyStart(const CryptoKey *privateKey,
                                    SCRATCH_PRIVATE_KEY,
                                    curve->length);
 
-        PKABigNumCmpStart(SCRATCH_PRIVATE_KEY,
+        PKABigNumCmpStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                           curve->order,
                           curve->length);
 
@@ -140,7 +140,7 @@ int_fast16_t ECJPAKECC26X2_generatePublicKeyStart(const CryptoKey *privateKey,
             return ECJPAKE_STATUS_INVALID_PRIVATE_KEY;
         }
 
-        PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+        PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                             curve->generatorX,
                             curve->generatorY,
                             curve->prime,
@@ -372,9 +372,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.generateZKP->curve->length);
 
-            PKABigNumMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                    object->operation.generateZKP->curve->length,
-                                   SCRATCH_BUFFER_0,
+                                   (uint8_t*)SCRATCH_BUFFER_0,
                                    object->operation.generateZKP->curve->length,
                                    &resultAddress);
 
@@ -382,7 +382,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_GENERATE_ZKP_PRIVATEKEY_X_HASH_RESULT:
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumMultGetResult((uint8_t*)SCRATCH_BUFFER_0,
                                                &scratchBufferSize,
                                                resultAddress);
 
@@ -395,7 +395,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * than the divisor.
              */
             if (object->operation.generateZKP->curve->length > scratchBufferSize) {
-                PKAZeroOutArray(SCRATCH_BUFFER_0 + scratchBufferSize,
+                PKAZeroOutArray((uint8_t*)SCRATCH_BUFFER_0 + scratchBufferSize,
                                 object->operation.generateZKP->curve->length - scratchBufferSize);
             }
 
@@ -404,7 +404,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * the PKA where dividend length < divisor length. Hence, the buffer size
              * always needs to be >= curve->length.
              */
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t*)SCRATCH_BUFFER_0,
                               MAX(scratchBufferSize, object->operation.generateZKP->curve->length),
                               object->operation.generateZKP->curve->order,
                               object->operation.generateZKP->curve->length,
@@ -430,7 +430,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PRIVATE_KEY,
                                        object->operation.generateRoundOneKeys->curve->length);
 
-            PKABigNumAddStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumAddStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                               object->operation.generateZKP->curve->length,
                               object->operation.generateZKP->curve->order,
                               object->operation.generateZKP->curve->length,
@@ -442,7 +442,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
             scratchBufferSize = SCRATCH_BUFFER_0_SIZE;
 
-            pkaResult = PKABigNumAddGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumAddGetResult((uint8_t*)SCRATCH_BUFFER_0,
                                               &scratchBufferSize,
                                               resultAddress);
 
@@ -450,7 +450,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_GENERATE_ZKP_SUBTRACT_RESULTS:
 
-            PKABigNumSubStart(SCRATCH_BUFFER_0,
+            PKABigNumSubStart((uint8_t*)SCRATCH_BUFFER_0,
                               scratchBufferSize,
                               object->operation.generateZKP->r,
                               object->operation.generateZKP->curve->length,
@@ -462,7 +462,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
             scratchBufferSize = SCRATCH_BUFFER_0_SIZE;
 
-            pkaResult = PKABigNumSubGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumSubGetResult((uint8_t*)SCRATCH_BUFFER_0,
                                               &scratchBufferSize,
                                               resultAddress);
 
@@ -475,7 +475,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * than the divisor.
              */
             if (object->operation.generateZKP->curve->length > scratchBufferSize) {
-                PKAZeroOutArray(SCRATCH_BUFFER_0 + scratchBufferSize,
+                PKAZeroOutArray((uint8_t*)SCRATCH_BUFFER_0 + scratchBufferSize,
                                 object->operation.generateZKP->curve->length - scratchBufferSize);
             }
 
@@ -484,7 +484,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * the PKA where dividend length < divisor length. Hence, the buffer size
              * always needs to be >= curve->length.
              */
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t*)SCRATCH_BUFFER_0,
                               MAX(scratchBufferSize, object->operation.generateZKP->curve->length),
                               object->operation.generateZKP->curve->order,
                               object->operation.generateZKP->curve->length,
@@ -520,8 +520,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.verifyZKP->curve->length);
 
-            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart(SCRATCH_PUBLIC_X,
-                                                              SCRATCH_PUBLIC_Y,
+            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart((uint8_t*)SCRATCH_PUBLIC_X,
+                                                              (uint8_t*)SCRATCH_PUBLIC_Y,
                                                               object->operation.verifyZKP->curve->prime,
                                                               object->operation.verifyZKP->curve->a,
                                                               object->operation.verifyZKP->curve->b,
@@ -553,9 +553,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                            object->operation.verifyZKP->curve->length);
 
 
-                PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                    SCRATCH_PUBLIC_X,
-                                    SCRATCH_PUBLIC_Y,
+                PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                    (uint8_t*)SCRATCH_PUBLIC_X,
+                                    (uint8_t*)SCRATCH_PUBLIC_Y,
                                     object->operation.verifyZKP->curve->prime,
                                     object->operation.verifyZKP->curve->a,
                                     object->operation.verifyZKP->curve->b,
@@ -564,7 +564,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
             }
             /* Otherwise, we just use the generator of the curve */
             else {
-                PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+                PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                     object->operation.verifyZKP->curve->generatorX,
                                     object->operation.verifyZKP->curve->generatorY,
                                     object->operation.verifyZKP->curve->prime,
@@ -579,8 +579,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_VERIFY_ZKP_MULT_G_BY_R_RESULT:
 
-            pkaResult = PKAEccMultiplyGetResult(SCRATCH_BUFFER_0,
-                                                SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
+            pkaResult = PKAEccMultiplyGetResult((uint8_t*)SCRATCH_BUFFER_0,
+                                                (uint8_t*)SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
                                                 resultAddress,
                                                 object->operation.verifyZKP->curve->length);
 
@@ -592,7 +592,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PRIVATE_KEY,
                                        object->operation.verifyZKP->curve->length);
 
-            PKABigNumModStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumModStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                               object->operation.verifyZKP->curve->length,
                               object->operation.verifyZKP->curve->order,
                               object->operation.verifyZKP->curve->length,
@@ -602,7 +602,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_VERIFY_ZKP_HASH_MOD_N_RESULT:
 
-            pkaResult = PKABigNumModGetResult(SCRATCH_BUFFER_2,
+            pkaResult = PKABigNumModGetResult((uint8_t*)SCRATCH_BUFFER_2,
                                               object->operation.verifyZKP->curve->length,
                                               resultAddress);
 
@@ -621,9 +621,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.verifyZKP->curve->length);
 
-            PKAEccMultiplyStart(SCRATCH_BUFFER_2,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_BUFFER_2,
+                                (uint8_t*)SCRATCH_PUBLIC_X,
+                                (uint8_t*)SCRATCH_PUBLIC_Y,
                                 object->operation.verifyZKP->curve->prime,
                                 object->operation.verifyZKP->curve->a,
                                 object->operation.verifyZKP->curve->b,
@@ -634,8 +634,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_VERIFY_ZKP_MULT_X_BY_HASH_RESULT:
 
-            pkaResult = PKAEccMultiplyGetResult(SCRATCH_BUFFER_2,
-                                                SCRATCH_BUFFER_2 + object->operation.verifyZKP->curve->length,
+            pkaResult = PKAEccMultiplyGetResult((uint8_t*)SCRATCH_BUFFER_2,
+                                                (uint8_t*)SCRATCH_BUFFER_2 + object->operation.verifyZKP->curve->length,
                                                 resultAddress,
                                                 object->operation.verifyZKP->curve->length);
 
@@ -643,10 +643,10 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_VERIFY_ZKP_ADD_RESULTS:
 
-            PKAEccAddStart(SCRATCH_BUFFER_0,
-                           SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
-                           SCRATCH_BUFFER_2,
-                           SCRATCH_BUFFER_2 + object->operation.verifyZKP->curve->length,
+            PKAEccAddStart((uint8_t*)SCRATCH_BUFFER_0,
+                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
+                           (uint8_t*)SCRATCH_BUFFER_2,
+                           (uint8_t*)SCRATCH_BUFFER_2 + object->operation.verifyZKP->curve->length,
                            object->operation.verifyZKP->curve->prime,
                            object->operation.verifyZKP->curve->a,
                            object->operation.verifyZKP->curve->length,
@@ -656,8 +656,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_VERIFY_ZKP_ADD_RESULTS_RESULT:
 
-            pkaResult = PKAEccAddGetResult(SCRATCH_BUFFER_0,
-                                           SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
+            pkaResult = PKAEccAddGetResult((uint8_t*)SCRATCH_BUFFER_0,
+                                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.verifyZKP->curve->length,
                                            resultAddress,
                                            object->operation.verifyZKP->curve->length);
 
@@ -678,12 +678,12 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
             CryptoUtils_reverseCopyPad(object->operation.verifyZKP->theirPublicV->u.plaintext.keyMaterial
                                            + OCTET_STRING_OFFSET
                                            + object->operation.verifyZKP->curve->length,
-                                       SCRATCH_BUFFER_2
-                                           + object->operation.verifyZKP->curve->length,
+                                       (uint32_t*)((uint8_t*)SCRATCH_BUFFER_2
+                                           + object->operation.verifyZKP->curve->length),
                                        object->operation.verifyZKP->curve->length);
 
-            if (CryptoUtils_buffersMatchWordAligned((uint32_t *)SCRATCH_BUFFER_2,
-                                                    (uint32_t *)SCRATCH_BUFFER_0,
+            if (CryptoUtils_buffersMatchWordAligned(SCRATCH_BUFFER_2,
+                                                    SCRATCH_BUFFER_0,
                                                     2 * object->operation.verifyZKP->curve->length)) {
                 return ECJPAKE_STATUS_SUCCESS;
             }
@@ -708,9 +708,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_BUFFER_0,
                                        object->operation.generateRoundTwoKeys->preSharedSecret->u.plaintext.keyLength);
 
-            PKABigNumMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                    object->operation.generateRoundTwoKeys->curve->length,
-                                   SCRATCH_BUFFER_0,
+                                   (uint8_t*)SCRATCH_BUFFER_0,
                                    object->operation.generateRoundTwoKeys->preSharedSecret->u.plaintext.keyLength,
                                    &resultAddress);
 
@@ -718,7 +718,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_ROUND_TWO_MULT_MYPRIVATEKEY2_BY_PRESHAREDSECRET_RESULT:
 
-            pkaResult = PKABigNumMultGetResult(SCRATCH_BUFFER_0,
+            pkaResult = PKABigNumMultGetResult((uint8_t*)SCRATCH_BUFFER_0,
                                                &scratchBufferSize,
                                                resultAddress);
 
@@ -731,7 +731,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * than the divisor.
              */
             if (object->operation.generateRoundTwoKeys->curve->length > scratchBufferSize) {
-                PKAZeroOutArray(SCRATCH_BUFFER_0 + scratchBufferSize,
+                PKAZeroOutArray((uint8_t*)SCRATCH_BUFFER_0 + scratchBufferSize,
                                 object->operation.generateRoundTwoKeys->curve->length - scratchBufferSize);
             }
 
@@ -740,7 +740,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              * the PKA where dividend length < divisor length. Hence, the buffer size
              * always needs to be >= curve->length.
              */
-            PKABigNumModStart(SCRATCH_BUFFER_0,
+            PKABigNumModStart((uint8_t*)SCRATCH_BUFFER_0,
                               MAX(scratchBufferSize, object->operation.generateRoundTwoKeys->curve->length),
                               object->operation.generateRoundTwoKeys->curve->order,
                               object->operation.generateRoundTwoKeys->curve->length,
@@ -792,13 +792,14 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
             CryptoUtils_reverseCopyPad(object->operation.generateRoundTwoKeys->theirPublicKey1->u.plaintext.keyMaterial
                                            + OCTET_STRING_OFFSET
                                            + object->operation.generateRoundTwoKeys->curve->length,
-                                       SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
+                                       (uint32_t*)((uint8_t*)SCRATCH_BUFFER_0
+                                           + object->operation.generateRoundTwoKeys->curve->length),
                                        object->operation.generateRoundTwoKeys->curve->length);
 
-            PKAEccAddStart(SCRATCH_PUBLIC_X,
-                           SCRATCH_PUBLIC_Y,
-                           SCRATCH_BUFFER_0,
-                           SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
+            PKAEccAddStart((uint8_t*)SCRATCH_PUBLIC_X,
+                           (uint8_t*)SCRATCH_PUBLIC_Y,
+                           (uint8_t*)SCRATCH_BUFFER_0,
+                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
                            object->operation.generateRoundTwoKeys->curve->prime,
                            object->operation.generateRoundTwoKeys->curve->a,
                            object->operation.generateRoundTwoKeys->curve->length,
@@ -808,8 +809,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
 
         case ECJPAKECC26X2_FSM_ROUND_TWO_ADD_MYPUBLICKEY1_TO_THEIRPUBLICKEY1_RESULT:
 
-            pkaResult = PKAEccAddGetResult(SCRATCH_BUFFER_0,
-                                           SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
+            pkaResult = PKAEccAddGetResult((uint8_t*)SCRATCH_BUFFER_0,
+                                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
                                            resultAddress,
                                            object->operation.generateRoundTwoKeys->curve->length);
 
@@ -832,10 +833,10 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.generateRoundTwoKeys->curve->length);
 
-            PKAEccAddStart(SCRATCH_BUFFER_0,
-                           SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
-                           SCRATCH_PUBLIC_X,
-                           SCRATCH_PUBLIC_Y,
+            PKAEccAddStart((uint8_t*)SCRATCH_BUFFER_0,
+                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
+                           (uint8_t*)SCRATCH_PUBLIC_X,
+                           (uint8_t*)SCRATCH_PUBLIC_Y,
                            object->operation.generateRoundTwoKeys->curve->prime,
                            object->operation.generateRoundTwoKeys->curve->a,
                            object->operation.generateRoundTwoKeys->curve->length,
@@ -867,10 +868,10 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.generateRoundTwoKeys->curve->length);
 
-            PKAEccAddStart(SCRATCH_BUFFER_0,
-                           SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
-                           SCRATCH_PUBLIC_X,
-                           SCRATCH_PUBLIC_Y,
+            PKAEccAddStart((uint8_t*)SCRATCH_BUFFER_0,
+                           (uint8_t*)SCRATCH_BUFFER_0 + object->operation.generateRoundTwoKeys->curve->length,
+                           (uint8_t*)SCRATCH_PUBLIC_X,
+                           (uint8_t*)SCRATCH_PUBLIC_Y,
                            object->operation.generateRoundTwoKeys->curve->prime,
                            object->operation.generateRoundTwoKeys->curve->a,
                            object->operation.generateRoundTwoKeys->curve->length,
@@ -910,9 +911,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.generateRoundTwoKeys->curve->length);
 
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                (uint8_t*)SCRATCH_PUBLIC_X,
+                                (uint8_t*)SCRATCH_PUBLIC_Y,
                                 object->operation.generateRoundTwoKeys->curve->prime,
                                 object->operation.generateRoundTwoKeys->curve->a,
                                 object->operation.generateRoundTwoKeys->curve->b,
@@ -957,7 +958,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.generateRoundTwoKeys->curve->length);
 
-            PKABigNumCmpStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumCmpStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                               object->operation.generateRoundTwoKeys->curve->order,
                               object->operation.generateRoundTwoKeys->curve->length);
 
@@ -969,9 +970,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                 return ECJPAKE_STATUS_INVALID_PRIVATE_KEY;
             }
 
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                (uint8_t*)SCRATCH_PUBLIC_X,
+                                (uint8_t*)SCRATCH_PUBLIC_Y,
                                 object->operation.generateRoundTwoKeys->curve->prime,
                                 object->operation.generateRoundTwoKeys->curve->a,
                                 object->operation.generateRoundTwoKeys->curve->b,
@@ -1007,8 +1008,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
              */
             CryptoUtils_reverseCopyPad(object->operation.computeSharedSecret->theirPublicKey2->u.plaintext.keyMaterial
                                            + OCTET_STRING_OFFSET,
-                                         SCRATCH_PUBLIC_X,
-                                         object->operation.computeSharedSecret->curve->length);
+                                       SCRATCH_PUBLIC_X,
+                                       object->operation.computeSharedSecret->curve->length);
 
             CryptoUtils_reverseCopyPad(object->operation.computeSharedSecret->theirPublicKey2->u.plaintext.keyMaterial
                                            + OCTET_STRING_OFFSET
@@ -1016,9 +1017,9 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PUBLIC_Y,
                                        object->operation.computeSharedSecret->curve->length);
 
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                (uint8_t*)SCRATCH_PUBLIC_X,
+                                (uint8_t*)SCRATCH_PUBLIC_Y,
                                 object->operation.computeSharedSecret->curve->prime,
                                 object->operation.computeSharedSecret->curve->a,
                                 object->operation.computeSharedSecret->curve->b,
@@ -1094,8 +1095,8 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
             PKAEccAddStart(object->operation.computeSharedSecret->sharedSecret->u.plaintext.keyMaterial,
                            object->operation.computeSharedSecret->sharedSecret->u.plaintext.keyMaterial
                             + object->operation.computeSharedSecret->curve->length,
-                           SCRATCH_PUBLIC_X,
-                           SCRATCH_PUBLIC_Y,
+                           (uint8_t*)SCRATCH_PUBLIC_X,
+                           (uint8_t*)SCRATCH_PUBLIC_Y,
                            object->operation.computeSharedSecret->curve->prime,
                            object->operation.computeSharedSecret->curve->a,
                            object->operation.computeSharedSecret->curve->length,
@@ -1123,7 +1124,7 @@ static int_fast16_t ECJPAKECC26X2_runFSM(ECJPAKE_Handle handle) {
                                        SCRATCH_PRIVATE_KEY,
                                        object->operation.computeSharedSecret->curve->length);
 
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                 object->operation.computeSharedSecret->sharedSecret->u.plaintext.keyMaterial,
                                 object->operation.computeSharedSecret->sharedSecret->u.plaintext.keyMaterial
                                     + object->operation.computeSharedSecret->curve->length,

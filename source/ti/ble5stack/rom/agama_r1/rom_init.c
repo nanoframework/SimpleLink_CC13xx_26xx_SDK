@@ -6,7 +6,7 @@
         initialization.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -91,8 +91,11 @@
 #include "gap_scanner_internal.h"
 #include "gap_scanner.h"
 #include "gap_initiator.h"
-
+#include "sm_internal.h"
 #include <ti/drivers/rf/RF.h>
+#ifdef SYSCFG
+#include "ti_ble_config.h"
+#endif
 
 /*******************************************************************************
  * EXTERNS
@@ -195,6 +198,7 @@ extern void l2capBuildConnectRsp(void);
 extern void l2capNotifySendSduDoneEvt(void);
 extern void l2capBuildFlowCtrlCredit(void);
 extern void attSendMsg(void);
+extern void attSendMsg_sPatch(void);
 extern void attSendRspMsg(void);
 extern void gattClientHandleConnStatusCB(void);
 extern void gattClientHandleTimerCB(void);
@@ -264,129 +268,6 @@ extern void gattServApp_ProcessReadByGrpTypeReq(void);
 extern void gattServApp_ProcessReadMultiReq(void);
 extern void gattServApp_ProcessReadReq(void);
 extern void gattServApp_ProcessWriteReq(void);
-extern void smProcessHCIBLEEventCode(void);
-extern void smProcessHCIBLEMetaEventCode(void);
-extern void smProcessOSALMsg(void);
-extern void generate_subkey(void);
-extern void leftshift_onebit(void);
-extern void padding(void);
-extern void smAuthReqToUint8(void);
-extern void smEncrypt(void);
-extern void smEncryptLocal(void);
-extern void smGenerateRandBuf(void);
-extern void smStartRspTimer(void);
-extern void smUint8ToAuthReq(void);
-extern void sm_c1new(void);
-extern void sm_CMAC(void);
-extern void sm_f4(void);
-extern void sm_f5(void);
-extern void sm_f6(void);
-extern void sm_g2(void);
-extern void sm_s1(void);
-extern void sm_xor(void);
-extern void xor_128(void);
-extern void smDetermineIOCaps(void);
-extern void smDetermineKeySize(void);
-extern void smEndPairing(void);
-extern void smFreePairingParams(void);
-extern void smF5Wrapper(void);
-extern void smGenerateAddrInput(void);
-extern void smGenerateConfirm(void);
-extern void smGenerateDHKeyCheck(void);
-extern void smGeneratePairingReqRsp(void);
-extern void smGenerateRandMsg(void);
-extern void smGetECCKeys(void);
-extern void smIncrementEccKeyRecycleCount(void);
-extern void smLinkCheck(void);
-extern void smNextPairingState(void);
-extern void smOobSCAuthentication(void);
-extern void smPairingSendEncInfo(void);
-extern void smPairingSendIdentityAddrInfo(void);
-extern void smPairingSendIdentityInfo(void);
-extern void smPairingSendMasterID(void);
-extern void smPairingSendSigningInfo(void);
-extern void smProcessDataMsg(void);
-extern void smProcessEncryptChange(void);
-extern void smProcessPairingReq(void);
-extern void smRegisterResponder(void);
-extern void smSavePairInfo(void);
-extern void smSaveRemotePublicKeys(void);
-extern void smSendDHKeyCheck(void);
-extern void smSendFailAndEnd(void);
-extern void smSendFailureEvt(void);
-extern void smSetPairingReqRsp(void);
-extern void smSendPublicKeys(void);
-extern void smStartEncryption(void);
-extern void smTimedOut(void);
-extern void sm_allocateSCParameters(void);
-extern void sm_computeDHKey(void);
-extern void sm_c1(void);
-extern void smpProcessIncoming(void);
-extern void smFinishPublicKeyExchange(void);
-extern void smResponderAuthStageTwo(void);
-extern void smpResponderProcessEncryptionInformation(void);
-extern void smpResponderProcessIdentityAddrInfo(void);
-extern void smpResponderProcessIdentityInfo(void);
-extern void smpResponderProcessMasterID(void);
-extern void smpResponderProcessPairingConfirm(void);
-extern void smpResponderProcessPairingDHKeyCheck(void);
-extern void smpResponderProcessPairingPublicKey(void);
-extern void smpResponderProcessPairingRandom(void);
-extern void smpResponderProcessPairingReq(void);
-extern void smpResponderProcessPairingReq_sPatch(void);
-extern void smpResponderProcessSigningInfo(void);
-extern void smpBuildEncInfo(void);
-extern void smpBuildIdentityAddrInfo(void);
-extern void smpBuildIdentityInfo(void);
-extern void smpBuildMasterID(void);
-extern void smpBuildPairingConfirm(void);
-extern void smpBuildPairingDHKeyCheck(void);
-extern void smpBuildPairingFailed(void);
-extern void smpBuildPairingPublicKey(void);
-extern void smpBuildPairingRandom(void);
-extern void smpBuildPairingReq(void);
-extern void smpBuildPairingReqRsp(void);
-extern void smpBuildPairingRsp(void);
-extern void smpBuildSecurityReq(void);
-extern void smpBuildSigningInfo(void);
-extern void smpParseEncInfo(void);
-extern void smpParseIdentityAddrInfo(void);
-extern void smpParseIdentityInfo(void);
-extern void smpParseKeypressNoti(void);
-extern void smpParseMasterID(void);
-extern void smpParsePairingConfirm(void);
-extern void smpParsePairingDHKeyCheck(void);
-extern void smpParsePairingFailed(void);
-extern void smpParsePairingPublicKey(void);
-extern void smStopRspTimer(void);
-extern void smpParsePairingRandom(void);
-extern void smpParsePairingReq(void);
-extern void smpParseSecurityReq(void);
-extern void smpParseSigningInfo(void);
-extern void smSendSMMsg(void);
-extern void smpInitiatorProcessPairingRsp(void);
-extern void smpInitiatorProcessPairingRsp_sPatch(void);
-extern void smpInitiatorProcessPairingPubKey(void);
-extern void smpInitiatorProcessPairingPubKey_sPatch(void);
-extern void smpInitiatorProcessPairingDHKeyCheck(void);
-extern void smpInitiatorProcessPairingConfirm(void);
-extern void smpInitiatorProcessPairingRandom(void);
-extern void smpInitiatorProcessEncryptionInformation(void);
-extern void smpInitiatorProcessMasterID(void);
-extern void smpInitiatorProcessIdentityInfo(void);
-extern void smpInitiatorProcessIdentityAddrInfo(void);
-extern void smpInitiatorProcessSigningInfo(void);
-extern void smInitiatorAuthStageTwo(void);
-extern void setupInitiatorKeys(void);
-extern void smInitiatorSendNextKeyInfo(void);
-extern void smpResponderProcessIncoming(void);
-extern void smpResponderProcessIncoming_sPatch(void);
-extern void smResponderSendNextKeyInfo(void);
-extern void smpResponderSendPairRspEvent(void);
-extern void smResponderProcessLTKReq(void);
-extern void smRegisterInitiator(void);
-extern void smEncLTK(void);
-extern void smpInitiatorProcessIncoming(void);
 extern void gapScan_filterDiscMode(void);
 extern void gapScan_discardAdvRptSession(void);
 extern void gapScan_sendSessionEndEvt(void);
@@ -444,6 +325,12 @@ typedef void (*RT_Init_fp)(void);
 #include "ll_timer_drift.h"
 #include "ll_rat.h"
 #include "ll_privacy.h"
+
+#if defined (MAX_NUM_BLE_CONNS)
+  #if (MAX_NUM_BLE_CONNS == 1)
+    #define ONE_CONN
+  #endif
+#endif
 
 // ROM Flash Jump Table
 #if defined ( FLASH_ROM_BUILD )
@@ -571,7 +458,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)LE_RemoveAdvSet,                                   // ROM_JT_OFFSET[98]
 #if ( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
   (uint32)LE_SetExtAdvData_hook,                             // ROM_JT_OFFSET[99]
-  (uint32)LE_SetExtAdvEnable,                                // ROM_JT_OFFSET[100]
+  (uint32)LE_SetExtAdvEnable_hook,                           // ROM_JT_OFFSET[100]
   (uint32)LE_SetExtAdvParams,                                // ROM_JT_OFFSET[101]
 #else // !( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
   (uint32)ROM_Spinlock,
@@ -863,7 +750,7 @@ const uint32 ROM_Flash_JT[] =
 #endif // SCAN_CFG
   (uint32)llFindNextAdvSet,                                  // ROM_JT_OFFSET[318]
   (uint32)llFindNextSecTask,                                 // ROM_JT_OFFSET[319]
-  (uint32)llFindStartType,                                   // ROM_JT_OFFSET[320]
+  (uint32)llFindStartType_hook,                              // ROM_JT_OFFSET[320]
   (uint32)llFragmentPDU,                                     // ROM_JT_OFFSET[321]
   (uint32)llFreeTask,                                        // ROM_JT_OFFSET[322]
   (uint32)llGenerateCRC,                                     // ROM_JT_OFFSET[323]
@@ -871,7 +758,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)llGetCurrentTask,                                  // ROM_JT_OFFSET[325]
   (uint32)llGetExtHdrLen,                                    // ROM_JT_OFFSET[326]
 #if (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
-  (uint32)llGetNextConn,                                     // ROM_JT_OFFSET[327]
+  (uint32)llGetNextConn_hook,                                // ROM_JT_OFFSET[327]
 #else // !(ADV_CONN_CFG | INIT_CFG)
   (uint32)ROM_Spinlock,
 #endif // (ADV_CONN_CFG | INIT_CFG)
@@ -912,7 +799,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)llMemCopySrc,                                      // ROM_JT_OFFSET[346]
   (uint32)llMoveTempTxDataEntries,                           // ROM_JT_OFFSET[347]
 #if ( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
-  (uint32)llNextChanIndex,                                   // ROM_JT_OFFSET[348]
+  (uint32)llNextChanIndex_hook,                              // ROM_JT_OFFSET[348]
 #else // !( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
   (uint32)ROM_Spinlock,
 #endif // ( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
@@ -957,7 +844,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)llSetupEncReq,                                     // ROM_JT_OFFSET[375]
   (uint32)llSetupEncRsp,                                     // ROM_JT_OFFSET[376]
 #if ( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
-  (uint32)llSetupExtAdv,                                     // ROM_JT_OFFSET[377]
+  (uint32)llSetupExtAdv_hook,                                // ROM_JT_OFFSET[377]
   (uint32)llSetupExtAdvLegacy,                               // ROM_JT_OFFSET[378]
 #else // !( CTRL_CONFIG & (ADV_NCONN_CFG | ADV_CONN_CFG) )
   (uint32)ROM_Spinlock,
@@ -1161,7 +1048,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)ATT_UpdateMTU,                                     // ROM_JT_OFFSET[557]
   (uint32)ATT_WriteReq,                                      // ROM_JT_OFFSET[558]
   (uint32)ATT_WriteRsp,                                      // ROM_JT_OFFSET[559]
-  (uint32)attSendMsg,                                        // ROM_JT_OFFSET[560]
+  (uint32)attSendMsg_sPatch,                                 // ROM_JT_OFFSET[560]
   (uint32)attSendRspMsg,                                     // ROM_JT_OFFSET[561]
   (uint32)GATT_AppCompletedMsg,                              // ROM_JT_OFFSET[562]
   (uint32)GATT_bm_alloc,                                     // ROM_JT_OFFSET[563]
@@ -1327,7 +1214,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)gapSendLinkUpdateEvent,                            // ROM_JT_OFFSET[696]
   (uint32)gapSendPairingReqEvent,                            // ROM_JT_OFFSET[697]
   (uint32)gapSendSignUpdateEvent,                            // ROM_JT_OFFSET[698]
-  (uint32)gapSendSlaveSecurityReqEvent,                      // ROM_JT_OFFSET[699]
+  (uint32)gapSendSlaveSecurityReqEvent_hook,                 // ROM_JT_OFFSET[699]
   (uint32)gapUpdateConnSignCounter,                          // ROM_JT_OFFSET[700]
   (uint32)sendAuthEvent,                                     // ROM_JT_OFFSET[701]
   (uint32)sendEstLinkEvent,                                  // ROM_JT_OFFSET[702]
@@ -1345,13 +1232,13 @@ const uint32 ROM_Flash_JT[] =
   (uint32)gapPeriProcessSignalEvt,                           // ROM_JT_OFFSET[714]
   (uint32)gapPeriProcessConnEvt,                             // ROM_JT_OFFSET[715]
 #if ( ( HOST_CONFIG & CENTRAL_CFG ) || ( HOST_CONFIG & PERIPHERAL_CFG) )
-  (uint32)SM_dhKeyCB,                                        // ROM_JT_OFFSET[716]
+  (uint32)SM_dhKeyCB_hook,                                   // ROM_JT_OFFSET[716]
 #else //
   (uint32)ROM_Spinlock,
 #endif
   (uint32)SM_GenerateAuthenSig,                              // ROM_JT_OFFSET[717]
 #if ( ( HOST_CONFIG & CENTRAL_CFG ) || ( HOST_CONFIG & PERIPHERAL_CFG) )
-  (uint32)SM_p256KeyCB,                                      // ROM_JT_OFFSET[718]
+  (uint32)SM_p256KeyCB_hook,                                 // ROM_JT_OFFSET[718]
 #else //
   (uint32)ROM_Spinlock,
 #endif
@@ -1387,10 +1274,10 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smEndPairing,                                      // ROM_JT_OFFSET[748]
   (uint32)smFreePairingParams,                               // ROM_JT_OFFSET[749]
   (uint32)smF5Wrapper,                                       // ROM_JT_OFFSET[750]
-  (uint32)smGenerateAddrInput,                               // ROM_JT_OFFSET[751]
+  (uint32)smGenerateAddrInput_sPatch,                        // ROM_JT_OFFSET[751]
   (uint32)smGenerateConfirm,                                 // ROM_JT_OFFSET[752]
   (uint32)smGenerateDHKeyCheck,                              // ROM_JT_OFFSET[753]
-  (uint32)smGeneratePairingReqRsp,                           // ROM_JT_OFFSET[754]
+  (uint32)smGeneratePairingReqRsp_hook,                      // ROM_JT_OFFSET[754]
   (uint32)smGenerateRandMsg,                                 // ROM_JT_OFFSET[755]
   (uint32)smGetECCKeys,                                      // ROM_JT_OFFSET[756]
   (uint32)smIncrementEccKeyRecycleCount,                     // ROM_JT_OFFSET[757]
@@ -1427,7 +1314,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smpResponderProcessMasterID,                       // ROM_JT_OFFSET[788]
   (uint32)smpResponderProcessPairingConfirm,                 // ROM_JT_OFFSET[789]
   (uint32)smpResponderProcessPairingDHKeyCheck,              // ROM_JT_OFFSET[790]
-  (uint32)smpResponderProcessPairingPublicKey,               // ROM_JT_OFFSET[791]
+  (uint32)smpResponderProcessPairingPublicKey_hook,          // ROM_JT_OFFSET[791]
   (uint32)smpResponderProcessPairingRandom,                  // ROM_JT_OFFSET[792]
   (uint32)smpResponderProcessPairingReq_sPatch,              // ROM_JT_OFFSET[793]
   (uint32)smpResponderProcessSigningInfo,                    // ROM_JT_OFFSET[794]
@@ -1465,7 +1352,7 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smpInitiatorProcessPairingDHKeyCheck,              // ROM_JT_OFFSET[826]
   (uint32)smpInitiatorProcessPairingConfirm,                 // ROM_JT_OFFSET[827]
 #if ( HOST_CONFIG & CENTRAL_CFG )
-  (uint32)smpInitiatorProcessPairingRandom,                  // ROM_JT_OFFSET[828]
+  (uint32)smpInitiatorProcessPairingRandom_hook,             // ROM_JT_OFFSET[828]
 #else //
   (uint32)ROM_Spinlock,
 #endif
@@ -1477,11 +1364,11 @@ const uint32 ROM_Flash_JT[] =
   (uint32)smInitiatorAuthStageTwo,                           // ROM_JT_OFFSET[834]
   (uint32)setupInitiatorKeys,                                // ROM_JT_OFFSET[835]
   (uint32)smInitiatorSendNextKeyInfo,                        // ROM_JT_OFFSET[836]
-  (uint32)smpResponderProcessIncoming_sPatch,                // ROM_JT_OFFSET[837]
+  (uint32)smpResponderProcessIncoming_hook,                  // ROM_JT_OFFSET[837]
   (uint32)smResponderSendNextKeyInfo,                        // ROM_JT_OFFSET[838]
   (uint32)smpResponderSendPairRspEvent,                      // ROM_JT_OFFSET[839]
 #if ( HOST_CONFIG & PERIPHERAL_CFG )
-  (uint32)smResponderProcessLTKReq,                          // ROM_JT_OFFSET[840]
+  (uint32)smResponderProcessLTKReq_hook,                     // ROM_JT_OFFSET[840]
 #else //
   (uint32)ROM_Spinlock,
 #endif
@@ -1983,7 +1870,6 @@ void ROM_Spinlock( void )
   while(i);
 }
 
-
 /*******************************************************************************
  * @fn          BLE ROM Initialization
  *
@@ -2260,7 +2146,7 @@ void MAP_llSetRfReportAodPackets( void )
 
 uint8 MAP_llGetCteInfo( uint8 id, void *ptr )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return llGetCteInfo(id, ptr);
 #else
   return 1;
@@ -2269,7 +2155,7 @@ uint8 MAP_llGetCteInfo( uint8 id, void *ptr )
 
 uint8 MAP_RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *pEvtData)
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return RTLSSrv_processHciEvent(hciEvt, hciEvtSz, pEvtData);
 #else
   return 1; //safeToDealloc
@@ -2279,7 +2165,7 @@ uint8 MAP_RTLSSrv_processHciEvent(uint16_t hciEvt, uint16_t hciEvtSz, uint8_t *p
 uint8 MAP_LL_SetConnectionCteReceiveParams( uint16 connHandle, uint8 samplingEnable,
                                             uint8 slotDurations, uint8 length, uint8 *pAntenna )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_SetConnectionCteReceiveParams( connHandle, samplingEnable, slotDurations, length, pAntenna );
 #else
   return 1;
@@ -2289,7 +2175,7 @@ uint8 MAP_LL_SetConnectionCteReceiveParams( uint16 connHandle, uint8 samplingEna
 uint8 MAP_LL_SetConnectionCteTransmitParams( uint16 connHandle, uint8  types,
                                              uint8 length, uint8 *pAntenna )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_SetConnectionCteTransmitParams( connHandle, types, length, pAntenna );
 #else
   return 1;
@@ -2299,7 +2185,7 @@ uint8 MAP_LL_SetConnectionCteTransmitParams( uint16 connHandle, uint8  types,
 uint8 MAP_LL_SetConnectionCteRequestEnable( uint16 connHandle, uint8 enable,
                                              uint16 interval, uint8 length, uint8 type )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_SetConnectionCteRequestEnable( connHandle, enable, interval, length, type );
 #else
   return 1;
@@ -2308,7 +2194,7 @@ uint8 MAP_LL_SetConnectionCteRequestEnable( uint16 connHandle, uint8 enable,
 
 uint8 MAP_LL_SetConnectionCteResponseEnable( uint16 connHandle, uint8 enable )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_SetConnectionCteResponseEnable( connHandle, enable );
 #else
   return 1;
@@ -2318,7 +2204,7 @@ uint8 MAP_LL_SetConnectionCteResponseEnable( uint16 connHandle, uint8 enable )
 uint8 MAP_LL_ReadAntennaInformation( uint8 *sampleRates, uint8 *maxNumOfAntennas,
                                      uint8 *maxSwitchPatternLen, uint8 *maxCteLen)
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_ReadAntennaInformation( sampleRates, maxNumOfAntennas, maxSwitchPatternLen, maxCteLen );
 #else
   return 1;
@@ -2327,14 +2213,14 @@ uint8 MAP_LL_ReadAntennaInformation( uint8 *sampleRates, uint8 *maxNumOfAntennas
 
 void MAP_llUpdateCteState( void *connPtr )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   llUpdateCteState(connPtr);
 #endif
 }
 
 uint8 MAP_llSetupCte( void *connPtr, uint8 req)
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return llSetupCte( connPtr, req );
 #else
   return 0;
@@ -2343,7 +2229,7 @@ uint8 MAP_llSetupCte( void *connPtr, uint8 req)
 
 uint8 MAP_llFreeCteSamplesEntryQueue( void )
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return llFreeCteSamplesEntryQueue();
 #else
   return 0;
@@ -2353,11 +2239,18 @@ uint8 MAP_llFreeCteSamplesEntryQueue( void )
 uint8 MAP_LL_EXT_SetLocationingAccuracy( uint16 handle, uint8  sampleRate1M, uint8  sampleSize1M,
                                          uint8  sampleRate2M, uint8  sampleSize2M, uint8  sampleCtrl)
 {
-#ifdef USE_RTLS
+#ifdef RTLS_CTE
   return LL_EXT_SetLocationingAccuracy( handle, sampleRate1M, sampleSize1M,
                                         sampleRate2M, sampleSize2M, sampleCtrl);
 #else
   return 1;
+#endif
+}
+
+void MAP_HCI_CteRequestFailedEvent( uint8  status, uint16 connHandle)
+{
+#ifdef RTLS_CTE
+  HCI_CteRequestFailedEvent(status,connHandle);
 #endif
 }
 /*******************************************************************************
@@ -2368,21 +2261,26 @@ extern void  rf_patch_cpe_multi_protocol();
 extern void  rf_patch_cpe_multi_protocol_rtls();
 extern void  rf_patch_cpe_multi_bt5_coex(void);
 extern void  rf_patch_rfe_ble_coex(void);
+extern void  rf_patch_mce_bt5(void);
 
 void MAP_rf_patch_cpe( void )
 {
-#if (defined USE_RTLS || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
-  rf_patch_cpe_multi_protocol_rtls();
-#else
-  #ifdef USE_DMM
-    rf_patch_cpe_multi_protocol();
+#if !defined(DeviceFamily_CC26X1)
+  #if (defined RTLS_CTE || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
+    rf_patch_cpe_multi_protocol_rtls();
   #else
-    #ifdef USE_COEX
-      rf_patch_cpe_multi_bt5_coex();
+    #ifdef USE_DMM
+      rf_patch_cpe_multi_protocol();
     #else
-      rf_patch_cpe_bt5();
+      #ifdef USE_COEX
+        rf_patch_cpe_multi_bt5_coex();
+      #else
+          rf_patch_cpe_bt5();
+      #endif
     #endif
   #endif
+#else
+  rf_patch_cpe_multi_protocol();
 #endif
 }
 
@@ -2390,6 +2288,13 @@ void MAP_rf_patch_rfe( void )
 {
 #ifdef USE_COEX
   rf_patch_rfe_ble_coex();
+#endif
+}
+
+void MAP_rf_patch_mce( void )
+{
+#if (defined(DeviceFamily_CC26X1) || defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7)) && !defined(RTLS_CTE)
+  rf_patch_mce_bt5();
 #endif
 }
 
@@ -2402,7 +2307,10 @@ extern uint8  llDmmSetAdvHandle(uint8 handle, uint8 clear);
 extern void   llDmmDynamicFree(void);
 extern uint8  llDmmDynamicAlloc(void);
 extern uint32_t LL_AbortedCback( uint8 preempted );
+extern uint32_t LL_AbortedCback_all( uint8 preempted );
 extern uint32_t LL_AbortedCback_peripheral( uint8 preempted );
+extern uint32_t LL_AbortedCback_broadcaster( uint8 preempted );
+extern uint32_t LL_AbortedCback_central( uint8 preempted );
 
 void MAP_llDmmSetThreshold( uint8 state, uint8 handle, uint8 reset )
 {
@@ -2447,22 +2355,48 @@ uint8 MAP_llDmmDynamicAlloc( void )
 
 uint32_t MAP_LL_AbortedCback( uint8 preempted )
 {
-#ifdef USE_DMM
-  // Just for now - DMM use only peripheral role
-  // ToDo - Should be expand to other roles by using CTRL_CONFIG, see rfCallback_hook above
-  return LL_AbortedCback_peripheral(preempted);
+#if ( CTRL_CONFIG == ADV_NCONN_CFG )
+  return (LL_AbortedCback_broadcaster(preempted));
+#elif ( CTRL_CONFIG == (ADV_NCONN_CFG | ADV_CONN_CFG) )
+  return (LL_AbortedCback_peripheral(preempted));
+#elif ( CTRL_CONFIG == (SCAN_CFG | INIT_CFG) )
+  return (LL_AbortedCback_central(preempted));
 #else
-  return LL_AbortedCback(preempted);
+  return (LL_AbortedCback_all(preempted));
 #endif
 }
 
 uint8 MAP_llSetStarvationMode(uint16 connId, uint8 setOnOffValue)
 {
-//#ifdef USE_DMM
+#if defined ( USE_DMM ) || defined ( NO_QOS )
   return LL_INACTIVE_CONNECTIONS;
-//#else
-//  return llSetStarvationMode(connId, setOnOffValue);
-//#endif
+#else
+  return llSetStarvationMode(connId, setOnOffValue);
+#endif
+}
+
+void MAP_llMaster_TaskEnd(void)
+{
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
+  llMaster_TaskEnd();
+#endif
+  return;
+}
+
+void MAP_llSlave_TaskEnd(void)
+{
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & ADV_CONN_CFG)
+  llSlave_TaskEnd();
+#endif
+  return;
+}
+
+void MAP_llInitFeatureSet( void )
+{
+  llInitFeatureSet();
+#ifdef EXCLUDE_AE
+  MAP_llRemoveFromFeatureSet(LL_FEATURE_EXTENDED_ADVERTISING);
+#endif
 }
 
 /*******************************************************************************
@@ -2519,7 +2453,7 @@ uint8 MAP_LE_SetPeriodicAdvEnable( uint8 enable,uint8 advHandle )
 uint8 MAP_LE_SetConnectionlessCteTransmitParams( uint8 advHandle, uint8 cteLen, uint8 cteType,
                                                  uint8 cteCount, uint8 length, uint8 *pAntenna )
 {
-#if defined ( USE_PERIODIC_ADV ) && defined ( USE_RTLS )
+#if defined ( USE_PERIODIC_ADV ) && defined ( RTLS_CTE )
   return LE_SetConnectionlessCteTransmitParams( advHandle, cteLen, cteType, cteCount, length, pAntenna );
 #else
   return 1;
@@ -2528,7 +2462,7 @@ uint8 MAP_LE_SetConnectionlessCteTransmitParams( uint8 advHandle, uint8 cteLen, 
 
 uint8 MAP_LE_SetConnectionlessCteTransmitEnable( uint8 advHandle, uint8 enable )
 {
-#if defined ( USE_PERIODIC_ADV ) && defined ( USE_RTLS )
+#if defined ( USE_PERIODIC_ADV ) && defined ( RTLS_CTE )
   return LE_SetConnectionlessCteTransmitEnable( advHandle, enable);
 #else
   return 1;
@@ -2615,12 +2549,10 @@ void *MAP_llGetCurrentPeriodicAdv( void )
 #endif
 }
 
-uint8 MAP_gapAdv_periodicAdvCmdCompleteCBs( void *pMsg )
+void MAP_llPeriodicAdv_Config( void *pAdvSet )
 {
 #ifdef USE_PERIODIC_ADV
-  return gapAdv_periodicAdvCmdCompleteCBs(pMsg);
-#else
-  return TRUE;
+  llPeriodicAdv_Config( pAdvSet );
 #endif
 }
 
@@ -2628,6 +2560,15 @@ void MAP_llClearPeriodicAdvSets( void )
 {
 #ifdef USE_PERIODIC_ADV
   llClearPeriodicAdvSets();
+#endif
+}
+
+uint8 MAP_gapAdv_periodicAdvCmdCompleteCBs( void *pMsg )
+{
+#ifdef USE_PERIODIC_ADV
+  return gapAdv_periodicAdvCmdCompleteCBs(pMsg);
+#else
+  return TRUE;
 #endif
 }
 
@@ -2716,7 +2657,7 @@ uint8 MAP_LE_SetConnectionlessIqSamplingEnable( uint16 syncHandle, uint8 samplin
                                                 uint8 slotDurations, uint8 maxSampledCtes,
                                                 uint8 length, uint8 *pAntenna )
 {
-#if defined ( USE_PERIODIC_SCAN ) && defined ( USE_RTLS )
+#if defined ( USE_PERIODIC_SCAN ) && defined ( RTLS_CTE )
   return LE_SetConnectionlessIqSamplingEnable( syncHandle, samplingEnable, slotDurations, maxSampledCtes, length, pAntenna );
 #else
   return 1;
@@ -2765,6 +2706,22 @@ void *MAP_llFindNextPeriodicScan( void )
 {
 #ifdef USE_PERIODIC_SCAN
   return llFindNextPeriodicScan();
+#else
+  return NULL;
+#endif
+}
+
+void MAP_llTerminatePeriodicScan( void )
+{
+#ifdef USE_PERIODIC_SCAN
+  llTerminatePeriodicScan();
+#endif
+}
+
+void *MAP_llGetPeriodicScan( uint16 handle )
+{
+#ifdef USE_PERIODIC_SCAN
+  return llGetPeriodicScan(handle);
 #else
   return NULL;
 #endif
@@ -2867,6 +2824,15 @@ uint8_t LE_SetExtScanRspData_hook( void * pMsg)
 #endif
 }
 
+uint8_t LE_SetExtAdvEnable_hook( void * pMsg)
+{
+#ifdef BLE3_CMD
+  return HCI_LE_SetAdvStatus(pMsg);
+#else
+  return LE_SetExtAdvEnable(pMsg);
+#endif
+}
+
 uint8 MAP_gapAdv_handleAdvHciCmdComplete( void *pMsg )
 {
 #ifdef BLE3_CMD
@@ -2876,6 +2842,151 @@ uint8 MAP_gapAdv_handleAdvHciCmdComplete( void *pMsg )
 #endif
 }
 
+/*******************************************************************************
+ * Single Connection
+ */
+extern uint8 llGetSingleConn( void );
+extern uint32 llCalcSingleConnMaxTimeLength(uint16 startConnId, uint16 bestSelectedConnIdAfterStart);
+extern uint32 llCalcConnMaxTimeLength(uint16 startConnId, uint16 bestSelectedConnIdAfterStart);
 
+uint8 llGetNextConn_hook( void )
+{
+#if defined ONE_CONN
+  return llGetSingleConn();
+#else
+  return llGetNextConn();
+#endif
+}
+
+uint32 MAP_llCalcConnMaxTimeLength(uint16 startConnId, uint16 bestSelectedConnIdAfterStart)
+{
+#if defined ONE_CONN
+  return llCalcSingleConnMaxTimeLength(startConnId, bestSelectedConnIdAfterStart);
+#else
+  return llCalcConnMaxTimeLength(startConnId, bestSelectedConnIdAfterStart);
+#endif
+}
+
+uint8 llFindStartType_hook( void *secTask, void *primTask )
+{
+#if defined NO_QOS
+  return llFindStartTypeNoQos( secTask, primTask );
+#else
+  return llFindStartType( secTask, primTask );
+#endif
+}
+
+/******************************************************************************
+* Legacy Adv Only
+*/
+extern void llUpdateExtAdvTx( advSet_t *pAdvSet );
+extern void llPrepareNextExtAdv( advSet_t *pAdvSet );
+
+uint8 llSetupExtAdv_hook( void *pAdvSet )
+{
+#ifndef EXCLUDE_AE
+  return llSetupExtAdv( pAdvSet );
+#else
+  return LL_STATUS_ERROR_FEATURE_NOT_SUPPORTED;
+#endif
+}
+
+uint8 llNextChanIndex_hook( uint16 eventCounter )
+{
+#ifndef EXCLUDE_AE
+  return llNextChanIndex( eventCounter );
+#else
+  return 0xFF;
+#endif
+}
+
+void MAP_llUpdateExtAdvTx( void *pAdvSet )
+{
+#ifndef EXCLUDE_AE
+  llUpdateExtAdvTx( pAdvSet );
+#endif
+}
+
+void MAP_llPrepareNextExtAdv( void *pAdvSet )
+{
+#ifndef EXCLUDE_AE
+  llPrepareNextExtAdv( pAdvSet );
+#endif
+}
+
+/*******************************************************************************
+ * Secure Manager hooks
+ */
+extern uint8 smpResponderProcessIncoming_hook( linkDBItem_t *pLinkItem, uint8 cmdID, smpMsgs_t *pParsedMsg );
+
+void SM_dhKeyCB_hook( void *pDhKey )
+{
+#ifndef EXCLUDE_SM
+  SM_dhKeyCB( pDhKey );
+#endif
+}
+
+void SM_p256KeyCB_hook( void *pK, uint8 *privateKey )
+{
+#ifndef EXCLUDE_SM
+  SM_p256KeyCB( pK, privateKey );
+#endif
+}
+
+uint8 smpInitiatorProcessPairingRandom_hook( void *pParsedMsg, uint16_t connHandle)
+{
+#ifndef EXCLUDE_SM
+  return smpInitiatorProcessPairingRandom( pParsedMsg, connHandle);
+#else
+  return SMP_PAIRING_FAILED_CMD_NOT_SUPPORTED;
+#endif
+}
+
+uint8 smpResponderProcessPairingPublicKey_hook( void *pParsedMsg )
+{
+#ifndef EXCLUDE_SM
+  return smpResponderProcessPairingPublicKey( pParsedMsg );
+#else
+  return SMP_PAIRING_FAILED_CMD_NOT_SUPPORTED;
+#endif
+}
+
+uint8 smResponderProcessLTKReq_hook( uint16 connectionHandle, uint8 *pRandom, uint16 encDiv )
+{
+#ifndef EXCLUDE_SM
+  return smResponderProcessLTKReq( connectionHandle, pRandom, encDiv );
+#else
+  return TRUE;
+#endif
+}
+
+uint8 smpResponderProcessIncoming_hook( linkDBItem_t *pLinkItem, uint8 cmdID, smpMsgs_t *pParsedMsg )
+{
+#ifndef EXCLUDE_SM
+  return smpResponderProcessIncoming_sPatch( pLinkItem, cmdID, pParsedMsg );
+#else
+  // This will cause the responder to send pairing fail response
+  return SMP_PAIRING_FAILED_NOT_SUPPORTED;
+#endif
+}
+
+uint8 smGeneratePairingReqRsp_hook( void )
+{
+#ifndef EXCLUDE_SM
+  return smGeneratePairingReqRsp();
+#else
+  return bleIncorrectMode;
+#endif
+}
+
+void gapSendSlaveSecurityReqEvent_hook( uint8 taskID, uint16 connHandle, uint8 *pDevAddr, uint8 authReq )
+{
+#ifndef EXCLUDE_SM
+  gapSendSlaveSecurityReqEvent(taskID, connHandle, pDevAddr, authReq);
+#else
+  // The initiator shall respnd with pairing failed command
+  MAP_GAP_TerminateAuth(connHandle, SMP_PAIRING_FAILED_NOT_SUPPORTED);
+#endif
+}
 /*******************************************************************************
  */

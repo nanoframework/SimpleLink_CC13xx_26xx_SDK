@@ -113,10 +113,6 @@ function freqBandOnChange(inst, ui) {
         ui.txPower2400.hidden = !prop24;
     }
 
-    if (highPaSupport) {
-        ui.highPA.hidden = prop24 || !c169hidden;
-    }
-
     // Get the PHY type for the current frequency band
     const phyType = Common.getPhyType(inst);
 
@@ -345,18 +341,24 @@ function onPermissionChange(inst, ui) {
  * @param ui - RF Setting UI instance
  */
 function updateVisibility(inst, ui) {
-    const phyType = Common.getPhyType(inst);
-    const isIeee154 = _.includes(phyType, "154g");
+    const phyName = Common.getPhyType(inst);
+    const cmdHandler = CmdHandler.get(PHY_GROUP, phyName);
+    const is154g = cmdHandler.is154g();
 
     // Read Only if IEEE 802.15.4
-    ui.syncWord.readOnly = isIeee154;
-    ui.syncWordLength.readOnly = isIeee154;
-    ui.preambleMode.readOnly = isIeee154;
+    ui.syncWord.readOnly = is154g;
+    ui.syncWordLength.readOnly = is154g;
+    ui.preambleMode.readOnly = is154g;
 
     // Hide if IEEE 802.15.4
-    ui.packetLengthConfig.hidden = isIeee154;
-    ui.packetLengthRx.hidden = isIeee154;
-    ui.fixedPacketLength.hidden = isIeee154 || inst.packetLengthConfig === "Variable";
+    ui.packetLengthConfig.hidden = is154g;
+    if (inst.parent === "Stack") {
+        ui.addressMode.hidden = true;
+    }
+    else {
+        ui.addressMode.hidden = is154g;
+    }
+    ui.fixedPacketLength.hidden = inst.packetLengthConfig === "Variable"; // Tx packet length
 
     // Address filter
     const hidden = inst.addressMode === "No address check";
@@ -417,7 +419,7 @@ function validateFrequency(inst) {
     }
 
     const prop24 = BAND_24G;
-    const highPA = DevInfo.hasHighPaSupport() && !prop24 ? inst.highPA : false;
+    const highPA = highPaSupport && !prop24 ? inst.highPA : false;
     const paSetting = RfDesign.getPaTable(freq, highPA);
 
     // Check if PA table is supported
@@ -462,6 +464,16 @@ function validateSymbolRate(inst) {
 
     if (symbolRate < SYM_RATE_MIN || symbolRate > SYM_RATE_MAX) {
         status.msg = "Valid range: " + SYM_RATE_MIN + " to " + SYM_RATE_MAX + " kBaud";
+        return status;
+    }
+
+    // Workaround for validation issues ( Wi-SUN #5, and sub-1GHz ZigBee 500 kbps)
+    const deviceNeedsWorkAround = Common.isDeviceClass7() || Common.isDeviceClass3();
+    const phyType = inst.phyType868;
+    const phyNeedsWorkaround = phyType === "2gfsk300kbps75dev915wsun5" || phyType === "2gfsk500kbps154g";
+
+    if (deviceNeedsWorkAround && phyNeedsWorkaround) {
+        status.valid = true;
         return status;
     }
 
@@ -532,7 +544,7 @@ function validate(inst, validation) {
     const freq433 = freq < Common.FreqHigher433 && !freq169;
 
     const prop24 = BAND_24G;
-    const highPA = DevInfo.hasHighPaSupport() && !prop24 ? inst.highPA : false;
+    const highPA = highPaSupport && !prop24 ? inst.highPA : false;
     const paSetting = RfDesign.getPaTable(freq, highPA);
 
     if (paSetting !== null) {

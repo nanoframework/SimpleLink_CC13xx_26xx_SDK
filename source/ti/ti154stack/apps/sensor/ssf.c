@@ -5,7 +5,7 @@
  @brief Sensor Specific Functions
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -481,11 +481,13 @@ void Ssf_init(void *sem)
 #endif /* FEATURE_SECURE_COMMISSIONING */
 
     /* Initialize Keys */
+    Button_init();
     Button_Params bparams;
     Button_Params_init(&bparams);
-    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, processKeyChangeCallback, &bparams);
+    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
+    Button_setCallback(gLeftButtonHandle, processKeyChangeCallback);
     // Open Right button without appCallBack
-    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, NULL, &bparams);
+    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
     // Read button state
     if (!GPIO_read(((Button_HWAttrs*)gRightButtonHandle->hwAttrs)->gpioIndex))
@@ -498,6 +500,7 @@ void Ssf_init(void *sem)
 
 #ifndef POWER_MEAS
     /* Initialize the LEDs */
+    LED_init();
     LED_Params ledParams;
     LED_Params_init(&ledParams);
     gGreenLedHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
@@ -647,11 +650,10 @@ void Ssf_processEvents(void)
 
     if(events & SENSOR_UI_INPUT_EVT)
     {
+        Util_clearEvent(&events, SENSOR_UI_INPUT_EVT);
 #ifndef CUI_DISABLE
         CUI_processMenuUpdate();
 #endif /* CUI_DISABLE */
-
-        Util_clearEvent(&events, SENSOR_UI_INPUT_EVT);
     }
 
     if(events & SENSOR_SEND_COLLECTOR_IDENT_EVT)

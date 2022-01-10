@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,7 @@ extern "C" {
  */
 typedef union HwiP_Struct {
     uint32_t dummy;  /*!< Align object */
-    char     data[HwiP_STRUCT_SIZE];
+    uint8_t  data[HwiP_STRUCT_SIZE];
 } HwiP_Struct;
 
 /*!

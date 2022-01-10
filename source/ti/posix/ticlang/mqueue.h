@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2016-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,6 @@
 only with a Texas Instruments clang compiler. You appear to be using a \
 different compiler.
 #endif
-
-/* CODEGEN-6425 work-around; remove when bug is fixed */
-#pragma clang system_header
 
 #include <stddef.h>
 #include <stdint.h>

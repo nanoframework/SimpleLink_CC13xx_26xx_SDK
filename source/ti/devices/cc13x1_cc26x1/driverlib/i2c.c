@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       i2c.c
-*  Revised:        2020-12-01 16:53:49 +0100 (Tue, 01 Dec 2020)
-*  Revision:       59683
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for the I2C module
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -141,7 +141,7 @@ I2CIntRegister(uint32_t ui32Base, void (*pfnHandler)(void))
     // Get the interrupt number.
     ui32Int = INT_I2C_IRQ;
 
-    // Register the interrupt handler, returning an error if an error occurs.
+    // Register the interrupt handler.
     IntRegister(ui32Int, pfnHandler);
 
     // Enable the I2C interrupt.

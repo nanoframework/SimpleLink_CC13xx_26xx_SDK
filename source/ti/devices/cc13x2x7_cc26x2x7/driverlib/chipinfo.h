@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       chipinfo.h
-*  Revised:        2020-11-30 13:49:16 +0100 (Mon, 30 Nov 2020)
-*  Revision:       59663
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Collection of functions returning chip information.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -86,6 +86,7 @@ extern "C"
     #define ChipInfo_GetHwRevision          NOROM_ChipInfo_GetHwRevision
     #define ThisLibraryIsFor_CC13x2x7_CC26x2x7_HaltIfViolated NOROM_ThisLibraryIsFor_CC13x2x7_CC26x2x7_HaltIfViolated
 #endif
+
 
 //*****************************************************************************
 //

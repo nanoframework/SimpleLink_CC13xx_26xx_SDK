@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,12 @@
 /*!*****************************************************************************
  *  @file       PIN.h
  *  @brief      Generic PIN & GPIO driver
+ *
+ *
+ * @warning The PIN driver will be removed in the 2Q22 release. Please port your
+ * application to the updated GPIO driver, which has been updated and is now at
+ * feature parity but is simpler to use, operates faster and requires less
+ * memory.
  *
  *  To use the PIN driver ensure that the correct TI-RTOS driver library for your
  *  device is linked in and include this header file:

@@ -6,7 +6,7 @@
 *  Description:    Defines and prototypes for the NIST-P256 curve constants to
 *                  be used with the ECC SW implementation.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

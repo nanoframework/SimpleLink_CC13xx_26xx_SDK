@@ -90,9 +90,6 @@ extern "C"
 #ifndef PER_TEST_APS_ACKS_WAIT_TIME
     #define PER_TEST_APS_ACKS_WAIT_TIME           3000
 #endif
-#ifndef PER_TEST_POLL_RATE
-    #define PER_TEST_POLL_RATE                    500
-#endif
 
 /*********************************************************************
  * TYPEDEFS

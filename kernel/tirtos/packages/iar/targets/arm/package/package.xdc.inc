@@ -7,6 +7,7 @@ M3.xdc
 M4.xdc
 M4F.xdc
 M33.xdc
+M33F.xdc
 package/iar.targets.arm.sch
 package/.vers_g200
 package/.vers_r200
@@ -22,4 +23,5 @@ M3.h
 M4.h
 M4F.h
 M33.h
+M33F.h
 package/iar.targets.arm.ccs

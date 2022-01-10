@@ -97,20 +97,110 @@
                 "OverrideField": [
                     {
                         "_name": "pRegOverride",
-                        "Block": "override_ieee_802_15_4.json"
+                        "Block": {
+                            "_name": "override_ieee_802_15_4.json",
+                            "Element32b": [
+                                {
+                                    "_type": "ELEMENT",
+                                    "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
+                                    "$": "0x000F8883"
+                                },
+                                {
+                                    "_type": "ELEMENT",
+                                    "_comment": "Tx: Set DCDC settings IPEAK=3, dither = off",
+                                    "$": "0x00F388D3"
+                                }
+                            ]
+                        }
                     },
                     {
                         "_name": "pRegOverrideTxStd",
                         "Block": [
-                            "override_txstd_placeholder.json",
-                            "override_txstd_settings.json"
+                            {
+                                "_name": "override_txstd_placeholder.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "TXSTDPA",
+                                        "_comment": "TX Standard power override",
+                                        "$": "0x00000000"
+                                    },
+                                    {
+                                        "_type": "ANADIV",
+                                        "_comment": "The ANADIV radio parameter based on LO divider and front end settings",
+                                        "$": "0x00000000"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_txstd_settings.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Set RTIM offset to default for standard PA",
+                                        "$": "0x00008783"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Set synth mux to default value for standard PA",
+                                        "$": "0x050206C3"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Set TXRX pin to 0 in RX and high impedance in idle\/TX. ",
+                                        "$": "0x60A8,0x0401"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Tx: Set DCDC settings IPEAK=3, dither = off",
+                                        "$": "0x00F388D3"
+                                    }
+                                ]
+                            }
                         ]
                     },
                     {
                         "_name": "pRegOverrideTx20",
                         "Block": [
-                            "override_tx20_placeholder.json",
-                            "override_tx20_settings.json"
+                            {
+                                "_name": "override_tx20_placeholder.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "TX20PA",
+                                        "_comment": "TX HighPA power override",
+                                        "$": "0x00000000"
+                                    },
+                                    {
+                                        "_type": "ANADIV",
+                                        "_comment": "The ANADIV radio parameter based on LO divider and front end settings",
+                                        "$": "0x00000000"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_tx20_settings.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Set RTIM offset to 3 for high power PA",
+                                        "$": "0x00038783"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Set synth mux for high power PA",
+                                        "$": "0x010206C3"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Set TXRX pin to 0 in RX\/TX and high impedance in idle. ",
+                                        "$": "0x60A8,0x0001"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Tx: Set DCDC settings IPEAK=7, dither = off",
+                                        "$": "0x00F788D3"
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]
@@ -175,13 +265,166 @@
                         "$": "0"
                     }
                 ]
+            },
+            {
+                "_name": "CMD_IEEE_TX",
+                "_function": "SendPacket",
+                "Field": [
+                    {
+                        "_name": "commandNo",
+                        "$": "CMD_IEEE_TX"
+                    },
+                    {
+                        "_name": "status",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pNextOp",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTime",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.triggerType",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.bEnaCmd",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.triggerNo",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.pastTrig",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "condition.rule",
+                        "$": "1"
+                    },
+                    {
+                        "_name": "condition.nSkip",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "txOpt",
+                        "$": "0x00"
+                    },
+                    {
+                        "_name": "payloadLen",
+                        "$": "0x1e"
+                    },
+                    {
+                        "_name": "timeStamp",
+                        "$": "0x00000000"
+                    }
+                ]
+            },
+            {
+                "_name": "CMD_IEEE_RX",
+                "Field": [
+                    {
+                        "_name": "commandNo",
+                        "$": "CMD_IEEE_RX"
+                    },
+                    {
+                        "_name": "status",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pNextOp",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTime",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.triggerType",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.bEnaCmd",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.triggerNo",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "startTrigger.pastTrig",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "condition.rule",
+                        "$": "1"
+                    },
+                    {
+                        "_name": "condition.nSkip",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "condition.nSkip",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "rxConfig",
+                        "$": "0x30"
+                    },
+                    {
+                        "_name": "frameFiltOpt",
+                        "$": "0x300"
+                    },
+                    {
+                        "_name": "frameTypes",
+                        "$": "0xFF"
+                    },
+                    {
+                        "_name": "ccaOpt",
+                        "$": "0x18"
+                    },
+                    {
+                        "_name": "ccaRssiThr",
+                        "$": "100"
+                    },
+                    {
+                        "_name": "numExtEntries",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "numShortEntries",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pExtEntryList",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pShortEntryList",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "localExtAddr",
+                        "$": "0x12345678"
+                    },
+                    {
+                        "_name": "localShortAddr",
+                        "$": "0xABBA"
+                    },
+                    {
+                        "_name": "endTrigger",
+                        "$": "1"
+                    },
+                    {
+                        "_name": "endTime",
+                        "$": "0"
+                    }
+                ]
             }
-        ],
-        "TestFunc": {
-            "ContTX": "testfunction_cont_tx.json",
-            "ContRX": "testfunction_cont_rx.json",
-            "PacketTX": "testfunction_packet_tx.json",
-            "PacketRX": "testfunction_packet_rx.json"
-        }
+        ]
     }
 }

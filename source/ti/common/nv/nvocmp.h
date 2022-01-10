@@ -5,7 +5,7 @@
  @brief NV definitions for CC26xx devices - On-Chip Multi-Page Flash Memory
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

@@ -41,13 +41,28 @@ extern "C" {
 #define BT_MESH_ADDR_RELAYS       0xfffe
 
 #define BT_MESH_KEY_UNUSED        0xffff
+#define BT_MESH_KEY_ANY           0xffff
 #define BT_MESH_KEY_DEV           0xfffe
 #define BT_MESH_KEY_DEV_LOCAL     BT_MESH_KEY_DEV
 #define BT_MESH_KEY_DEV_REMOTE    0xfffd
 #define BT_MESH_KEY_DEV_ANY       0xfffc
 
+#define BT_MESH_ADDR_IS_UNICAST(addr) ((addr) && (addr) < 0x8000)
+#define BT_MESH_ADDR_IS_GROUP(addr) ((addr) >= 0xc000 && (addr) <= 0xff00)
+#define BT_MESH_ADDR_IS_VIRTUAL(addr) ((addr) >= 0x8000 && (addr) < 0xc000)
+#define BT_MESH_ADDR_IS_RFU(addr) ((addr) >= 0xff00 && (addr) <= 0xfffb)
+
 #define BT_MESH_IS_DEV_KEY(key) (key == BT_MESH_KEY_DEV_LOCAL || \
 				 key == BT_MESH_KEY_DEV_REMOTE)
+
+/** Maximum payload size of an access message (in octets). */
+#define BT_MESH_APP_SEG_SDU_MAX   BT_MESH_SEG_SIZE
+/** Maximum possible payload size of an outgoing access message (in octets). */
+#define BT_MESH_TX_SDU_MAX        (CONFIG_BT_MESH_TX_SEG_MAX * \
+				  BT_MESH_APP_SEG_SDU_MAX)
+/** Maximum possible payload size of an incoming access message (in octets). */
+#define BT_MESH_RX_SDU_MAX        (CONFIG_BT_MESH_RX_SEG_MAX * \
+				  BT_MESH_APP_SEG_SDU_MAX)
 
 /** Helper to define a mesh element within an array.
  *
@@ -406,16 +421,16 @@ struct bt_mesh_model_pub {
 	struct bt_mesh_model *mod;
 
 	uint16_t addr;         /**< Publish Address. */
-    uint16_t key:12,       /**< Publish AppKey Index. */
-             cred:1,       /**< Friendship Credentials Flag. */
-             send_rel:1;   /**< Force reliable sending (segment acks) */
+	uint16_t key:12,       /**< Publish AppKey Index. */
+	      cred:1,       /**< Friendship Credentials Flag. */
+	      send_rel:1;   /**< Force reliable sending (segment acks) */
 
 	uint8_t  ttl;          /**< Publish Time to Live. */
 	uint8_t  retransmit;   /**< Retransmit Count & Interval Steps. */
 	uint8_t  period;       /**< Publish Period. */
 	uint8_t  period_div:4, /**< Divisor for the Period. */
-	         fast_period:1,/**< Use FastPeriodDivisor */
-	         count:3;      /**< Retransmissions left. */
+	      fast_period:1,/**< Use FastPeriodDivisor */
+	      count:3;      /**< Retransmissions left. */
 
 	uint32_t period_start; /**< Start of the current period. */
 

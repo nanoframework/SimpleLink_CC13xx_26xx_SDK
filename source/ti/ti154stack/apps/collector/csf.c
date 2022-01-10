@@ -6,7 +6,7 @@
  @brief Collector Specific Functions
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -106,6 +106,10 @@
 #include "device_type.h"
 #endif /* DEVICE_TYPE_MSG */
 
+#ifdef MAC_STATS
+#include "mac.h"
+#endif
+
 /******************************************************************************
  Constants and definitions
  *****************************************************************************/
@@ -143,6 +147,16 @@
 #define JOIN_TIMEOUT_VALUE       20
 /* timeout value for config request delay */
 #define CONFIG_TIMEOUT_VALUE 1000
+
+#ifdef IEEE_COEX_METRICS
+/* timeout value for the coex metrics timer */
+#define COEX_METRICS_TIMEOUT_VALUE  120000
+#endif
+
+#ifdef MAC_STATS
+/* timeout value for the MAC statistics timer */
+#define MAC_STATS_TIMEOUT_VALUE  10000
+#endif
 
 #if defined(USE_DMM)
 #define FH_ASSOC_TIMER              2000
@@ -202,6 +216,17 @@ static Clock_Handle trackingClkHandle;
 static Clock_Struct broadcastClkStruct;
 static Clock_Handle broadcastClkHandle;
 
+#ifdef IEEE_COEX_METRICS
+static Clock_Struct coexClkStruct;
+static Clock_Handle coexClkHandle;
+#endif
+
+#ifdef MAC_STATS
+static Clock_Struct statsClkStruct;
+static Clock_Handle statsClkHandle;
+#endif
+
+
 /* Clock/timer resources for CLLC */
 /* trickle timer */
 STATIC Clock_Struct tricklePAClkStruct;
@@ -239,6 +264,14 @@ static uint32_t lastSavedCoordinatorFrameCounter = 0;
 static const NVINTF_itemID_t nvResetId = NVID_RESET;
 #endif
 
+#ifdef MAC_STATS
+bool statsStarted;
+#ifdef IEEE_COEX_ENABLED
+uint32_t totalTime;
+uint32_t prevTick;
+uint32_t currTick;
+#endif
+#endif
 /******************************************************************************
  Global variables
  *****************************************************************************/
@@ -269,6 +302,18 @@ uint32_t numJoinDevStatusLine;
 #ifdef LPSTK
 uint32_t lpstkDataStatusLine;
 #endif
+#ifdef IEEE_COEX_METRICS
+uint32_t coexStatusLine;
+#endif
+#ifdef MAC_STATS
+uint32_t macStatsLine1;
+#ifdef IEEE_COEX_ENABLED
+uint32_t macStatsLine2;
+uint32_t macStatsLine3;
+#endif
+#endif
+
+
 #endif /* CUI_DISABLE */
 
 static uint16_t SelectedSensor;
@@ -288,6 +333,14 @@ static void processPCTrickleTimeoutCallback(UArg a0);
 static void processJoinTimeoutCallback(UArg a0);
 static void processConfigTimeoutCallback(UArg a0);
 static void processIdentifyTimeoutCallback(UArg a0);
+#ifdef IEEE_COEX_METRICS
+static void processCoexTimeoutCallback(UArg a0);
+static void readCoexMetrics(void);
+#endif
+#ifdef MAC_STATS
+static void processStatsTimeoutCallback(UArg a0);
+static void readMacStats(void);
+#endif
 #ifndef CUI_DISABLE
 static uint16_t getNumActiveDevices(void);
 #endif /* CUI_DISABLE */
@@ -330,6 +383,14 @@ static void sensorSelectAction(const char _input, char* _pLines[3], CUI_cursorIn
 static void sensorSetReportInterval(const char _input, char* _pLines[3], CUI_cursorInfo_t* _pCurInfo);
 static void sensorLedToggleAction(int32_t menuEntryInex);
 static void sensorDisassocAction(int32_t menuEntryInex);
+#ifdef IEEE_COEX_METRICS
+static void coexMetricsRequestAction(int32_t menuEntryInex);
+static void coexMetricsResetAction(int32_t menuEntryInex);
+#endif
+#ifdef MAC_STATS
+static void macStatsRequestAction(int32_t menuEntryInex);
+static void macStatsResetAction(int32_t menuEntryInex);
+#endif
 
 #if defined(DEVICE_TYPE_MSG)
 static void sensorDeviceTypeRequestAction(int32_t menuEntryInex);
@@ -363,6 +424,12 @@ static void openCloseNwkAndUpdateUser(bool openNwkRequest);
 #define SECURITY_MENU_ENABLED 0
 #endif
 
+#ifdef IEEE_COEX_METRICS
+#define COEX_MENU_ENABLED 2
+#else
+#define COEX_MENU_ENABLED 0
+#endif
+
 CUI_SUB_MENU(configureSubMenu, "<      CONFIGURE      >", 2 + FH_MENU_ENABLED + SECURITY_MENU_ENABLED, csfMainMenu)
     CUI_MENU_ITEM_INT_ACTION(  "<      SET PANID      >", setPanIdAction)
     CUI_MENU_ITEM_INT_ACTION(  "<    SET CHAN MASK    >", setChMaskAction)
@@ -374,11 +441,19 @@ CUI_SUB_MENU(configureSubMenu, "<      CONFIGURE      >", 2 + FH_MENU_ENABLED + 
 #endif
 
 CUI_SUB_MENU_END
-CUI_SUB_MENU(commissionSubMenu,"<   NETWORK ACTIONS   >", 3, csfMainMenu)
+CUI_SUB_MENU(commissionSubMenu,"<   NETWORK ACTIONS   >", 3 + COEX_MENU_ENABLED, csfMainMenu)
     CUI_MENU_ITEM_ACTION(      "<       FORM NWK      >", formNwkAction)
     CUI_MENU_ITEM_ACTION(      "<       OPEN NWK      >", openNwkAction)
     CUI_MENU_ITEM_ACTION(      "<       CLOSE NWK     >", closeNwkAction)
 //    CUI_MENU_ITEM_ACTION(    "<    DISASSOCIATE     >", disassocAction)
+#if defined(IEEE_COEX_METRICS)
+    CUI_MENU_ITEM_ACTION(      "<  READ COEX METRICS  >", coexMetricsRequestAction)
+    CUI_MENU_ITEM_ACTION(      "<  RESET COEX METRICS >", coexMetricsResetAction)
+#endif /* IEEE_COEX_METRICS */
+#if defined(MAC_STATS)
+    CUI_MENU_ITEM_ACTION(      "<   READ MAC STATS    >", macStatsRequestAction)
+    CUI_MENU_ITEM_ACTION(      "<   RESET MAC STATS   >", macStatsResetAction)
+#endif /* MAC_STATS */
 CUI_SUB_MENU_END
 
 /* This menu will be registered/de-registered at run time to create
@@ -458,6 +533,20 @@ void Csf_init(void *sem)
 #ifdef SECURE_MANAGER_DEBUG2
     clientParams.maxStatusLines++;
 #endif /* SECURE_MANAGER_DEBUG2 */
+#ifdef IEEE_COEX_METRICS
+    clientParams.maxStatusLines++;
+#endif /* IEEE_COEX_METRICS */
+#ifdef MAC_STATS
+#ifdef IEEE_COEX_ENABLED
+    clientParams.maxStatusLines+=3;
+    totalTime = 0;
+    prevTick = 0;
+    currTick = 0;
+#else
+    clientParams.maxStatusLines++;
+#endif
+    statsStarted = false;
+#endif /* MAC_STATS */
 
     csfCuiHndl = CUI_clientOpen(&clientParams);
 #endif /* CUI_DISABLE */
@@ -474,9 +563,10 @@ void Csf_init(void *sem)
     /* Initialize Keys */
     Button_Params bparams;
     Button_Params_init(&bparams);
-    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, processKeyChangeCallback, &bparams);
+    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
+    Button_setCallback(gLeftButtonHandle, processKeyChangeCallback);
     // Open Right button without appCallBack
-    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, NULL, &bparams);
+    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
     // Read button state
     if (!GPIO_read(((Button_HWAttrs*)gRightButtonHandle->hwAttrs)->gpioIndex))
@@ -502,6 +592,16 @@ void Csf_init(void *sem)
     CUI_registerMenu(csfCuiHndl, &csfMainMenu);
 
     CUI_statusLineResourceRequest(csfCuiHndl, "Status", false, &collectorStatusLine);
+#ifdef IEEE_COEX_METRICS
+    CUI_statusLineResourceRequest(csfCuiHndl, "Coex Status", true, &coexStatusLine);
+#endif
+#ifdef MAC_STATS
+    CUI_statusLineResourceRequest(csfCuiHndl, "MAC Stats 1", true, &macStatsLine1);
+#ifdef IEEE_COEX_ENABLED
+    CUI_statusLineResourceRequest(csfCuiHndl, "MAC Stats 2", true, &macStatsLine2);
+    CUI_statusLineResourceRequest(csfCuiHndl, "MAC Stats 3", true, &macStatsLine3);
+#endif
+#endif
     CUI_statusLineResourceRequest(csfCuiHndl, "Device Status", true, &deviceStatusLine);
 #ifdef LPSTK
     CUI_statusLineResourceRequest(csfCuiHndl, "LPSTK Data", true, &lpstkDataStatusLine);
@@ -607,12 +707,11 @@ void Csf_processEvents(void)
 
     if(Csf_events & COLLECTOR_UI_INPUT_EVT)
     {
+        /* Clear the event */
+        Util_clearEvent(&Csf_events, COLLECTOR_UI_INPUT_EVT);
 #ifndef CUI_DISABLE
         CUI_processMenuUpdate();
 #endif /* CUI_DISABLE */
-
-        /* Clear the event */
-        Util_clearEvent(&Csf_events, COLLECTOR_UI_INPUT_EVT);
     }
 
     if(Csf_events & COLLECTOR_SENSOR_ACTION_EVT)
@@ -665,6 +764,28 @@ void Csf_processEvents(void)
         /* Clear the event */
         Util_clearEvent(&Csf_events, COLLECTOR_SENSOR_ACTION_EVT);
     }
+
+#ifdef IEEE_COEX_METRICS
+    if(Csf_events & COEX_IEEE_METRICS_EVT)
+    {
+        /* Read and print coex metrics */
+        readCoexMetrics();
+
+        /* Clear the event */
+        Util_clearEvent(&Csf_events, COEX_IEEE_METRICS_EVT);
+    }
+#endif /* endif for IEEE_COEX_METRICS */
+
+#ifdef MAC_STATS
+    if(Csf_events & MAC_STATS_EVT)
+    {
+        /* Read and print coex metrics */
+        readMacStats();
+
+        /* Clear the event */
+        Util_clearEvent(&Csf_events, MAC_STATS_EVT);
+    }
+#endif /* endif for MAC_STATS */
 
 #if defined(MT_CSF)
     MTCSF_displayStatistics();
@@ -854,11 +975,12 @@ void Csf_deviceSensorDataUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
         CUI_statusLinePrintf(csfCuiHndl, deviceStatusLine, "Sensor - Addr=0x%04x, Temp=%d, RSSI=%d",
                              pSrcAddr->addr.shortAddr, pMsg->tempSensor.ambienceTemp, rssi);
 #ifdef LPSTK
-        CUI_statusLinePrintf(csfCuiHndl, lpstkDataStatusLine, "Humid=%d, Light=%d, Accl=(%d, %d, %d, %d, %d)",
+        CUI_statusLinePrintf(csfCuiHndl, lpstkDataStatusLine, "Humid=%d, Light=%d, Accl=(%d, %d, %d, %d, %d), Hall=%d",
                              pMsg->humiditySensor.humidity, pMsg->lightSensor.rawData,
                              pMsg->accelerometerSensor.xAxis, pMsg->accelerometerSensor.yAxis,
                              pMsg->accelerometerSensor.zAxis, pMsg->accelerometerSensor.xTiltDet,
-                             pMsg->accelerometerSensor.yTiltDet);
+                             pMsg->accelerometerSensor.yTiltDet,
+                             pMsg->hallEffectSensor.fluxLevel);
 #endif
     }
     CUI_statusLinePrintf(csfCuiHndl, numJoinDevStatusLine, "%x", getNumActiveDevices());
@@ -1051,6 +1173,42 @@ void Csf_initializeTrackingClock(void)
                                         0);
 }
 
+#ifdef IEEE_COEX_METRICS
+/*!
+ Initialize the coex clock.
+
+ Public function defined in csf.h
+ */
+void Csf_initializeCoexClock(void)
+{
+    /* Initialize the timers needed for this application */
+    coexClkHandle = UtilTimer_construct(&coexClkStruct,
+                                        processCoexTimeoutCallback,
+                                        COEX_METRICS_TIMEOUT_VALUE,
+                                        COEX_METRICS_TIMEOUT_VALUE,
+                                        false,
+                                        0);
+}
+#endif
+
+#ifdef MAC_STATS
+/*!
+ Initialize the coex clock.
+
+ Public function defined in csf.h
+ */
+void Csf_initializeStatsClock(void)
+{
+    /* Initialize the timers needed for this application */
+    statsClkHandle = UtilTimer_construct(&statsClkStruct,
+                                        processStatsTimeoutCallback,
+                                        MAC_STATS_TIMEOUT_VALUE,
+                                        MAC_STATS_TIMEOUT_VALUE,
+                                        false,
+                                        0);
+}
+#endif
+
 /*!
  Initialize the broadcast cmd clock.
 
@@ -1159,6 +1317,52 @@ void Csf_setTrackingClock(uint32_t trackingTime)
         UtilTimer_start(&trackingClkStruct);
     }
 }
+
+#ifdef IEEE_COEX_METRICS
+/*!
+ Set the coex clock.
+
+ Public function defined in csf.h
+ */
+void Csf_setCoexClock(uint32_t coexTime)
+{
+    /* Stop the Coex timer */
+    if(UtilTimer_isActive(&coexClkStruct) == true)
+    {
+        UtilTimer_stop(&coexClkStruct);
+    }
+
+    if(coexTime)
+    {
+        /* Setup timer */
+        UtilTimer_setTimeout(coexClkHandle, coexTime);
+        UtilTimer_start(&coexClkStruct);
+    }
+}
+#endif
+
+#ifdef MAC_STATS
+/*!
+ Set the mac stats clock.
+
+ Public function defined in csf.h
+ */
+void Csf_setStatsClock(uint32_t statsTime)
+{
+    /* Stop the Coex timer */
+    if(UtilTimer_isActive(&statsClkStruct) == true)
+    {
+        UtilTimer_stop(&statsClkStruct);
+    }
+
+    if(statsTime)
+    {
+        /* Setup timer */
+        UtilTimer_setTimeout(statsClkHandle, statsTime);
+        UtilTimer_start(&statsClkStruct);
+    }
+}
+#endif
 
 /*!
  Set the broadcast clock.
@@ -1904,6 +2108,40 @@ static void processTrackingTimeoutCallback(UArg a0)
     Semaphore_post(collectorSem);
 }
 
+#ifdef IEEE_COEX_METRICS
+/*!
+ * @brief       Coex timeout handler function.
+ *
+ * @param       a0 - ignored
+ */
+static void processCoexTimeoutCallback(UArg a0)
+{
+    (void)a0; /* Parameter is not used */
+
+    Csf_events |= COEX_IEEE_METRICS_EVT;
+
+    /* Wake up the application thread when it waits for clock event */
+    Semaphore_post(collectorSem);
+}
+#endif
+
+#ifdef MAC_STATS
+/*!
+ * @brief       MAC Stats timeout handler function.
+ *
+ * @param       a0 - ignored
+ */
+static void processStatsTimeoutCallback(UArg a0)
+{
+    (void)a0; /* Parameter is not used */
+
+    Csf_events |= MAC_STATS_EVT;
+
+    /* Wake up the application thread when it waits for clock event */
+    Semaphore_post(collectorSem);
+}
+#endif
+
 /*!
  * @brief       Tracking timeout handler function.
  *
@@ -2009,6 +2247,111 @@ static void processKeyChangeCallback(Button_Handle _buttonHandle, Button_EventMa
         Semaphore_post(collectorSem);
     }
 }
+
+#ifdef IEEE_COEX_METRICS
+/*!
+ * @brief       Read coex metrics from MAC
+ */
+static void readCoexMetrics(void)
+{
+    Collector_coexStatistics_t coexStatistics;
+    ApiMac_mlmeGetCoexReqStruct(ApiMac_coexAttribute_coexMetrics,
+                                &coexStatistics);
+
+#ifndef CUI_DISABLE
+    CUI_statusLinePrintf(csfCuiHndl, coexStatusLine,
+                         "Grants=%d, Rejects=%d, Cont Rejects=%d, Max Cont Rejects=%d",
+                         coexStatistics.dbgCoexGrants,
+                         coexStatistics.dbgCoexRejects,
+                         coexStatistics.dbgCoexContRejects,
+                         coexStatistics.dbgCoexMaxContRejects);
+#endif
+}
+
+/*!
+ * @brief       Reset coex metrics in MAC
+ */
+static void coexMetricsResetAction(int32_t menuEntryInex)
+{
+    Collector_coexStatistics_t coexStatistics;
+    memset(&coexStatistics, 0, sizeof(Collector_coexStatistics_t));
+
+    ApiMac_mlmeSetCoexReqStruct(ApiMac_coexAttribute_coexMetrics,
+                                &coexStatistics);
+
+    Csf_events |= COEX_IEEE_METRICS_EVT;
+
+    // Wake up the application thread when it waits for event
+    Semaphore_post(collectorSem);
+}
+#endif /* IEEE_COEX_METRICS */
+
+#ifdef MAC_STATS
+/*!
+ * @brief       Read mac stats from MAC
+ */
+static void readMacStats(void)
+{
+    macStatisticsStruct_t macStats;
+    ApiMac_mlmeGetMacStatsReqStruct(ApiMac_macAttribute_macStatistics,
+                                &macStats);
+
+#ifndef CUI_DISABLE
+    CUI_statusLinePrintf(csfCuiHndl, macStatsLine1,
+                         "CcaRetries=%d, CcaRejects=%d, UCastRetries=%d, UCastRejects=%d",
+                         macStats.cca_retries,
+                         macStats.cca_failures,
+                         macStats.mac_tx_ucast_retry,
+                         macStats.mac_tx_ucast_fail);
+
+#ifdef IEEE_COEX_ENABLED
+    CUI_statusLinePrintf(csfCuiHndl, macStatsLine2,
+                         "LowPrioReq=%d, HighPrioReq=%d, LowPrioDenied=%d, HighPrioDenied=%d",
+                         macStats.pta_lo_pri_req,
+                         macStats.pta_hi_pri_req,
+                         macStats.pta_lo_pri_denied,
+                         macStats.pta_hi_pri_denied);
+    uint16_t totalDenied = macStats.pta_hi_pri_denied + macStats.pta_lo_pri_denied;
+    if (prevTick == 0)
+    {
+        prevTick = Clock_getTicks();
+    }
+    else
+    {
+        currTick = Clock_getTicks();
+        totalTime += ((currTick - prevTick) * Clock_tickPeriod) / 1000000;
+        prevTick = currTick;
+    }
+    CUI_statusLinePrintf(csfCuiHndl, macStatsLine3,
+                         "DeniedRate=%d per %d secs",
+                         totalDenied,
+                         totalTime);
+    macStats.pta_denied_rate = totalTime;
+
+    ApiMac_mlmeSetMacStatsReqStruct(ApiMac_macAttribute_macStatistics,
+                                &macStats);
+#endif
+
+#endif
+}
+
+/*!
+ * @brief       Reset mac stats in MAC
+ */
+static void macStatsResetAction(int32_t menuEntryInex)
+{
+    macStatisticsStruct_t macStats;
+    memset(&macStats, 0, sizeof(macStatisticsStruct_t));
+
+    ApiMac_mlmeSetMacStatsReqStruct(ApiMac_macAttribute_macStatistics,
+                                &macStats);
+
+    Csf_events |= MAC_STATS_EVT;
+
+    // Wake up the application thread when it waits for event
+    Semaphore_post(collectorSem);
+}
+#endif /* MAC_STATS */
 
 /*!
  * @brief       Add an entry into the device list
@@ -3513,6 +3856,31 @@ static void closeNwkAction(int32_t menuEntryInex)
     Semaphore_post(collectorSem);
 }
 
+#ifdef IEEE_COEX_METRICS
+/**
+ *  @brief Callback to be called when the UI requests coex metrics
+ */
+static void coexMetricsRequestAction(int32_t menuEntryInex)
+{
+    Csf_events |= COEX_IEEE_METRICS_EVT;
+
+    // Wake up the application thread when it waits for event
+    Semaphore_post(collectorSem);
+}
+#endif
+
+#ifdef MAC_STATS
+/**
+ *  @brief Callback to be called when the UI requests mac stats
+ */
+static void macStatsRequestAction(int32_t menuEntryInex)
+{
+    Csf_events |= MAC_STATS_EVT;
+
+    // Wake up the application thread when it waits for event
+    Semaphore_post(collectorSem);
+}
+#endif
 
 /**
  *  @brief Send process menu event.

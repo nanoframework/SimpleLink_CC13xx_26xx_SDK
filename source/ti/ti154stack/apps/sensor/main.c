@@ -5,7 +5,7 @@
  @brief main entry of the example application
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -68,6 +68,7 @@
 /* Header files required for the temporary idle task function */
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
+#include <ti/drivers/GPIO.h>
 #include <aon_rtc.h>
 #include <prcm.h>
 
@@ -341,7 +342,7 @@ int main(void)
      *  press on reset. This indicates to revert to some
      *  factory image
      */
-    if(!PIN_getInputValue(CONFIG_PIN_BTN1))
+    if(!GPIO_read(CONFIG_GPIO_BTN1))
     {
         OAD_markSwitch();
     }

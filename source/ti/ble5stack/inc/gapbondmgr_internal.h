@@ -5,7 +5,7 @@
  @brief This file contains internal interfaces for the gapbondmgr.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -120,7 +120,7 @@ extern "C"
  */
 
 extern bStatus_t gapBondMgr_syncResolvingList(void);
-extern uint8_t gapBondMgr_CheckNVLen(uint8_t id, uint8_t len);
+extern uint8_t gapBondMgr_CheckNVLen(uint16_t id, uint8_t len);
 
 /**
  * This should only be used in osal_icall_ble.c in osalInitTasks()

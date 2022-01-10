@@ -1,0 +1,13 @@
+{
+    "target": {
+        "Name": "LP_CC2674R10_RGZ",
+        "Revision": [],
+        "Description": "CC2674R10 RGZ on CC1352R1_LAUNCHXL.",
+        "DeviceName": "CC2674R10RGZ",
+        "DevicePackage": "RGZ 7x7",
+        "FrontEnd": "XD",
+        "PaSettings": "pasettings.json",
+        "RfDesign": "CC2642EM-7ID",
+        "DefaultCategory": "Settings"
+    }
+}

@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       aon_rtc.c
-*  Revised:        2020-02-14 11:30:20 +0100 (Fri, 14 Feb 2020)
-*  Revision:       56760
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for the AON RTC.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,6 @@
     #undef  AONRTCCurrent64BitValueGet
     #define AONRTCCurrent64BitValueGet      NOROM_AONRTCCurrent64BitValueGet
 #endif
-
 
 //*****************************************************************************
 //

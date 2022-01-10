@@ -4,7 +4,7 @@
 
  @brief This file implements the RTLS Services APIs
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -539,8 +539,8 @@ extern bStatus_t RTLSSrv_setCteSampleAccuracy(uint16_t handle,
                                               uint8_t  sampleSize2M,
                                               uint8_t  sampleCtrl);
 /**
- * Initialize antenna array
- * To initialize a single pin, use array of length 1
+ * Initialize GPIO's which correspond to Antenna Table configured in sysConfig or in ble_user_config.c (antennaTbl)
+ * Initialize one of the antenna ID's(mainAntenna) as the main antenna used to Tx/Rx
  *
  * @param mainAntenna - Antenna ID to be used as main receiving antenna
  *

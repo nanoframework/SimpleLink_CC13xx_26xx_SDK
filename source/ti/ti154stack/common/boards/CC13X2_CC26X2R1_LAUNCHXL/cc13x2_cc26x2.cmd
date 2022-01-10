@@ -5,7 +5,7 @@
  @brief Linker configuration file for sensor/collector on cc13x2/cc26x2 devices
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

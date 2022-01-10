@@ -6,7 +6,7 @@
         Protocol (ATT) module.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -107,6 +107,9 @@ extern uint8_t att_sendRspOnly;
 extern uint16 attBuildExecuteWriteRsp( uint8 *pBuf, uint8 *pMsg );
 
 extern uint16 attBuildHandleValueCfm( uint8 *pBuf, uint8 *pMsg );
+
+bStatus_t attSendMsg_sPatch( uint16 connHandle, attBuildMsg_t pfnBuildMsg,
+                             uint8 opcode, uint8 *pMsg, uint8 *pPayload );
 
 extern bStatus_t attSendMsg( uint16 connHandle, attBuildMsg_t pfnBuildMsg,
                              uint8 opcode, uint8 *pMsg, uint8 *pPayload );

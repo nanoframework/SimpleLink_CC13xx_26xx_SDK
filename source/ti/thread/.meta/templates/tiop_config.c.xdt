@@ -35,6 +35,12 @@
  *  ============================ tiop_config.c.xdt ============================
  *  TI-OpenThread SysConfig module template for configuration functions
  */
+
+/* Static module and submodules */
+const thread            = system.modules['/ti/thread/thread'];
+const threadStatic      = thread.$static;
+const threadRF          = threadStatic.rf;
+
 %%}
 /******************************************************************************
 
@@ -53,6 +59,10 @@
 #include <openthread/thread.h>
 #include <openthread/link.h>
 #include <openthread/joiner.h>
+
+% if (threadRF.coexEnable) {
+#include "platform/radio.h"
+% }
 
 /* Configuration header file */
 #include "tiop_config.h"
@@ -82,15 +92,12 @@ void TIOP_init(otInstance * aInstance)
     unsigned int i;
     otError err;
 
-    otLinkModeConfig linkMode;
-    otExtAddress extAddress;
+    otLinkModeConfig linkMode = {0};
     otExtendedPanId extPanID;
     otMasterKey aKey;
 
-
     /* Set link mode */
     linkMode.mRxOnWhenIdle       = TIOP_CONFIG_LINK_MODE_R;
-    linkMode.mSecureDataRequests = 1;
     linkMode.mDeviceType         = TIOP_CONFIG_LINK_MODE_D;
     linkMode.mNetworkData        = 1;
     err = otThreadSetLinkMode(aInstance, linkMode);
@@ -140,6 +147,22 @@ void TIOP_init(otInstance * aInstance)
         err = otThreadSetNetworkName(aInstance, TIOP_CONFIG_NETWORK_NAME);
         assert(err == OT_ERROR_NONE);
     }
+% if (threadRF.coexEnable) {
+%   if (threadRF.coexPriority == "high") {
+    rfCorePriorityCoex(true);
+%   }
+%   else if (threadRF.coexPriority == "low") {
+    rfCorePriorityCoex(false);
+%   }
+%   // Default does not need to be set here
+%   if (threadRF.coexRequest == "assertRx") {
+    rfCoreRequestCoex(true);
+%   }
+%   else if (threadRF.coexRequest == "noAssertRx") {
+    rfCoreRequestCoex(false);
+%   }
+%   // Default does not need to be set here
+% }
 
     /* Prevent compiler warning */
     (void) err;

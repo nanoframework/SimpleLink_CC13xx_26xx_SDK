@@ -5,7 +5,7 @@
  @brief NV driver for CC26x2 devices - On-Chip Multi-Page Flash Memory
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -553,6 +553,7 @@ typedef struct
   uint8_t tailPage;     // transfer destination page
   uint8_t actPage;      // current active page
   uint8_t xsrcPage;     // transfer source page
+  uint8_t forceCompact; // force compaction to happen
   uint16_t actOffset;   // active page offset
   uint16_t xsrcOffset;  // transfer source page offset
   uint16_t xdstOffset;  // transfer destination page offset
@@ -932,7 +933,7 @@ static uint8_t NVOCMP_initNvApi(void *param)
         NVS_getAttrs(NVOCMP_nvsHandle,&NVOCMP_nvsAttrs);
 #else
         NV_LINUX_init();
-        
+
         NVOCMP_nvsHandle = NVS_HANDLE;
         NVOCMP_nvsAttrs.sectorSize = FLASH_PAGE_SIZE;
         NVOCMP_nvsAttrs.regionSize = FLASH_PAGE_SIZE * NVOCMP_NVPAGES;
@@ -959,6 +960,9 @@ static uint8_t NVOCMP_initNvApi(void *param)
             NVOCMP_EXCEPTION(pg, NVINTF_NOTREADY);
             return(NVOCMP_failF);
         }
+
+        // Initialize force compaction to false
+        NVOCMP_nvHandle.forceCompact = 0;
 
         // Look for active page and clean up the other if necessary
         NVOCMP_nvHandle.actPage = NVOCMP_NULLPAGE;
@@ -1123,14 +1127,14 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
             err = NVINTF_BADPARAM;
         }
     }
-    
+
 #ifdef NV_LINUX
     if(err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
-    
+
     NVOCMP_UNLOCK(err);
 }
 
@@ -2311,6 +2315,7 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
       pNvHandle->headPage = NVOCMP_INCPAGE(pgXdst);
       NVOCMP_failW = NVOCMP_erase(pNvHandle, pgXdst);
       NVOCMP_changePageState(pNvHandle, pgXdst, NVOCMP_PGXDST);
+      pNvHandle->forceCompact = 1;
       NVOCMP_compactPage(pNvHandle, 0);
       break;
   case NVOCMP_RECOVER_ERASE :
@@ -2501,6 +2506,7 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
         }
         else
         {
+          pNvHandle->forceCompact = 1;
           compact = true;
         }
       }
@@ -2523,6 +2529,7 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
       break;
 #endif
   case NVOCMP_RECOVER_COMPACT :
+    pNvHandle->forceCompact = 1;
     compact = true;
     break;
   default :
@@ -2612,6 +2619,7 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
         }
         else
         {
+          pNvHandle->forceCompact = 1;
           compact = true;
         }
       }
@@ -2620,6 +2628,7 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
 #endif
       break;
   case NVOCMP_RECOVER_COMPACT :
+    pNvHandle->forceCompact = 1;
     compact = true;
     break;
   default :
@@ -3938,7 +3947,7 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
     }
   }
 
-  if(allActivePages == NVOCMP_NVSIZE - 1)
+  if((allActivePages == NVOCMP_NVSIZE - 1) && !pNvHandle->forceCompact)
   {
     return(0);
   }
@@ -3990,7 +3999,26 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
 
     if(status == NVOCMP_COMPACT_FAILURE)
     {
-      return(0);
+#ifdef NVOCMP_RECOVER_FROM_COMPACT_FAILURE
+        uint8_t p;
+        for(p = 0; p < NVOCMP_NVSIZE; p++)
+        {
+            NVOCMP_failW |= NVOCMP_erase(pNvHandle, p);
+            if((p != 0) && (p != NVOCMP_NVSIZE - 1))
+            {
+              NVOCMP_changePageState(pNvHandle, p, NVOCMP_PGRDY);
+            }
+        }
+        pNvHandle->actPage = 0;
+        pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+        pNvHandle->headPage = 0;
+        pNvHandle->tailPage = NVOCMP_NVSIZE - 1;
+        NVOCMP_changePageState(pNvHandle, NVOCMP_NVSIZE - 1, NVOCMP_PGXDST);
+        NVOCMP_changePageState(pNvHandle, 0, NVOCMP_PGACT);
+
+        pNvHandle->forceCompact = 0;
+#endif
+    return(0);
     }
 
     needBytes = nBytes ? nBytes : 16;
@@ -4064,6 +4092,8 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
   pNvHandle->actPage = pg;
   pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
   NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
+
+  pNvHandle->forceCompact = 0;
   return(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset);
 }
 #else
@@ -4112,7 +4142,7 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
 
   // mark page mode
   NVOCMP_read(srcPg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-  if(pageHdr.allActive)
+  if(pageHdr.allActive && !pNvHandle->forceCompact)
   {
     return(0);
   }
@@ -4143,6 +4173,25 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
 
   if(status == NVOCMP_COMPACT_FAILURE)
   {
+#ifdef NVOCMP_RECOVER_FROM_COMPACT_FAILURE
+      uint8_t p;
+      for(p = 0; p < NVOCMP_NVSIZE; p++)
+      {
+        NVOCMP_failW |= NVOCMP_erase(pNvHandle, p);
+        if((p != 0) && (p != NVOCMP_NVSIZE - 1))
+        {
+          NVOCMP_changePageState(pNvHandle, p, NVOCMP_PGRDY);
+        }
+      }
+      pNvHandle->actPage = 0;
+      pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+      pNvHandle->headPage = 0;
+      pNvHandle->tailPage = NVOCMP_NVSIZE - 1;
+      NVOCMP_changePageState(pNvHandle, NVOCMP_NVSIZE - 1, NVOCMP_PGXDST);
+      NVOCMP_changePageState(pNvHandle, 0, NVOCMP_PGACT);
+
+      pNvHandle->forceCompact = 0;
+#endif
     return(0);
   }
 
@@ -4175,6 +4224,8 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
 #if(NVOCMP_NVPAGES > NVOCMP_NVONEP)
   NVOCMP_changePageState(pNvHandle, srcPg ,NVOCMP_PGXDST);
 #endif
+
+  pNvHandle->forceCompact = 0;
   return(FLASH_PAGE_SIZE - pNvHandle->actOffset);
 }
 #endif

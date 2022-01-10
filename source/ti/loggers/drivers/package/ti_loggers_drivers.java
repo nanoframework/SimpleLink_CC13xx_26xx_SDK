@@ -93,22 +93,28 @@ public class ti_loggers_drivers
         sb.append("pkg.build.libraries = [\n");
             sb.append("'lib/ticlang/m4/loggers.a',\n");
             sb.append("'lib/ticlang/m4f/loggers.a',\n");
+            sb.append("'lib/ticlang/m33f/loggers.a',\n");
             sb.append("'lib/ccs/m4/loggers.a',\n");
             sb.append("'lib/ccs/m4f/loggers.a',\n");
             sb.append("'lib/gcc/m4/loggers.a',\n");
             sb.append("'lib/gcc/m4f/loggers.a',\n");
+            sb.append("'lib/gcc/m33f/loggers.a',\n");
             sb.append("'lib/iar/m4/loggers.a',\n");
             sb.append("'lib/iar/m4f/loggers.a',\n");
+            sb.append("'lib/iar/m33f/loggers.a',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ticlang/m4/loggers.a', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
             sb.append("['lib/ticlang/m4f/loggers.a', {target: 'ti.targets.arm.clang.M4F', suffix: 'm4f'}],\n");
+            sb.append("['lib/ticlang/m33f/loggers.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
             sb.append("['lib/ccs/m4/loggers.a', {target: 'ti.targets.arm.elf.M4', suffix: 'em4'}],\n");
             sb.append("['lib/ccs/m4f/loggers.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/gcc/m4/loggers.a', {target: 'gnu.targets.arm.M4', suffix: 'm4g'}],\n");
             sb.append("['lib/gcc/m4f/loggers.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
+            sb.append("['lib/gcc/m33f/loggers.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
             sb.append("['lib/iar/m4/loggers.a', {target: 'iar.targets.arm.M4', suffix: 'rm4'}],\n");
             sb.append("['lib/iar/m4f/loggers.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/iar/m33f/loggers.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

@@ -46,19 +46,25 @@
 
   Application-specific UI peripherals being used:
   - LEDs:
-    LED1 Solid On if there is a change notification indicating Fire Alarm. Off when the change notification indicates No Fire.
+    LED1:
+      - Off: Indicates No Fire from change notification.
+      - On: Indicates Fire from change notification.
 
   Application-specific menu system:
-    Screens:
-      Discover Zone Device Screen: Press 'Enter' to discover the Zone device that is already discoverable, to perform the
-        enrollment of the Zone device.
-      Squawk Screen: This can be used to send a squawk to all binded devices that has Warning Cluster. This will cause the LED1
-        of the remote devices that supports Warning cluster to blink once if there is no alarm or warning in progress.
-      Config Discovery Screen: Enable or disable the Service Discovery of new devices that join the network.
-    Status Lines:
-      Last Zone Event status line: This screen displayes the last event received from remote devices on regard to Zone cluster.
-        1.- It may display the last Zone device enrolled short address.
-        2.- Status from a Change Notification from a remote device with Zone Cluster and its short address.
+    <DISCOVER> Sends Identify Query to start discovery mechanism for creating bind to a Zone.
+
+    <SEND SQUAWK> Sends squawk to all binded devices which has Warning cluster.
+      This will cause the LED1 of remote devices which support Warning cluster to blink once
+        if there is no alarm, or warning in progress.
+
+    <CONFIG DISCOVERY> Enables/disables automatic Service Discovery of newly joined devices.
+
+    The APP Info line will display the following information:
+      [Last Event]
+        NO EVENT YET - No events have yet been received from remote devices
+        Zone added device 0xXXXX - Zone device added a new remote device
+        No fire in device 0xXXXX - Received change notification indicating 'No Fire'
+        ALARM! in device: 0xXXXX - Received change notification indicating 'Fire'
 
 *********************************************************************/
 
@@ -747,9 +753,9 @@ static void zclSampleCIE_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

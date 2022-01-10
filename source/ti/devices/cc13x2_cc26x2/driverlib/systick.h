@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       systick.h
-*  Revised:        2017-05-23 12:08:52 +0200 (Tue, 23 May 2017)
-*  Revision:       49048
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Prototypes for the SysTick driver.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

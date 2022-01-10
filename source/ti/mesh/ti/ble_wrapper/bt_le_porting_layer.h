@@ -55,15 +55,27 @@
 #define DEFAULT_MESH_SCAN_DURATION   0
 // The default state of mesh scanning
 #define DEFAULT_MESH_SCAN_TYPE       SCAN_TYPE_PASSIVE
+#ifdef ZEPHYR_ADV_EXT
+// Extended adv can be sent over 1M or coded PHY
+#define DEFAULT_MESH_SCAN_PHY        SCAN_PRIM_PHY_CODED
+#else
 // Mesh 1.0 supports only 1M phy
 #define DEFAULT_MESH_SCAN_PHY        SCAN_PRIM_PHY_1M
+#endif
 // Duplicate filter is disabled by default
 #define DEFAULT_MESH_SCAN_FLT_DUP    SCAN_FLT_DUP_DISABLE
 // PDU type filter
+#ifdef ZEPHYR_ADV_EXT
+  // Set PDU type filter (Only Non-connectable, Complete and Extended packets)
+#define DEFAULT_MESH_SCAN_FLT_PDU   (SCAN_FLT_PDU_NONCONNECTABLE_ONLY | \
+                                     SCAN_FLT_PDU_COMPLETE_ONLY       | \
+                                     SCAN_FLT_PDU_EXTENDED_ONLY)
+#else
+  // Set PDU type filter (Only Non-connectable, Complete and Legacy packets)
 #define DEFAULT_MESH_SCAN_FLT_PDU   (SCAN_FLT_PDU_NONCONNECTABLE_ONLY | \
                                      SCAN_FLT_PDU_COMPLETE_ONLY       | \
                                      SCAN_FLT_PDU_LEGACY_ONLY)
-
+#endif
 
 // Advertising report fields to keep in the list - by default keep all fields
 // except secondary phy
@@ -104,8 +116,13 @@ static GapAdv_params_t meshAdvParams = {
   .peerAddr =     { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa },
   .filterPolicy = GAP_ADV_WL_POLICY_ANY_REQ,
   .txPower =      GAP_ADV_TX_POWER_NO_PREFERENCE,
+#ifdef ZEPHYR_ADV_EXT
+  .primPhy =      GAP_ADV_PRIM_PHY_CODED_S2,
+  .secPhy =       GAP_ADV_SEC_PHY_CODED_S2,
+#else
   .primPhy =      GAP_ADV_PRIM_PHY_1_MBPS,
   .secPhy =       GAP_ADV_SEC_PHY_1_MBPS,
+#endif
   .sid =          0
 };
 

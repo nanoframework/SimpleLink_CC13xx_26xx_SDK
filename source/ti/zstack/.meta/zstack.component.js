@@ -42,7 +42,7 @@ const displayName = "Z-Stack";
 let topModules = [];
 let templates = [];
 
-if(deviceId.match(/CC2652[RP]|CC1352R1|CC1352P[17]/))
+if(deviceId.match(/CC2651[RP]|CC2652[RP]|CC1352R1|CC1352P[17]/))
 {
     let name = system.deviceData.deviceId;
     if(system.deviceData.board != null)
@@ -63,6 +63,10 @@ if(deviceId.match(/CC2652[RP]|CC1352R1|CC1352P[17]/))
             }
         ];
         templates = [
+            {
+                name: "/ti/zstack/templates/ti_zstack_config.c.xdt",
+                outputPath: "ti_zstack_config.c"
+            },
             {
                 name: "/ti/zstack/templates/ti_zstack_config.h.xdt",
                 outputPath: "ti_zstack_config.h"

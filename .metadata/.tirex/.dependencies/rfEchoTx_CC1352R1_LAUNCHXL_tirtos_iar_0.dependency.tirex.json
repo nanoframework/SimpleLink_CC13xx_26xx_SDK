@@ -1,19 +1,19 @@
 [
     {
         "files": [
+            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
+            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf",
+            "+../main_tirtos.c -> main_tirtos.c",
+            "+../../overview.rov.json -> overview.rov.json",
             "+../../README.md -> README.md",
-            "+../../RFQueue.h -> RFQueue.h",
-            "+../../RFQueue.c -> RFQueue.c",
-            "+../../rfEcho_PerfectEcho.png -> rfEcho_PerfectEcho.png",
+            "+../../rfEcho_ErrorTxRx.png -> rfEcho_ErrorTxRx.png",
             "+../../rfEcho_MissedFirstPacket.png -> rfEcho_MissedFirstPacket.png",
             "+../../rfEcho_MissingFirstCouplePackets.png -> rfEcho_MissingFirstCouplePackets.png",
-            "+../../rfEcho_ErrorTxRx.png -> rfEcho_ErrorTxRx.png",
-            "+../rfEchoTx.syscfg -> rfEchoTx.syscfg",
-            "+../../overview.rov.json -> overview.rov.json",
+            "+../../rfEcho_PerfectEcho.png -> rfEcho_PerfectEcho.png",
             "+../../rfEchoTx.c -> rfEchoTx.c",
-            "+../main_tirtos.c -> main_tirtos.c",
-            "+../../../../../../../source/ti/boards/CC1352R1_LAUNCHXL/Board.html -> Board.html",
-            "+cc13x2_cc26x2_tirtos.icf -> cc13x2_cc26x2_tirtos.icf"
+            "+../rfEchoTx.syscfg -> rfEchoTx.syscfg",
+            "+../../RFQueue.c -> RFQueue.c",
+            "+../../RFQueue.h -> RFQueue.h"
         ]
     }
 ]

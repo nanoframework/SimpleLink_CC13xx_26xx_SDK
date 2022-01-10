@@ -2,15 +2,31 @@
     "target": {
         "Name": "LP_CC2651P3",
         "Revision": [],
-        "Description": "CC2651P3 LP. 7x7 VQFN48 package. Internal bias, differential output. 2.4 GHz frequency band.",
+        "Description": "CC2651P3 LP. 7x7 VQFN48 package. External bias, differential output. 2.4 GHz frequency band.",
         "DeviceName": "CC2651R3",
         "DevicePackage": "VQFN 7x7",
-        "FrontEnd": "ID",
+        "FrontEnd": "XD",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC2652REM-7ID",
+        "RfDesign": "CC2651-P3EM-7XD24-PA24_5DBM",
         "DefaultCategory": "Settings",
-        "IoSettingsIdle": [],
-        "IoSettingsRx": [],
-        "IoSettingsTx": []
+        "IoSettings": {
+            "_name": "RF Switch",
+            "IoPin": [
+                {
+                    "_name": "DIO28",
+                    "ControlFunction": "Input\/Output",
+                    "Idle": "Input tristate (Default)",
+                    "Tx": "Output high",
+                    "Rx": "Output high"
+                },
+                {
+                    "_name": "DIO29",
+                    "ControlFunction": "Input\/Output",
+                    "Idle": "Input tristate (Default)",
+                    "Tx": "Output low",
+                    "Rx": "Output low"
+                }
+            ]
+        }
     }
 }

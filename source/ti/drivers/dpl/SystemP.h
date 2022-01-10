@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
  *
  *  @brief      System module for the RTOS Porting Interface
  *
- *  Basic system services for supporting printf-like output.
+ *  Basic system services.
  *
  *  ===========================================================================
  */
@@ -52,8 +52,16 @@ extern "C" {
 extern int SystemP_snprintf(char *buf, size_t n, const char *format,...);
 extern int SystemP_vsnprintf(char *buf, size_t n, const char *format, va_list va);
 
+/*!
+ * @brief    Start command for the RTOS scheduler
+ *
+ * This function will never return. Call only once, from the application's
+ * main function.
+ */
+extern void SystemP_startScheduler(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ti_dpl_SemaphoreP__include */
+#endif

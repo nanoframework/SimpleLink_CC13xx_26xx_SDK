@@ -132,7 +132,7 @@
 #define ZS_ZDO_MGMT_NWK_UPDATE_NOTIFY_CDID  0x00800000
 #define ZS_ZDO_DEVICE_ANNOUNCE_CDID         0x01000000
 #define ZS_DEV_STATE_CHANGE_CDID            0x02000000
-#define ZS_DEV_JAMMER_IND_CDID              0x04000000
+// 0x04000000 is available for use. Was used for ZS_DEV_JAMMER_IND_CDID
 #define ZS_TC_DEVICE_IND_CDID               0x08000000
 #define ZS_DEV_PERMIT_JOIN_IND_CDID         0x10000000
 
@@ -565,8 +565,8 @@ static bool processBdbTouchLinkTargetDisableCommissioningReq( uint8_t srcService
 static bool processBdbTouchLinkTargetGetTimerReq( uint8_t srcServiceTaskId, void *pMsg );
 #endif
 
-#if (ZG_BUILD_ENDDEVICE_TYPE)
-static bool processBdbZedAttemptRecoverNwkReq( uint8_t srcServiceTaskId, void *pMsg );
+#if (ZG_BUILD_JOINING_TYPE)
+static bool processBdbRecoverNwkReq( uint8_t srcServiceTaskId, void *pMsg );
 #endif
 
 #if (ZG_BUILD_JOINING_TYPE)
@@ -1531,9 +1531,9 @@ static bool appMsg( uint8_t* pMsg )
       break;
 #endif
 
-#if (ZG_BUILD_ENDDEVICE_TYPE)
+#if (ZG_BUILD_JOINING_TYPE)
     case zstackmsg_CmdIDs_BDB_ZED_ATTEMPT_RECOVER_NWK_REQ:
-      resend = processBdbZedAttemptRecoverNwkReq( srcServiceTaskId, pMsg );
+      resend = processBdbRecoverNwkReq( srcServiceTaskId, pMsg );
       break;
 #endif
 
@@ -1850,6 +1850,17 @@ static void zsProcessZDOMsgs( zdoIncomingMsg_t *inMsg )
 
         ZDO_ParseSimpleDescRsp( inMsg, &simpleRsp );
         sendSimpleDescRsp( inMsg->srcAddr.addr.shortAddr, &simpleRsp );
+
+        if(simpleRsp.simpleDesc.pAppInClusterList != NULL)
+        {
+          OsalPort_free( simpleRsp.simpleDesc.pAppInClusterList );
+          simpleRsp.simpleDesc.pAppInClusterList = ( cId_t* )NULL;
+        }
+        if(simpleRsp.simpleDesc.pAppOutClusterList != NULL)
+        {
+          OsalPort_free( simpleRsp.simpleDesc.pAppOutClusterList );
+          simpleRsp.simpleDesc.pAppOutClusterList = ( cId_t* )NULL;
+        }
       }
       break;
 #endif
@@ -4682,7 +4693,7 @@ static bool processDevForceNetworkSettingsReq( uint8_t srcServiceTaskId, void *p
     // Copy the new network parameters to NIB
     _NIB.nwkState = (nwk_states_t)pReq->pReq->state;
     _NIB.nwkDevAddress = pReq->pReq->nwkAddr;
-    _NIB.nwkLogicalChannel = pReq->pReq->channelList;
+    _NIB.nwkLogicalChannel = pReq->pReq->logicalChannel;
     _NIB.nwkCoordAddress = pReq->pReq->parentNwkAddr;
     _NIB.channelList = pReq->pReq->channelList;
     _NIB.nwkPanId = pReq->pReq->panID;
@@ -6875,18 +6886,6 @@ static bool processDevZDOCBReq( uint8_t srcServiceTaskId, void *pMsg )
         else
         {
           pItem->zdoRsps &= ~ZS_DEV_STATE_CHANGE_CDID;
-        }
-      }
-
-      if ( pPtr->pReq->has_devJammerInd )
-      {
-        if ( pPtr->pReq->devJammerInd )
-        {
-          pItem->zdoRsps |= ZS_DEV_JAMMER_IND_CDID;
-        }
-        else
-        {
-          pItem->zdoRsps &= ~ZS_DEV_JAMMER_IND_CDID;
         }
       }
 
@@ -9131,7 +9130,7 @@ static bool processBdbNwkDescFreeReq( uint8_t srcServiceTaskId, void *pMsg )
 /**************************************************************************************************
  * @fn          processBdbFilterNwkDescCompleteReq
  *
- * @brief       Process BDB ZED Attempt Recovery Network Request
+ * @brief       Process BDB Filter Nwk Descriptor Complete Request
  *
  * @param       srcServiceTaskId - Source Task ID
  * @param       pMsg - pointer to message
@@ -9285,25 +9284,25 @@ static bool processBdbTouchlinkGetAllowStealingReq( uint8_t srcServiceTaskId, vo
 }
 #endif
 
-#if (ZG_BUILD_ENDDEVICE_TYPE)
+#if (ZG_BUILD_JOINING_TYPE)
 /**************************************************************************************************
- * @fn          processBdbZedAttemptRecoverNwkReq
+ * @fn          processBdbRecoverNwkReq
  *
- * @brief       Process BDB ZED Attempt Recovery Network Request
+ * @brief       Process BDB Recover Network Request
  *
  * @param       srcServiceTaskId - Source Task ID
  * @param       pMsg - pointer to message
  *
  * @return      TRUE to send the response back
  */
-static bool processBdbZedAttemptRecoverNwkReq( uint8_t srcServiceTaskId, void *pMsg )
+static bool processBdbRecoverNwkReq( uint8_t srcServiceTaskId, void *pMsg )
 {
-  zstackmsg_bdbZedAttemptRecoverNwkReq_t *pPtr = (zstackmsg_bdbZedAttemptRecoverNwkReq_t *)pMsg;
+  zstackmsg_bdbRecoverNwkReq_t *pPtr = (zstackmsg_bdbRecoverNwkReq_t *)pMsg;
 
   if ( pPtr->pRsp )
   {
     pPtr->hdr.status = zstack_ZStatusValues_ZSuccess;
-    pPtr->pRsp->status = bdb_ZedAttemptRecoverNwk();
+    pPtr->pRsp->status = bdb_recoverNwk();
   }
   else
   {

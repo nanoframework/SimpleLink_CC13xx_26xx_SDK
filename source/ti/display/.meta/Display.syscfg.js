@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ let config = [
     {
         name: "displayImplementation",
         displayName: "Display Implementation",
-        default: "DisplayUart",
+        default: "DisplayUart2",
         options: [
             {name: "DisplayUart"},
             {name: "DisplayUart2"},
@@ -93,7 +93,8 @@ value that cannot be changed. Please refer to the
         name        : "useUART2",
         displayName : "Use UART2",
         description : "Use UART2 for underlying UART driver",
-        default     : false,
+        default     : true,
+        hidden      : false,
         onChange    : onChange
     },
     {
@@ -148,6 +149,47 @@ value that cannot be changed. Please refer to the
 ];
 
 /*
+ *  ======== pinmuxRequirements ========
+ *  Returns peripheral pin requirements of the specified instance
+ */
+function pinmuxRequirements(inst)
+{
+    if (inst.displayType !== "LCD") {
+        return [];
+    }
+
+    let lcdPins = [
+        {
+            name: "lcdEnablePin",
+            displayName: "LCD Enable",
+            interfaceName: "GPIO",
+            signalTypes: ["DOUT"]
+        },
+        {
+            name: "lcdPowerPin",
+            displayName: "LCD Power",
+            interfaceName: "GPIO",
+            signalTypes: ["DOUT"]
+        },
+        {
+            name: "lcdSSPin",
+            displayName: "LCD Slave Select",
+            interfaceName: "GPIO",
+            signalTypes: ["DOUT"]
+        }
+    ];
+
+    /* If we have hardware, require the specific pins instead of generic DOUT pins */
+    if (inst.$hardware) {
+        lcdPins[0].signalTypes = ["LCD_ENABLE"];
+        lcdPins[1].signalTypes = ["LCD_POWER"];
+        lcdPins[2].signalTypes = ["SPI_SS"];
+    }
+
+    return lcdPins;
+}
+
+/*
  * ======== moduleInstances ========
  */
 function moduleInstances(inst)
@@ -155,6 +197,7 @@ function moduleInstances(inst)
     if (inst.displayType === "UART") {
 
         let displayName = "UART";
+
         let moduleName = "/ti/drivers/UART";
         if (inst.$hardware && inst.$hardware.displayName) {
             displayName = inst.$hardware.displayName;
@@ -183,6 +226,8 @@ function moduleInstances(inst)
         let selectName = "LCD Slave Select";
         let selectHardware = null;
 
+        let shortName = inst.$name.replace("CONFIG_", "");
+
         /* Speculatively get hardware and displayName */
         if (inst.$hardware && inst.$hardware.subComponents) {
             let components = inst.$hardware.subComponents;
@@ -204,25 +249,55 @@ function moduleInstances(inst)
 
         return ([
             {
-                name       : "lcdEnable",
+                name: "lcdEnable",
                 displayName: enableName,
-                moduleName : "/ti/drivers/GPIO",
-                hardware   : enableHardware,
-                args       : { mode: "Dynamic" }
+                moduleName: "/ti/drivers/GPIO",
+                args: {
+                    /* Sets default but user can reconfigure */
+                    $name: "CONFIG_GPIO_" + shortName + "_ENABLE",
+                    mode: "Output"
+                },
+                requiredArgs: {
+                    /* Can't be changed by the user */
+                    parentInterfaceName: "GPIO",
+                    parentSignalName: "lcdEnablePin",
+                    parentSignalDisplayName: enableName,
+                    $hardware: enableHardware
+                }
             },
             {
-                name       : "lcdPower",
+                name: "lcdPower",
                 displayName: powerName,
-                moduleName : "/ti/drivers/GPIO",
-                hardware   : powerHardware,
-                args       : { mode: "Dynamic" }
+                moduleName: "/ti/drivers/GPIO",
+                args: {
+                    /* Sets default but user can reconfigure */
+                    $name: "CONFIG_GPIO_" + shortName + "_POWER",
+                    mode: "Output"
+                },
+                requiredArgs: {
+                    /* Can't be changed by the user */
+                    parentInterfaceName: "GPIO",
+                    parentSignalName: "lcdPowerPin",
+                    parentSignalDisplayName: powerName,
+                    $hardware: powerHardware
+                }
             },
             {
-                name       : "lcdSS",
+                name: "lcdSS",
                 displayName: selectName,
-                moduleName : "/ti/drivers/GPIO",
-                hardware   : selectHardware,
-                args       : { mode: "Dynamic" }
+                moduleName: "/ti/drivers/GPIO",
+                args: {
+                    /* Sets default but user can reconfigure */
+                    $name: "CONFIG_GPIO_" + shortName + "_SELECT",
+                    mode: "Output"
+                },
+                requiredArgs: {
+                    /* Can't be changed by the user */
+                    parentInterfaceName: "GPIO",
+                    parentSignalName: "lcdSSPin",
+                    parentSignalDisplayName: selectName,
+                    $hardware: selectHardware
+                }
             }
         ]);
     }
@@ -285,20 +360,6 @@ function validate(inst, validation)
     if (inst.lcdSize <= 0) {
         logError(validation, inst, 'lcdSize', 'Must be a positive integer.');
     }
-
-    /* Ensure display baud rate is supported by the uart's baud rate list */
-    if (inst.displayType === "UART" && inst.uart.hasOwnProperty('baudRates')) {
-        if (! inst.uart.baudRates.includes(inst.baudRate)) {
-            let suffix = "";
-            if (inst.uart.$hardware) {
-                suffix = "(" + inst.uart.$hardware.name + ")";
-            }
-            logError(validation, inst, 'baudRate',
-                inst.baudRate + " baud is not supported by the UART "
-                + inst.uart.$name + suffix
-            );
-        }
-    }
 }
 
 /*
@@ -345,7 +406,7 @@ function onChange(inst, ui)
         ui.mutexTimeoutValue.hidden = true;
         inst.displayImplementation = "DisplayHost";
     }
-    else {
+    else if (inst.displayType == "UART"){
         ui.enableANSI.hidden = false;
         ui.maxPrintLength.hidden = true;
         ui.uartBufferSize.hidden = false;
@@ -356,8 +417,7 @@ function onChange(inst, ui)
         onChangeMutexTimeout(inst, ui);
 
         if (inst.useUART2 == false) {
-            inst.displayImplementation =
-                inst.$module.$configByName.displayImplementation.default;
+            inst.displayImplementation = "DisplayUart";
         }
         else {
             inst.displayImplementation = "DisplayUart2";
@@ -431,8 +491,13 @@ function getLibs(mod)
     let GenLibs = system.getScript("/ti/utils/build/GenLibs");
     let libPath = GenLibs.libPath;
 
+    /* get library name from DriverLib */
+    var DriverLib = system.getScript("/ti/devices/DriverLib");
+    let devId = system.deviceData.deviceId;
+    let libFamilyName = DriverLib.getAttrs(devId).libName;
+
     /* add the display library to libGroup's libs */
-    libGroup.libs.push(libPath("ti/display", "display.a"));
+    libGroup.libs.push(libPath("ti/display", "display_" + libFamilyName + ".a"));
 
     /* add dependency on /ti/drivers (if needed) */
     let needDrivers = false;
@@ -474,6 +539,7 @@ and portable APIs.
     maxInstances          : 3,
     filterHardware        : filterHardware,
     onHardwareChanged     : onHardwareChanged,
+    pinmuxRequirements    : pinmuxRequirements,
     modules               : Common.autoForceModules(["Board"]),
     moduleInstances       : moduleInstances,
     sharedModuleInstances : sharedModuleInstances,

@@ -1,7 +1,7 @@
 /******************************************************************************
 *  Filename:       hw_smph_h
-*  Revised:        2020-06-17 11:27:30 +0200 (Wed, 17 Jun 2020)
-*  Revision:       57777
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 * Copyright (c) 2015 - 2017, Texas Instruments Incorporated
 * All rights reserved.

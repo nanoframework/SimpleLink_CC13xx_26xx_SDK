@@ -6,7 +6,7 @@
         This file targets the Texas Instruments CC26xx Device Family.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

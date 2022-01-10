@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       osc.c
-*  Revised:        2020-12-11 09:56:37 +0100 (Fri, 11 Dec 2020)
-*  Revision:       59847
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Driver for setting up the system Oscillators
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -170,7 +170,7 @@ OSCClockSourceGet(uint32_t ui32SrcClk)
                                             DDI_0_OSC_STAT0_SCLK_HF_SRC_M,
                                             DDI_0_OSC_STAT0_SCLK_HF_SRC_S);
     }
-    return (ui32ClockSource);
+    return ( ui32ClockSource );
 }
 
 //*****************************************************************************
@@ -324,14 +324,16 @@ OSCHF_SwitchToRcOscTurnOffXosc( void )
 void
 OSC_AdjustXoscHfCapArray( int32_t capArrDelta )
 {
-   // read the MODE_CONF register in CCFG
-   uint32_t ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
-   // Clear CAP_MODE and the CAPARRAY_DELATA field
-   ccfg_ModeConfReg &= ~( CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M | CCFG_MODE_CONF_XOSC_CAP_MOD_M );
-   // Insert new delta value
-   ccfg_ModeConfReg |= ((((uint32_t)capArrDelta) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S ) & CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M );
-   // Update the HW register with the new delta value
-   DDI32RegWrite(AUX_DDI0_OSC_BASE, DDI_0_OSC_O_ANABYPASSVAL1, SetupGetTrimForAnabypassValue1( ccfg_ModeConfReg ));
+    {
+        // Read the MODE_CONF register in CCFG
+        uint32_t ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
+        // Clear CAP_MODE and the CAPARRAY_DELATA field
+        ccfg_ModeConfReg &= ~( CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M | CCFG_MODE_CONF_XOSC_CAP_MOD_M );
+        // Insert new delta value
+        ccfg_ModeConfReg |= ((((uint32_t)capArrDelta) << CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_S ) & CCFG_MODE_CONF_XOSC_CAPARRAY_DELTA_M );
+        // Update the HW register with the new delta value
+        DDI32RegWrite(AUX_DDI0_OSC_BASE, DDI_0_OSC_O_ANABYPASSVAL1, SetupGetTrimForAnabypassValue1( ccfg_ModeConfReg ));
+    }
 }
 
 //*****************************************************************************
@@ -571,7 +573,7 @@ OSC_HPOSCInitializeSingleInsertionFreqOffsParams( uint32_t measFieldAddress )
     {
         /* Coefficients for SW-TCXO */
         .pu0b = {44, 44, 27, 20},
-        .pu0c = {7322, -5021, -209, -104861}
+        .pu0c = {8183, -2546, -210, -104866}
     };
 
     /* Retrieve insertions from FCFG */
@@ -763,6 +765,7 @@ uint32_t OSCHF_DebugGetCrystalStartupTime( void )
 
    // Start operation in sync with the LF clock
    HWREG( AON_RTC_BASE + AON_RTC_O_SYNCLF );
+
    OSCHF_TurnOnXosc();
    while ( ! OSCHF_AttemptToSwitchToXosc() ) {
       HWREG( AON_RTC_BASE + AON_RTC_O_SYNCLF );

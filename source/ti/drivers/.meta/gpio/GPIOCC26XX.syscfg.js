@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,17 +45,16 @@ let Common = system.getScript("/ti/drivers/Common.js");
  *  Device-specific extensions to be added to base GPIO configuration
  */
 let devSpecific = {
-
-    /* PIN instances */
-    moduleInstances: moduleInstances,
-
     templates:
     {
         boardc : "/ti/drivers/gpio/GPIOCC26XX.Board.c.xdt",
+        board_initc : "/ti/drivers/gpio/GPIO.Board_init.c.xdt",
         boardh : "/ti/drivers/gpio/GPIO.Board.h.xdt"
     },
 
-    _getPinResources: _getPinResources
+    _getPinResources: _getPinResources,
+    _getHwSpecificAttrs: _getHwSpecificAttrs,
+    _pinToDio: _pinToDio
 };
 
 /*
@@ -78,6 +77,25 @@ function _getPinResources(inst)
 }
 
 /*
+ *  ======== _getHwSpecificAttrs ========
+ */
+function _getHwSpecificAttrs(inst)
+{
+    return [];
+}
+
+/*
+ *  ======== _pinToDio ========
+ */
+function _pinToDio(pinSolution, devicePin)
+{
+    /* The description passed here comes from the device metadata and is
+     * of the format DIO_n - substring gets rid of DIO_ and we parse the result
+     */
+    return parseInt(devicePin.description.split("_")[1], 10);
+}
+
+/*
  *  ======== pinmuxRequirements ========
  *  Return peripheral pin requirements as a function of config
  *  Called on instantiation and every config change.
@@ -88,41 +106,6 @@ function pinmuxRequirements(inst, $super)
 {
     let result = $super.pinmuxRequirements ? $super.pinmuxRequirements(inst) : [];
     return (result);
-}
-
-/*
- *  ======== moduleInstances ========
- *  returns a PIN instance
- */
-function moduleInstances(inst)
-{
-
-    if (inst.nullEntry == true) return [];
-
-    let mode = inst.mode;
-    let pinInstance = new Array();
-
-    if (inst.mode == "Dynamic") {
-        mode = "Input";
-    }
-
-    pinInstance.push(
-        {
-            name: "pinInstance",
-            displayName: "Pin Instance",
-            description: "PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
-            collapsed: true,
-            args: { parentMod: "/ti/drivers/GPIO",
-                    parentSignalName: "gpioPin",
-                    parentSignalDisplayName: "GPIO Pin",
-                    mode: mode,
-                    outputState: inst.initialOutputState,
-                    pull: inst.pull }
-        }
-    );
-
-    return (pinInstance);
 }
 
 /*
@@ -140,8 +123,13 @@ function extend(base)
     };
 
     /* display which driver implementation can be used */
-    base = Common.addImplementationConfig(base, "GPIO", null,
-        [{name: "GPIOCC26XX"}], null);
+    base = Common.addImplementationConfig(
+        base,
+        "GPIO",
+        null,
+        [{name: "GPIOCC26XX"}],
+        null
+    );
 
     /* merge and overwrite base module attributes */
     return (Object.assign({}, base, devSpecific));

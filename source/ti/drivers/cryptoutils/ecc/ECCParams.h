@@ -101,11 +101,6 @@ typedef uint32_t ECCParams_CurveType;
 #define ECCParams_CURVE_TYPE_MONTGOMERY 3U
 #define ECCParams_CURVE_TYPE_EDWARDS 4U
 
-typedef struct ECCParams_ECCPoint {
-    const uint8_t *x;
-    const uint8_t *y;
-} ECCParams_ECCPoint;
-
 /*!
  *
  *  @brief A structure containing the parameters of an elliptic curve in short Weierstrass form.
@@ -123,20 +118,10 @@ typedef struct ECCParams_CurveParams {
     const uint8_t               *a;
     const uint8_t               *b;
     const uint8_t               *order;
-    const ECCParams_ECCPoint    *g;
-    const ECCParams_ECCPoint    *t;
-    uint16_t                    primeBitLength;
-    uint16_t                    orderBitLength;
     uint8_t                     cofactor;
-    uint8_t                     curveID;
-    uint16_t                    reserved;
-
-    /* Below: differences between implementations that need to be aligned */
     const size_t                length;
     const uint8_t               *generatorX;
     const uint8_t               *generatorY;
-    ECCParams_ECCPoint          generator;
-    ECCParams_ECCPoint          precomputed;
 } ECCParams_CurveParams;
 
 

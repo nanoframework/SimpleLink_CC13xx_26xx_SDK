@@ -37,6 +37,7 @@
  */
 
 const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
+const RF = system.modules["/ti/drivers/RF"].$static;
 
 // Get common utility functions
 const Common = system.getScript("/ti/ti154stack/ti154stack_common.js");

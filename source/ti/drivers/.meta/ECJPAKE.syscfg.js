@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,18 +47,6 @@ let family = Common.device2Family(system.deviceData, "ECDH");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - ECJPAKE instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base ECJPAKE properties and methods
  */
@@ -82,7 +70,6 @@ certificate authorities.
 [3]: /drivers/doxygen/html/_e_c_j_p_a_k_e_8h.html#ti_drivers_ECJPAKE_Examples "C usage examples"
 [4]: /drivers/syscfg/html/ConfigDoc.html#ECJPAKE_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     defaultInstanceName : "CONFIG_ECJPAKE_",
     config              : Common.addNameConfig(config, "/ti/drivers/ECJPAKE", "CONFIG_ECJPAKE_"),
     modules             : Common.autoForceModules(["Board", "Power"])

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -83,8 +83,6 @@ function validate(inst, validation)
         message = 'Period value: ' + period + ' can not be negative';
         logError(validation, inst, "period", message);
     }
-
-    Common.validateNames(inst, validation);
 }
 
 /*

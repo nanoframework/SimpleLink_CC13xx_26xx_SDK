@@ -2,7 +2,7 @@
  @file:       urfc.h
 
  Group: WCS BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -75,7 +75,9 @@ extern "C"
  * INCLUDES
  */
 #include <hal_types.h>
+#if !defined(DeviceFamily_CC26X1)
 #include <rf_patches/rf_patch_cpe_multi_protocol_rtls.h>
+#endif
 #include <ti/drivers/rf/RF.h>
 #include "rf_hal.h"
 
@@ -268,6 +270,41 @@ extern "C"
 #endif // <board>
 /** @} End URF_Constants */
 
+
+// CTE Config parameters
+#define  CTE_CONNECTION_ENABLE                         (0)
+#define  CTE_GENERIC_RX_ENABLE                         (1)
+#define  CTE_SCANNER_ENABLE                            (2)
+#define  CTE_USE_MCE_RAM                               (3)
+#define  CTE_USE_RFE_RAM                               (4)
+#define  CTE_USE_DUAL_RAM                              (5)
+#define  CTE_FLOW_CONTROL                              (6)
+#define  CTE_AUTO_COPY                                 (7)
+
+// Supported CTE for generic Rx and allow using RFE Ram for sampling
+#define CTE_CONFIG  (BV(CTE_CONNECTION_ENABLE) | \
+                     BV(CTE_GENERIC_RX_ENABLE) | \
+                     BV(CTE_SCANNER_ENABLE)    | \
+                     BV(CTE_USE_MCE_RAM)       | \
+                     BV(CTE_USE_RFE_RAM)       | \
+                     BV(CTE_USE_DUAL_RAM)      | \
+                     BV(CTE_FLOW_CONTROL)      | \
+                     BV(CTE_AUTO_COPY))
+
+// 4 us before start of sampling
+#define CTE_OFFSET                                     (4)
+#define CTE_REFERENCE_PERIOD                           (8)
+
+// sampling rate on 1 Mbps and 2 Mbps packets
+#define CTE_SAMPLING_CONFIG_1MHZ                       (1)
+#define CTE_SAMPLING_CONFIG_2MHZ                       (2)
+#define CTE_SAMPLING_CONFIG_3MHZ                       (3)
+#define CTE_SAMPLING_CONFIG_4MHZ                       (4)
+
+// set the CTE sampling rate 4Mhz (4 samples in 1us)
+#define CTE_SAMPLING_CONFIG_1MBPS     (CTE_SAMPLING_CONFIG_4MHZ)
+#define CTE_SAMPLING_CONFIG_2MBPS     (CTE_SAMPLING_CONFIG_4MHZ)
+
 /*******************************************************************************
  * TYPEDEFS
  */
@@ -287,6 +324,7 @@ PACKED_TYPEDEF_CONST_STRUCT
   ubTxPowerVal_t* pTxPowerVals;   //!< pointer to Tx Power Values
   uint8           numTxPowerVal;  //!< Number of Tx Power Values
 } ubTxPowerTable_t;               //!< Tx Power Table
+
 /** @} End URF_Structures */
 
 /*******************************************************************************

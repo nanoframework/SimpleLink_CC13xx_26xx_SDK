@@ -46,11 +46,17 @@
 
   Application-specific UI peripherals being used:
 
-  - none (LED1 is currently unused by this application).
+  - LEDs:
+    LED1 is not used in this application
 
   Application-specific menu system:
-
     <TOGGLE LIGHT> Send a toggle command targeting appropriate devices from the binding table.
+
+    <DISCOVER> Sets Switch device into Identify mode.
+
+    The APP Info line will display the following information:
+      [Remote Light]
+        0xXXXX is On/Off/Unknown- Remote light short address and state of the remote light
 
 *********************************************************************/
 
@@ -928,9 +934,9 @@ static void zclSampleSw_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

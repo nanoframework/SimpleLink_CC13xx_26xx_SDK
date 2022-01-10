@@ -855,7 +855,24 @@ static void bdb_linkedListAttrInit( bdbAttrLinkedListAttr_t *list )
  */
 static uint8_t bdb_linkedListAttrAdd( bdbAttrLinkedListAttr_t *list, bdbReportAttrLive_t* data )
 {
-  bdbLinkedListAttrItem_t* newItem = (bdbLinkedListAttrItem_t *)OsalPort_malloc( sizeof(bdbLinkedListAttrItem_t) );
+  uint8_t i;
+  bdbLinkedListAttrItem_t* tmpItem = list->head;
+  bdbLinkedListAttrItem_t* newItem;
+
+  if (tmpItem != NULL )
+  {
+    for (i=0; i<list->numItems; i++)
+    {
+      // Don't add duplicate attribute
+      if (tmpItem->data->attrID == data->attrID)
+      {
+        return BDBREPORTING_ERROR;
+      }
+      tmpItem = tmpItem->next;
+    }
+  }
+
+  newItem = (bdbLinkedListAttrItem_t *)OsalPort_malloc( sizeof(bdbLinkedListAttrItem_t) );
   if( newItem == NULL )
   {
     return BDBREPORTING_ERROR;

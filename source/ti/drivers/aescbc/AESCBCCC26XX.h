@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,6 +77,9 @@
 
 #include <ti/drivers/dpl/SwiP.h>
 
+#include <ti/devices/DeviceFamily.h>
+#include DeviceFamily_constructPath(driverlib/aes.h)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -109,18 +112,33 @@ typedef struct {
  *  The application must not access any member variables of this structure!
  */
 typedef struct {
-    bool                            isOpen;
-    bool                            operationInProgress;
-    bool                            operationCanceled;
-    bool                            threadSafe;
-    int_fast16_t                    returnStatus;
-    AESCBC_ReturnBehavior           returnBehavior;
-    AESCBC_OperationType            operationType;
+    uint32_t                        iv[AES_BLOCK_SIZE / 4];
     uint32_t                        semaphoreTimeout;
     AESCBC_CallbackFxn              callbackFxn;
-    AESCBC_Operation                *operation;
-    uint8_t                         iv[16];
+    AESCBC_OperationUnion           *operation;
+    CryptoKey                       key;
+    volatile int_fast16_t           returnStatus;
+    AESCBC_ReturnBehavior           returnBehavior;
+    AESCBC_OperationType            operationType;
+    bool                            isOpen;
+    volatile bool                   operationInProgress;
+    bool                            threadSafe;
+    volatile bool                   hwBusy;
+    volatile bool                   cryptoResourceLocked;
 } AESCBCCC26XX_Object;
+
+/*!
+ *  @cond NODOC
+ *  @brief Non-public functions required by other drivers
+ *
+ *  The functions may be required by other drivers and are required to
+ *  ensure thread-safe behavior across multiple calls.
+ */
+bool AESCBC_acquireLock(AESCBC_Handle handle, uint32_t timeout);
+void AESCBC_releaseLock(AESCBC_Handle handle);
+void AESCBC_enableThreadSafety(AESCBC_Handle handle);
+void AESCBC_disableThreadSafety(AESCBC_Handle handle);
+/*! @endcond */
 
 #ifdef __cplusplus
 }

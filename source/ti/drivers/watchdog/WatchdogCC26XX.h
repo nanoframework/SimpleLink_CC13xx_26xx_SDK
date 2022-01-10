@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,12 @@
  *  @note The Watchdog interrupt is configured as a non-maskable interrupt
  *  (NMI) and the user-defined callback function is called in the context of
  *  NMI. Because the Watchdog interrupt is non-maskable, it is not safe to call
- *  any BIOS APIs from the Watchdog callback function.
+ *  any BIOS APIs from the Watchdog callback function. Calls to DPL and TIDRIVERS
+ *  APIs should also be avoided given that they may indirectly make calls to BIOS
+ *  APIs. Furthermore, the watchdog callback should only be reached if the
+ *  watchdog times out. This should indicate an error event and allow logging
+ *  or other housekeeping before resetting the device. Clearing of the watchdog
+ *  and checking alive signals should be done in another execution context.
  *
  *  The reload value from which the Watchdog timer counts down may be changed
  *  during runtime using #Watchdog_setReload(). This value should be specified

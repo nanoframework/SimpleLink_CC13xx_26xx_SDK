@@ -161,6 +161,7 @@ typedef enum addr_filter_e addr_filter_t;
  */
 typedef enum
 {
+  nwkPanId            = 0x80,
   nwkSequenceNum      = 0x81,
   nwkPassiveAckTimeout,
   nwkMaxBroadcastRetries,

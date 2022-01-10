@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -224,13 +224,13 @@ int_fast16_t ECDSA_sign(ECDSA_Handle handle, ECDSA_OperationSign *operation) {
     /* Now that we have created r and s, we need to copy them back and reverse
      * them since the ECC in ROM implementation provides little-endian values.
      */
-    CryptoUtils_reverseCopyPad(&rUnion.word[1],
-                               operation->r,
-                               ECC_NISTP256_PARAM_LENGTH_BYTES);
+    CryptoUtils_reverseCopy(&rUnion.word[1],
+                            operation->r,
+                            ECC_NISTP256_PARAM_LENGTH_BYTES);
 
-    CryptoUtils_reverseCopyPad(&sUnion.word[1],
-                               operation->s,
-                               ECC_NISTP256_PARAM_LENGTH_BYTES);
+    CryptoUtils_reverseCopy(&sUnion.word[1],
+                            operation->s,
+                            ECC_NISTP256_PARAM_LENGTH_BYTES);
 
     /* If the application uses callback return behaviour, emulate it */
     if (object->returnBehavior == ECDSA_RETURN_BEHAVIOR_CALLBACK) {

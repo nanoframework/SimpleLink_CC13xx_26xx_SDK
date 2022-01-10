@@ -82,9 +82,6 @@ const devSpecificSlLr5KbpsSettings = {
     args: {
         freqBand: "433",
         phyType433: "slr5kbps2gfsk433mhz",
-        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
-16/32-bit CRC`,
-        packetLengthConfig: "Fixed",
         txPower433: "0",
         codeExportConfig: {
             rfMode: "RF_prop_slr5kbps2gfsk433mhz",
@@ -108,8 +105,6 @@ const devSpecific2Gfsk50KbpsSettings = {
     args: {
         freqBand: "433",
         phyType433: "2gfsk50kbps154g433mhz",
-        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
-16/32-bit CRC`,
         txPower433: "0",
         codeExportConfig: {
             rfMode: "RF_prop_2gfsk50kbps154g433mhz",

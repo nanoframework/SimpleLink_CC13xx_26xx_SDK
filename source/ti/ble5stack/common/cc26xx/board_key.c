@@ -5,7 +5,7 @@
  @brief This file contains the interface to the SRF06EB Key Service.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -48,10 +48,16 @@
  * INCLUDES
  */
 #include <stdbool.h>
+
+#ifdef FREERTOS
+#include <ti/drivers/dpl/HwiP.h>
+#include <ti/drivers/dpl/SwiP.h>
+#else
 #include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/family/arm/m3/Hwi.h>
 #include <ti/sysbios/knl/Semaphore.h>
 #include <ti/sysbios/knl/Queue.h>
+#include <ti/sysbios/family/arm/m3/Hwi.h>
+#endif
 
 #include <ti/drivers/pin/PINCC26XX.h>
 
@@ -64,6 +70,10 @@
 #include "util.h"
 #include "board_key.h"
 #include <ti_drivers_config.h>
+
+#ifdef FREERTOS
+typedef void* UArg;
+#endif
 
 /*********************************************************************
  * TYPEDEFS
@@ -93,14 +103,21 @@ static Clock_Struct keyChangeClock;
 keysPressedCB_t appKeyChangeHandler = NULL;
 
 // Memory for the GPIO module to construct a Hwi
+#ifdef FREERTOS
+HwiP_Struct callbackHwiKeys;
+#else
 Hwi_Struct callbackHwiKeys;
+#endif
 
 // PIN configuration structure to set all KEY pins as inputs with pullups enabled
 PIN_Config keyPinsCfg[] =
 {
-#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || defined (CC1352P7_4_LP))
-    CONFIG_PIN_BTN1   | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
-    CONFIG_PIN_BTN2   | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
+#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || \
+    defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || \
+    defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || \
+    defined (CC1352P7_4_LP) || defined (CC2651P3_LP) || defined (CC2651R3_LP)
+    CONFIG_GPIO_BTN1   | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
+    CONFIG_GPIO_BTN2   | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
 #elif defined(CC2650_LAUNCHXL) || defined(CC2640R2_LAUNCHXL) || defined(CC1350_LAUNCHXL)
     Board_BTN1          | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
     Board_BTN2          | PIN_GPIO_OUTPUT_DIS  | PIN_INPUT_EN  |  PIN_PULLUP,
@@ -135,9 +152,12 @@ void Board_initKeys(keysPressedCB_t appKeyCB)
   hKeyPins = PIN_open(&keyPins, keyPinsCfg);
   PIN_registerIntCb(hKeyPins, Board_keyCallback);
 
-#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || defined (CC1352P7_4_LP))
-  PIN_setConfig(hKeyPins, PIN_BM_IRQ, CONFIG_PIN_BTN1 | PIN_IRQ_NEGEDGE);
-  PIN_setConfig(hKeyPins, PIN_BM_IRQ, CONFIG_PIN_BTN2 | PIN_IRQ_NEGEDGE);
+#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || \
+    defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || \
+    defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || \
+    defined (CC1352P7_4_LP) || defined (CC2651P3_LP) || defined (CC2651R3_LP)
+  PIN_setConfig(hKeyPins, PIN_BM_IRQ, CONFIG_GPIO_BTN1 | PIN_IRQ_NEGEDGE);
+  PIN_setConfig(hKeyPins, PIN_BM_IRQ, CONFIG_GPIO_BTN2 | PIN_IRQ_NEGEDGE);
 #elif defined(CC2650_LAUNCHXL) || defined(CC2640R2_LAUNCHXL) || defined(CC1350_LAUNCHXL)
   PIN_setConfig(hKeyPins, PIN_BM_IRQ, Board_BTN1        | PIN_IRQ_NEGEDGE);
   PIN_setConfig(hKeyPins, PIN_BM_IRQ, Board_BTN2        | PIN_IRQ_NEGEDGE);
@@ -151,9 +171,12 @@ void Board_initKeys(keysPressedCB_t appKeyCB)
 
 #ifdef POWER_SAVING
   //Enable wakeup
-#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || defined (CC1352P7_4_LP))
-  PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, CONFIG_PIN_BTN1 | PINCC26XX_WAKEUP_NEGEDGE);
-  PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, CONFIG_PIN_BTN2 | PINCC26XX_WAKEUP_NEGEDGE);
+#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || \
+    defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || \
+    defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || \
+    defined (CC1352P7_4_LP) || defined (CC2651P3_LP) || defined (CC2651R3_LP)
+  PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, CONFIG_GPIO_BTN1 | PINCC26XX_WAKEUP_NEGEDGE);
+  PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, CONFIG_GPIO_BTN2 | PINCC26XX_WAKEUP_NEGEDGE);
 #elif defined(CC2650_LAUNCHXL) || defined(CC2640R2_LAUNCHXL) || defined(CC1350_LAUNCHXL)
   PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, Board_BTN1        | PINCC26XX_WAKEUP_NEGEDGE);
   PIN_setConfig(hKeyPins, PINCC26XX_BM_WAKEUP, Board_BTN2        | PINCC26XX_WAKEUP_NEGEDGE);
@@ -186,13 +209,16 @@ void Board_initKeys(keysPressedCB_t appKeyCB)
 static void Board_keyCallback(PIN_Handle hPin, PIN_Id pinId)
 {
   keysPressed = 0;
-#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || (defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || defined (CC1352P7_4_LP))
-  if ( PIN_getInputValue(CONFIG_PIN_BTN1) == 0 )
+#if defined(CC26X2R1_LAUNCHXL) || defined(CC2652RB_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL) || \
+    defined (CC13X2P1_LAUNCHXL) || defined (CC13X2P_2_LAUNCHXL) || defined (CC13X2P_4_LAUNCHXL) || \
+    defined (CC2652PSIP_LP) || defined (CC2652RSIP_LP) || defined (CC2652R7_LP) || defined (CC1352P7_1_LP) || \
+    defined (CC1352P7_4_LP) || defined (CC2651P3_LP) || defined (CC2651R3_LP)
+  if ( PIN_getInputValue(CONFIG_GPIO_BTN1) == 0 )
   {
     keysPressed |= KEY_LEFT;
   }
 
-  if ( PIN_getInputValue(CONFIG_PIN_BTN2) == 0 )
+  if ( PIN_getInputValue(CONFIG_GPIO_BTN2) == 0 )
   {
     keysPressed |= KEY_RIGHT;
   }

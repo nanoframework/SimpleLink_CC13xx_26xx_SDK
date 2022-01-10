@@ -5,7 +5,7 @@
  This file contains the profile implementation for the buttons and button service
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -93,8 +93,10 @@ bStatus_t ButtonProfile_init()
   Button_init();
   Button_Params buttonParams;
   Button_Params_init(&buttonParams);
-  io.button.zero = Button_open(CONFIG_BUTTON_0, button_callback, &buttonParams);
-  io.button.one = Button_open(CONFIG_BUTTON_1, button_callback, &buttonParams);
+  io.button.zero = Button_open(CONFIG_BUTTON_0, &buttonParams);
+  io.button.one = Button_open(CONFIG_BUTTON_1, &buttonParams);
+  Button_setCallback(io.button.zero, button_callback);
+  Button_setCallback(io.button.one, button_callback);
 
   if ((io.button.zero != NULL) && (io.button.one != NULL))
   {

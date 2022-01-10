@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,8 +91,8 @@
  *    curve.
  *  - Initialize the private key CryptoKey. CryptoKeys are opaque datastructures
  *    and representations of keying material and its storage.
- *    Depending on how the keying material is stored (RAM or flash, key store,
- *    key blob), the CryptoKey must be initialized differently.
+ *    Depending on how the keying material is stored (RAM or flash, key store),
+ *    the CryptoKey must be initialized differently.
  *    The ECDSA API can handle all types of CryptoKey.
  *    However, not all device-specific implementions support all types of
  *    CryptoKey.

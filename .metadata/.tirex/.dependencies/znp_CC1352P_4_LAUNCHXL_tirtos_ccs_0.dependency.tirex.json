@@ -1,16 +1,9 @@
 [
     {
         "files": [
-            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
-            "+../../../../../../../source/ti/zstack/boards/CC1352P_4_LAUNCHXL/CC1352P_4_LAUNCHXL_fxns.c -> CC1352P_4_LAUNCHXL_fxns.c",
-            "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.c -> Stack/Config/mac_user_config.c",
-            "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.h -> Stack/Config/mac_user_config.h",
-            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.c -> Stack/MAC/LowLevel/mac_settings.c",
-            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.h -> Stack/MAC/LowLevel/mac_settings.h",
-            "+../../../../../../../source/ti/zstack/rtos/app.cfg -> app.cfg",
-            "+../../../../../../../source/ti/zstack/boards/cc13x2_cc26x2/cc13x2_cc26x2.cmd -> cc13x2_cc26x2.cmd",
             "+../../../../../../../source/ti/zstack/apps/znp/znp_cnf.opts -> Stack/Config/znp_cnf.opts",
             "+../../README.html -> README.html",
+            "+../../../../../../../source/ti/zstack/startup/main.c -> Application/StartUp/main.c",
             "+../../../../../../../source/ti/common/cui/cui.c -> Application/ui/cui.c",
             "+../../../../../../../source/ti/common/cui/cui.h -> Application/ui/cui.h",
             "+../../../../../../../source/ti/zstack/startup/zstackstartup.c -> Application/StartUp/zstackstartup.c",
@@ -72,6 +65,7 @@
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_assert.h -> Stack/MAC/LowLevel/mac_assert.h",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_rx.h -> Stack/MAC/LowLevel/mac_rx.h",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_tx.h -> Stack/MAC/LowLevel/mac_tx.h",
+            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_activity.c -> Stack/MAC/LowLevel/mac_activity.c",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_activity.h -> Stack/MAC/LowLevel/mac_activity.h",
             "+../../../../../../../source/ti/ti154stack/inc/mac_api.h -> Stack/MAC/mac_api.h",
             "+../../../../../../../source/ti/zstack/stack/nwk/addr_mgr.h -> Stack/nwk/addr_mgr.h",
@@ -192,8 +186,14 @@
             "+../../../../../../../source/ti/zstack/mt/mt_zdo.h -> Application/mt/mt_zdo.h",
             "+../../../../../../../source/ti/zstack/mt/mt_znp.c -> Application/mt/mt_znp.c",
             "+../../../../../../../source/ti/zstack/mt/mt_znp.h -> Application/mt/mt_znp.h",
-            "+../../../../../../../source/ti/zstack/startup/main.c -> Application/StartUp/main.c",
             "+../../znp.syscfg -> znp.syscfg",
+            "+../../../../../../../source/ti/boards/CC1352P_4_LAUNCHXL/Board.html -> Board.html",
+            "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.c -> Stack/Config/mac_user_config.c",
+            "+../../../../../../../source/ti/ti154stack/common/boards/mac_user_config.h -> Stack/Config/mac_user_config.h",
+            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.c -> Stack/MAC/LowLevel/mac_settings.c",
+            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.h -> Stack/MAC/LowLevel/mac_settings.h",
+            "+../../../../../../../source/ti/zstack/rtos/app.cfg -> app.cfg",
+            "+../../../../../../../source/ti/zstack/boards/cc13x2_cc26x2/cc13x2_cc26x2.cmd -> cc13x2_cc26x2.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

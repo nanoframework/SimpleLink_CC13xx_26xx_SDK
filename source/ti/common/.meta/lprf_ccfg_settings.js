@@ -146,6 +146,18 @@ const boardSpecificCCFGSettings = {
         enableBootloaderBackdoor: true,
         dioBootloaderBackdoor: 13,
         levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC2651R3_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC2651P3_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
     }
 };
 

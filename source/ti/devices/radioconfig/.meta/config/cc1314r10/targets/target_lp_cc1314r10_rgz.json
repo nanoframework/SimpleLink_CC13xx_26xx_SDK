@@ -1,0 +1,13 @@
+{
+    "target": {
+        "Name": "LP_CC1314R10_RGZ",
+        "Revision": [],
+        "Description": "CC1314R10 RGZ on CC1312R1 LaunchPad.",
+        "DeviceName": "CC1314R10RGZ",
+        "DevicePackage": "RGZ 7x7",
+        "FrontEnd": "XD",
+        "PaSettings": "pasettings.json",
+        "RfDesign": "CC1352EM-XD7793-XD24",
+        "DefaultCategory": "Settings"
+    }
+}

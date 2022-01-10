@@ -8,40 +8,44 @@
                 "PaSettingTable": {
                     "PaSetting": [
                         {
+                            "_text": "5.5",
+                            "Value": "0x003F"
+                        },
+                        {
                             "_text": "5",
-                            "Value": "0x7217"
+                            "Value": "0x6A36"
                         },
                         {
                             "_text": "4",
-                            "Value": "0x4E63"
+                            "Value": "0x8E1F"
                         },
                         {
                             "_text": "3",
-                            "Value": "0x385D"
+                            "Value": "0x7017"
                         },
                         {
                             "_text": "2",
-                            "Value": "0x3259"
+                            "Value": "0x4A60"
                         },
                         {
                             "_text": "1",
-                            "Value": "0x2856"
+                            "Value": "0x285B"
                         },
                         {
                             "_text": "0",
-                            "Value": "0x2853"
+                            "Value": "0x2C57"
                         },
                         {
                             "_text": "-3",
-                            "Value": "0x1893"
+                            "Value": "0x1894"
                         },
                         {
                             "_text": "-5",
-                            "Value": "0x12D6"
+                            "Value": "0x1290"
                         },
                         {
                             "_text": "-6",
-                            "Value": "0x10D4"
+                            "Value": "0x128E"
                         },
                         {
                             "_text": "-9",
@@ -49,7 +53,7 @@
                         },
                         {
                             "_text": "-10",
-                            "Value": "0x0ACF"
+                            "Value": "0x0ACE"
                         },
                         {
                             "_text": "-12",
@@ -57,15 +61,15 @@
                         },
                         {
                             "_text": "-15",
-                            "Value": "0x06CA"
+                            "Value": "0x0AC9"
                         },
                         {
                             "_text": "-18",
-                            "Value": "0x06C8"
+                            "Value": "0x06C7"
                         },
                         {
                             "_text": "-20",
-                            "Value": "0x04C6"
+                            "Value": "0x06C6"
                         }
                     ]
                 }

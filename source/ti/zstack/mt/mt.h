@@ -95,7 +95,7 @@ extern "C"
 #define MT_SYS_OSAL_NV_DELETE                0x12
 #define MT_SYS_OSAL_NV_LENGTH                0x13
 #define MT_SYS_SET_TX_POWER                  0x14
-#define MT_SYS_JAMMER_PARAMETERS             0x15
+// 0x15 is available for use. Was used for MT_SYS_JAMMER_PARAMETERS
 #define MT_SYS_SNIFFER_PARAMETERS            0x16
 #define MT_SYS_ZDIAGS_INIT_STATS             0x17
 #define MT_SYS_ZDIAGS_CLEAR_STATS            0x18
@@ -117,7 +117,7 @@ extern "C"
 /* AREQ to host */
 #define MT_SYS_RESET_IND                     0x80
 #define MT_SYS_OSAL_TIMER_EXPIRED            0x81
-#define MT_SYS_JAMMER_IND                    0x82
+// 0x82 is available for use. Was used for MT_SYS_JAMMER_IND
 
 
 #define MT_SYS_RESET_HARD     0
@@ -461,6 +461,10 @@ extern "C"
 #define MT_DEBUG_TP2_ENABLEAPSSECURITY        0x01
 #define MT_DEBUG_TP2_SET_NODE_R20             0x02
 #define MT_DEBUG_TP2_SET_END_DEV_TIMEOUT_10S  0x03
+#define MT_DEBUG_TP2_SET_FRAG_BLOCK_SIZE      0x04
+// 0x05-0x06 are not available for use.
+#define MT_DEBUG_TP2_GU_SEND_LINKSTATUS       0x07
+#define MT_DEBUG_TP2_SET_ZDO_USEEXTPANID      0x08
 
 /* AREQ */
 #define MT_DEBUG_MSG                         0x80
@@ -480,7 +484,7 @@ extern "C"
 #define MT_APP_CNF_BDB_SET_ACTIVE_DEFAULT_CENTRALIZED_KEY  0x07
 #define MT_APP_CNF_BDB_SET_CHANNEL                         0x08
 #define MT_APP_CNF_BDB_SET_TC_REQUIRE_KEY_EXCHANGE         0x09
-#define MT_APP_CNF_BDB_ZED_ATTEMPT_RECOVER_NWK             0x0A
+#define MT_APP_CNF_BDB_RECOVER_NWK                         0x0A
 #define MT_APP_CNF_BDB_SET_DEFAULT_PARENT_INFO             0x0B
 #define MT_APP_CNF_SET_POLL_RATE_TYPE                      0x0C
 
@@ -765,6 +769,15 @@ extern "C"
 #define TP_SEND_REJOIN_REQ_UNSECURE 0x005E
 #define TP_SET_NOT_REMOVE_DEV_WHEN_SEND_LEAVE_REQ  0x005F
 #define TP_SEND_ZDO_INVALID_CMD     0x0060
+#if defined ( APP_TP2_TEST_MODE )
+#define TP_CONFIG_KEY_EXCHANGE      0x0061
+#define TP_GU_SET_JOINER_NWKADDR    0x0062
+#define TP_GU_SET_NWKDEPTH          0x0063
+#define TP_GU_SET_NEIGHBOR_TXCOST   0x0064
+#endif // APP_TP2_TEST_MODE
+#define TP_SET_ALLOW19SEC           0x0065
+#define TP_SEND_ENDDEVTIMEOUT_REQ   0x0066
+#define TP_SET_CLEAR_TCLK_ON_LEAVE  0x0067
 #endif
 
 #endif

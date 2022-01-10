@@ -226,6 +226,11 @@ CONST uint32_t gMAX_NWK_FRAMECOUNTER_CHANGES = MAX_NWK_FRAMECOUNTER_CHANGES;
   uint8_t gMAX_MNP_QUEUED = MAX_MNP_QUEUED;
 #endif
 
+// This stores the max broadcast jitter when rebroadcasting packets (in 2 millisecond periods)
+CONFIG_ITEM uint16_t gNWK_MAX_BROADCAST_JITTER = NWK_MAX_BROADCAST_JITTER;
+
+CONST uint32_t gNWK_JOIN_SECURITY_TIMEOUT_PERIOD = NWK_JOIN_SECURITY_TIMEOUT_PERIOD;
+
 /*********************************************************************
  * APS GLOBAL VARIABLES
  */

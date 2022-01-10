@@ -6,7 +6,7 @@
        the BLE Host API through eRPC.
 
 Group: WCS, BTS
-Target Device: cc13x2_26x2
+Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
@@ -60,6 +60,9 @@ Target Device: cc13x2_26x2
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/mesh.h>
 
+#include "ti_ble_mesh_prov_data.h"
+#include "ti_device_composition.h"
+
 /*********************************************************************
  * MACROS
  */
@@ -76,8 +79,38 @@ Target Device: cc13x2_26x2
 /*********************************************************************
  * GLOBAL VARIABLES
  */
+#ifdef MESH_ERPC
 struct bt_mesh_comp *comp_data;
 struct bt_mesh_prov *prov_data;
+#else
+struct bt_mesh_comp *comp_data = &comp;
+struct bt_mesh_prov *prov_data = &prov;
+#endif
+
+#ifdef MESH_ERPC
+/* Register Zephyr's Callbacks */
+BT_MESH_HB_CB_DEFINE(eRPC_hb_cb) = {
+  .recv    = hb_recv_cb,
+  .sub_end = hb_sub_end_cb,
+};
+
+#ifdef CONFIG_BT_MESH_FRIEND
+BT_MESH_FRIEND_CB_DEFINE(eRPC_friend_cb) = {
+  .established = friend_friendship_established_cb,
+  .terminated  = friend_friendship_terminated_cb,
+};
+#endif /* CONFIG_BT_MESH_FRIEND */
+
+#ifdef CONFIG_BT_MESH_LOW_POWER
+BT_MESH_LPN_CB_DEFINE(eRPC_lpn_cb) = {
+  .established = lpn_friendship_established_cb,
+  .terminated  = lpn_friendship_terminated_cb,
+  .polled      = lpn_polled_cb,
+};
+#endif /* CONFIG_BT_MESH_LOW_POWER */
+
+BT_MESH_APP_KEY_CB_DEFINE(appkey_evt_cb);
+#endif /* MESH_ERPC */
 
 /*********************************************************************
  * LOCAL FUNCTIONS
@@ -101,6 +134,7 @@ int update_callback(struct bt_mesh_model *model);
 int init_callback(struct bt_mesh_model *model);
 void reset_callback(struct bt_mesh_model *model);
 int start_callback(struct bt_mesh_model *model);
+int settings_set_callback(struct bt_mesh_model *model, const char *name, size_t len_rd, settings_read_cb read_cb, void *cb_arg);
 int fault_get_cur_callback(struct bt_mesh_model *model, uint8_t *test_id,
                            uint16_t *company_id, uint8_t *faults,
                            uint8_t *fault_count);
@@ -131,8 +165,9 @@ extern void mesh_erpc_register(void);
  int mesh_init(void)
  {
      int err = 0;
-     int i = 0;
 
+#ifdef MESH_ERPC
+     int i = 0;
      // Register to the ICALL from the eRPC context
      mesh_erpc_register();
 
@@ -144,6 +179,8 @@ extern void mesh_erpc_register(void);
              return -1;
          }
      }
+#endif
+
      err = bt_mesh_init(prov_data, comp_data);
      if (err != 0) {
          return -1;
@@ -342,34 +379,15 @@ int bt_mesh_cfg_cli_raw_init(uint16_t elem_index, uint16_t model_index)
 *
 * @return  None.
 */
-int bt_mesh_cfg_srv_raw_init(uint16_t model_index, const struct bt_mesh_cfg_srv_raw * cfg_srv)
+int bt_mesh_cfg_srv_raw_init(uint16_t model_index)
 {
     // Return an error in case the model_index is >= from the model_count of element 0
     if(model_index >= comp_data->elem->model_count)
     {
         return -1;
     }
-    struct bt_mesh_cfg_srv * curr_cfg_srv = (struct bt_mesh_cfg_srv *)ICall_malloc(sizeof(struct bt_mesh_cfg_srv));
-    if(!curr_cfg_srv)
-    {
-      return -1;
-    }
 
-    memcpy(curr_cfg_srv, cfg_srv, sizeof(struct bt_mesh_cfg_srv));
-    memset(&(curr_cfg_srv->hb_pub), 0, sizeof(struct bt_mesh_hb_pub));
-    memset(&(curr_cfg_srv->hb_sub), 0, sizeof(struct bt_mesh_hb_sub));
-
-    if(cfg_srv->hb_pub)
-    {
-        memcpy(&(curr_cfg_srv->hb_pub.dst), &(cfg_srv->hb_pub->dst), sizeof(struct bt_mesh_hb_pub_raw) - sizeof(uint32_t));
-    }
-    if(cfg_srv->hb_sub)
-    {
-        memcpy(&(curr_cfg_srv->hb_sub), (cfg_srv->hb_sub), sizeof(struct bt_mesh_hb_sub));
-    }
-
-
-    struct bt_mesh_model cfg_srv_model = BT_MESH_MODEL_CFG_SRV(curr_cfg_srv);
+    struct bt_mesh_model cfg_srv_model = BT_MESH_MODEL_CFG_SRV;
 
     memcpy(((comp_data->elem)->models + model_index), &cfg_srv_model, sizeof(struct bt_mesh_model));
     return 0;
@@ -514,6 +532,7 @@ int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const
         // Update the bt_mesh_model_cb with the wrappers callbacks
         struct bt_mesh_model_cb cb_wrappers =
         {
+         .settings_set = model_raw->cb->settings_set ? settings_set_callback: NULL,
          .start = model_raw->cb->start ? start_callback: NULL,
          .init = model_raw->cb->init ? init_callback: NULL,
          .reset = model_raw->cb->reset ? reset_callback: NULL
@@ -566,7 +585,7 @@ int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const
 * @return  None.
 */
 int bt_mesh_cfg_app_key_add_wrapper(uint16_t net_idx, uint16_t addr, uint16_t key_net_idx,
-                uint16_t key_app_idx, uint8_t app_key[16])
+                uint16_t key_app_idx, const uint8_t app_key[16])
 {
     return bt_mesh_cfg_app_key_add(net_idx, addr, key_net_idx, key_app_idx, app_key, NULL);
 }
@@ -596,7 +615,7 @@ int bt_mesh_cfg_mod_app_bind_vnd_wrapper(uint16_t net_idx, uint16_t addr, uint16
 * @return  None.
 */
 int bt_mesh_cfg_mod_app_bind_wrapper(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
-                 uint16_t mod_app_idx, uint16_t mod_id)
+                                     uint16_t mod_app_idx, uint16_t mod_id)
 {
     return bt_mesh_cfg_mod_app_bind(net_idx, addr, elem_addr, mod_app_idx, mod_id, NULL);
 }
@@ -829,6 +848,30 @@ int bt_mesh_model_find_vnd_wrapper(uint16_t elem_idx, uint16_t company, uint16_t
     }
     // In case that the model id doesn't exist in the given element return indication
     return -1;
+}
+
+/*********************************************************************
+* @fn      store_data_wrapper
+*
+* @brief   call to bt_mesh_model_data_store API which stores a data
+*          item to NV.
+*
+* @param   elem_idx - the index number of the element
+* @param   is_vnd - is it a vendor model or not (generic model)
+* @param   model_index - the index number of the model
+* @param   name - name/key of the data item to be stored
+* @param   data_len - the length of the data to be stored
+* @param   data - the data to be stored
+*
+* @return  0 when data stored successfully, otherwise a nonzero
+*          value.
+*/
+int store_data_wrapper(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index, const char *name, uint8_t data_len, uint8_t *data)
+{
+    // Get the model
+    struct bt_mesh_model *model = get_model_data(elem_idx, is_vnd, model_index);
+
+    return bt_mesh_model_data_store(model, is_vnd, name, (void *)data, data_len);
 }
 
 #ifdef CONFIG_BT_MESH_MODEL_EXTENSIONS
@@ -1202,6 +1245,40 @@ int start_callback(struct bt_mesh_model *model)
     return 0;
 }
 
+/*********************************************************************
+* @fn      settings_set_callback wrapper
+*
+* @brief   reads data from NV and calls the settings_set_cb
+*
+* @param   model - model to read the persistent data of
+* @param   name - name/key of the data to be read
+* @param   len_rd - the size of the data to be read
+* @param   read_cb - function provided to read the data from the Mesh
+*                    stack.
+* @param   cb_arg - arguments for the read function provided by the
+*                   Mesh stack.
+*
+* @return  0 if the read succeeded, otherwise -EINVAL value
+*/
+int settings_set_callback(struct bt_mesh_model *model, const char *name, size_t len_rd, settings_read_cb read_cb, void *cb_arg)
+{
+    model_info_t curr_model_info = get_model_info(model);
+
+    // Allocate memory for the data pointer
+    uint8_t *data = (uint8_t *)ICall_malloc(len_rd);
+
+    // Calling read_cb to get the data saved in NV
+    if (read_cb(cb_arg, data, len_rd) != len_rd)
+    {
+        return -EINVAL;
+    }
+
+    // Call the eRPC named callback
+    settings_set_cb(curr_model_info.elem_index, curr_model_info.is_vnd, curr_model_info.model_index, name, data, len_rd);
+
+    ICall_free(data);
+    return 0;
+}
 
 /*********************************************************************
 * @fn      fault_get_cur callback wrapper

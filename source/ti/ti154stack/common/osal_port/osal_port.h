@@ -4,7 +4,7 @@
  @brief This API maps ICALL and OSAL API's used by the MAC to TIRTOS API's
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

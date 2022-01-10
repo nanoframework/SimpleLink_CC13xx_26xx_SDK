@@ -1,12 +1,11 @@
-
 /******************************************************************************
 *  Filename:       aes.c
-*  Revised:        2021-01-29 17:39:02 +0100 (Fri, 29 Jan 2021)
-*  Revision:       60252
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
-*  Description:    Driver for the aes functions of the crypto module
+*  Description:    Driver for the AES functions of the crypto module
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -68,6 +67,26 @@
 
 
 
+#ifndef CRYPTO_SWRESET_SW_RESET
+/* This definition is missing in hw_crypto.h for  CC26X0 and CC13X0 devices */
+#define CRYPTO_SWRESET_SW_RESET  0x00000001
+#endif
+
+#ifndef CRYPTO_DMASWRESET_SWRES
+/* This definition is missing in hw_crypto.h for CC26X0 and CC13X0 devices */
+#define CRYPTO_DMASWRESET_SWRES  0x00000001
+#endif
+
+#ifndef CRYPTO_DMASTAT_CH0_ACT
+/* This definition is missing in hw_crypto.h for  CC26X0 and CC13X0 devices */
+#define CRYPTO_DMASTAT_CH0_ACT   0x00000001
+#endif
+
+#ifndef CRYPTO_DMASTAT_CH1_ACT
+/* This definition is missing in hw_crypto.h for  CC26X0 and CC13X0 devices */
+#define CRYPTO_DMASTAT_CH1_ACT   0x00000002
+#endif
+
 //*****************************************************************************
 //
 // Load the initialization vector.
@@ -80,6 +99,36 @@ void AESSetInitializationVector(const uint32_t *initializationVector)
     HWREG(CRYPTO_BASE + CRYPTO_O_AESIV1) = initializationVector[1];
     HWREG(CRYPTO_BASE + CRYPTO_O_AESIV2) = initializationVector[2];
     HWREG(CRYPTO_BASE + CRYPTO_O_AESIV3) = initializationVector[3];
+}
+
+//*****************************************************************************
+//
+// Read the IV for Authenticated Modes (CCM or GCM) after the tag has been read.
+//
+//*****************************************************************************
+void AESReadAuthenticationModeIV(uint32_t *iv)
+{
+    /* Read the computed IV out from the hw registers */
+    iv[0] = HWREG(CRYPTO_BASE + CRYPTO_O_AESIV0);
+    iv[1] = HWREG(CRYPTO_BASE + CRYPTO_O_AESIV1);
+    iv[2] = HWREG(CRYPTO_BASE + CRYPTO_O_AESIV2);
+    /* This read will clear the saved_context_ready bit
+     * and allow the AES core to start the next operation.
+     */
+    iv[3] = HWREG(CRYPTO_BASE + CRYPTO_O_AESIV3);
+}
+
+//*****************************************************************************
+//
+// Read the IV for Non-Authenticated Modes (CBC or CTR).
+//
+//*****************************************************************************
+void AESReadNonAuthenticationModeIV(uint32_t *iv)
+{
+    /* Wait until the saved context is ready */
+    while(!(HWREG(CRYPTO_BASE + CRYPTO_O_AESCTL) & CRYPTO_AESCTL_SAVED_CONTEXT_RDY_M));
+
+    AESReadAuthenticationModeIV(iv);
 }
 
 //*****************************************************************************
@@ -165,6 +214,8 @@ uint32_t AESWriteToKeyStore(const uint8_t *aesKey, uint32_t aesKeyLength, uint32
            (aesKeyLength == AES_192_KEY_LENGTH_BYTES) ||
            (aesKeyLength == AES_256_KEY_LENGTH_BYTES));
 
+    // This buffer must be declared at function scope to prevent LLVM compiler from optimizing out memcpy.
+    uint8_t paddedKey[AES_256_KEY_LENGTH_BYTES] = {0};
     uint32_t keySize = 0;
 
     switch (aesKeyLength) {
@@ -211,9 +262,8 @@ uint32_t AESWriteToKeyStore(const uint8_t *aesKey, uint32_t aesKeyLength, uint32
     {
         // Writing a 192-bit key to the key store RAM must be done by writing
         // 256 bits of data with the 64 most significant bits set to zero.
-        uint8_t paddedKey[AES_256_KEY_LENGTH_BYTES] = {0};
-
         memcpy(paddedKey, aesKey, AES_192_KEY_LENGTH_BYTES);
+
         AESStartDMAOperation(paddedKey, AES_256_KEY_LENGTH_BYTES, 0, 0);
     }
     else
@@ -381,4 +431,120 @@ void AESWriteCCMInitializationVector(const uint8_t *nonce, uint32_t nonceLength)
     memcpy(&(initializationVector.byte[1]), nonce, nonceLength);
 
     AESSetInitializationVector(initializationVector.word);
+}
+
+//*****************************************************************************
+//
+// Write AES_KEY2 registers
+//
+//*****************************************************************************
+void AESWriteKey2(const uint32_t *key2) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY20) = key2[0];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY21) = key2[1];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY22) = key2[2];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY23) = key2[3];
+}
+
+//*****************************************************************************
+//
+// Write AES_KEY3 register
+//
+//*****************************************************************************
+void AESWriteKey3(const uint32_t *key3) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY30) = key3[0];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY31) = key3[1];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY32) = key3[2];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY33) = key3[3];
+}
+
+//*****************************************************************************
+//
+// Clear AES_DATA_IN registers
+//
+//*****************************************************************************
+void AESClearDataIn(void) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN0) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN1) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN2) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN3) = 0;
+}
+
+//*****************************************************************************
+//
+// Write AES_DATA_IN registers
+//
+//*****************************************************************************
+void AESWriteDataIn(const uint32_t *dataInBuffer) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN0) = dataInBuffer[0];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN1) = dataInBuffer[1];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN2) = dataInBuffer[2];
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAIN3) = dataInBuffer[3];
+}
+
+//*****************************************************************************
+//
+// Read AES_DATA_OUT registers
+//
+//*****************************************************************************
+void AESReadDataOut(uint32_t *dataOutBuffer) {
+    dataOutBuffer[0] = HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAOUT0);
+    dataOutBuffer[1] = HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAOUT1);
+    dataOutBuffer[2] = HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAOUT2);
+    dataOutBuffer[3] = HWREG(CRYPTO_BASE + CRYPTO_O_AESDATAOUT3);
+}
+
+//*****************************************************************************
+//
+// Clear AES_KEY2 registers
+//
+//*****************************************************************************
+void AESClearKey2(void) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY20) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY21) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY22) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY23) = 0;
+}
+
+//*****************************************************************************
+//
+// Clear AES_KEY3 registers
+//
+//*****************************************************************************
+void AESClearKey3(void) {
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY30) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY31) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY32) = 0;
+    HWREG(CRYPTO_BASE + CRYPTO_O_AESKEY33) = 0;
+}
+
+
+//*****************************************************************************
+//
+// Reset crypto engine
+//
+//*****************************************************************************
+void AESReset(void)
+{
+    /* Soft reset routine per SafeXcel */
+    HWREG(CRYPTO_BASE + CRYPTO_O_SWRESET) = CRYPTO_SWRESET_SW_RESET;
+    AESSetCtrl(0);
+    AESSetDataLength(0);
+    AESSetAuthLength(0);
+
+
+}
+
+//*****************************************************************************
+//
+// Reset crypto DMA
+//
+//*****************************************************************************
+void AESDMAReset(void)
+{
+    /* Reset DMA */
+    HWREG(CRYPTO_BASE + CRYPTO_O_DMASWRESET) = CRYPTO_DMASWRESET_SWRES;
+
+    /* Wait for DMA channels to be inactive */
+    while (HWREG(CRYPTO_BASE + CRYPTO_O_DMASTAT) &
+           (CRYPTO_DMASTAT_CH0_ACT | CRYPTO_DMASTAT_CH1_ACT));
 }

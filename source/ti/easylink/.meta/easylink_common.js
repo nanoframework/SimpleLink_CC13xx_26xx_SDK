@@ -58,7 +58,10 @@ const deviceToBoard = {
     CC2652P1FRGZ: "CC1352P_4_LAUNCHXL",
     CC2652R7: "LP_CC2652R7",
     CC1312R7RGZ: "LP_CC1312R7",
-    CC1352P7: "LP_CC1352P7_1"
+    CC1352P7: "LP_CC1352P7_1",
+    CC2651P3: "LP_CC2651P3",
+    CC2651R3: "LP_CC2651R3",
+    CC1311P3: "LP_CC1311P3"
 };
 
 // Settings for ti/devices/CCFG module
@@ -148,7 +151,13 @@ const supportedMigrations = {
         CC2652R1FSIP: {disable: sub1To24Text},
         CC2652R1FRGZ: {disable: sub1To24Text},
         CC2652R7RGZ: {disable: sub1To24Text},
-        LP_CC2652R7: {disable: sub1To24Text}
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text},
+        CC2652P1FSIP: {disable: sub1To24Text},
+        LP_CC2652PSIP: {disable: sub1To24Text}
     },
     LP_CC1312R7: {
         CC1312R7RGZ: {},
@@ -158,7 +167,29 @@ const supportedMigrations = {
         CC2652R1FSIP: {disable: sub1To24Text},
         CC2652R1FRGZ: {disable: sub1To24Text},
         CC2652R7RGZ: {disable: sub1To24Text},
-        LP_CC2652R7: {disable: sub1To24Text}
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text},
+        CC2652P1FSIP: {disable: sub1To24Text},
+        LP_CC2652PSIP: {disable: sub1To24Text}
+    },
+    LP_CC1311P3: {
+        CC1311P3RGZ: {},
+        LP_CC1311P3: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text},
+        CC2652P1FSIP: {disable: sub1To24Text},
+        LP_CC2652PSIP: {disable: sub1To24Text}
     },
     CC26X2R1_LAUNCHXL: {
         CC2652R1FRGZ: {},
@@ -168,7 +199,9 @@ const supportedMigrations = {
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
         CC1312R1F3RGZ: {disable: twoFourToSub1Text},
         LP_CC1312R7: {disable: twoFourToSub1Text},
-        CC1312R7RGZ: {disable: twoFourToSub1Text}
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     },
     LP_CC2652RSIP: {
         CC2652R1FRGZ: {},
@@ -178,7 +211,19 @@ const supportedMigrations = {
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
         CC1312R1F3RGZ: {disable: twoFourToSub1Text},
         LP_CC1312R7: {disable: twoFourToSub1Text},
-        CC1312R7RGZ: {disable: twoFourToSub1Text}
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    LP_CC2652PSIP: {
+        CC2652P1FSIP: {},
+        LP_CC2652PSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     },
     LP_CC2652R7: {
         CC2652R7RGZ: {},
@@ -186,7 +231,29 @@ const supportedMigrations = {
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
         CC1312R1F3RGZ: {disable: twoFourToSub1Text},
         LP_CC1312R7: {disable: twoFourToSub1Text},
-        CC1312R7RGZ: {disable: twoFourToSub1Text}
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    LP_CC2651P3: {
+        CC2651P3RGZ: {},
+        LP_CC2651P3: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    LP_CC2651R3: {
+        CC2651R3RGZ: {},
+        LP_CC2651R3: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     },
 
     // Devices
@@ -217,7 +284,11 @@ const supportedMigrations = {
         CC2652R1FSIP: {disable: sub1To24Text},
         CC2652R1FRGZ: {disable: sub1To24Text},
         CC2652R7RGZ: {disable: sub1To24Text},
-        LP_CC2652R7: {disable: sub1To24Text}
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text}
     },
     CC1312R7RGZ: {
         CC1312R7RGZ: {},
@@ -227,7 +298,29 @@ const supportedMigrations = {
         CC2652R1FSIP: {disable: sub1To24Text},
         CC2652R1FRGZ: {disable: sub1To24Text},
         CC2652R7RGZ: {disable: sub1To24Text},
-        LP_CC2652R7: {disable: sub1To24Text}
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text},
+        CC2652P1FSIP: {disable: sub1To24Text},
+        LP_CC2652PSIP: {disable: sub1To24Text}
+    },
+    CC1311P3RGZ: {
+        CC1311P3RGZ: {},
+        LP_CC1311P3: {},
+        LP_CC2652RSIP: {disable: sub1To24Text},
+        CC26X2R1_LAUNCHXL: {disable: sub1To24Text},
+        CC2652R1FSIP: {disable: sub1To24Text},
+        CC2652R1FRGZ: {disable: sub1To24Text},
+        CC2652R7RGZ: {disable: sub1To24Text},
+        LP_CC2652R7: {disable: sub1To24Text},
+        LP_CC2651P3: {disable: sub1To24Text},
+        LP_CC2651R3: {disable: sub1To24Text},
+        CC2651P3RGZ: {disable: sub1To24Text},
+        CC2651R3RGZ: {disable: sub1To24Text},
+        CC2652P1FSIP: {disable: sub1To24Text},
+        LP_CC2652PSIP: {disable: sub1To24Text}
     },
     CC2652R1FRGZ: {
         CC2652R1FRGZ: {},
@@ -237,7 +330,9 @@ const supportedMigrations = {
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
         CC1312R1F3RGZ: {disable: twoFourToSub1Text},
         LP_CC1312R7: {disable: twoFourToSub1Text},
-        CC1312R7RGZ: {disable: twoFourToSub1Text}
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     },
     CC2652R1FSIP: {
         CC2652R1FRGZ: {},
@@ -245,7 +340,19 @@ const supportedMigrations = {
         CC26X2R1_LAUNCHXL: {},
         LP_CC2652RSIP: {},
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
-        CC1312R1F3RGZ: {disable: twoFourToSub1Text}
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    CC2652P1FSIP: {
+        CC2652P1FSIP: {},
+        LP_CC2652PSIP: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     },
     CC2652P1FRGZ: {
         CC1352P_2_LAUNCHXL: {},
@@ -258,7 +365,29 @@ const supportedMigrations = {
         CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
         CC1312R1F3RGZ: {disable: twoFourToSub1Text},
         LP_CC1312R7: {disable: twoFourToSub1Text},
-        CC1312R7RGZ: {disable: twoFourToSub1Text}
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    CC2651P3RGZ: {
+        CC2651P3RGZ: {},
+        LP_CC2651P3: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    CC2651R3RGZ: {
+        CC2651R3RGZ: {},
+        LP_CC2651R3: {},
+        CC1312R1_LAUNCHXL: {disable: twoFourToSub1Text},
+        CC1312R1F3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1312R7: {disable: twoFourToSub1Text},
+        CC1312R7RGZ: {disable: twoFourToSub1Text},
+        CC1311P3RGZ: {disable: twoFourToSub1Text},
+        LP_CC1311P3: {disable: twoFourToSub1Text}
     }
 };
 

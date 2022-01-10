@@ -1,11 +1,13 @@
 {
-    "name": "simplelink_cc13x2_26x2_sdk",
-    "displayName": "SimpleLink CC13x2/CC26x2 SDK",
-    "version": "5.10.00.48",
+    "name": "simplelink_cc13xx_cc26xx_sdk",
+    "displayName": "simplelink_cc13xx_cc26xx_sdk",
+    "version": "5.30.01.01",
     "documentationPath": "../docs",
     "includePaths": [
         "../source",
-        "../kernel/tirtos/packages"
+        "../kernel/tirtos/packages",
+        "../kernel/tirtos7/builds",
+        "../kernel/tirtos7/packages"
     ],
     "components": [
         "/ti/ble5stack/ble.component.js",
@@ -21,24 +23,41 @@
         "/ti/drivers/rflib.component.js",
         "/ti/loggers/drivers/drivers.component.js",
         "/ti/loggers/utils/utils.component.js",
+        "/ti/posix/tiposix.component.js",
         "/ti/rpc/rpc.component.js",
+        "/ti/ti_wisunfan/ti_wisunfan.component.js",
+        "/ti/ti_wisunfan/wisunfan_mac/ti154stack.component.js",
         "/ti/utils/tiutils.component.js",
         "/ti/utils/build/build.component.js",
         "/ti/utils/osal/osal.component.js",
         "/ti/utils/rov/rov.component.js",
-        "/ti/utils/runtime/runtime.component.js"
+        "/ti/utils/runtime/runtime.component.js",
+        "/ti/sysbios/sysbios.component.js",
+        "/ti/ble5stack/aoa/aoa.component.js"
     ],
     "devices": [
+        "CC1311P3RGZ",
+        "CC1311R3RGZ",
         "CC1312R1F3RGZ",
         "CC1312R7RGZ",
         "CC1352P1F3RGZ",
         "CC1352P7RGZ",
         "CC1352R1F3RGZ",
         "CC2642R1FRGZ",
+        "CC2651P3RGZ",
+        "CC2651R3RGZ",
+        "CC2652P1FSIP",
         "CC2652R1FRGZ",
         "CC2652R1FSIP",
         "CC2652R7RGZ",
         "CC2652RB1FRGZ"
     ],
-    "minToolVersion": "1.8.0"
+    "minToolVersion": "1.10.0",
+    "rtos": [
+        "freertos",
+        "none",
+        "nortos",
+        "tirtos",
+        "tirtos7"
+    ]
 }

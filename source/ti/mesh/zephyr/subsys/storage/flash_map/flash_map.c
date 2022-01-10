@@ -77,7 +77,7 @@ static bool should_bail(const struct flash_pages_info *info,
 // Iterate over all flash pages on a device
 static void flash_page_foreach(const struct device *dev, flash_page_cb cb, void *data)
 {
-  const struct flash_driver_api *api = dev->driver_api;
+  const struct flash_driver_api *api = dev->api;
   const struct flash_pages_layout *layout;
   struct flash_pages_info page_info;
   size_t block, num_blocks, page = 0, i;

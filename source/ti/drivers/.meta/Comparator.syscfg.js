@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,18 +64,6 @@ function filterHardware(component)
     return (false);
 }
 
-/*
- *  =========== validate ==========
- *  Validate this instance's configuration
- *
- *  @param inst         - Comparator instance to be validated
- *  @param validation   - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
 function _getPinResources()
 {
     return;
@@ -103,7 +91,6 @@ and writing to the Comparator peripherals.
 `,
     defaultInstanceName: "CONFIG_COMPARATOR_",
     config: Common.addNameConfig(config, "/ti/drivers/Comparator", "CONFIG_COMPARATOR_"),
-    validate: validate,
     filterHardware: filterHardware,
     modules: Common.autoForceModules(["Board", "Power"]),
     _getPinResources: _getPinResources

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -266,28 +266,31 @@ typedef void (*Button_Callback)(Button_Handle buttonHandle,
 /*!
  *  @brief    Button Pull settings
  *
- * This enumeration defines whether the GPIO connected to the button
- * is PULL UP or PULL DOWN
+ * This enumeration defines whether the button is active low (PULL_UP) or
+ * active high (PULL_DOWN) and is used to control internal logic.
  */
 typedef enum Button_Pull
 {
     /* NOTE: DO NOT change the values of DOWN/UP from (0,1) */
     Button_PULL_DOWN   = 0,     /*!< Button is PULLED DOWN. */
     Button_PULL_UP     = 1,     /*!< Button is PULLED UP. */
-    Button_PULL_NOTSET = 2      /*!< Button pull not set */
 } Button_Pull;
 
 /*!
  *  @brief    Hardware specific settings for a button
  *
  *  This structure should be defined and provided by the application.
- *  The index provided should correspond to a gpio pin in a #GPIO_PinConfig
- *  array. This gpio pin should be the pin connected to the button and must
- *  be configured as #GPIO_CFG_INPUT and #GPIO_CFG_IN_INT_FALLING.
  */
 typedef struct Button_HWAttrs
 {
-    uint_least8_t gpioIndex;    /*!< GPIO configuration index. */
+    /*! GPIO configuration index. */
+    uint_least8_t   gpioIndex;
+
+    /*! Whether the button is active high or active low. */
+    Button_Pull     pullMode;
+
+    /*! True/False whether the pullup on the GPIO pin should be enabled */
+    uint32_t        internalPullEnabled;
 } Button_HWAttrs;
 
 /*!
@@ -335,9 +338,6 @@ typedef struct Button_Object
 
     /*! Double press detection timeout is milliseconds(ms) */
     uint32_t               doublePressDetectiontimeout;
-
-    /*! Button pull(stored after reading from GPIO module) */
-    Button_Pull            buttonPull;
 } Button_Object;
 
 /*!
@@ -351,16 +351,19 @@ typedef struct Button_Object
 typedef struct Button_Params
 {
     /*! Debounce duration for the button in milliseconds(ms) */
-    uint32_t        debounceDuration;
+    uint32_t            debounceDuration;
 
     /*! Long press duration is milliseconds(ms) */
-    uint32_t        longPressDuration;
+    uint32_t            longPressDuration;
 
     /*! Double press detection timeout is milliseconds(ms) */
-    uint32_t        doublePressDetectiontimeout;
+    uint32_t            doublePressDetectiontimeout;
 
     /*! Event subscription mask for the button */
     Button_EventMask    buttonEventMask;
+
+    /*! A #Button_Callback that is called when a masked event occurs. */
+    Button_Callback     buttonCallback;
 } Button_Params;
 
 /*!
@@ -372,7 +375,7 @@ typedef struct Button_Params
  *
  *  @return     True on success or false upon failure.
  */
-extern bool Button_close(Button_Handle handle);
+extern void Button_close(Button_Handle handle);
 
 /*!
  *  @brief  Function to initialize Button driver.
@@ -391,9 +394,6 @@ extern void Button_init();
  *  @param[in] buttonIndex    Logical button number indexed into
  *                            the Button_config table
  *
- *  @param[in] buttonCallback A #Button_Callback that is called when a desired
- *                            event occurs.
- *
  *  @param[in] *params        A pointer to #Button_Params structure. If NULL,
  *                            it will use default values.
  *
@@ -403,9 +403,7 @@ extern void Button_init();
  *  @sa      Button_Params_init()
  *  @sa      Button_close()
  */
-extern Button_Handle Button_open(uint_least8_t buttonIndex,
-                                 Button_Callback buttonCallback,
-                                 Button_Params *params);
+extern Button_Handle Button_open(uint_least8_t buttonIndex, Button_Params *params);
 
 /*!
  *  @brief  Function to initialize a #Button_Params struct to its defaults
@@ -449,8 +447,7 @@ extern uint32_t Button_getLastPressedDuration(Button_Handle handle);
  *  @param[in] buttonCallback   button callback function
  *
  */
-extern void Button_setCallback(Button_Handle handle,
-                               Button_Callback buttonCallback);
+extern void Button_setCallback(Button_Handle handle, Button_Callback buttonCallback);
 
 /*!
  *  @brief  This is the GPIO interrupt callback function which is called on a

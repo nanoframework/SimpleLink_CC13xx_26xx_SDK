@@ -2,9 +2,6 @@
  @file      cc26x2x7.lds
  @brief     CC26x2x7 rev1 linker configuration file for GNU compiler.
 
- Revised    $Date$
- Revision   $Revision$
-
  This file is auto-generated.
 
   Copyright (C) 2020 Texas Instruments Incorporated - http:www.ti.com/

@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 Collector Example Application
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -91,6 +91,10 @@
 #endif
 #endif
 
+#if defined(IEEE_COEX_METRICS) && !defined(IEEE_COEX_ENABLED)
+#error "IEEE_COEX_ENABLED must be defined to view coex metrics"
+#endif
+
 /* Default MSDU Handle rollover */
 #define MSDU_HANDLE_MAX 0x1F
 
@@ -137,6 +141,16 @@
 #else
 #define TRACKING_TIMEOUT_TIME (CONFIG_POLLING_INTERVAL * 3) /*in milliseconds*/
 #endif
+
+#ifdef IEEE_COEX_METRICS
+/* Timeout in milliseconds for coex metrics reads */
+#define COEX_IEEE_METRICS_TIMEOUT_TIME  120000
+#endif
+#ifdef MAC_STATS
+/* Timeout in milliseconds for coex metrics reads */
+#define MAC_STATS_TIMEOUT_TIME  10000
+#endif
+
 /* Initial delay before broadcast transmissions are started in FH mode */
 #define BROADCAST_CMD_START_TIME 60000
 
@@ -1076,6 +1090,12 @@ static void initializeClocks(void)
 {
     /* Initialize the tracking clock */
     Csf_initializeTrackingClock();
+#ifdef IEEE_COEX_METRICS
+    Csf_initializeCoexClock();
+#endif
+#ifdef MAC_STATS
+    Csf_initializeStatsClock();
+#endif
     Csf_initializeConfigClock();
     Csf_initializeBroadcastClock();
     Csf_initializeIdentifyClock();
@@ -1103,6 +1123,15 @@ static void cllcStartedCB(Llc_netInfo_t *pStartedInfo)
 
     /* Start the tracking clock */
     Csf_setTrackingClock(TRACKING_DELAY_TIME);
+
+#ifdef IEEE_COEX_METRICS
+    Csf_setCoexClock(COEX_IEEE_METRICS_TIMEOUT_TIME);
+#endif
+
+#ifdef MAC_STATS
+    Csf_setStatsClock(MAC_STATS_TIMEOUT_TIME);
+#endif
+
 #ifdef FEATURE_SECURE_COMMISSIONING
     /* Coordinator has started */
     readySMToRun = true;
@@ -1817,11 +1846,7 @@ static void processSensorData(ApiMac_mcpsDataInd_t *pDataInd)
 
     if(sensorData.frameControl & Smsgs_dataFields_hallEffectSensor)
     {
-        sensorData.hallEffectSensor.flux = (float) Util_buildUint32(pBuf[0],
-                                                                    pBuf[1],
-                                                                    pBuf[2],
-                                                                    pBuf[3]);
-        pBuf += 4;
+        sensorData.hallEffectSensor.fluxLevel = (uint8_t)*pBuf++;
     }
 
     if(sensorData.frameControl & Smsgs_dataFields_accelSensor)

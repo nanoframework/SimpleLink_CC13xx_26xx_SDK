@@ -24,6 +24,7 @@
 #include <sys/util.h>
 #include <sys/slist.h>
 #include <sys/printk.h>
+#include <sys/__assert.h>
 #include <arch/cpu.h>
 
 #include <xdc/std.h>
@@ -41,14 +42,15 @@
 
 #include <drivers/flash.h>
 
-#define K_NO_WAIT 0
-#define K_FOREVER BIOS_WAIT_FOREVER
+#define K_FOREVER Z_TIMEOUT_TICKS(BIOS_WAIT_FOREVER)
+
+#define K_NO_WAIT Z_TIMEOUT_NO_WAIT
 
 #define K_THREAD_STACK_DEFINE		K_KERNEL_STACK_DEFINE
 
 #define K_THREAD_STACK_SIZEOF		K_KERNEL_STACK_SIZEOF
 
-#define USECS_TO_MSECS 1000
+#define MSECS_TO_USECS 1000
 #define k_panic() \
 {\
   volatile uint8_t x = 0;\
@@ -72,7 +74,7 @@
 
 static inline uint32_t k_uptime_get_32(void)
 {
-    return ((Clock_getTicks() * Clock_tickPeriod) / USECS_TO_MSECS);
+    return ((Clock_getTicks() * Clock_tickPeriod) / MSECS_TO_USECS);
 }
 
 static inline int64_t k_uptime_get(void)
@@ -81,6 +83,28 @@ static inline int64_t k_uptime_get(void)
 }
 
 #define z_tick_get k_uptime_get
+
+/**
+ * @brief Get elapsed time.
+ *
+ * This routine computes the elapsed time between the current system uptime
+ * and an earlier reference time, in milliseconds.
+ *
+ * @param reftime Pointer to a reference time, which is updated to the current
+ *                uptime upon return.
+ *
+ * @return Elapsed time.
+ */
+static inline int64_t k_uptime_delta(int64_t *reftime)
+{
+    int64_t uptime, delta;
+
+    uptime = k_uptime_get();
+    delta = uptime - *reftime;
+    *reftime = uptime;
+
+    return delta;
+}
 
 /** @brief Convert ticks to milliseconds
  *
@@ -123,7 +147,7 @@ static inline uint64_t z_timeout_end_calc(k_timeout_t timeout)
         return z_tick_get();
     }
 
-    dt = k_ms_to_ticks_ceil32(timeout);
+    dt = k_ms_to_ticks_ceil32(timeout.ticks);
 
     return z_tick_get() + MAX(1, dt);
 }
@@ -198,9 +222,20 @@ typedef void (*k_thread_entry_t)(void *, void *, void *);
 void k_thread_create(struct k_thread *new_thread, k_thread_stack_t *stack,
                      size_t stack_size, k_thread_entry_t entry,
                      void *p1, void *p2, void *p3, int prio, uint32_t options,
-                     int32_t delay);
+                     k_timeout_t delay);
 
 int _thread_setPri(int priority);
+
+/**
+ * @brief Start an inactive thread
+ *
+ * If a thread was created with K_FOREVER in the delay parameter, it will
+ * not be added to the scheduling queue until this function is called
+ * on it.
+ *
+ * @param thread thread to start
+ */
+void k_thread_start(struct k_thread *thread);
 
 
 static inline void k_thread_name_set(struct k_thread * t, const char * name)
@@ -223,10 +258,13 @@ static inline void k_yield(void)
     Task_yield();
 }
 
-static inline void k_sleep(uint32_t ms)
+/* @breif: Converts Zephyr's sleep method to Osal's sleep method
+ * @param time: sleep duration (in ms)
+ */
+static inline void k_sleep(k_timeout_t time)
 {
     // Task_sleep takes in the amount of ticks to sleep
-    Task_sleep(ms * USECS_TO_MSECS / Clock_tickPeriod);
+    Task_sleep(time.ticks * MSECS_TO_USECS / Clock_tickPeriod);
 }
 
 struct _timeout {
@@ -535,7 +573,7 @@ extern void k_delayed_work_init(struct k_delayed_work *work,
  */
 extern int k_delayed_work_submit_to_queue(struct k_work_q *work_q,
                       struct k_delayed_work *work,
-                      int32_t delay);
+                      k_timeout_t delay);
 
 /**
  * @brief Cancel a delayed work item.
@@ -557,6 +595,27 @@ extern int k_delayed_work_submit_to_queue(struct k_work_q *work_q,
  * @req K-DWORK-001
  */
 extern int k_delayed_work_cancel(struct k_delayed_work *work);
+
+/**
+ * @brief  Check if a delayed work item is pending.
+ *
+ * This routine indicates if the work item @a work is pending in a workqueue's
+ * queue or waiting for the delay timeout.
+ *
+ * @note Checking if the delayed work is pending gives no guarantee that the
+ *       work will still be pending when this information is used. It is up to
+ *       the caller to make sure that this information is used in a safe manner.
+ *
+ * @note Can be called by ISRs.
+ *
+ * @param work Address of delayed work item.
+ *
+ * @return true if work item is waiting for the delay to expire or pending on a
+ *         work queue, or false if it is not pending.
+ */
+extern bool k_delayed_work_pending(struct k_delayed_work *work);
+
+extern uint32_t z_timeout_remaining(Clock_Struct *timeout);
 
 /**
  * @brief Submit a work item to the system workqueue.
@@ -619,7 +678,7 @@ static inline void k_work_submit(struct k_work *work)
  * @req K-DWORK-001
  */
 static inline int k_delayed_work_submit(struct k_delayed_work *work,
-                    int32_t delay)
+                    k_timeout_t delay)
 {
     return k_delayed_work_submit_to_queue(&k_sys_work_q, work, delay);
 }
@@ -638,9 +697,7 @@ static inline int k_delayed_work_submit(struct k_delayed_work *work,
  */
 static inline int32_t k_delayed_work_remaining_get(struct k_delayed_work *work)
 {
-    // todo
-    //return k_ticks_to_ms_floor64(z_timeout_remaining(&work->timeout));
-    return (0);
+    return z_timeout_remaining(&work->timeout);
 }
 
 #if 0
@@ -843,7 +900,7 @@ static inline void k_mutex_init(struct k_mutex *mutex)
   mutex->initialized = TRUE;
 }
 
-static inline int k_mutex_lock(struct k_mutex *mutex, int32_t timeout)
+static inline int k_mutex_lock(struct k_mutex *mutex, k_timeout_t timeout)
 {
   // Init the mutex if first use
   if (!mutex->initialized)
@@ -870,7 +927,7 @@ struct k_sem {
 void k_sem_init(struct k_sem *sem, unsigned int initial_count,
                 unsigned int limit);
 void k_sem_give(struct k_sem *sem);
-int k_sem_take(struct k_sem *sem, int timeout);
+int k_sem_take(struct k_sem *sem, k_timeout_t timeout);
 
 /**
  * @brief Reset a semaphore's count to zero.
@@ -977,7 +1034,7 @@ struct k_mem_block {
  * @req K-MPOOL-002
  */
 extern int k_mem_pool_alloc(struct k_mem_pool *pool, struct k_mem_block *block,
-                size_t size, int32_t timeout);
+                size_t size, k_timeout_t timeout);
 
 /**
  * @brief Allocate memory from a memory pool with malloc() semantics

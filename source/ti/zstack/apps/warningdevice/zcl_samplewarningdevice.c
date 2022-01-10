@@ -47,36 +47,41 @@
   Application-specific UI peripherals being used:
 
   - LEDs:
-    LED1 Blinking if there is an alarm in the local device. Solid On if there is a warning message
-    from another device. Blink once when a Squawk is received from CIE. Off otherwise.
+    LED1:
+      - Off: Indicates no alarm.
+      - On: Received warning message from another device.
+      - Blinking: Alarmed in local device.
+      - Single Blink: Received Squawk from CIE.
 
   Application-specific menu system:
-    Screens:
-      Enrollment Mode Configuration Screen:
-        TRIP_TO_PAIR:
-          Zone should perform manual Zone Enroll Request by user action (e.g. through UI)
-          Enabled by default, use the <SEND ENROLL REQ > App screen to perform this action.
-        AUTO_ENROLL_REQUEST:
-          Zone should automatically send a Zone Enroll Request after the
-          CIE IEEE Addr attribute is written by the CIE
-      Discover Zone Device Screen: Press 'Enter' to discover the Zone device that is already discoverable, to perform the
-        enrollment of the Zone device.
-      Zone Enrollment Screen: Summarizes the enrollment status of the Zone device displaying if the enrollment
-        process has finished or not. This screen also displays the type of Zone (fire alarm in this case)
-      Toggle Alarm screen: Press 'Enter' to toggle between Alarm or No Alarm, this will trigger a Change Notification
-        Request to CIE if fully enrolled.
-    Status Lines:
-      CIE Address/Zone ID: Shows the current values of CIE IEEE Address + Zone ID
-        1.- If no CIE Address has been provided, then it is set to F's.
-        2.- If CIE address is provided, enrollement can be sent using the Zone Enrollment Screen, or by
-            enabling Auto Enrollment via the Enrollment Configuration screen
-        3.- If fully enrolled, CIE address is displayed allong with the Zone Id.
-      Zone Status: Shows if the device is currently Zone Enrolled, the type of Zone, and if the Zone
-        is currently Alarmed or not
-      Strobe Alarmed: This line displays warning messages received from CIE (Alarm in Progress) if no alarm is
-        currenty running on the local device.
+    <DISCOVER> Sets Warning Device into Identify mode. Once the discovery process is done,
+      this triggers the commissioning method on CIE to write IEEE address into this device.
 
+    <ENROLLMENT MODE> Sets the enrollment mode to enroll in zone.
+      TRIP-TO-PAIR: Zone should perform manual Zone Enroll Request via user action (e.g. through UI)
+        Enabled by default, use <SEND ENROLL REQ> to perform this action.
+      AUTO ENROLL REQUEST: Zone should automatically perform Zone Enroll Request after CIE IEEE Addr
+        attribute is written by the CIE.
 
+    <SEND ENROLL REQ> Manually sends Zone Enroll Request to CIE, if CIE IEEE Addr is written to
+      local device. Used for Trip-to-Pair enrollment method.
+
+    <TOGGLE ALARM> Changes alarm state of the local device, updating the Zone Alarmed status line
+      and sends a Zone Change notification to the CIE.
+
+    The APP Info line will display the following information:
+      [CIE Address]
+        XXXXXXXXXXXXXXXX - CIE IEEE Addr attribute populated by the CIE
+      [Zone Id]
+        0xXX - Zone ID
+      [Zone Enrolled]
+        Yes/No - Indicates whether device was successfully enrolled
+      [Zone Type]
+        Fire detector - Indicates the type of Zone (currently will always show as Fire detector)
+      [Zone Alarmed]
+        Yes/No - Indicates whether Zone is currently Alarmed or not
+      [Strobe Alarmed]
+        Yes/No - Indicates whether warning message is received from CIE or not
 
 *********************************************************************/
 
@@ -798,9 +803,9 @@ static void zclSampleWarningDevice_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

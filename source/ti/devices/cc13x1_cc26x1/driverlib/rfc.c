@@ -283,7 +283,7 @@ RFCRfTrimRead(rfc_radioOp_t *pOpSetup, rfTrim_t *pRfTrim)
     #define DIVIDER_INV_DIV2_BM   0x80
     // Definition of invalid divider value
     #define FCFG1_DIVIDER_INVALID 0xFF
-    
+
     // Local variable
     int32_t divider;
 
@@ -307,7 +307,7 @@ RFCRfTrimRead(rfc_radioOp_t *pOpSetup, rfTrim_t *pRfTrim)
     // Read trim values from FCFG1
     pRfTrim->configIfAdc    = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_IF_ADC);
     pRfTrim->configRfCommon = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_RF_COMMON);
-    
+
     if ((divider & DIVIDER_DIVIDER_BM) == 0)
     {
         pRfTrim->configRfFrontend = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_CC26_FE);
@@ -328,55 +328,55 @@ RFCRfTrimRead(rfc_radioOp_t *pOpSetup, rfTrim_t *pRfTrim)
           case 2:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV2_CC26_1G);
                   break;
-                  
+
           case 2 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV2_CC13_1G);
                   break;
-                  
+
           case 4:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV4_CC13);
                   break;
-                  
+
           case 4 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV4_CC26);
                   break;
-                  
+
           case 5:
           case 5 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV5);
                   break;
-                  
+
           case 6:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV6_CC13);
                   break;
-                  
+
           case 6 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV6_CC26);
                   break;
-                  
+
           case 10:
           case 10 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV10);
                   break;
-                  
+
           case 12:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV12_CC13);
                   break;
-                  
+
           case 12 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV12_CC26);
                   break;
-                  
+
           case 15:
           case 15 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV15);
                   break;
-                  
+
           case 30:
           case 30 | DIVIDER_INV_DIV2_BM:
                   pRfTrim->configSynth = HWREG(FCFG1_BASE + FCFG1_O_CONFIG_SYNTH_DIV30);
                   break;
-                  
+
           default:
                   // Other values are invalid
                   divider = FCFG1_DIVIDER_INVALID;

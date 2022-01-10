@@ -33,3 +33,15 @@ lib/gcc/m4/loggers_debug.a
 lib/gcc/m4/loggers_release.a
 lib/iar/m4/loggers_debug.a
 lib/iar/m4/loggers_release.a
+lib/ticlang/m0/loggers_debug.a
+lib/ticlang/m0/loggers_release.a
+lib/gcc/m0/loggers_debug.a
+lib/gcc/m0/loggers_release.a
+lib/iar/m0/loggers_debug.a
+lib/iar/m0/loggers_release.a
+lib/iar/m33f/loggers_debug.a
+lib/iar/m33f/loggers_release.a
+lib/gcc/m33f/loggers_debug.a
+lib/gcc/m33f/loggers_release.a
+lib/ticlang/m33f/loggers_debug.a
+lib/ticlang/m33f/loggers_release.a

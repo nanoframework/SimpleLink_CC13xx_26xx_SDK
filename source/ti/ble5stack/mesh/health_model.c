@@ -5,7 +5,7 @@
 @brief  Health Server Model
 
 Group: WCS, BTS
-Target Device: cc13x2_26x2
+Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
@@ -52,6 +52,7 @@ Target Device: cc13x2_26x2
 #include "health_model.h"
 #include "ti_device_composition.h"
 #include "ble_stack_api.h"
+#include "mesh_erpc_wrapper.h"
 
 #define HEALTH_TEST_STANDARD         0x00
 #define HEALTH_MODELS_OBJ_NUM        HEALTH_SRV_NUM
@@ -125,16 +126,17 @@ struct healthSrv_data * healthSrv_get_data_obj(const struct bt_mesh_model * mode
 int healthSrv_init(void)
 {
     int i = 0, j = 0, healthModelsFound = 0;
+    uint16_t model_index;
     struct bt_mesh_model * p_health_srv_obj;
     size_t element_count = comp.elem_count;
-    struct bt_mesh_elem * element_list = comp.elem;
     struct healthSrv_data * cur_obj;
 
     //  Go through all elements, in each element find if a
     //  health server model exists
     for(i = 0; i < element_count; i++)
     {
-        p_health_srv_obj = bt_mesh_model_find(&element_list[i], BT_MESH_MODEL_ID_HEALTH_SRV);
+        model_index = bt_mesh_model_find_wrapper(i, BT_MESH_MODEL_ID_HEALTH_SRV);
+        p_health_srv_obj = get_model_data(i, 0, model_index);
 
         // If model is a health serve model, then initiate it's corresponded
         // health server data object

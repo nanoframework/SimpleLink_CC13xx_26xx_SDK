@@ -5,7 +5,7 @@
  @brief ICall BLE Stack Dispatcher for embedded and NP/Serial messages.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -723,16 +723,20 @@ const uint32_t bleAPItable[] =
 #endif // (defined(HOST_CONFIG) !defined(GATT_NO_CLIENT) )
 #if ( HOST_CONFIG & ( PERIPHERAL_CFG ))
   (uint32)GATT_GetNextHandle,                                // JT_INDEX[272]
+  (uint32)GATT_ServiceNumAttrs,                              // JT_INDEX[273]
+  (uint32)GATT_FindHandle,                                   // JT_INDEX[274]
 #else // !( HOST_CONFIG & ( PERIPHERAL_CFG ) )
+  (uint32)icall_liteErrorFunction,
+  (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
 #endif // ( HOST_CONFIG & ( PERIPHERAL_CFG ) )
 #if ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES) )))
-  (uint32)GATT_PrepareWriteReq,                              // JT_INDEX[273]
-  (uint32)GATT_ExecuteWriteReq,                              // JT_INDEX[274]
-  (uint32)GATT_FindUUIDRec,                                  // JT_INDEX[275]
-  (uint32)GATT_RegisterService,                              // JT_INDEX[276]
-  (uint32)GATT_DeregisterService,                            // JT_INDEX[277]
-  (uint32)GATT_FindIncludedServices,                         // JT_INDEX[278]
+  (uint32)GATT_PrepareWriteReq,                              // JT_INDEX[275]
+  (uint32)GATT_ExecuteWriteReq,                              // JT_INDEX[276]
+  (uint32)GATT_FindUUIDRec,                                  // JT_INDEX[277]
+  (uint32)GATT_RegisterService,                              // JT_INDEX[278]
+  (uint32)GATT_DeregisterService,                            // JT_INDEX[279]
+  (uint32)GATT_FindIncludedServices,                         // JT_INDEX[280]
 #else // !( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
@@ -742,17 +746,17 @@ const uint32_t bleAPItable[] =
   (uint32)icall_liteErrorFunction,
 #endif // ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
 #if ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) ))
-  (uint32)GATT_RegisterForReq,                               // JT_INDEX[279]
+  (uint32)GATT_RegisterForReq,                               // JT_INDEX[281]
 #else // !( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) ))
   (uint32)icall_liteErrorFunction,
 #endif // ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) ))
 #if defined(HOST_CONFIG)
-  (uint32)GATTServApp_RegisterService,                       // JT_INDEX[280]
-  (uint32)GATTServApp_AddService,                            // JT_INDEX[281]
-  (uint32)GATTServApp_DeregisterService,                     // JT_INDEX[282]
-  (uint32)GATTServApp_SetParameter,                          // JT_INDEX[283]
-  (uint32)GATTServApp_GetParameter,                          // JT_INDEX[284]
-  (uint32)GATTServApp_SendCCCUpdatedEvent,                   // JT_INDEX[285]
+  (uint32)GATTServApp_RegisterService,                       // JT_INDEX[282]
+  (uint32)GATTServApp_AddService,                            // JT_INDEX[283]
+  (uint32)GATTServApp_DeregisterService,                     // JT_INDEX[284]
+  (uint32)GATTServApp_SetParameter,                          // JT_INDEX[285]
+  (uint32)GATTServApp_GetParameter,                          // JT_INDEX[286]
+  (uint32)GATTServApp_SendCCCUpdatedEvent,                   // JT_INDEX[287]
 #else // !defined(HOST_CONFIG)
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
@@ -762,42 +766,42 @@ const uint32_t bleAPItable[] =
   (uint32)icall_liteErrorFunction,
 #endif // defined(HOST_CONFIG)
 #if !defined(GATT_NO_SERVICE_CHANGED)
-  (uint32)GATTServApp_SendServiceChangedInd,                 // JT_INDEX[286]
+  (uint32)GATTServApp_SendServiceChangedInd,                 // JT_INDEX[288]
 #else // !( !defined(GATT_NO_SERVICE_CHANGED) )
   (uint32)icall_liteErrorFunction,
 #endif // ( !defined(GATT_NO_SERVICE_CHANGED) )
 #ifdef ATT_DELAYED_REQ
-  (uint32)GATTServApp_ReadRsp,                               // JT_INDEX[287]
+  (uint32)GATTServApp_ReadRsp,                               // JT_INDEX[289]
 #else // !( ATT_DELAYED_REQ )
   (uint32)icall_liteErrorFunction,
 #endif // ( ATT_DELAYED_REQ )
 #ifdef GATT_QUAL
-  (uint32)GATTQual_AddService,                               // JT_INDEX[288]
+  (uint32)GATTQual_AddService,                               // JT_INDEX[290]
 #else // !( GATT_QUAL )
   (uint32)icall_liteErrorFunction,
 #endif // ( GATT_QUAL )
 #ifdef GATT_TEST
-  (uint32)GATTTest_AddService,                               // JT_INDEX[289]
+  (uint32)GATTTest_AddService,                               // JT_INDEX[291]
 #else // !( GATT_TEST )
   (uint32)icall_liteErrorFunction,
 #endif // ( GATT_TEST )
 #if ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES) )))
-  (uint32)GATTServApp_GetParamValue,                         // JT_INDEX[290]
-  (uint32)GATTServApp_SetParamValue,                         // JT_INDEX[291]
+  (uint32)GATTServApp_GetParamValue,                         // JT_INDEX[292]
+  (uint32)GATTServApp_SetParamValue,                         // JT_INDEX[293]
 #else // !( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
 #endif // ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
 #if ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) ))
-  (uint32)GATTServApp_RegisterForMsg,                        // JT_INDEX[292]
+  (uint32)GATTServApp_RegisterForMsg,                        // JT_INDEX[294]
 #else // !( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL)  ))
   (uint32)icall_liteErrorFunction,
 #endif // ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL)   ))
 #if defined(HOST_CONFIG)
-  (uint32)linkDB_NumActive,                                  // JT_INDEX[293]
-  (uint32)linkDB_GetInfo,                                    // JT_INDEX[294]
-  (uint32)linkDB_State,                                      // JT_INDEX[295]
-  (uint32)linkDB_NumConns,                                   // JT_INDEX[296]
+  (uint32)linkDB_NumActive,                                  // JT_INDEX[295]
+  (uint32)linkDB_GetInfo,                                    // JT_INDEX[296]
+  (uint32)linkDB_State,                                      // JT_INDEX[297]
+  (uint32)linkDB_NumConns,                                   // JT_INDEX[298]
 #else // !defined(HOST_CONFIG)
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
@@ -805,29 +809,29 @@ const uint32_t bleAPItable[] =
   (uint32)icall_liteErrorFunction,
 #endif // defined(HOST_CONFIG)
 #if defined(HOST_CONFIG)
-  (uint32)SM_GetScConfirmOob,                                // JT_INDEX[297]
-  (uint32)SM_GenerateRandBuf,                                // JT_INDEX[298]
-  (uint32)SM_AuthenticatedPairingOnlyMode,                   // JT_INDEX[299]
+  (uint32)SM_GetScConfirmOob,                                // JT_INDEX[299]
+  (uint32)SM_GenerateRandBuf,                                // JT_INDEX[300]
+  (uint32)SM_AuthenticatedPairingOnlyMode,                   // JT_INDEX[301]
 #else // !defined(HOST_CONFIG)
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
 #endif // defined(HOST_CONFIG)
 #if defined(HOST_CONFIG)
-  (uint32)SM_GetEccKeys,                                     // JT_INDEX[300]
-  (uint32)SM_GetDHKey,                                       // JT_INDEX[301]
-  (uint32)SM_RegisterTask,                                   // JT_INDEX[302]
+  (uint32)SM_GetEccKeys,                                     // JT_INDEX[302]
+  (uint32)SM_GetDHKey,                                       // JT_INDEX[303]
+  (uint32)SM_RegisterTask,                                   // JT_INDEX[304]
 #else // !(defined(HOST_CONFIG))
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
 #endif // #if defined(HOST_CONFIG)
 #if defined(HOST_CONFIG)
-  (uint32)ATT_ErrorRsp,                                      // JT_INDEX[303]
-  (uint32)ATT_ReadBlobRsp,                                   // JT_INDEX[304]
-  (uint32)ATT_ExecuteWriteRsp,                               // JT_INDEX[305]
-  (uint32)ATT_WriteRsp,                                      // JT_INDEX[306]
-  (uint32)ATT_ReadRsp,                                       // JT_INDEX[307]
+  (uint32)ATT_ErrorRsp,                                      // JT_INDEX[305]
+  (uint32)ATT_ReadBlobRsp,                                   // JT_INDEX[306]
+  (uint32)ATT_ExecuteWriteRsp,                               // JT_INDEX[307]
+  (uint32)ATT_WriteRsp,                                      // JT_INDEX[308]
+  (uint32)ATT_ReadRsp,                                       // JT_INDEX[309]
 #else // !defined(HOST_CONFIG)
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
@@ -836,14 +840,14 @@ const uint32_t bleAPItable[] =
   (uint32)icall_liteErrorFunction,
 #endif // defined(HOST_CONFIG)
 #if ( defined(HOST_CONFIG) && defined(HCI_TL_FULL))
-  (uint32)ATT_ParseExchangeMTUReq,                           // JT_INDEX[308]
-  (uint32)ATT_ExchangeMTURsp,                                // JT_INDEX[309]
-  (uint32)ATT_FindInfoRsp,                                   // JT_INDEX[310]
-  (uint32)ATT_FindByTypeValueRsp,                            // JT_INDEX[311]
-  (uint32)ATT_ReadByTypeRsp,                                 // JT_INDEX[312]
-  (uint32)ATT_ReadMultiRsp,                                  // JT_INDEX[313]
-  (uint32)ATT_ReadByGrpTypeRsp,                              // JT_INDEX[314]
-  (uint32)ATT_PrepareWriteRsp,                               // JT_INDEX[315]
+  (uint32)ATT_ParseExchangeMTUReq,                           // JT_INDEX[310]
+  (uint32)ATT_ExchangeMTURsp,                                // JT_INDEX[311]
+  (uint32)ATT_FindInfoRsp,                                   // JT_INDEX[312]
+  (uint32)ATT_FindByTypeValueRsp,                            // JT_INDEX[313]
+  (uint32)ATT_ReadByTypeRsp,                                 // JT_INDEX[314]
+  (uint32)ATT_ReadMultiRsp,                                  // JT_INDEX[315]
+  (uint32)ATT_ReadByGrpTypeRsp,                              // JT_INDEX[316]
+  (uint32)ATT_PrepareWriteRsp,                               // JT_INDEX[317]
 #else // !defined(HOST_CONFIG)
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
@@ -855,28 +859,30 @@ const uint32_t bleAPItable[] =
   (uint32)icall_liteErrorFunction,
 #endif // defined(HOST_CONFIG)
 #if defined(HOST_CONFIG) && !defined(GATT_NO_CLIENT)
-  (uint32)ATT_HandleValueCfm,                                // JT_INDEX[316]
+  (uint32)ATT_HandleValueCfm,                                // JT_INDEX[318]
 #else // !(defined(HOST_CONFIG) && !defined(GATT_NO_CLIENT) )
   (uint32)icall_liteErrorFunction,
 #endif // (defined(HOST_CONFIG) && !defined(GATT_NO_CLIENT) )
 #if ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES) )))
-  (uint32)ATT_SetParamValue,                                 // JT_INDEX[317]
-  (uint32)ATT_GetParamValue,                                 // JT_INDEX[318]
+  (uint32)ATT_SetParamValue,                                 // JT_INDEX[319]
+  (uint32)ATT_GetParamValue,                                 // JT_INDEX[320]
 #else // !( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
   (uint32)icall_liteErrorFunction,
   (uint32)icall_liteErrorFunction,
 #endif // ( defined(HOST_CONFIG) && ( defined(HCI_TL_FULL) && ( !defined(GATT_DB_OFF_CHIP) && defined(TESTMODES))  ))
-  (uint32)osal_snv_read,                                     // JT_INDEX[319]
-  (uint32)osal_snv_write,                                    // JT_INDEX[320]
+  (uint32)osal_snv_read,                                     // JT_INDEX[321]
+  (uint32)osal_snv_write,                                    // JT_INDEX[322]
 #if !defined(HCI_TL_NONE)
-  (uint32)NPI_RegisterTask,                                  // JT_INDEX[321]
+  (uint32)NPI_RegisterTask,                                  // JT_INDEX[323]
 #else // !( !defined(HCI_TL_NONE) )
   (uint32)icall_liteErrorFunction,
 #endif // ( !defined(HCI_TL_NONE) )
+  (uint32)HCI_LE_SetHostDefChanClassificationCmd,            // JT_INDEX[322]
+  (uint32)HCI_LE_SetHostConnChanClassificationCmd,           // JT_INDEX[323]
 /* this should remain last, so that for any configuration, 
 the revision needs to be read. this enable quick detection of bad alignement 
 in the table */
-  (uint32)buildRevision,                                     // JT_INDEX[322]
+  (uint32)buildRevision,                                     // JT_INDEX[324]
 };
 #endif /* STACK_LIBRARY */
 /*********************************************************************

@@ -1912,11 +1912,11 @@ extern "C"
 #define ZCL_ON_OFF_EXTENSION_SIZE   0
 #endif
 
-#ifdef ZCL_LEVEL_CONTROL
+#ifdef ZCL_LEVEL_CTRL
 //for Level Control cluster (currentLevel attribute)
-#define ZCL_LEVEL_CONTROL_EXTENSION_SIZE (2 + 1 + 1)
+#define ZCL_LEVEL_CTRL_EXTENSION_SIZE (2 + 1 + 1)
 #else
-#define ZCL_LEVEL_CONTROL_EXTENSION_SIZE  0
+#define ZCL_LEVEL_CTRL_EXTENSION_SIZE  0
 #endif
 
 #ifdef ZCL_LIGHTING
@@ -1945,7 +1945,7 @@ extern "C"
 // Scene extension length is defined by:
 // Cluster ID + Attribute ID + Attribute data
 // The maximum length of the scene extension field:
-#define ZCL_GENERAL_SCENE_EXT_LEN   (ZCL_ON_OFF_EXTENSION_SIZE + ZCL_LEVEL_CONTROL_EXTENSION_SIZE + ZCL_LIGHTING_EXTENSION_SIZE + ZCL_DOORLOCK_EXTENSION_SIZE + ZCL_WINDOWCOVERING_EXTENSION_SIZE)
+#define ZCL_GENERAL_SCENE_EXT_LEN   (ZCL_ON_OFF_EXTENSION_SIZE + ZCL_LEVEL_CTRL_EXTENSION_SIZE + ZCL_LIGHTING_EXTENSION_SIZE + ZCL_DOORLOCK_EXTENSION_SIZE + ZCL_WINDOWCOVERING_EXTENSION_SIZE)
 #endif  //!defined ( ZCL_GENERAL_SCENE_EXT_LEN )
 
 // The maximum number of entries in the Scene table
@@ -2638,13 +2638,6 @@ typedef struct
  *      ZStatus_t zclGeneral_SendOnOff_CmdToggle( uint16_t srcEP, afAddrType_t *dstAddr, uint8_t disableDefaultRsp, uint8_t seqNum );
  */
 #define zclGeneral_SendOnOff_CmdToggle(a,b,c,d) zcl_SendCommand( (a), (b), ZCL_CLUSTER_ID_GENERAL_ON_OFF, COMMAND_ON_OFF_TOGGLE, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR, (c), 0, (d), 0, NULL )
-
-/*!
- *  Send an On Off Command - COMMAND_ONOFF_ONDURATION
- *  Use like:
- *      ZStatus_t zclGeneral_SendOnOff_CmdOnDuration( uint16_t srcEP, afAddrType_t *dstAddr, uint16_t onDuration, uint8_t disableDefaultRsp, uint8_t seqNum );
- */
-#define zclGeneral_SendOnOff_CmdOnDuration(a,b,c,d,e) zcl_SendCommand( (a), (b), ZCL_CLUSTER_ID_GENERAL_ON_OFF, COMMAND_ON_DURATION, TRUE, ZCL_FRAME_CLIENT_SERVER_DIR, (d), 0, (e), 2, (c) )
 
 #ifdef ZCL_LIGHT_LINK_ENHANCE
 /*!

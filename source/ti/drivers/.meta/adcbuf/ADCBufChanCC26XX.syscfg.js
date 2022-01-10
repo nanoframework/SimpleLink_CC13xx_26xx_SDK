@@ -113,6 +113,7 @@ function moduleInstances(inst)
 {
     let modInstances = new Array();
     let name = inst.channelString;
+    let shortName = inst.$name.replace("CONFIG_", "");
 
     if (name === "null" || name === "Battery" ||
         name === "Decoupling" || name === "Ground") {
@@ -122,16 +123,17 @@ function moduleInstances(inst)
     modInstances.push(
         {
             name: "adcPinInstance" + inst.channelString,
-            displayName: "ADCBuf Input PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "ADCBuf Input configuration when not in use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/ADCBuf",
+            requiredArgs: {
                 parentInterfaceName: "adc",
                 parentSignalName: "adcPin",
-                parentSignalDisplayName: "ADCBuf Channel " + inst.channelString,
-                mode: "Input",
-                pull: "None"
+                parentSignalDisplayName: "ADCBuf Channel " + inst.channelString
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_CHANNEL_" + inst.channelString,
+                mode: "Input"
             }
         }
     );

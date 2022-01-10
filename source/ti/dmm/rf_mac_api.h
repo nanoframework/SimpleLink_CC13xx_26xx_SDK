@@ -8,7 +8,7 @@
  *  DMM equivalents that are defined in the dmm_schedular module so that
  *  priorities and timing can be set according to the dual mode manager policy
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
  ******************************************************************************
  
  Copyright (c) 2015-2021, Texas Instruments Incorporated

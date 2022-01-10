@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
  *  ======== ITMCC26XX.Board.c.xdt ========
  */
 
-    let ITM      = args[0];
-    let itmStatic      = ITM.$static;
+    let ITM         = args[0];
+    let itmStatic   = ITM.$static;
 %%}
 /*
  *  =============================== ITM ===============================
@@ -50,12 +50,11 @@
  *  ======== itmHWAttrs ========
  */
 static const ITMCC26XX_HWAttrs itmCC26XXHWAttrs = {
-%     let swoPinName =  'IOID' + itmStatic.swoPin.$solution.devicePinName.substring(3);
     .format             = `itmStatic.tpiuSerialFormat`,
     .tpiuPrescaler      = `itmStatic.tpiuPrescaler`,
     .fullPacketInCycles = `itmStatic.fullPacketInCycles`,
-    .traceEnable        = `itmStatic.traceEnable`,
-    .swoPin             = `swoPinName`,
+    .traceEnable        = `"0x" + itmStatic.traceEnable.toString(16)`,
+    .swoPin             = `itmStatic.swoPinInstance.$name`,
 };
 
 void *itmHwAttrs = (void *)&itmCC26XXHWAttrs;

@@ -47,18 +47,6 @@ let family = Common.device2Family(system.deviceData, "EDDSA");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - EDDSA instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base EDDSA properties and methods
  */
@@ -72,12 +60,11 @@ and verifying digital signatures.
 * [Usage Synopsis][2]
 * [Examples][3]
 * [Configuration Options][4]
-[1]: /tidrivers/doxygen/html/_e_d_d_s_a_8h.html#details "C API reference"
-[2]: /tidrivers/doxygen/html/_e_d_d_s_a_8h.html#ti_drivers_EDDSA_Synopsis "Basic C usage summary"
-[3]: /tidrivers/doxygen/html/_e_d_d_s_a_8h.html#ti_drivers_EDDSA_Examples "C usage examples"
-[4]: /tidrivers/syscfg/html/ConfigDoc.html#EDDSA_Configuration_Options "Configuration options reference"
+[1]: /drivers/doxygen/html/_e_d_d_s_a_8h.html#details "C API reference"
+[2]: /drivers/doxygen/html/_e_d_d_s_a_8h.html#ti_drivers_EDDSA_Synopsis "Basic C usage summary"
+[3]: /drivers/doxygen/html/_e_d_d_s_a_8h.html#ti_drivers_EDDSA_Examples "C usage examples"
+[4]: /drivers/syscfg/html/ConfigDoc.html#EDDSA_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     defaultInstanceName : "CONFIG_EDDSA_",
     config              : Common.addNameConfig(config, "/ti/drivers/EDDSA", "CONFIG_EDDSA_"),
     modules             : Common.autoForceModules(["Board", "Power"])

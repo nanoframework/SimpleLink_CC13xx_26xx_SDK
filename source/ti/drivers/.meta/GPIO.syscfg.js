@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,8 @@ let logInfo = Common.logInfo;
 /* compute /ti/drivers family name from device object */
 let family = Common.device2Family(system.deviceData, "GPIO");
 
+const inversionAvailable = (family !== "CC32XX");
+
 let intPriority = Common.newIntPri()[0];
 intPriority.name = "interruptPriority";
 intPriority.displayName = "Interrupt Priority";
@@ -73,33 +75,14 @@ let config = [
         options: [
             {
                 name: "Input",
-                description: "This GPIO is always used for input"
+                description: "This GPIO is initially configured for input"
             },
             {
                 name: "Output" ,
-                description: "This GPIO is always used for output"
-            },
-            {
-                name: "Dynamic",
-                description: "This GPIO is dynamically reconfigured at"
-                  + " runtime using the GPIO APIs",
-                longDescription: "This mode indicates that the"
-                  + " application will dynamically configure the GPIO at"
-                  + " runtime using the GPIO APIs. As a result, it's assumed"
-                  + " that this GPIO requires an entry in the table of GPIO"
-                  + " callback functions; see [Optimize Callback Table Size]"
-                  + "(/drivers/syscfg/html/ConfigDoc.html#"
-                  + "ti_drivers_GPIO_optimizeCallbackTableSize)."
+                description: "This GPIO is initially configured for output"
             }
         ],
         onChange: updateConfigs
-    },
-    {
-        name: "nullEntry",
-        description: "For internal use only.",
-        hidden: true,
-        default: false,
-        onChange: updateNullEntry
     },
     {
         name: "outputType",
@@ -110,7 +93,8 @@ let config = [
         options: [
             { name: "Standard" },
             { name: "Open Drain" }
-        ]
+        ],
+        onChange: updateConfigs
     },
     {
         name: "outputStrength",
@@ -151,13 +135,33 @@ let config = [
         ]
     },
     {
+        name: "invert",
+        displayName: "Value Inversion",
+        description: "Invert input/output value in hardware",
+        hidden: !inversionAvailable,
+        default: false
+    },
+    {
+        name: "outputSlew",
+        displayName: "Reduce Slew Rate",
+        description: "Reduce pin slew rate",
+        hidden: true,
+        default: false
+    },
+    {
+        name: "hysteresis",
+        displayName: "Enable Hysteresis",
+        description: "Enable input hysteresis",
+        hidden: !inversionAvailable,
+        default: false
+    },
+    {
         name: "interruptTrigger",
         displayName: "Interrupt Trigger",
         description: "Specifies when or if interrupts are triggered",
         longDescription: `
 This parameter configures when the GPIO pin interrupt will trigger. Even when this config is set, interrupts are not enabled until
-[\`GPIO_enableInt()\`](/drivers/doxygen/html/_g_p_i_o_8h.html#a31c4e65b3855424418262e35521c7051) is called at runtime. If using
-GPIO interrupts, the __Callback Function__ cannot be empty.`,
+[\`GPIO_enableInt()\`](/drivers/doxygen/html/_g_p_i_o_8h.html#a31c4e65b3855424418262e35521c7051) is called at runtime.`,
         hidden: false,
         default: "None",
         options: [
@@ -179,11 +183,6 @@ If you need to set the callback at runtime, set this configuration parameter
 to 'NULL' and call [\`GPIO_setCallback()\`](/drivers/doxygen/html/_g_p_i_o_8h.html#a24c401f32e65f60f11a1594fdafb9d2a) with the name of the function you
 want to be triggered.
 
-If this config is not set (empty text field), GPIO assumes that no callback will ever be set for
-this GPIO instance at runtime and, as a result, no space will be allocated to save the address of
-the callback; thus, it's important to never use \`GPIO_setCallback()\` on a
-GPIO for which this config is empty.
-
 [More ...](/drivers/syscfg/html/ConfigDoc.html#ti_drivers_GPIO_callbackFunction "Function's type signature and an example")
 `,
         documentation: `
@@ -197,12 +196,40 @@ Example: [Creating an input callback](/drivers/doxygen/html/_g_p_i_o_8h.html#ti_
         placeholder: "<a callback is never needed>",
         default: "NULL" /* a callback may be set at runtime */
     },
+    /* Compatibility - these deprecated options mirror PIN configurables */
     {
-        name: "comment",
-        displayName: "Comment",
-        hidden: true,
+        name: "outputState",
+        description: "GPIO uses initialOutputState instead of outputState.",
+        deprecated: true,
         default: "",
-        description: "User specified comment to add the generated files."
+        onChange: updateDeprecatedConfigs
+    },
+    {
+        name: "irq",
+        displayName: "GPIO uses interruptTrigger instead of irq",
+        deprecated: true,
+        default: "",
+        onChange: updateDeprecatedConfigs
+    },
+    /* Internal only - used by modules that instantiate GPIO objects to convey ownership information */
+    {
+        name: "parentSignalName",
+        displayName: "Parent Signal Name",
+        hidden: true,
+        default: ""
+    },
+    {
+        name: "parentInterfaceName",
+        displayName: "Parent Interface Name",
+        hidden: true,
+        default: ""
+    },
+    {
+        name: "parentSignalDisplayName",
+        displayName: "Parent Signal Display Name",
+        description: "Used in comments to indicate what this pin is for. Examples would be SCLK, TX, AOUT.",
+        hidden: true,
+        default: ""
     }
 ];
 
@@ -217,27 +244,34 @@ Example: [Creating an input callback](/drivers/doxygen/html/_g_p_i_o_8h.html#ti_
 function getDisabledHWOptions(inst, comps)
 {
     let disabled = [];
-    if (inst.$uiState.mode.readOnly) {
-        let modeCfg = system.getReference(inst, "mode");
-        for (let i = 0; i < comps.length; i++) {
-            let comp = comps[i];
+    let modeCfg = system.getReference(inst, "mode");
+    for (let i = 0; i < comps.length; i++) {
+        let comp = comps[i];
+
+        /* Can't configure hardware for 'owned' modules */
+        if (inst.$ownedBy && comp !== inst.$hardware) {
+            disabled.push({
+                component: comp,
+                reason: "Can't configure a GPIO owned by " + system.getReference(inst.$ownedBy)
+            });
+            continue;
+        }
+
+        if (inst.$uiState.mode.readOnly) {
+            /* Some DIOs only support Input or Output modes */
             for (let sig in comp.signals) {
                 let type = comp.signals[sig].type;
 
-                if (inst.mode == "Input"
-                    && !Common.typeMatches(type, ["DIN"])) {
+                if (inst.mode == "Input" && !Common.typeMatches(type, ["DIN"])) {
                     disabled.push({
                         component: comp,
-                        reason: "This hardware component does not support 'Input' "
-                                + modeCfg
+                        reason: "This hardware component does not support 'Input' " + modeCfg
                     });
                 }
-                else if (inst.mode == "Output"
-                         && !Common.typeMatches(type, ["DOUT"])) {
+                else if (inst.mode == "Output" && !Common.typeMatches(type, ["DOUT"])) {
                     disabled.push({
                         component: comp,
-                        reason: "This hardware component does not support 'Output' "
-                                + modeCfg
+                        reason: "This hardware component does not support 'Output' " + modeCfg
                     });
                 }
             }
@@ -253,7 +287,7 @@ function getDisabledHWOptions(inst, comps)
  */
 function pinmuxRequirements(inst)
 {
-    if (inst.nullEntry == true) {
+    if (inst.$ownedBy) {
         return ([]);
     }
 
@@ -272,9 +306,20 @@ function pinmuxRequirements(inst)
  */
 function filterHardware(component)
 {
-    for (let sig in component.signals) {
-        let type = component.signals[sig].type;
-        if (Common.typeMatches(type, ["DIN", "DOUT"])) {
+    let signals = component.signals;
+    if (!signals) {
+        return false;
+    }
+
+    if (!Array.isArray(signals)) {
+        /* This means the component has its pins defined as a dictionary.
+         * Extract an array of pin objects to pass to Common.typeMatches.
+         */
+        signals = Object.values(component.signals);
+    }
+
+    for (let i = 0; i < signals.length; i++) {
+        if (Common.typeMatches(signals[i].type, ["DIN", "DOUT"])) {
             return (true);
         }
     }
@@ -283,98 +328,63 @@ function filterHardware(component)
 }
 
 /*
- *  ======== sort ========
- *  Reorder GPIO instances to minimize space required for callbacks
- *
- *  @param instances - GPIO.$instances array
- *  @returns array of instances such that all GPIOs with interrupts
- *   appear ahead of GPIOs that can't trigger an interrupt.
- */
-function sort(instances, addCallback)
-{
-    if (instances.length == 0
-        || instances[0].$module.$static.optimizeCallbackTableSize == false) {
-        return (instances);
-    }
-
-    let callbackInstances = [];
-    let otherInstances = [];
-
-    for (let i = 0; i < instances.length; i++) {
-        let inst = instances[i];
-        if (addCallback[inst.$name] == true) {
-            callbackInstances[callbackInstances.length] = inst;
-        } else {
-            otherInstances[otherInstances.length] = inst;
-        }
-    }
-
-    return (callbackInstances.concat(otherInstances));
-}
-
-/*
  *  ======== updateConfigs ========
  *  Adjust UI properties of configs based on current config settings
  */
 function updateConfigs(inst, ui)
 {
-    switch (inst.mode) {
-        case "Output":
-            {
-                ui.callbackFunction.hidden = true;
-                ui.outputType.hidden = false;
-                ui.initialOutputState.hidden = false;
-                if (inst.outputType == "Standard") {
-                    ui.pull.hidden = true;
-                    ui.outputStrength.hidden = false;
-                } else {
-                    ui.pull.hidden = false;
-                    ui.outputStrength.hidden = true;
-                }
-                ui.pull.hidden = false;
-                ui.interruptTrigger.hidden = true;
-                inst.interruptTrigger = "None";
-                inst.callbackFunction = "";
-                break;
-            }
-        case "Input":
-            {
-                ui.outputType.hidden = true;
-                ui.outputStrength.hidden = true;
-                ui.initialOutputState.hidden = true;
-                ui.pull.hidden = false;
-                ui.interruptTrigger.hidden = false;
-                ui.callbackFunction.hidden = false;
-                inst.interruptTrigger = "None";
-                if (inst.callbackFunction === "") {
-                    inst.callbackFunction = "NULL";
-                }
-                break;
-            }
-        case "Dynamic":
-            {
-                ui.outputType.hidden = true;
-                ui.outputStrength.hidden = true;
-                ui.initialOutputState.hidden = true;
-                ui.pull.hidden = true;
-                ui.callbackFunction.hidden = false;
-                ui.interruptTrigger.hidden = true;
-                if (inst.callbackFunction === "") {
-                    inst.callbackFunction = "NULL";
-                }
-                break;
-            }
+    if (inst.mode == "Output") {
+        /* Show output-specific options */
+        ui.outputType.hidden = false;
+        ui.outputSlew.hidden = !inversionAvailable;
+        ui.outputStrength.hidden = false;
+        ui.initialOutputState.hidden = false;
+
+        /* Hide input-specific options */
+        ui.pull.hidden = true;
+        ui.hysteresis.hidden = true;
+        ui.interruptTrigger.hidden = true;
+        ui.callbackFunction.hidden = true;
+
+        /* Clear input-specific text configurables */
+        inst.callbackFunction = "";
+
+        /* Special case: Open Drain can have a pull but not a drive strength */
+        if (inst.outputType == "Open Drain") {
+            ui.pull.hidden = false;
+            ui.outputStrength.hidden = true;
+        }
+    }
+    else if (inst.mode == "Input") {
+        /* Show input-specific options */
+        ui.pull.hidden = false;
+        ui.hysteresis.hidden = !inversionAvailable;
+        ui.interruptTrigger.hidden = false;
+        ui.callbackFunction.hidden = false;
+
+        /* Reset input-specific text configurables */
+        inst.interruptTrigger = "None";
+        inst.callbackFunction = "NULL";
+
+        /* Hide output-specific options */
+        ui.outputType.hidden = true;
+        ui.outputSlew.hidden = true;
+        ui.outputStrength.hidden = true;
+        ui.initialOutputState.hidden = true;
     }
 }
 
 /*
- *  ======== updateNullEntry ========
+ *  ======== updateDeprecatedConfigs ========
+ *  Port deprecated configuration values to updated ones
  */
-function updateNullEntry(inst, ui)
+function updateDeprecatedConfigs(inst, ui)
 {
-    if (inst.nullEntry == true) {
-        inst.interruptTrigger = "None";
-        inst.callbackFunction = "NULL"; /* ensure there's a callback entry */
+    if (inst.outputState !== "") {
+        inst.initialOutputState = inst.outputState;
+    }
+    if (inst.irq !== "") {
+        inst.interruptTrigger = inst.irq;
     }
 }
 
@@ -410,24 +420,11 @@ function validate(inst, validation)
         logError(validation, inst, "callbackFunction", message);
     }
 
-    /* TODO: if not defined should we plug-in NOP and remark? */
-    if ((inst.interruptTrigger !== "None")
-        && (inst.callbackFunction === "")
-        && (inst.mode !== "Dynamic")) {
-        logWarning(validation, inst, "callbackFunction",
-            "If 'Callback Function' is empty, it is assumed this GPIO"
-            + " will never configure an interrupt at runtime and therefore"
-            + " does not require an entry in the GPIO callback table. Consider"
-            + " configuring a callback function or setting the 'mode' to"
-            + " 'Dynamic' (not " + inst.mode + ")");
-    }
-
     if (inst.callbackFunction !== "NULL"
         && (inst.callbackFunction.toLowerCase() === "null")) {
         logWarning(validation, inst, "callbackFunction",
             "Did you mean \"NULL\"?");
     }
-
 
     if (inst.$hardware) {
         /*
@@ -457,81 +454,29 @@ function validate(inst, validation)
 }
 
 /*
- *  ======== getPinNum ========
- *  Translate GPIO name ("Px.y") into corresponding device pin number.
- */
-function getPinNum(gpioName)
-{
-    for (let x in system.deviceData.devicePins) {
-        if (system.deviceData.devicePins[x].description.match(gpioName)) {
-            return (String(system.deviceData.devicePins[x].ball));
-        }
-    }
-
-    return ("");
-}
-
-/*
- *  ======== getFullPinName ========
- *  Translate GPIO name ("Px.y") into corresponding description.
- */
-function getFullPinName(gpioName)
-{
-    for (let x in system.deviceData.devicePins) {
-        if (system.deviceData.devicePins[x].description.match(gpioName)) {
-            return (String(system.deviceData.devicePins[x].description));
-        }
-    }
-
-    return ("");
-}
-
-/*
- *  ======== getPinName ========
- *  Translate device pin number into GPIO name ("Px.y")
- */
-function getPinName(pinNum)
-{
-    if (isNaN(pinNum)) {
-        throw Error("'" + pinNum + "' is not a pin number");
-    }
-    for (let x in system.deviceData.devicePins) {
-        if (system.deviceData.devicePins[x].ball == pinNum) {
-            let desc = String(system.deviceData.devicePins[x].description);
-            return (desc.substr(0, desc.indexOf("G")-1));
-        }
-    }
-
-    return ("");
-}
-
-/*
  *  ======== onHardwareChanged ========
  */
 function onHardwareChanged(inst, ui)
 {
-
     if (inst.$hardware) {
         let key = Object.keys(inst.$hardware.signals)[0];
         let signal = inst.$hardware.signals[key];
         let type = signal.type;
 
-        if (Common.typeMatches(type, ["DOUT"])) {
-            if (Common.typeMatches(type, ["DIN"])) {
-                inst.mode = "Dynamic";
-                updateConfigs(inst, ui);
-            }
-            else {
-                inst.mode = "Output";
-                updateConfigs(inst, ui);
-                Common.setDefaults(inst, signal, "DOUT");
-            }
+        let output = Common.typeMatches(type, ["DOUT"]);
+        let input = Common.typeMatches(type, ["DIN"]);
+
+        if (output && !input)
+        {
+            inst.mode = "Output";
+            updateConfigs(inst, ui);
         }
-        else if (Common.typeMatches(type, ["DIN"])) {
+        if (input && !output)
+        {
             inst.mode = "Input";
             updateConfigs(inst, ui);
-            Common.setDefaults(inst, signal, "DIN");
         }
+        /* Intentionally do nothing for mixed input/output */
     }
     else {
         /* Return to default settings */
@@ -551,204 +496,197 @@ function onHardwareChanged(inst, ui)
 }
 
 /*
+ *  ======== getPinBounds ========
+ * This function assumes all inaccessible pins are either at the start or the
+ * end; if this is ever not true we will need to revisit it to add better
+ * verification
+ */
+function getPinBounds(module)
+{
+    /* This function does a min-max search for DIO numbers. These initial
+     * values will be replaced with the lowest and highest found numbers,
+     * but 'lowest' needs to have a large initial value because it is only
+     * changed if we find a value that is smaller than it
+     */
+    let pins = {
+        "lowest": 999,
+        "highest": 0
+    };
+
+    for (let x in system.deviceData.devicePins)
+    {
+        let pin = system.deviceData.devicePins[x];
+
+        /* CC26XX devices have DIO_0, DIO_16 while CC32XX devices have GP03, GP30 */
+        if ((pin.description.startsWith("DIO")) ||
+            (pin.description.startsWith("RGCDIO")) ||
+            (pin.description.startsWith("GP") && pin.devicePinType === "Default"))
+        {
+            let dioNum = module._pinToDio(null, pin);
+            if (dioNum < pins.lowest)
+            {
+                pins.lowest = dioNum;
+            }
+            if (dioNum > pins.highest)
+            {
+                pins.highest = dioNum;
+            }
+        }
+    }
+    return pins;
+}
+
+/*
+ *  ======== getPinData ========
+ * GPIO is slightly different from other modules - we always want to emit values
+ * for all pins on the device, then modify that data for configured instances.
+ *
+ * Here we collect a list of all device pins (with some invalid pins at low
+ * indexes where applicable) and then modify that list with instance data.
+ */
+function getPinData(module)
+{
+    let localPinData = [];
+    let pinBounds = getPinBounds(module);
+
+    /* Start with any dummy pins, if we have a lower bound */
+    for (let i = 0; i < pinBounds.lowest; i++)
+    {
+        localPinData.push({
+            "name": "Pin is not available on this device",
+            "config": "0",
+            "callback": "NULL"
+        });
+    }
+
+    /* Then all the valid pins */
+    for (let i = pinBounds.lowest; i <= pinBounds.highest; i++)
+    {
+        localPinData.push({
+            "name": "DIO_" + i,
+            "config": module._getDefaultAttrs(),
+            "callback": "NULL"
+        });
+    }
+
+    /* Go through all the configured pins and overwrite as appropriate */
+    for (let inst of module.$instances) {
+        let dio = module.getDioForInst(inst);
+
+        localPinData[dio].inst = inst;
+        localPinData[dio].name = inst.$name;
+        localPinData[dio].config = getAttrs(inst);
+    }
+
+    return localPinData;
+}
+
+/*
+ * ======== getConfiguredCallbacks ========
+ * Generates two pieces of data: a list of unique names and an indented string
+ * containing calls to GPIO_setCallback. This is needed because if a callback
+ * is reused, we don't want to generate two extern definitions for it because
+ * that would look ugly.
+ *
+ * Note that this callback configuration is slightly heavier on runtime cost
+ * than having the array contain initialised values, but it saves flash since
+ * the table is likely to be quite sparse.
+ */
+function getConfiguredCallbacks(instances)
+{
+    let callbackInfo = {
+        /* A set of unique callback function names */
+        names: [],
+        /* String containing calls to GPIO_setCallback */
+        calls: ""
+    };
+
+    for (let inst of instances)
+    {
+        if (inst.callbackFunction !== "" && inst.callbackFunction !== "NULL")
+        {
+            if (!callbackInfo.names.includes(inst.callbackFunction))
+            {
+                callbackInfo.names.push(inst.callbackFunction);
+            }
+            callbackInfo.calls += "    GPIO_setCallback(" + inst.$name + ", " + inst.callbackFunction + ");\n";
+        }
+    }
+
+    /* Snip the trailing linebreak */
+    callbackInfo.calls = callbackInfo.calls.trim();
+
+    return callbackInfo;
+}
+
+/*
  *  ======== getAttrs ========
  *  Return a symbolic GPIO bit mask corresponding to inst's configs
  */
 function getAttrs(inst)
 {
-    if (inst.mode == "Dynamic" || inst.nullEntry == true) {
-        return ("GPIO_DO_NOT_CONFIG");
-    }
+    let strengthMapping = {
+        "High": "GPIO_CFG_OUT_STR_HIGH",
+        "Medium": "GPIO_CFG_OUT_STR_MED",
+        "Low": "GPIO_CFG_OUT_STR_LOW"
+    };
+    let pullMapping = {
+        "Pull Up": "GPIO_CFG_PULL_UP_INTERNAL",
+        "Pull Down": "GPIO_CFG_PULL_DOWN_INTERNAL",
+        "None": "GPIO_CFG_PULL_NONE_INTERNAL"
+    };
+    let intMapping = {
+        "Falling Edge": "GPIO_CFG_IN_INT_FALLING",
+        "Rising Edge": "GPIO_CFG_IN_INT_RISING",
+        "Both Edges": "GPIO_CFG_IN_INT_BOTH_EDGES",
+        "High": "GPIO_CFG_IN_INT_HIGH",
+        "Low": "GPIO_CFG_IN_INT_LOW",
+        "None": "GPIO_CFG_IN_INT_NONE"
+    };
+    let outputMapping = {
+        "Open Drain": "GPIO_CFG_OUTPUT_OPEN_DRAIN_INTERNAL"
+    };
+
+    let listOfDefines = [];
 
     if (inst.mode == "Output") {
-        let output = "";
-        if (inst.outputType == "Standard") {
-            output += "GPIO_CFG_OUT_STD";
-            switch (inst.outputStrength) {
-                case "High": {
-                    output += " | GPIO_CFG_OUT_STR_HIGH";
-                    break;
-                }
-                case "Medium": {
-                    output += " | GPIO_CFG_OUT_STR_MED";
-                    break;
-                }
-                case "Low":
-                default: {
-                    output += " | GPIO_CFG_OUT_STR_LOW";
-                    break;
-                }
-            }
+        listOfDefines.push("GPIO_CFG_OUTPUT_INTERNAL");
+        listOfDefines.push(strengthMapping[inst.outputStrength]);
+
+        if (inst.outputType != "Standard") {
+            listOfDefines.push(outputMapping[inst.outputType]);
         }
-        else {
-            switch (inst.pull) {
-                case "Pull Up": {
-                    output = "GPIO_CFG_OUT_OD_PU";
-                    break;
-                }
-                case "Pull Down": {
-                    output = "GPIO_CFG_OUT_OD_PD";
-                    break;
-                }
-                case "None":
-                default: {
-                    output = "GPIO_CFG_OUT_OD_NOPULL";
-                    break;
-                }
-            }
-        }
+
         if (inst.initialOutputState == "High") {
-            output += " | GPIO_CFG_OUT_HIGH";
+            listOfDefines.push("GPIO_CFG_OUT_HIGH");
         }
         else {
-            output += " | GPIO_CFG_OUT_LOW";
+            listOfDefines.push("GPIO_CFG_OUT_LOW");
         }
-        return (output);
     }
     else {
-        let input = "";
-        switch (inst.pull) {
-            case "Pull Up": {
-                input = "GPIO_CFG_IN_PU";
-                break;
-            }
-            case "Pull Down": {
-                input = "GPIO_CFG_IN_PD";
-                break;
-            }
-            case "None":
-            default: {
-                input = "GPIO_CFG_IN_NOPULL";
-                break;
-            }
-        }
-
-        if (inst.interruptTrigger != "None") {
-            switch (inst.interruptTrigger) {
-                case "Falling Edge": {
-                    input += " | GPIO_CFG_IN_INT_FALLING";
-                    break;
-                }
-                case "Rising Edge": {
-                    input += " | GPIO_CFG_IN_INT_RISING";
-                    break;
-                }
-                case "High": {
-                    input += " | GPIO_CFG_IN_INT_HIGH";
-                    break;
-                }
-                case "Low": {
-                    input += " | GPIO_CFG_IN_INT_LOW";
-                    break;
-                }
-                case "Both Edges": {
-                    input += " | GPIO_CFG_IN_INT_BOTH_EDGES";
-                    break;
-                }
-            }
-        }
-        else {
-            input += " | GPIO_CFG_IN_INT_NONE";
-        }
-        return (input);
-    }
-}
-
-/*
- *  ======== collectCallbacks ========
- */
-function collectCallbacks(instances, externs, addCallback)
-{
-    let callbacks = {};
-    let callbackCount = 0;
-    let sortEnabled = system.modules["/ti/drivers/GPIO"].$static.optimizeCallbackTableSize;
-
-    for (let i = 0; i < instances.length; i++) {
-        let inst = instances[i];
-
-        if (sortEnabled
-            && (inst.mode == "Output" || (inst.callbackFunction == ""))) {
-            addCallback[inst.$name] = false;
-        }
-        else {
-                addCallback[inst.$name] = true;
-                callbackCount++;
-        }
-
-        if (inst.callbackFunction != "" && inst.callbackFunction !== "NULL") {
-            callbacks[inst.callbackFunction] = 1;
-        }
+        listOfDefines.push("GPIO_CFG_INPUT_INTERNAL");
+        listOfDefines.push(intMapping[inst.interruptTrigger]);
+        listOfDefines.push(pullMapping[inst.pull]);
     }
 
-    for (let name in callbacks) {
-        externs.push("extern void " + name + "(uint_least8_t index);");
+    if (inst.invert) {
+        listOfDefines.push("GPIO_CFG_INVERT_ON");
+    }
+    if (inst.hysteresis) {
+        listOfDefines.push("GPIO_CFG_HYSTERESIS_ON");
+    }
+    if (inst.outputSlew) {
+        listOfDefines.push("GPIO_CFG_SLEW_REDUCED");
     }
 
-    return (callbackCount);
-}
+    let devSpecificDefines = inst.$module._getHwSpecificAttrs(inst);
 
-/*
- *  ======== addComment ========
- *
- *  %p = Px.y extracted from $solution.peripheralPinName
- *  %P = entire pin name from $solution.devicePinName
- *  %i = GPIO config array index
- *  %c = C Name
- *  %n = $name
- *  %l = comment text is inserted a line before the config line.
- *  %tnum = comment is placed at character position - num.
- */
-function addComment(line, inst, index, pin)
-{
-    let padding = Array(80).join(' ');
-    let comment = inst.comment;
-    if (inst.comment === "") {
-        if (inst.$hardware && inst.$hardware.displayName) {
-            comment = "    /* " + inst.$name + " : " + inst.$hardware.displayName + " */\n";
-        }
-        else {
-            comment = "    /* " + inst.$name + " */\n";
-        }
-        return (comment + line);
-    }
-    if (comment.match("%t")) {
-        let tab = comment.substring(comment.indexOf("%t") + 2);
-        let ts = parseInt(tab);
-        comment = comment.replace("%t"+ts, "");
-        comment = padding.substring(0, ts - line.length) + comment;
-    }
-    if (comment.match("%c")) {
-        comment = comment.replace("%c",  inst.$name);
-    }
-    if (comment.match("%n")) {
-        comment = comment.replace("%n",  inst.$name);
-    }
-    if (comment.match("%i")) {
-        comment = comment.replace("%i", index);
-    }
-    if (comment.match("%p")) {
-        if (inst.nullEntry == true) {
-            comment = comment.replace("%p", "Empty Pin");
-        }
-        else {
-            let pName = pin.$solution.peripheralPinName;
-            comment = comment.replace("%p", pName);
-        }
-    }
-    if (comment.match("%P")) {
-        if (inst.nullEntry == true) {
-            comment = comment.replace("%P", "Empty Pin");
-        }
-        else {
-            comment = comment.replace("%P",  pin.$solution.devicePinName);
-        }
-    }
-    if (comment.match("%l")) {
-        comment = comment.replace("%l", "");
-        line = comment + "\n" + line;
-        return (line);
-    }
-    return (line + comment);
+    /* ... is the spread operator and splits the list into elements
+     * Without this we would have a list embedded in the list
+     */
+    listOfDefines.push(...devSpecificDefines);
+    return listOfDefines.join(" | ");
 }
 
 /*
@@ -758,6 +696,66 @@ function addComment(line, inst, index, pin)
 function _getPinResources(inst)
 {
     return;
+}
+
+/*
+ *  ======== getDioForInst ========
+ */
+function getDioForInst(inst)
+{
+    let pinSolution;
+
+    if (inst.$ownedBy) {
+        if (inst.parentInterfaceName == "GPIO") {
+            /* GPIO interfaces only have one layer */
+            pinSolution = inst.$ownedBy[inst.parentSignalName].$solution;
+        }
+        else {
+            /* Other interfaces require us to index again into SignalName */
+            pinSolution = inst.$ownedBy[inst.parentInterfaceName][inst.parentSignalName].$solution;
+        }
+    }
+    else {
+        pinSolution = inst.gpioPin.$solution;
+    }
+
+    let devicePin = system.deviceData.devicePins[pinSolution.packagePinName];
+
+    /* Conflicting pins have no valid mapping until ignored */
+    if (devicePin) {
+        return inst.$module._pinToDio(pinSolution, devicePin);
+    }
+
+    return null;
+}
+
+/*
+ *  ======== _pinToDio ========
+ */
+/* istanbul ignore next */
+function _pinToDio(pinSolution, devicePin)
+{
+    throw 'This function must be defined for each device!';
+}
+
+/*
+ *  ======== _getDefaultAttrs ========
+ */
+/* istanbul ignore next */
+function _getDefaultAttrs()
+{
+    return "GPIO_CFG_NO_DIR";
+}
+
+/*
+ *  ======== _getHwSpecificAttrs ========
+ *  Override in each implementation to control the mapping of hardware specific
+ *  options to hardware specific defines
+ */
+/* istanbul ignore next */
+function _getHwSpecificAttrs(inst)
+{
+    return [];
 }
 
 /*
@@ -773,6 +771,10 @@ The [__GPIO driver__][1] allows you to manage General Purpose I/O
 resources via simple and portable APIs. GPIO pin behavior is
 configured statically, but can also be [reconfigured at runtime][2].
 
+Note: If you add only a GPIO to a configuration, you will need to manually
+add either Board or Power to generate the correct templates due to a circular
+dependency issue.
+
 * [Usage Synopsis][3]
 * [Examples][4]
 * [Configuration Options][5]
@@ -785,6 +787,7 @@ configured statically, but can also be [reconfigured at runtime][2].
 `,
 
     pinmuxRequirements: pinmuxRequirements,
+    updateDeprecatedConfigs: updateDeprecatedConfigs,
     validate: validate,
 
     defaultInstanceName: "CONFIG_GPIO_",
@@ -794,46 +797,20 @@ configured statically, but can also be [reconfigured at runtime][2].
         name: "gpioGlobal",
         displayName: "GPIO Global",
         config: [
-            intPriority,
-            {
-                name: "optimizeCallbackTableSize",
-                displayName: "Optimize Callback Table Size",
-
-                description: "Enabling this option removes unnecessary"
-                    + " entries in the GPIO callback table."
-                    + " Before enabling this option, carefully review the"
-                    + " detailed help for runtime benefits AND caveats.",
-
-                longDescription: "This option causes the GPIO driver tables"
-                    + " to be sorted so that all GPIOs that trigger interrupts"
-                    + " appear first in the GPIO table. This allows the table"
-                    + " of GPIO callbacks, which is also indexed by the GPIO"
-                    + " index, to be substantially shorter then the table of"
-                    + " all GPIOs."
-                    + "\n\n"
-                    + "However, this also means that calls to"
-                    + " `GPIO_setCallback()` must **never** be made to GPIOs"
-                    + " whose callbacks are configured as the empty string"
-                    + " (which is shown as '&lt;a callback is never"
-                    + " needed&gt;' in the GUI).",
-
-                hidden: false,
-                default: false
-            }
+            intPriority
         ],
-        getPinNum: getPinNum,
-        getPinName: getPinName,
-        getFullPinName: getFullPinName,
-        getAttrs: getAttrs,
-        collectCallbacks: collectCallbacks,
-        addComment: addComment,
-        modules: Common.autoForceModules(["Board", "Power"])
+        getAttrs: getAttrs
     },
 
-    /* common sort for GPIO tables to minimize GPIO ISR table size */
-    sort: sort,
+    _getPinResources: _getPinResources,
+    _getDefaultAttrs: _getDefaultAttrs,
+    _getHwSpecificAttrs: _getHwSpecificAttrs,
+    _pinToDio: _pinToDio,
 
-    _getPinResources: _getPinResources
+    getPinData: getPinData,
+    getPinBounds: getPinBounds,
+    getDioForInst: getDioForInst,
+    getConfiguredCallbacks: getConfiguredCallbacks
 };
 
 /* extend our common exports to include the family-specific content */

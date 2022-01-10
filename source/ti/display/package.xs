@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,44 @@
 
 function getLibs(prog)
 {
-    var name = "display.a" + prog.build.target.suffix;
-    var lib = "";
+    var deviceString = "";
+    var targetSuffix = "";
 
-    lib = "lib/" + name;
+    /* Determine libraries required by device name. */
+    if (Program.cpu.deviceName.match(/CC13.4/)) {
+        deviceString = "_cc13x4";
+    }
+    else if (Program.cpu.deviceName.match(/CC13.2/)) {
+        deviceString = "_cc13x2";
+    }
+    else if (Program.cpu.deviceName.match(/CC13.0/)) {
+        deviceString = "_cc13x0";
+    }
+    else if (Program.cpu.deviceName.match(/CC26.0R2/)) {
+        deviceString = "_cc26x0r2";
+    }
+    else if (Program.cpu.deviceName.match(/CC26.4/)) {
+        deviceString = "_cc26x4";
+    }
+    else if (Program.cpu.deviceName.match(/CC26.2/)) {
+        deviceString = "_cc26x2";
+    }
+    else if (Program.cpu.deviceName.match(/CC26.0/)) {
+        deviceString = "_cc26x0";
+    }
+    else if (Program.cpu.deviceName.match(/CC3220/)) {
+        deviceString = "_cc32xx";
+    }
+    else if (Program.cpu.deviceName.match(/CC23.0/)) {
+        deviceString = "_cc23x0";
+    }
+    else {
+        throw ("Driver not found for this device " + Program.cpu.deviceName +
+               " and target " + Program.build.target.suffix);
+    }
 
-    return lib;
+    targetSuffix = ".a" + prog.build.target.suffix;
+
+    var retString = "lib/display" + deviceString + targetSuffix;
+    return retString;
 }

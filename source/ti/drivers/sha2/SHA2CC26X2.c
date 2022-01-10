@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,11 @@
 #define HMAC_OPAD_BYTE 0x5C
 #define HMAC_IPAD_BYTE 0x36
 
+/* Though the DMA Length Registers are 32-bit, they can only take a 16-bit
+ * length while the bits [31:16] are reserved.
+ */
+#define DMA_MAX_TXN_LENGTH  0xFFFFU
+
 typedef enum {
     SHA2_OperationType_SingleStep,
     SHA2_OperationType_MultiStep,
@@ -87,6 +92,9 @@ static int_fast16_t SHA2CC26X2_hashData(SHA2_Handle handle,
                                         const void *data,
                                         size_t length,
                                         void *digest);
+static void SHA2CC26X2_emptyFinalize(SHA2CC26X2_Object *object,
+                                     void *digest);
+static void SHA2CC26X2_computeIntermediateHash(SHA2CC26X2_Object *object);
 
 /* Static globals */
 static const uint32_t hashModeTable[] = {
@@ -119,6 +127,12 @@ static const uint8_t intermediateDigestSizeTable[] = {
 
 static const uint8_t *SHA2_data;
 
+/* Used only for single-step operations to track the final destination of
+ * the output digest, in case the operation is internally segmented to
+ * tackle the limitation in the max length the DMA controller can handle
+ * per DMA transaction. */
+static void *SHA2_finalDigest;
+
 static uint32_t SHA2_dataBytesRemaining;
 
 static SHA2_OperationType SHA2_operationType;
@@ -142,23 +156,29 @@ static void SHA2_hwiFxn(uintptr_t arg0) {
 
     SHA2CC26X2_cleanUpAfterOperation(object);
 
-    if (object->retainAccessCounter == 0) {
-        /*  Grant access for other threads to use the crypto module.
-         *  The semaphore must be posted before the callbackFxn to allow the chaining
-         *  of operations.
-         */
-        SemaphoreP_post(&CryptoResourceCC26XX_accessSemaphore);
-    }
+    /* Ensure all DMA transactions are done before releasing the resources or
+     * posting a callback. If there's more data remaining tracked by
+     * SHA2_dataBytesRemaining, the operation is not complete yet, unless
+     * the remaining data is smaller than a block size in which case it will
+     * be buffered in.
+     */
+    if (!object->operationInProgress) {
+        if (object->retainAccessCounter == 0) {
+            /*  Grant access for other threads to use the crypto module.
+             *  The semaphore must be posted before the callbackFxn to allow the chaining
+             *  of operations.
+             */
+            SemaphoreP_post(&CryptoResourceCC26XX_accessSemaphore);
+        }
 
-    Power_releaseConstraint(PowerCC26XX_DISALLOW_STANDBY);
+        Power_releaseConstraint(PowerCC26XX_DISALLOW_STANDBY);
 
-    if (object->returnBehavior == SHA2_RETURN_BEHAVIOR_BLOCKING) {
-        /* Unblock the pending task to signal that the operation is complete. */
-        SemaphoreP_post(&CryptoResourceCC26XX_operationSemaphore);
-    }
-    else if (object->returnBehavior == SHA2_RETURN_BEHAVIOR_CALLBACK)
-    {
-        if (object->callbackFxn) {
+        if (object->returnBehavior == SHA2_RETURN_BEHAVIOR_BLOCKING) {
+            /* Unblock the pending task to signal that the operation is complete. */
+            SemaphoreP_post(&CryptoResourceCC26XX_operationSemaphore);
+        }
+        else if (object->returnBehavior == SHA2_RETURN_BEHAVIOR_CALLBACK)
+        {
             object->callbackFxn((SHA2_Handle)arg0, object->returnStatus);
         }
     }
@@ -189,13 +209,15 @@ static void SHA2CC26X2_cleanUpAfterOperation(SHA2CC26X2_Object *object) {
         HwiP_restore(key);
         return;
 
-    } else if (irqStatus & SHA2_DMA_BUS_ERR) {
+    }
+    else if (irqStatus & SHA2_DMA_BUS_ERR) {
         /*
          * In the unlikely event of an error we can stop here.
          */
         object->returnStatus = SHA2_STATUS_ERROR;
 
-    } else {
+    }
+    else {
         if (readIntermediateDigest == true) {
             /*
              * Last transaction has finished and we need to store an intermediate
@@ -207,45 +229,60 @@ static void SHA2CC26X2_cleanUpAfterOperation(SHA2CC26X2_Object *object) {
             readIntermediateDigest = false;
         }
 
-        if (SHA2_dataBytesRemaining >= blockSize) {
-            /*
-             * Start another transaction
-             */
-            uint32_t transactionLength = floorUint32(SHA2_dataBytesRemaining,
-                                                     blockSize);
+        if (SHA2_operationType == SHA2_OperationType_SingleStep) {
+            if (SHA2_dataBytesRemaining > blockSize) {
+                SHA2CC26X2_computeIntermediateHash(object);
 
-            /* SHA2ComputeIntermediateHash reads out and writes back
-             * intermediate digest sizes of the the final digest size. For
-             * SHA-224 and SHA-384, this produces incorrect results. Instead,
-             * the digest size of SHA-256 and SHA-512 should be used instead.
-             * This is why we are writing the digest to the accelerator here
-             * first to cover the difference in digest sizes.
-             */
-            SHA2SetDigest(object->digest,
-                          intermediateDigestSizeTable[object->hashType]);
+                HwiP_restore(key);
+                return;
+            }
+            else if (SHA2_dataBytesRemaining > 0) {
+                /* SHA2ComputeIntermediateHash reads out and writes back
+                 * intermediate digest sizes of the the final digest size. For
+                 * SHA-224 and SHA-384, this produces incorrect results. Instead,
+                 * the digest size of SHA-256 and SHA-512 should be used instead.
+                 * This is why we are writing the digest to the accelerator here
+                 * first to cover the difference in digest sizes.
+                 */
+                SHA2SetDigest(object->digest,
+                              intermediateDigestSizeTable[object->hashType]);
 
-            SHA2ComputeIntermediateHash(SHA2_data,
-                                   object->digest,
-                                   hashModeTable[object->hashType],
-                                   transactionLength);
+                SHA2ComputeFinalHash(SHA2_data,
+                                     SHA2_finalDigest,
+                                     object->digest,
+                                     object->bytesProcessed + SHA2_dataBytesRemaining,
+                                     SHA2_dataBytesRemaining,
+                                     hashModeTable[object->hashType]);
 
-            SHA2_dataBytesRemaining -= transactionLength;
-            SHA2_data += transactionLength;
-            object->bytesProcessed += transactionLength;
-            readIntermediateDigest = true;
+                /* No need to update object->bytesProcessed for finalization
+                 * as it would be cleared upon reentry into SHA2CC26X2_cleanUpAfterOperation
+                 * and will anyways not be used anymore. */
+                SHA2_dataBytesRemaining = 0;
+                SHA2_data = NULL;
+                readIntermediateDigest = false;
 
-            HwiP_restore(key);
-            return;
-        } else if (SHA2_dataBytesRemaining > 0) {
-            /*
-             * Copy remaining data into buffer
-             */
-            memcpy(object->buffer, SHA2_data, SHA2_dataBytesRemaining);
-            object->bytesInBuffer += SHA2_dataBytesRemaining;
-            SHA2_dataBytesRemaining = 0;
+                HwiP_restore(key);
+                return;
+            }
+        }
+        else { /* Multi-step operation */
+            if (SHA2_dataBytesRemaining >= blockSize) {
+                SHA2CC26X2_computeIntermediateHash(object);
+
+                HwiP_restore(key);
+                return;
+            }
+            else if (SHA2_dataBytesRemaining > 0) {
+                /* Copy remaining data into buffer if it's a multi-step
+                 * operation and only less than a block-size of data is
+                 * remaining.
+                 */
+                memcpy(object->buffer, SHA2_data, SHA2_dataBytesRemaining);
+                object->bytesInBuffer += SHA2_dataBytesRemaining;
+                SHA2_dataBytesRemaining = 0;
+            }
         }
     }
-
 
     /*
      * Since we got here, every transaction has been finished
@@ -261,6 +298,45 @@ static void SHA2CC26X2_cleanUpAfterOperation(SHA2CC26X2_Object *object) {
     }
 
     HwiP_restore(key);
+}
+
+/*
+ *  ======== SHA2CC26X2_computeIntermediateHash ========
+ *  NOTE: This function should only be used within a critical section.
+ */
+static void SHA2CC26X2_computeIntermediateHash(SHA2CC26X2_Object *object) {
+    uint32_t blockSize = blockSizeTable[object->hashType];
+    uint32_t transactionLength;
+
+    /* DMA Controller has a limitation of processing max 0xFFFF bytes per transaction */
+    if (SHA2_dataBytesRemaining > DMA_MAX_TXN_LENGTH) {
+        transactionLength = floorUint32(DMA_MAX_TXN_LENGTH, blockSize);
+    }
+    else {
+        transactionLength = floorUint32(SHA2_dataBytesRemaining, blockSize);
+    }
+
+    /* SHA2ComputeIntermediateHash reads out and writes back
+     * intermediate digest sizes of the the final digest size. For
+     * SHA-224 and SHA-384, this produces incorrect results. Instead,
+     * the digest size of SHA-256 and SHA-512 should be used instead.
+     * This is why we are writing the digest to the accelerator here
+     * first to cover the difference in digest sizes.
+     */
+    SHA2SetDigest(object->digest,
+                  intermediateDigestSizeTable[object->hashType]);
+
+    SHA2ComputeIntermediateHash(SHA2_data,
+                                object->digest,
+                                hashModeTable[object->hashType],
+                                transactionLength);
+
+    SHA2_dataBytesRemaining -= transactionLength;
+    SHA2_data += transactionLength;
+    object->bytesProcessed += transactionLength;
+    readIntermediateDigest = true;
+
+    return;
 }
 
 /*
@@ -483,7 +559,14 @@ static int_fast16_t SHA2CC26X2_addData(SHA2_Handle handle,
         }
         else {
             transactionStartAddress = data;
-            transactionLength = floorUint32(length, blockSize);
+
+            /* DMA Controller has a limitation of processing max 0xFFFF bytes per transaction */
+            if (length > DMA_MAX_TXN_LENGTH) {
+                transactionLength = floorUint32(DMA_MAX_TXN_LENGTH, blockSize);
+            }
+            else {
+                transactionLength = floorUint32(length, blockSize);
+            }
 
             SHA2_data = (const uint8_t*)data + transactionLength;
             SHA2_dataBytesRemaining = length - transactionLength;
@@ -591,7 +674,12 @@ static int_fast16_t SHA2CC26X2_finalize(SHA2_Handle handle, void *digest) {
     if (object->bytesProcessed == 0) {
         /*
          * Since no hash operation has been performed yet and no intermediate
-         * digest is available, we have to perform a full hash operation
+         * digest is available, we have to perform a full hash operation.
+         *
+         * No new data can be added during a finalize operation. That means
+         * in this case, the total length of all the data added using addData
+         * calls is less than a blocksize for the given hashType. So the remaining
+         * data is only in the buffer and only that needs to be hashed.
          */
         SHA2ComputeHash(object->buffer,
                         digest,
@@ -618,64 +706,79 @@ static int_fast16_t SHA2CC26X2_finalize(SHA2_Handle handle, void *digest) {
                              totalLength,
                              chunkLength,
                              hashModeTable[object->hashType]);
-    } else {
-        /*
-         * The hardware is incapable of finalizing an empty partial message,
-         * but we can trick it by pretending this to be an intermediate block.
-         *
-         * Calculate the length in bits and put it at the end of the dummy
-         * finalization block in big endian order
-         */
-        uint64_t lengthInBits = object->bytesProcessed * 8;
-        uint32_t blockSize    = blockSizeTable[object->hashType];
-        uint8_t *lengthBytes  = (uint8_t*)&lengthInBits;
-
-        /*
-         * Use the existing buffer as scratch pad
-         */
-        memset(object->buffer, 0, blockSize);
-
-        /*
-         * Final block starts with '10000000'.
-         */
-        object->buffer[0] = 0x80;
-
-        /*
-         * The length is written into the end of the finalization block
-         * in big endian order. We always write only the last 8 bytes.
-         */
-        uint32_t i = 0;
-        for (i = 0; i < 4; i++) {
-            object->buffer[blockSize - 8 + i] = lengthBytes[7 - i];
-            object->buffer[blockSize - 4 + i] = lengthBytes[3 - i];
-        }
-
-        /*
-         * SHA2ComputeIntermediateHash uses the same digest location for
-         * both input and output. Instead of copying the final digest result
-         * we use the final location as input and output.
-         */
-        memcpy(digest, object->digest, digestSizeTable[object->hashType]);
-
-        /* SHA2ComputeIntermediateHash and SHA2ComputeFinalHash read out and writes
-         * back intermediate digest sizes of the the final digest size. For
-         * SHA-224 and SHA-384, this produces incorrect results. Instead,
-         * the digest size of SHA-256 and SHA-512 should be used instead.
-         * This is why we are writing the digest to the accelerator here
-         * first to cover the difference in digest sizes.
-         */
-        SHA2SetDigest(object->digest,
-                      intermediateDigestSizeTable[object->hashType]);
-
-        SHA2ComputeIntermediateHash(object->buffer,
-                                    digest,
-                                    hashModeTable[object->hashType],
-                                    blockSize);
+    }
+    else {
+        SHA2CC26X2_emptyFinalize(object, digest);
     }
 
     HwiP_restore(key);
 
     return SHA2CC26X2_waitForResult(handle);
+}
+
+/*
+ *  ======== SHA2_emptyFinalize ========
+ */
+static void SHA2CC26X2_emptyFinalize(SHA2CC26X2_Object *object, void *digest) {
+    /*
+     * The hardware is incapable of finalizing a SHA2 hash without additional
+     * data to process. However, SW can create the final block (consisting of
+     * pad and an encoding of the message length) and request that block
+     * be hashed by the hardware. The resulting hash is the final SHA2 hash.
+     *
+     * Calculate the length in bits and put it at the end of the dummy
+     * finalization block in big endian order
+     */
+    uint64_t lengthInBits = object->bytesProcessed * 8;
+    uint32_t blockSize    = blockSizeTable[object->hashType];
+    uint8_t *lengthBytes  = (uint8_t*)&lengthInBits;
+
+    /*
+     * Use the existing buffer as scratch pad
+     */
+    memset(object->buffer, 0, blockSize);
+
+    /*
+     * Final block starts with '10000000'.
+     */
+    object->buffer[0] = 0x80;
+
+    /*
+     * The length is written into the end of the finalization block
+     * in big endian order. We always write only the last 8 bytes.
+     */
+    uint32_t i = 0;
+    for (i = 0; i < 4; i++) {
+        object->buffer[blockSize - 8 + i] = lengthBytes[7 - i];
+        object->buffer[blockSize - 4 + i] = lengthBytes[3 - i];
+    }
+
+    /*
+     * There is no singular function in the driverlib SHA2 interface
+     * that can handle this situation. Thus, several lower-level
+     * calls to the driverlib SHA2 library as well as direct
+     * register access is performed.
+     */
+    SHA2ClearDigestAvailableFlag();
+
+    if (object->hashType == SHA2_HASH_TYPE_224 ||
+        object->hashType == SHA2_HASH_TYPE_256) {
+        // Configure DMA to handle shorter digest outputs
+        SHA2SelectAlgorithm(SHA2_ALGSEL_SHA256 | SHA2_ALGSEL_TAG);
+    } else {
+        // Configure DMA to handle longer digest outputs
+        SHA2SelectAlgorithm(SHA2_ALGSEL_SHA512 | SHA2_ALGSEL_TAG);
+    }
+
+    SHA2IntClear(SHA2_DMA_IN_DONE | SHA2_RESULT_RDY);
+    SHA2IntEnable(SHA2_DMA_IN_DONE | SHA2_RESULT_RDY);
+    HWREG(CRYPTO_BASE + CRYPTO_O_HASHMODE) = hashModeTable[object->hashType];
+    SHA2SetDigest(object->digest,
+                  intermediateDigestSizeTable[object->hashType]);
+    SHA2StartDMAOperation(object->buffer, blockSize,
+                          digest, digestSizeTable[object->hashType]);
+
+    return;
 }
 
 /*
@@ -703,7 +806,9 @@ static int_fast16_t SHA2CC26X2_hashData(SHA2_Handle handle,
                                         void *digest) {
     SHA2CC26X2_Object *object = handle->object;
     SHA2CC26X2_HWAttrs const *hwAttrs = handle->hwAttrs;
+    uint32_t blockSize = blockSizeTable[object->hashType];
     uintptr_t key;
+    uint32_t transactionLength;
 
     Power_setConstraint(PowerCC26XX_DISALLOW_STANDBY);
 
@@ -722,10 +827,30 @@ static int_fast16_t SHA2CC26X2_hashData(SHA2_Handle handle,
      * flag must be atomic.
      */
     key = HwiP_disable();
-    SHA2ComputeHash(data,
-                    digest,
-                    length,
-                    hashModeTable[object->hashType]);
+
+    /* DMA Controller has a limitation of processing max 0xFFFF bytes per transaction.
+     * Segment the operation internally catering to that limitation to process all the
+     * available data successfully. */
+    if (length <= DMA_MAX_TXN_LENGTH) {
+        SHA2ComputeHash(data,
+                        digest,
+                        length,
+                        hashModeTable[object->hashType]);
+    }
+    else {
+        transactionLength = floorUint32(DMA_MAX_TXN_LENGTH, blockSize);
+
+        SHA2ComputeInitialHash(data,
+                               object->digest,
+                               hashModeTable[object->hashType],
+                               transactionLength);
+
+        SHA2_data = (const uint8_t*)data + transactionLength;
+        SHA2_dataBytesRemaining = length - transactionLength;
+        object->bytesProcessed += transactionLength;
+        readIntermediateDigest = true;
+        SHA2_finalDigest = digest;
+    }
 
     object->operationInProgress = true;
     HwiP_restore(key);

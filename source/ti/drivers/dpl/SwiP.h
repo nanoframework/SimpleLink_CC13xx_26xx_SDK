@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ extern "C" {
  */
 typedef union SwiP_Struct {
     uint32_t dummy;  /*!< Align object */
-    char     data[SwiP_STRUCT_SIZE];
+    uint8_t  data[SwiP_STRUCT_SIZE];
 } SwiP_Struct;
 
 /*!

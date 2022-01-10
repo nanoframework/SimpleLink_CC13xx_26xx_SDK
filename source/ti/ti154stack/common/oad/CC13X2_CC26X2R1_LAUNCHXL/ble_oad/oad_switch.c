@@ -5,7 +5,7 @@
  @brief Over the Air Download for use with the BLE OAD example
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

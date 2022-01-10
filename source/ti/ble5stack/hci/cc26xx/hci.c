@@ -5,7 +5,7 @@
  @brief This file contains the Host Controller Interface (HCI) API.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -98,7 +98,7 @@ extern RF_Handle rfHandle;
 
 // Major Version (8 bits) . Minor Version (4 bits) . SubMinor Version (4 bits)
 #if defined( CC26X2 ) || defined(CC13X2) || defined(CC13X2P)
-#define HCI_REVISION                                 0x0221  // HCI Version BLE5 2.2.1
+#define HCI_REVISION                                 0x0223  // HCI Version BLE5 2.2.3
 #elif defined( CC26XX )
 #define HCI_REVISION                                 0x0111  // HCI Version BLE5 1.1.1
 #else // !CC26X2 && !CC13X2 && !CC26XX && !CC13XX
@@ -1272,7 +1272,6 @@ hciStatus_t HCI_ReadLocalVersionInfoCmd( void )
   return( HCI_SUCCESS );
 }
 
-
 /*******************************************************************************
  * This BT API is used to read the locally supported commands.
  *
@@ -1587,8 +1586,23 @@ hciStatus_t HCI_LE_SetExtScanRspData( aeSetDataCmd_t *pCmdParams )
 
   return status;
 }
-#endif // ADV_NCONN_CFG | ADV_CONN_CFG
 
+hciStatus_t HCI_LE_SetAdvStatus( aeEnableCmd_t *pCmdParams )
+{
+  hciStatus_t status = LE_SetExtAdvEnable(pCmdParams);
+
+  if( pCmdParams->enable == LL_ADV_MODE_ON )
+  {
+    MAP_HCI_CommandCompleteEvent( HCI_LE_MAKE_DISCOVERABLE_DONE, sizeof(status), &status );
+  }
+  else
+  {
+    MAP_HCI_CommandCompleteEvent( HCI_LE_END_DISCOVERABLE_DONE, sizeof(status), &status );
+  }
+
+  return status;
+}
+#endif // ADV_NCONN_CFG | ADV_CONN_CFG
 
 #if defined(CTRL_CONFIG) && ((CTRL_CONFIG & ADV_NCONN_CFG) || (CTRL_CONFIG & ADV_CONN_CFG))
 /*******************************************************************************
@@ -1926,7 +1940,7 @@ hciStatus_t HCI_LE_SetHostChanClassificationCmd( uint8 *chanMap )
 #endif
 
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
-  status = MAP_LL_ChanMapUpdate( chanMap );
+  status = MAP_LL_ChanMapUpdate( chanMap , maxNumConns );
 #endif
   MAP_HCI_CommandCompleteEvent( HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION,
                                 sizeof(status),
@@ -1936,6 +1950,59 @@ hciStatus_t HCI_LE_SetHostChanClassificationCmd( uint8 *chanMap )
 }
 #endif // INIT_CFG
 
+/*******************************************************************************
+ * This EXT API is used to update the default channel map.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_EXT_SetHostDefChanClassificationCmd( uint8 *chanMap )
+{
+  // 0: Event Opcode (LSB)
+  // 1: Event Opcode (MSB)
+  // 2: Status
+  uint8 rtnParam[3];
+
+  rtnParam[0] = LO_UINT16( HCI_EXT_SET_HOST_DEF_CHANNEL_CLASSIFICATION_EVENT );
+  rtnParam[1] = HI_UINT16( HCI_EXT_SET_HOST_DEF_CHANNEL_CLASSIFICATION_EVENT );
+  rtnParam[2] = LL_STATUS_ERROR_FEATURE_NOT_SUPPORTED;
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
+  rtnParam[2] = LL_SetDefChanMap( chanMap );
+#endif
+
+  MAP_HCI_VendorSpecifcCommandCompleteEvent( HCI_EXT_SET_HOST_DEFAULT_CHANNEL_CLASSIFICATION,
+                                             sizeof(rtnParam),
+                                             rtnParam );
+
+  return( HCI_SUCCESS );
+}
+
+/*******************************************************************************
+ * This EXT API is used to update the channel map of a specific connection.
+ *
+ * Public function defined in hci.h.
+ */
+hciStatus_t HCI_EXT_SetHostConnChanClassificationCmd( uint8 *chanMap , uint16 connID )
+{
+  // 0: Event Opcode (LSB)
+  // 1: Event Opcode (MSB)
+  // 2: Status
+  uint8 rtnParam[3];
+
+  rtnParam[0] = LO_UINT16( HCI_EXT_SET_HOST_CONN_CHANNEL_CLASSIFICATION_EVENT );
+  rtnParam[1] = HI_UINT16( HCI_EXT_SET_HOST_CONN_CHANNEL_CLASSIFICATION_EVENT );
+  rtnParam[2] = LL_STATUS_ERROR_FEATURE_NOT_SUPPORTED;
+
+#if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
+  rtnParam[2] = MAP_LL_ChanMapUpdate( chanMap,  connID);
+#endif
+
+  MAP_HCI_VendorSpecifcCommandCompleteEvent( HCI_EXT_SET_HOST_CONNECTION_CHANNEL_CLASSIFICATION,
+                                             sizeof(rtnParam),
+                                             rtnParam );
+
+  return( HCI_SUCCESS );
+}
 
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & (ADV_CONN_CFG | INIT_CFG))
 /*******************************************************************************
@@ -2857,7 +2924,7 @@ hciStatus_t HCI_LE_SetPhyCmd( uint16 connHandle,
 
 /*******************************************************************************
  * This LE API is used to start the transmit Direct Test Mode test.
- *
+ * The Controller shall transmit at maximum power.
  * Public function defined in hci.h.
  */
 hciStatus_t HCI_LE_TransmitterTestCmd( uint8 txChan,

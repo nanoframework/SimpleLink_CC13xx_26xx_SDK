@@ -88,12 +88,12 @@ static uint32_t resultAddress;
 #define SCRATCH_BUFFER_OFFSET 512
 #define SCRATCH_BUFFER_SIZE 96
 
-#define SCRATCH_PRIVATE_KEY ((uint8_t *)(PKA_RAM_BASE               \
+#define SCRATCH_PRIVATE_KEY ((uint32_t *)(PKA_RAM_BASE               \
                                          + SCRATCH_BUFFER_OFFSET))
-#define SCRATCH_PUBLIC_X ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_X ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + SCRATCH_BUFFER_SIZE))
-#define SCRATCH_PUBLIC_Y ((uint8_t *)(PKA_RAM_BASE                  \
+#define SCRATCH_PUBLIC_Y ((uint32_t *)(PKA_RAM_BASE                  \
                                       + SCRATCH_BUFFER_OFFSET       \
                                       + 2 * SCRATCH_BUFFER_SIZE))
 
@@ -163,6 +163,23 @@ static uint32_t ECDHCC26X2_getPublicKeyResultMontgomery(CryptoKey *publicKey,
                                             resultPKAMemAddr,
                                             curve->length);
         return pkaResult;
+}
+
+/*
+ *  ======== ECDHCC26X2_formatCurve25519PrivateKeyScratch ========
+ */
+static void ECDHCC26X2_formatCurve25519PrivateKeyScratch(uint32_t *myPrivateKey){
+    /*
+     * As per RFC 7748, the private key of Curve25519 is pruned so that
+     * the three LSB's are cleared, bit 255 is cleared, and bit 254 is
+     * set.
+     */
+    /* Clear bit 0, 1, and 2 */
+    myPrivateKey[0] &= 0xFFFFFFF8UL;
+    /* Clear bit 255 */
+    myPrivateKey[7] &= 0x7FFFFFFFUL;
+    /* Set bit 254 */
+    myPrivateKey[7] |= 0x40000000UL;
 }
 
 /*
@@ -277,7 +294,7 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
                 return ECDH_STATUS_PRIVATE_KEY_ZERO;
             }
 
-            PKABigNumCmpStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumCmpStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                               object->operation.generatePublicKey->curve->order,
                               object->operation.generatePublicKey->curve->length);
 
@@ -290,7 +307,7 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
             }
 
             /* Perform an elliptic curve multiplication on a short Weierstrass curve */
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                 object->operation.generatePublicKey->curve->generatorX,
                                 object->operation.generatePublicKey->curve->generatorY,
                                 object->operation.generatePublicKey->curve->prime,
@@ -311,19 +328,18 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
 
         case ECDHCC26X2_FSM_GEN_PUB_KEY_MULT_PRIVATE_KEY_BY_GENERATOR_MONTGOMERY:
 
-            /* Curve25519 private keys must be formatted according to cr.yp.to/ecdh.html.
-             * Since the keying material may not be altered (because the array is in flash e.g.),
-             * we need to reject any non-conforming private keys.
+            /*
+             * As per RFC 7748, the private key of Curve25519 is pruned so that
+             * the three LSB's are cleared, bit 255 is cleared, and bit 254 is
+             * set.
              */
-            if (object->operation.generatePublicKey->myPrivateKey->u.plaintext.keyMaterial[31] & 0x07 ||
-                object->operation.generatePublicKey->myPrivateKey->u.plaintext.keyMaterial[0] & 0x80 ||
-                !(object->operation.generatePublicKey->myPrivateKey->u.plaintext.keyMaterial[0] & 0x40)) {
-
-                return ECDH_STATUS_ERROR;
+            if (object->operation.generatePublicKey->curve->length == ECCPARAMS_CURVE25519_LENGTH)
+            {
+                ECDHCC26X2_formatCurve25519PrivateKeyScratch(SCRATCH_PRIVATE_KEY);
             }
 
             /* Perform an elliptic curve multiplication on a Montgomery curve. Likely Curve25519. */
-            PKAEccMontgomeryMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMontgomeryMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                           object->operation.generatePublicKey->curve->generatorX,
                                           object->operation.generatePublicKey->curve->prime,
                                           object->operation.generatePublicKey->curve->a,
@@ -357,8 +373,8 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
 
         case ECDHCC26X2_FSM_COMPUTE_SHARED_SECRET_MULT_PRIVATE_KEY_BY_PUB_KEY:
             /* If we are using a short Weierstrass curve, we need to validate the public key */
-            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart(SCRATCH_PUBLIC_X,
-                                                              SCRATCH_PUBLIC_Y,
+            pkaResult = PKAEccVerifyPublicKeyWeierstrassStart((uint8_t*)SCRATCH_PUBLIC_X,
+                                                              (uint8_t*)SCRATCH_PUBLIC_Y,
                                                               object->operation.computeSharedSecret->curve->prime,
                                                               object->operation.computeSharedSecret->curve->a,
                                                               object->operation.computeSharedSecret->curve->b,
@@ -370,9 +386,9 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
             }
 
             /* Perform an elliptic curve multiplication on a short Weierstrass curve */
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                SCRATCH_PUBLIC_X,
-                                SCRATCH_PUBLIC_Y,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                (uint8_t*)SCRATCH_PUBLIC_X,
+                                (uint8_t*)SCRATCH_PUBLIC_Y,
                                 object->operation.computeSharedSecret->curve->prime,
                                 object->operation.computeSharedSecret->curve->a,
                                 object->operation.computeSharedSecret->curve->b,
@@ -395,6 +411,10 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
              * As per RFC 7748, Curve25519 will mask the most significant bit
              * of the final byte for received u-coordinates. The curve length
              * of the Montgomery curve is used as an identifier here.
+             *
+             * Furthermore, the private key of Curve25519 is pruned so that
+             * the three LSB's are cleared, bit 255 is cleared, and bit 254 is
+             * set.
              */
             if (object->operation.computeSharedSecret->curve->length == ECCPARAMS_CURVE25519_LENGTH)
             {
@@ -402,13 +422,18 @@ static int_fast16_t ECDHCC26X2_runFSM(ECDH_Handle handle) {
                  * significant word of the received Curve25519 public key and
                  * mask its MSB.
                  */
-                uint32_t * curve25519PubKeyWord = (uint32_t *) SCRATCH_PUBLIC_X;
+                uint32_t * curve25519PubKeyWord = SCRATCH_PUBLIC_X;
                 curve25519PubKeyWord[(ECCPARAMS_CURVE25519_LENGTH / sizeof(uint32_t)) - 1U] &= 0x7FFFFFFF;
+
+                /* Prune the private key */
+                ECDHCC26X2_formatCurve25519PrivateKeyScratch(SCRATCH_PRIVATE_KEY);
             }
 
+
+
             /* Perform an elliptic curve multiplication on a Montgomery curve. Likely Curve25519. */
-            PKAEccMontgomeryMultiplyStart(SCRATCH_PRIVATE_KEY,
-                                          SCRATCH_PUBLIC_X,
+            PKAEccMontgomeryMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
+                                          (uint8_t*)SCRATCH_PUBLIC_X,
                                           object->operation.computeSharedSecret->curve->prime,
                                           object->operation.computeSharedSecret->curve->a,
                                           object->operation.computeSharedSecret->curve->length,
@@ -643,7 +668,9 @@ int_fast16_t ECDH_generatePublicKey(ECDH_Handle handle, ECDH_OperationGeneratePu
     /* Since we are receiving the private keys in octet string format,
      * we need to convert them to little-endian form for use with the PKA
      */
-    CryptoUtils_reverseCopyPad(operation->myPrivateKey->u.plaintext.keyMaterial, SCRATCH_PRIVATE_KEY, operation->curve->length);
+    CryptoUtils_reverseCopyPad(operation->myPrivateKey->u.plaintext.keyMaterial,
+                               SCRATCH_PRIVATE_KEY,
+                               operation->curve->length);
 
     /* Copy over all parameters we will need access to in the FSM.
      * The FSM runs in SWI context and thus needs to keep track of

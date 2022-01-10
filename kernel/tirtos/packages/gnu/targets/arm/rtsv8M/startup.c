@@ -1,5 +1,5 @@
 /*
- *  Copyright 2020 by Texas Instruments Incorporated.
+ *  Copyright 2021 by Texas Instruments Incorporated.
  *
  */
 
@@ -121,7 +121,7 @@ void _fini(void) {
 
 
 /*
- *  @(#) gnu.targets.arm.rtsv8M; 1, 0, 0,; 9-3-2020 14:59:35; /db/ztree/library/trees/xdctargets/xdctargets-w19/src/ xlibrary
+ *  @(#) gnu.targets.arm.rtsv8M; 1, 0, 0,; 7-28-2021 07:05:40; /db/ztree/library/trees/xdctargets/xdctargets-w20/src/ xlibrary
 
  */
 

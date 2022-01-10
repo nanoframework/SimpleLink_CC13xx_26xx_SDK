@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -108,7 +108,7 @@ static void AESGCM_hwiFxn (uintptr_t arg0) {
          */
         object->callbackFxn((AESGCM_Handle)arg0,
                             object->returnStatus,
-                            object->operation,
+                            (AESGCM_OperationUnion *)object->operation,
                             object->operationType);
     }
 }
@@ -201,8 +201,6 @@ AESGCM_Handle AESGCM_construct(AESGCM_Config *config, const AESGCM_Params *param
         params = (AESGCM_Params *)&AESGCM_defaultParams;
     }
 
-    /* This is currently not supported. Eventually it will make the TRNG generate the iv */
-    DebugP_assert(!params->ivInternallyGenerated);
     DebugP_assert(params->returnBehavior == AESGCM_RETURN_BEHAVIOR_CALLBACK ? params->callbackFxn : true);
 
     object->returnBehavior = params->returnBehavior;
@@ -239,21 +237,30 @@ void AESGCM_close(AESGCM_Handle handle) {
 static int_fast16_t AESGCM_startOperation(AESGCM_Handle handle,
                                           AESGCM_Operation *operation,
                                           AESGCM_OperationType operationType) {
+    DebugP_assert(handle);
+    DebugP_assert(operation);
+
+    /* Internally generated IVs aren't supported for now */
+    DebugP_assert(!operation->ivInternallyGenerated);
+
+    /* Only IVs of length 12 are supported for now */
+    DebugP_assert(operation->iv && (operation->ivLength == 12));
+    DebugP_assert((operation->aad && operation->aadLength) || (operation->input && operation->inputLength));
+    DebugP_assert(operation->mac && (operation->macLength <= 16));
+
+    DebugP_assert(operationType == AESGCM_OPERATION_TYPE_DECRYPT || operationType == AESGCM_OPERATION_TYPE_ENCRYPT);
+
     AESGCMCC26XX_Object *object = handle->object;
     AESGCMCC26XX_HWAttrs const *hwAttrs = handle->hwAttrs;
     SemaphoreP_Status resourceAcquired;
     uint32_t aesCtrl;
 
     /* Only plaintext CryptoKeys are supported for now */
+    DebugP_assert(operation->key);
+    DebugP_assert(operation->key->encoding == CryptoKey_PLAINTEXT);
+
     uint16_t keyLength = operation->key->u.plaintext.keyLength;
     uint8_t *keyingMaterial = operation->key->u.plaintext.keyMaterial;
-
-    DebugP_assert(handle);
-    DebugP_assert(key);
-    DebugP_assert(iv && ivLength == 12);
-    DebugP_assert((aad && aadLength) || (input && inputLength));
-    DebugP_assert(mac && (macLength <= 16));
-    DebugP_assert(key->encoding == CryptoKey_PLAINTEXT);
 
     /* Try and obtain access to the crypto module */
     resourceAcquired = SemaphoreP_pend(&CryptoResourceCC26XX_accessSemaphore,
@@ -412,6 +419,85 @@ int_fast16_t AESGCM_oneStepDecrypt(AESGCM_Handle handle, AESGCM_Operation *opera
 }
 
 /*
+ *  ======== AESGCM_setupEncrypt ========
+ */
+int_fast16_t AESGCM_setupEncrypt(AESGCM_Handle handle,
+                                 const CryptoKey *key,
+                                 size_t totalAADLength,
+                                 size_t totalPlaintextLength) {
+
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_setupDecrypt ========
+ */
+int_fast16_t AESGCM_setupDecrypt(AESGCM_Handle handle,
+                                 const CryptoKey *key,
+                                 size_t totalAADLength,
+                                 size_t totalPlaintextLength) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_setLengths ========
+ */
+int_fast16_t AESGCM_setLengths(AESGCM_Handle handle, size_t aadLength, size_t plaintextLength) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_setIV ========
+ */
+int_fast16_t AESGCM_setIV(AESGCM_Handle handle, const uint8_t *iv, size_t ivLength) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_generateIV ========
+ */
+int_fast16_t AESGCM_generateIV(AESGCM_Handle handle, uint8_t *iv, size_t ivSize, size_t* ivLength) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_addAAD ========
+ */
+int_fast16_t AESGCM_addAAD(AESGCM_Handle handle, AESGCM_SegmentedAADOperation *operation) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_addData ========
+ */
+int_fast16_t AESGCM_addData(AESGCM_Handle handle, AESGCM_SegmentedDataOperation *operation) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_finalizeEncrypt ========
+ */
+int_fast16_t AESGCM_finalizeEncrypt(AESGCM_Handle handle, AESGCM_SegmentedFinalizeOperation *operation) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
+ *  ======== AESGCM_finalizeDecrypt ========
+ */
+int_fast16_t AESGCM_finalizeDecrypt(AESGCM_Handle handle, AESGCM_SegmentedFinalizeOperation *operation) {
+    /* Segmented operations aren't supported by the HW on this device */
+    return AESGCM_STATUS_FEATURE_NOT_SUPPORTED;
+}
+
+/*
  *  ======== AESGCM_cancelOperation ========
  */
 int_fast16_t AESGCM_cancelOperation(AESGCM_Handle handle) {
@@ -455,7 +541,7 @@ int_fast16_t AESGCM_cancelOperation(AESGCM_Handle handle) {
         /* Call the callback function provided by the application. */
         object->callbackFxn(handle,
                             AESGCM_STATUS_CANCELED,
-                            object->operation,
+                            (AESGCM_OperationUnion *)object->operation,
                             object->operationType);
     }
 

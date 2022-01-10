@@ -18,6 +18,7 @@ hide smpInitiatorProcessPairingConfirm
 hide HCI_ReadLocalVersionInfoCmd
 hide abort
 hide rfMode
+hide rfObject
 hide llScheduleTask
 hide LL_DirectTestTxTest
 hide LL_DirectTestRxTest
@@ -26,6 +27,7 @@ hide LL_EXT_ModemTestRx
 hide LL_EXT_EnhancedModemTestTx
 hide LL_WriteDefaultDataLen
 hide LL_EXT_EnhancedModemHopTestTx
+hide LL_EXT_DisconnectImmed
 hide LL_EXT_EnhancedModemTestRx
 hide ll_GenerateDHKey
 hide LL_GenerateDHKeyCmd
@@ -118,6 +120,7 @@ hide llSetupExtHdr
 hide llSetupConnRxDataEntryQueue
 hide llConnTerminate
 hide llReplaceRxBuffers
+hide LL_ChanMapUpdate
 //
 rename ECC_keyGen                 as eccRom_genKeys
 rename ECDH_commonKey             as eccRom_genSharedSecret

@@ -5,7 +5,7 @@
  @brief Driver for the Invensys MPU6500 Motion Porcessing Unit
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

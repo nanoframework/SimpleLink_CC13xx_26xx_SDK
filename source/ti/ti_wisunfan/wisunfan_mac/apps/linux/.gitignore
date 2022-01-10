@@ -1,0 +1,13 @@
+Debug
+Release
+objs
+x64
+*.bak
+.vs
+*.log
+release
+# EMACS makes backup files like this
+.\#*
+KlocTables
+LPRF_TIMAC2_LINUX.out
+LPRF_TIMAC2_LINUX.tpl

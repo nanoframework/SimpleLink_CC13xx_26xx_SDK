@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,20 @@ void AESCBC_Params_init(AESCBC_Params *params){
  */
 void AESCBC_Operation_init(AESCBC_Operation *operationStruct) {
     memset(operationStruct, 0x00, sizeof(AESCBC_Operation));
+}
+
+/*
+ *  ======== AESCBC_OneStepOperation_init ========
+ */
+void AESCBC_OneStepOperation_init(AESCBC_OneStepOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCBC_OneStepOperation));
+}
+
+/*
+ *  ======== AESCBC_SegmentedOperation_init ========
+ */
+void AESCBC_SegmentedOperation_init(AESCBC_SegmentedOperation *operationStruct) {
+    memset(operationStruct, 0x00, sizeof(AESCBC_SegmentedOperation));
 }
 
 /*

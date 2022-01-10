@@ -164,20 +164,22 @@ function pinmuxRequirements(inst)
  */
 function moduleInstances(inst)
 {
-
+    let shortName = inst.$name.replace("CONFIG_", "");
     let pinInstances = new Array();
 
     pinInstances.push(
         {
             name: "dacPinInstance",
-            displayName: "DAC Output PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            displayName: "DAC Output Pin Configuration While Pin is Not In Use",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/DAC",
+            requiredArgs: {
                 parentInterfaceName: "dac",
                 parentSignalName: "dacPin",
-                parentSignalDisplayName: "DAC Pin",
+                parentSignalDisplayName: "DAC Pin"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_AOUT",
                 mode: "Output",
                 pull: "None"
             }
@@ -204,7 +206,7 @@ function sharedModuleInstances(inst)
             displayName: "Auxiliary ADC Instance",
             moduleName: "/ti/drivers/ADC",
             collapsed: true,
-            readOnly: true,
+            readOnly: false,
             requiredArgs: {
                 $name: "CONFIG_ADC_AUX",
                 referenceSource: "Fixed",

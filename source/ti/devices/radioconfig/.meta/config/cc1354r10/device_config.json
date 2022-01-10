@@ -2,16 +2,28 @@
     "configFiles": {
         "path": [
             {
+                "_file": "device_definition.json",
+                "$": ".\/..\/config\/cc1352r"
+            },
+            {
+                "_file": "device_description.json",
+                "$": ".\/..\/config\/cc1354r10"
+            },
+            {
                 "_file": "targets.json",
                 "$": ".\/..\/config\/cc1354r10\/targets"
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc1354r10\/targets"
+                "$": ".\/..\/config\/cc1354p10\/targets"
             },
             {
                 "_file": "param_definition.json",
                 "$": ".\/..\/config\/cc1354r10_prop_pg10"
+            },
+            {
+                "_file": "io_pin_definition.json",
+                "$": ".\/..\/config\/cc1352r\/targets"
             },
             {
                 "_file": "param_definition.json",
@@ -22,6 +34,10 @@
                 "_file": "param_definition.json",
                 "_phy": "ieee_15_4",
                 "$": ".\/..\/config\/cc1354r10_ieee_15_4_pg10"
+            },
+            {
+                "_file": "io_register_definition.json",
+                "$": ".\/..\/config\/cc1352r"
             },
             {
                 "_file": "param_cmd_mapping.json",

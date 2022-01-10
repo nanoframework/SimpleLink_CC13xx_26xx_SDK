@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -75,6 +75,20 @@ AESCTR_Handle AESCTR_open(uint_least8_t index, const AESCTR_Params *params) {
 /*
  *  ======== AESCTR_Operation_init ========
  */
-void AESCTR_Operation_init(AESCTR_Operation *operationStruct) {
-    memset(operationStruct, 0x00, sizeof(AESCTR_Operation));
+void AESCTR_Operation_init(AESCTR_Operation *operation) {
+    AESCTR_OneStepOperation_init(operation);
+}
+
+/*
+ *  ======== AESCTR_Operation_init ========
+ */
+void AESCTR_OneStepOperation_init(AESCTR_OneStepOperation *operation) {
+    memset(operation, 0x00, sizeof(AESCTR_OneStepOperation));
+}
+
+/*
+ *  ======== AESCTR_SegmentedOperation_init ========
+ */
+void AESCTR_SegmentedOperation_init(AESCTR_SegmentedOperation *operation) {
+    memset(operation, 0x00, sizeof(AESCTR_SegmentedOperation));
 }

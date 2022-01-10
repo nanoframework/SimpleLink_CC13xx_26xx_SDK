@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,23 +72,10 @@ let base = {
 [2]: /ndk/NDK_Users_Guide.html#overview "NDK User's Guide"
 [3]: /drivers/syscfg/html/ConfigDoc.html#EMAC_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     modules: Common.autoForceModules(["Board", "Power", "DMA"]),
 
     _getPinResources: _getPinResources
 };
-
-/*
- *  ======== validate ========
- *  Validate this module's configuration
- *
- *  @param inst       - EMAC instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
 
 /* extend the base exports to include family-specific content */
 let devEMAC = system.getScript("/ti/drivers/emac/EMAC" + family);

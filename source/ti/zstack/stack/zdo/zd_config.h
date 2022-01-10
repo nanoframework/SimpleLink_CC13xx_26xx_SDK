@@ -279,7 +279,7 @@ extern "C"
 
 #define MAX_ENDPOINTS	            	254
 
-#define MAX_PARENT_ANNCE_CHILD		9
+#define MAX_PARENT_ANNCE_CHILD		  10
 
 // Node Description Bitfields
 #define ZDOLOGICALTYPE_MASK		    	0x07

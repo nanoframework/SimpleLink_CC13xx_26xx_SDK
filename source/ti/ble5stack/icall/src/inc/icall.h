@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -484,6 +484,7 @@ typedef struct
   uint32_t totalSize;
   uint32_t totalFreeSize;
   uint32_t largestFreeSize;
+
 }ICall_heapStats_t;
 
 /**
@@ -1505,7 +1506,7 @@ ICall_setTimerMSecs(uint_fast32_t msecs,
  * @ref ICall_getTickPeriod
  */
 ICall_Errno
-ICall_setTimer(uint_fast32_t ticks,
+ICall_setTimer(uint32_t ticks,
                ICall_TimerCback cback,
                void *arg,
                ICall_TimerID *id);

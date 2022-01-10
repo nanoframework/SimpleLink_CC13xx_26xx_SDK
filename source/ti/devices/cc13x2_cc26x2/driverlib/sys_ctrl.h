@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       sys_ctrl.h
-*  Revised:        2020-08-19 12:18:33 +0200 (Wed, 19 Aug 2020)
-*  Revision:       58172
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the System Controller.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -260,6 +260,7 @@ extern void SysCtrlShutdownWithAbort(void);
 //
 //*****************************************************************************
 extern void SysCtrlShutdown(void);
+
 
 //*****************************************************************************
 //

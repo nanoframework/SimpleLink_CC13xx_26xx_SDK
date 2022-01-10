@@ -263,16 +263,6 @@ SECTIONS {
         __bss_end__ = .;
     } > REGION_BSS AT> REGION_BSS
 
-    .heap : {
-        __heap_start__ = .;
-        end = __heap_start__;
-        _end = end;
-        __end = end;
-        KEEP(*(.heap))
-        __heap_end__ = .;
-        __HeapLimit = __heap_end__;
-    } > REGION_HEAP AT> REGION_HEAP
-
     /* Heap buffer used by HeapMem */
     .priheap : {
         . = ALIGN (8);

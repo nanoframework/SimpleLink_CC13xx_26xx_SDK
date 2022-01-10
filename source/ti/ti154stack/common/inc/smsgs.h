@@ -5,7 +5,7 @@
  @brief Data Structures for the sensor messages sent over the air.
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -439,8 +439,8 @@ typedef struct _Smsgs_humiditysensorfield_t
  */
 typedef struct _Smsgs_halleffectsensorfield_t
 {
-    /*! Magnetic Flux value in milli Tesla. */
-    float flux;
+    /*! Magnetic Flux Switch. */
+    uint8_t fluxLevel;
 } Smsgs_hallEffectSensorField_t;
 
 /*!

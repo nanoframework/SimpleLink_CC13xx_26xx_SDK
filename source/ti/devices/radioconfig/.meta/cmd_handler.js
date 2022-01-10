@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -183,9 +183,6 @@ function create(phyGroup, phyName, first) {
     // Commands contained in the setting
     addUsedCommands();
 
-    // Add test functions (commands included from setting file)
-    addTestFunctions();
-
     // Add commands that are not used by the setting
     addUnusedCommands();
 
@@ -236,6 +233,9 @@ function create(phyGroup, phyName, first) {
             const cmdDef = getCommandDefByName(cmd._name);
             const fields = cmdDef.Field;
             _.each(fields, (field) => {
+                const range = field.ByteIndex.split("..");
+                const byteIndex = range[0];
+
                 if ("BitField" in field) {
                     // Word contains bit fields
                     const bitFields = Common.forceArray(field.BitField);
@@ -261,13 +261,14 @@ function create(phyGroup, phyName, first) {
                         }
                         _.each(bitFields, (bitfield) => {
                             name = field._name + "." + bitfield._name;
-                            const range = bitfield.BitIndex.split("..");
-                            const width = calculateWidth(range);
+                            const bitrange = bitfield.BitIndex.split("..");
+                            const width = calculateWidth(bitrange);
                             const item = {
                                 name: name,
                                 isPointer: false,
+                                byteOffset: byteIndex,
                                 width: 0,
-                                default: getBitfieldValue(initValue, range[0], width)
+                                default: getBitfieldValue(initValue, bitrange[0], width)
                             };
                             cmdBuf.push(item);
                         });
@@ -279,6 +280,7 @@ function create(phyGroup, phyName, first) {
                             const item = {
                                 name: name,
                                 isPointer: false,
+                                byteOffset: byteIndex,
                                 width: 0,
                                 default: getSettingFieldDefault(fullName)
                             };
@@ -296,11 +298,10 @@ function create(phyGroup, phyName, first) {
                     if (isEnabled) {
                         const isPointer = "_type" in field && field._type === "pointer";
                         const fullName = cmd._name + "." + field._name;
-                        const range = field.ByteIndex.split("..");
                         const item = {
                             name: field._name,
                             isPointer: isPointer,
-                            byteOffset: range[0],
+                            byteOffset: byteIndex,
                             width: calculateWidth(range) * 2,
                             default: getSettingFieldDefault(fullName)
                         };
@@ -455,7 +456,7 @@ function create(phyGroup, phyName, first) {
         // Update TX power override
         const txPowActual = getTxPower(txPower);
         const highPA = getCmdFieldValue("txPower") === "0xFFFF";
-        OverrideHandler.init(Setting.Command, PhyGroup, highPA);
+        OverrideHandler.init(Setting.Command, highPA);
         OverrideHandler.updateTxPowerOverride(txPowActual, freq, txPower.high);
 
         const cfgCommon = {};
@@ -749,6 +750,14 @@ function create(phyGroup, phyName, first) {
             ret.default = getCmdFieldValueByOpt("txPower", "txPower");
         }
         return ret;
+    }
+
+    /*!
+     *  ======== is154g ========
+     *  True if the setting supports IEEE 802.15.4g (proprietary advanced RX/TX commands)
+     */
+    function is154g() {
+        return CmdUsed.includes("CMD_PROP_RX_ADV");
     }
 
     /*!
@@ -1046,8 +1055,11 @@ function create(phyGroup, phyName, first) {
             if (protocol === "multi") {
                 ret.cpe = "rf_patch_cpe_multi_protocol";
             }
-            else if (protocol === "coex") {
+            else if (protocol === "coex_ble") {
                 ret.cpe = "rf_patch_cpe_multi_bt5_coex";
+            }
+            else if (protocol === "coex_ieee") {
+                ret.cpe = "rf_patch_cpe_ieee_coex";
             }
             else {
                 ret.cpe = patches.Cpe;
@@ -1059,7 +1071,7 @@ function create(phyGroup, phyName, first) {
         }
 
         if ("Rfe" in patches) {
-            if (protocol === "coex") {
+            if (protocol === "coex_ble") {
                 ret.rfe = "rf_patch_rfe_ble_coex";
             }
             else {
@@ -1604,19 +1616,6 @@ function create(phyGroup, phyName, first) {
     }
 
     /*!
-     *  ======== addTestFunctions ========
-     *  Add additional test settings includes from the settings file (e.g CMD_PROP_TX)
-     */
-    function addTestFunctions() {
-        for (const testFunc in Setting.TestFunc) {
-            if (_.has(Setting.TestFunc, testFunc)) {
-                const file = Setting.TestFunc[testFunc];
-                addSetting(file);
-            }
-        }
-    }
-
-    /*!
     *  ======== addUnusedCommands ========
     *  Add unused commands to the list as these may optionally be used
     *  by the code export. Unused commands are those not referred to
@@ -1643,55 +1642,6 @@ function create(phyGroup, phyName, first) {
             // Add if not already in place
             if (!present) {
                 currentCmds.push(cmd);
-            }
-        });
-    }
-
-    /*!
-     *  ======== addSetting ========
-     * The setting name is here the name of the file that contains the setting
-     * Example: setting_tc106.json (file imported from SmartRF Studio)
-     *
-     * @param fileName - name of the settings file
-     */
-    function addSetting(fileName) {
-        // Replace the extension of the file, and load
-        const added = system.getScript(SettingPath + fileName);
-
-        // Get the command part of the file (JSON object)
-        const newEntry = added.testfunction.Command;
-        const currentCmds = Setting.Command;
-
-        // Create array of commands to be added
-        let newCmds = [];
-        if ("Field" in newEntry) {
-            // Single new entry
-            newCmds.push(newEntry);
-        }
-        else {
-            // Multiple entries
-            newCmds = newEntry;
-        }
-
-        // Apply new commands
-        _.each(newCmds, (newCmd) => {
-            const name = newCmd._name;
-
-            // Check if duplicate
-            let present = false;
-            _.each(currentCmds, (cmd) => {
-                if (name === cmd._name) {
-                    present = true;
-                    return false;
-                }
-                // Continue _.each iteration
-                return true;
-            });
-
-            // Add if not already in place
-            if (!present) {
-                CmdUsed.push(name);
-                currentCmds.push(newCmd);
             }
         });
     }
@@ -1976,7 +1926,7 @@ function create(phyGroup, phyName, first) {
 
         // Create override table
         const highPA = getCmdFieldValue("txPower") === "0xFFFF";
-        OverrideHandler.init(Setting.Command, PhyGroup, highPA);
+        OverrideHandler.init(Setting.Command, highPA);
     }
 
     /*!
@@ -2072,6 +2022,7 @@ function create(phyGroup, phyName, first) {
         getCommandName: function(cmd) {
             return cmd._name;
         },
+        is154g: is154g,
         updateRfCommands: updateRfCommands,
         initConfigurables: initConfigurables,
         getCmdList: getCmdList,

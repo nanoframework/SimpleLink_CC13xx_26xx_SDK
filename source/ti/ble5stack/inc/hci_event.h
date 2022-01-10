@@ -6,7 +6,7 @@
         etc. for the BLE Controller.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

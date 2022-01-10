@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -165,14 +165,6 @@ function onHardwareChanged(inst, ui)
 }
 
 /*
- *  ======== validate ========
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== moduleInstances ========
  */
 function moduleInstances(inst)
@@ -221,9 +213,9 @@ function _getPinResources(inst)
 
         let spiFlash = inst.externalFlash.spiFlashDevice;
 
-        if (spiFlash.slaveSelectGpioInstance) {
+        if (spiFlash.slaveSelectPinInstance) {
             mod = system.getScript("/ti/drivers/GPIO.syscfg.js");
-            ss = "SS: " + mod._getPinResources(spiFlash.slaveSelectGpioInstance);
+            ss = "SS: " + mod._getPinResources(spiFlash.slaveSelectPinInstance);
         }
 
         if (spiFlash.sharedSpiInstance) {
@@ -267,7 +259,6 @@ let base = {
     description: "Non-Volatile Storage Driver",
     longDescription: longDescription,
     config: Common.addNameConfig(configs, "/ti/drivers/NVS", "CONFIG_NVS_"),
-    validate: validate,
     moduleInstances: moduleInstances,
     modules: Common.autoForceModules(["Board"]),
     filterHardware: filterHardware,

@@ -5,7 +5,7 @@
  @brief main entry of the BLE stack sample application.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -74,6 +74,7 @@ icall_userCfg_t user0Cfg = BLE_USER_CFG;
 #endif // USE_DEFAULT_USER_CFG
 
 #include <ti/display/Display.h>
+#include <ti/drivers/GPIO.h>
 
 /* Wsn Application Header files */
 #include "wsn_node/NodeRadioTask.h"
@@ -89,7 +90,6 @@ icall_userCfg_t user0Cfg = BLE_USER_CFG;
 #endif
 
 #ifdef DMM_OAD
-#include <ti/drivers/GPIO.h>
 #include <profiles/oad/cc26xx/mark_switch_factory_img.h>
 #endif
 
@@ -147,6 +147,8 @@ int main()
   /* Register Application callback to trap asserts raised in the Stack */
   RegisterAssertCback(AssertHandler);
 
+  /* GPIO init must be called prior to Board_initGeneral for proper pin configuration */
+  GPIO_init();
   Board_initGeneral();
 
 #ifdef DMM_OAD

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,10 @@ const StandardIncludes = "#include <ti/devices/DeviceFamily.h>\n"
   + driverLibCmdInclude("common");
 const RfDriverInclude = "#include <ti/drivers/rf/RF.h>\n";
 const RfInclude = "#include \"ti_radio_config.h\"\n";
-const CoExIncludeDriverLib = "#include DeviceFamily_constructPath(driverlib/rf_bt5_coex.h)\n";
+const CoExIncludeDriverLib = {
+    coex_ble: "#include DeviceFamily_constructPath(driverlib/rf_bt5_coex.h)\n",
+    coex_ieee: "#include DeviceFamily_constructPath(driverlib/rf_ieee_coex.h)\n"
+};
 
 /*!
 *  ======== generateIncludesH ========
@@ -92,54 +95,45 @@ function generateIncludesH(modules) {
 *  Generated include directives for use in the implementation file (*.c)
 *
 *  @param modules - all modules in the SDK
-*  @param useCoEx - include BLE/WiFi CoEx
+*  @param coexType - ble or ieee
 */
-function generateIncludesC(modules, useCoEx) {
+function generateIncludesC(modules, coexType) {
     // Common includes (for compatibility with SmartRF Studio)
-    let incl = StandardIncludes;
+    let incl = RfInclude;
     let patchIncludes = {};
 
     _.each(modules, (modpath) => {
-        let libPath;
         let phyGroup;
 
         // Add DriverLib includes
         if (modpath === BasePath + "settings/prop") {
-            libPath = "prop";
             phyGroup = Common.PHY_PROP;
         }
         else if (modpath === BasePath + "settings/ble") {
-            libPath = "ble";
             phyGroup = Common.PHY_BLE;
         }
         else if (modpath === BasePath + "settings/ieee_15_4") {
-            libPath = "ieee";
             phyGroup = Common.PHY_IEEE_15_4;
         }
         else {
             // Not a RadioConfig module, skip
             return true;
         }
-        incl += driverLibCmdInclude(libPath);
-
-        const mod = system.modules[modpath];
-        if (phyGroup === Common.PHY_BLE && mod.hasWBMS()) {
-            incl += driverLibCmdInclude("prop");
-        }
 
         // Aggregate patch includes
-        patchIncludes = Object.assign(patchIncludes, getPatchIncludes(phyGroup, mod.$instances, useCoEx));
+        const mod = system.modules[modpath];
+        patchIncludes = Object.assign(patchIncludes, getPatchIncludes(phyGroup, mod.$instances, coexType));
 
         return true;
     });
 
     // Use Co-Ex DriverLib entry if applicable
-    if (useCoEx) {
-        incl += CoExIncludeDriverLib;
+    if (coexType) {
+        incl += CoExIncludeDriverLib[coexType];
     }
 
     // RF driver
-    incl += RfDriverInclude;
+    // incl += RfDriverInclude;
 
     // Iterate patch includes
     _.each(patchIncludes, (value, patchName) => {
@@ -147,7 +141,7 @@ function generateIncludesC(modules, useCoEx) {
     });
 
     // Radio Config header file
-    incl += RfInclude;
+    // incl += RfInclude;
 
     return incl;
 }
@@ -159,9 +153,9 @@ function generateIncludesC(modules, useCoEx) {
 *
 *  @param phyGroup - ble, prop or ieee_154
 *  @param instances - list of instances to generate patch includes for
-*  @param useCoEx - Co-ex override to apply
+*  @param coexType - coex_ble or coex_ieee
 */
-function getPatchIncludes(phyGroup, instances, useCoEx) {
+function getPatchIncludes(phyGroup, instances, coexType) {
     const includes = {};
 
     _.each(instances, (inst) => {
@@ -178,8 +172,8 @@ function getPatchIncludes(phyGroup, instances, useCoEx) {
         }
 
         let protocol;
-        if (useCoEx) {
-            protocol = "coex";
+        if (coexType) {
+            protocol = coexType;
         }
         else {
             protocol = inst.codeExportConfig.useMulti ? "multi" : "single";

@@ -1,8 +1,22 @@
 TI 15.4-Stack Sensor OAD On-Chip Example
 ===================================
 
-Example Summary
----------------
+## Table of Contents
+
+* [Example Summary](#ExampleSummary)
+* [Peripherals Exercised](#PeripheralsExercised)
+* [Resources & Jumper Settings](#Resources&JumperSettings)
+* [Example Application Dataflow](#ExampleApplicationDataflow)
+* [Example Usage](#ExampleUsage)
+* [Generating the Required Binary Images](#GeneratingtheRequiredBinaryImages)
+* [Project Configuration](#ProjectConfiguration)
+  * [Disabling Common User Interface](#DisablingCommonUserInterface)
+  * [Multi-Page NV Configuration](#MultiPageNVConfiguration)
+  * [Advanced OAD Configuration](#AdvancedOADConfiguration)
+  * [CCFG Configuration](#CCFGConfiguration)
+* [Reverting to Persistent Application](#RevertingtoPersistentApplication)
+
+## <a name="ExampleSummary"></a>Example Summary
 
 The Sensor OAD On-Chip example application demonstrates how to implement a sensor network device using TI 15.4-Stack with the On-Chip OAD configuration. TI 15.4-Stack based star network consists of two types of logical devices: the PAN-Coordinator and the network devices (e.g. the Collector and Sensor applications respectively).
 
@@ -16,11 +30,10 @@ In case of On-Chip OAD, there is another "always present/needed" persistent imag
 
 > Note that this also includes the CC1352P-X boards, where the X represents which board subset is used, and the power amplification range.
 
-Peripherals Exercised
----------------------
+## <a name="PeripheralsExercised"></a>Peripherals Exercised
 
 > To trigger various events, buttons can be used as well as the configurable user interface.
-> The Example Usage section of this document explains how to use the user interface, although both the button presses and the UART perform the
+> The [Example Usage](#ExampleUsage) section of this document explains how to use the user interface, although both the button presses and the UART perform the
 > same actions.
 
 * `CONFIG_GPIO_RLED` - Turns on after the sensor connects to the collector.
@@ -29,26 +42,25 @@ Peripherals Exercised
 
 > If `CONFIG_GPIO_BTN2` is held while power is applied to the Launchpad, NV Flash will be erased.
 
+## <a name="Resources&JumperSettings"></a>Resources & Jumper Settings
 
-Resources & Jumper Settings
----------------------------
 The following hardware is required to run TI 15.4-Stack Out of Box (OOB) example applications:
+
 * Two [**CC13x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc1352r1) or two [**CC26x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc26x2r1)
 
 > If you're using an IDE (such as CCS or IAR), please refer to `Board.html` in
 your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
-&lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
+`<SDK_INSTALL_DIR>/source/ti/boards/<BOARD>`.
 
 Please refer to the following link for helpful SimpleLink Academy guides for ramping up
 on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
 
 For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
-`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+`<SDK_INSTALL_DIR>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
 
+## <a name="ExampleApplicationDataflow"></a>Example Application Dataflow
 
-Example Application Dataflow
----------------------------
 The sensor application has three processing loops each handling a different set of
 events. These are as follows:
 
@@ -56,7 +68,7 @@ events. These are as follows:
 	* Sensor event handling:
 		* Start sensor scan for network (SENSOR_START_EVT)
 		* Read sensor value and report to collector (SENSOR_READING_TIMEOUT_EVT)
-		* Diassociate sensor (SENSOR_DISASSOC_EVT)
+		* Disassociate sensor (SENSOR_DISASSOC_EVT)
 	* Triggers Jdllc_process and Ssf_processEvents
 	* Triggers MAC callback handling via ApiMac_processIncoming
 * Jdllc_process: Sensor logical link controller event handling
@@ -103,21 +115,20 @@ An overview of the sensor jdllc states and state transitions is as follows:
 	  +----------------- Jdllc_states_
 	                     orphan
 
-
-Example Usage
--------------
+## <a name="ExampleUsage"></a>Example Usage
 
 The out of box example for the sensor_oad_onchip project uses the Linux Collector to update the FW on a sensor device. The following steps walk through the process of performing an OAD:
 
-Please note that prebuilt images are only provided for the 1352R1 device. If you are using a different device, please refer to section "Generating the Required Binary Images" in this document on how to build the images from the projects.
+Please note that prebuilt images are only provided for the 1352R1 device. If you are using a different device, please refer to section [Generating the Required Binary Images](#GeneratingtheRequiredBinaryImages) in this document on how to build the images from the projects.
 
 The Linux collector requires the coprocessor device to operate. To setup the coprocessor device:
-* Load `<SDK_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/coprocessor_cc1352lp_tirtos_ccs.hex` onto the device using Uniflash
+
+* Load `<SDK_INSTALL_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/coprocessor_cc1352lp_tirtos_ccs.hex` onto the device using Uniflash
 
 For the sensor device:
-1. Add the On-Chip BIM image `<SDK_DIR>/examples/rtos/CC1352R1_LAUNCHXL/easylink/hexfiles/onChipOad/cc13x2r1lp_bim_onchip.hex` to the image list
-2. Add the user application `<SDK_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/sensor_oad_onchip_secure_cc1352lp_tirtos_ccs.bin` to the image list
-3. Add the persistent application `<SDK_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/sensor_oad_onchip_persistent_secure_cc1352lp_tirtos_ccs.hex` to the image list
+1. Add the On-Chip BIM image `<SDK_INSTALL_DIR>/examples/rtos/CC1352R1_LAUNCHXL/easylink/hexfiles/onChipOad/cc13x2r1lp_bim_onchip.hex` to the image list
+2. Add the user application `<SDK_INSTALL_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/sensor_oad_onchip_secure_cc1352lp_tirtos_ccs.bin` to the image list
+3. Add the persistent application `<SDK_INSTALL_DIR>/examples/rtos/CC1352R1_LAUNCHXL/ti154stack/hexfiles/sensor_oad_onchip_persistent_secure_cc1352lp_tirtos_ccs.hex` to the image list
 4. Load all three images onto the device using Uniflash
 
 Connect the coprocessor to a Linux machine and run the Linux Collector application. If the sensor has previously connected to the Linux Collector and then been reprogrammed (erasing its network parameters stored in flash), you will need to remove the nv-simulation.bin file before launching the application. More information can be found on using the Linux Collector in the Linux Gateway SDK documentation. To use the Linux Collector for OAD, make sure it is built without the `IS_HEADLESS` pre-defined symbol.
@@ -125,7 +136,7 @@ Connect the coprocessor to a Linux machine and run the Linux Collector applicati
 #### **Note**
 > For the 2.4GHz OAD example applications, the OAD_BLOCK_SIZE has been changed from 128 down to 64. This was done because the max packet size is much smaller for a 2.4GHz network.
 Modify the Makefile that resides in `example/collector` in the Linux Gateway SDK and uncomment `CFLAGS += -DOAD_BLOCK_SIZE=64` line.
-After this step, rebuild the Collector example. Also, the prebuilt image for Collector working in 2.4GHz, <SDK_INSTALLATION>/prebuilt/bin/host_collector_2_4g can also be used.
+After this step, rebuild the Collector example. Also, the prebuilt image for Collector working in 2.4GHz, `<SDK_INSTALL_DIR>/prebuilt/bin/host_collector_2_4g` can also be used.
 
 When ran the Linux Collector will display the following UI on the terminal:
 
@@ -190,7 +201,7 @@ cmd: v
 
 Note that the version of BIM must match the BIM's being used in the system.
 
-Generate a v2 application binary (see 'Generating the Required Binary Images' section) and copy it to the Linux machine. Paste the '.bin' file in the following location: `<SDK_DIR>/prebuilt/bin/`.
+Generate a v2 application binary (see [Generating the Required Binary Images](#GeneratingtheRequiredBinaryImages) section) and copy it to the Linux machine. Paste the '.bin' file in the following location: `<SDK_INSTALL_DIR>/prebuilt/bin/`.
 
 The FW image file to update can be selected using the `f <path_to_File/file_name.bin>` command:
 
@@ -263,18 +274,16 @@ Info: Sending 0x0001 FW Version Req
 cmd: v
 ```
 
-Generating the Required Binary Images
--------------------------------------
+## <a name="GeneratingtheRequiredBinaryImages"></a>Generating the Required Binary Images
 
-The On-Chip OAD example requires three images to be flashed onto the sensor device: BIM, user application, and persistent application. The BIM can be built from the following project:
-* `<SDK/DIR>/examples/nortos/CC13X2R1_LAUNCHXL/bim/bim_onchip`
+The On-Chip OAD example requires three images to be flashed onto the sensor device: BIM, user application, and persistent application. The BIM can be built from the following project: `<SDK/DIR>/examples/nortos/CC13X2R1_LAUNCHXL/bim/bim_onchip`
 
-The user application image is created as part of the post build process in the sensor_oad_onchip project:
-* `<SDK_DIR>/examples/rtos/CC13X2R1_LAUNCHXL/ti154stack/sensor_oad_onchip_secure`
+The user application image is created as part of the post build process in the sensor_oad_onchip project: `<SDK_INSTALL_DIR>/examples/rtos/CC13X2R1_LAUNCHXL/ti154stack/sensor_oad_onchip_secure`
 
-To update the version in the OAD header, open the project in your IDE and change the `SOFTWARE_VER` define in application/sensor/oad/oad_image_header_app.c. The two most significant bytes indicate the stack version, and the two least significant bytes indicate the application version.
+To update the version in the OAD header, open the project in your IDE and change the `SOFTWARE_VER` define in `application/sensor/oad/oad_image_header_app.c`. The two most significant bytes indicate the stack version, and the two least significant bytes indicate the application version.
 
 When the project is built under the default build configuration, the resulting bin can be found in the following output directory:
+
 * CCS: `<WORKSPACE_DIR>/sensor_oad_onchip_secure_CC13X2R1_LAUNCHXL_tirtos_ccs/Release/sensor_oad_onchip_secure_CC13X2R1_LAUNCHXL_tirtos_ccs.bin`
 * IAR: `<WORKSPACE_DIR>/Release/sensor_oad_onchip_secure_src_CC13X2R1_LAUNCHXL_tirtos_iar`
 
@@ -286,12 +295,12 @@ When the project is built under the default build configuration, the resulting b
 > If you have enabled the persistent image authentication feature in the BIM (see the bim_onchip readme for more information), you will have to flash the `sensor_oad_onchip_persistent_secure_cc1352lp_tirtos_ccs.bin` file, not the .hex file. The .bin file is required since it has the populated security segment signature for BIM authentication. When flashing the persistent image .bin file, you must specify the binary load address as the starting address specified in the persistent application project's linker file (`IMG_A_FLASH_START`). The default persistent application starting address will depend on the available flash memory of the device.
 
 The persistent image is built from the sensor_oad_onchip_persistent project:
-* `<SDK_DIR>/examples/rtos/CC13X2R1_LAUNCHXL/ti154stack/sensor_oad_onchip_persistent_secure`
+
+* `<SDK_INSTALL_DIR>/examples/rtos/CC13X2R1_LAUNCHXL/ti154stack/sensor_oad_onchip_persistent_secure`
 
 The built persistent image hex file can similarly be found in the output directory of your build configuration.
 
-Project Configuration
---------------------------
+## <a name="ProjectConfiguration"></a>Project Configuration
 
 The System Configuration (SysConfig) tool is a graphical interface for configuring your TI 15.4-Stack project. Based on the parameters configured in the SysConfig dashboard, C source files and header files are generated. Further advanced parameters can be located in `advanced_config.h`.
 
@@ -312,7 +321,7 @@ Some important settings in the TI 15.4-Stack module include:
 
 More information about the configuration and feature options can be found in the TI 15.4-Stack documentation under **Example Applications > Configuration Parameters**.
 
-### Disabling Common User Interface
+### <a name="DisablingCommonUserInterface"></a>Disabling Common User Interface
 
 The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the project-specific .opts file:
 
@@ -320,21 +329,21 @@ The common user interface (CUI) is a UART based interface that allows users to c
 -DCUI_DISABLE
 ```
 
-> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
+> Please Note: particular features that are dependent on the CUI will be unavailable when this feature is enabled.
 
-### Multi-Page NV Configuration
+### <a name="MultiPageNVConfiguration"></a>Multi-Page NV Configuration
 
 By default, this project is configured to use two pages of NV. A maximum of five NV pages are supported. In order to modify the NV pages, update the following:
+
 * `NVOCMP_NVPAGES=2` in the project-specific .opts file
-* `NVOCMP_NVPAGES=2` in the linker options
 * SysConfig NVS module:
    * Set Region Size based on the formula `NVOCMP_NVPAGES * 0x2000`
    * Set Region Base based on the formula `0x56000 - (NVOCMP_NVPAGES * 0x2000)`
 
-### Advanced OAD Configuration
+### <a name="AdvancedOADConfiguration"></a>Advanced OAD Configuration
 
 The 15.4 OAD protocol supports the following robustness features:
-1. Timeouts: This is when a the data request for a block response is not answered. The data request delay from an OAD block request being sent is set by the `Block Request Poll Delay`. It is advised that this be set as short as possible to avoid unnecessary queueing of data in the Co-Processor. A timeout is typically caused by the Linux Collector taking too long to read the OAD Block from the FW Image file (due to CPU load). The number of timeouts before a retry is set by OAD_MAX_TIMEOUTS.
+1. Timeouts: This is when a the data request for a block response is not answered. The data request delay from an OAD block request being sent is set by the `Block Request Poll Delay`. It is advised that this be set as short as possible to avoid unnecessary queuing of data in the Co-Processor. A timeout is typically caused by the Linux Collector taking too long to read the OAD Block from the FW Image file (due to CPU load). The number of timeouts before a retry is set by OAD_MAX_TIMEOUTS.
 2. Retries: A retry is when the maximum number timeouts has expired before the OAD Block Response has been received. In his case the OAD Block Request is resent. The number of retires before an OAD Abort is set by OAD_MAX_RETRIES.
 3. Aborts: The OAD is aborted after there are OAD_MAX_RETRIES block requests with no response. After an OAD abort the OAD is attempted to be resumed after OAD_BLOCK_AUTO_RESUME_DELAY ms, if the OAD abort again on the same block number the OAD is terminated.
 
@@ -361,18 +370,17 @@ In Beacon Mode, data requests are configured to time out after 1 beacon interval
 Finally, the sensor_oad project has 3 defines related to the OAD feature, defined by default in the project's .opts file or in the project settings:
 
 * `FEATURE_NATIVE_OAD`: This includes the 15.4 OAD client. This results in an application that supports the OAD messages needed to receive an OAD update over the 15.4 network.
-* `FEATURE_BLE_OAD`: This allows the 15.4 application to revert to the persistent application to perform an OAD. Fore more information, see section "Reverting to Persistent Application"
+* `FEATURE_BLE_OAD`: This allows the 15.4 application to revert to the persistent application to perform an OAD. For more information, see section [Reverting to Persistent Application](#RevertingtoPersistentApplication)
 * `SECURITY`: This includes the OAD secure signing. This results in an application binary that is signed using an AES encryption of SHA2 hash of the image.
 
-### CCFG Configuration
+### <a name="CCFGConfiguration"></a>CCFG Configuration
 
 For OAD applications, the Customer Configuration (CCFG) area must be configured in the BIM project. In order to modify the default CCFG values, update `ccfg_app.c` in the BIM On-Chip example and rebuild.
 
-Reverting to Persistent Application
------------------------------------
+## <a name="RevertingtoPersistentApplication"></a>Reverting to Persistent Application
 
 When the LEFT Button (`CONFIG_GPIO_BTN1`) is held down and a reset occurs (RESET Button or cord unplug/plug in), the user application will enter into the `OAD_markSwitch` function. This invalidates the currently running application image itself as a bootable image and performs a soft reset of the device. This will cause the BIM to boot up like normal. However, the BIM will detect that the user application image is no longer valid. This will cause the BIM to boot into the persistent application.
 
-In the example usage section, the persistent application is a 15.4 image. However, this image can use any networking stack, such as BLE. The persistent application implements the OAD protocol, so whichever networking is stack used by the persistent application, you will have to perform On-Chip OAD according to the stack protocol.
+In The [Example Usage](#ExampleUsage) section, the persistent application is a 15.4 image. However, this image can use any networking stack, such as BLE. The persistent application implements the OAD protocol, so whichever networking is stack used by the persistent application, you will have to perform On-Chip OAD according to the stack protocol.
 
 For more information about performing a BLE OAD of a 15.4 image, see the BLE5-Stack documentation under **Over-the-Air Download (OAD) > Performing a BLE OAD**.

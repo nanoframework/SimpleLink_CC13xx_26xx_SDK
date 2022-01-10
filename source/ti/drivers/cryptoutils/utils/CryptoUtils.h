@@ -67,8 +67,8 @@ extern "C" {
  *  @retval true                The contents of the buffers match.
  *  @retval false               The contents of the buffers do not match.
  */
-bool CryptoUtils_buffersMatch(const void *buffer0,
-                              const void *buffer1,
+bool CryptoUtils_buffersMatch(const volatile void *volatile buffer0,
+                              const volatile void *volatile buffer1,
                               size_t bufferByteLength);
 
 /**
@@ -99,8 +99,8 @@ bool CryptoUtils_buffersMatch(const void *buffer0,
  *  @retval true                The contents of the buffers match.
  *  @retval false               The contents of the buffers do not match.
  */
-bool CryptoUtils_buffersMatchWordAligned(const uint32_t *buffer0,
-                                         const uint32_t *buffer1,
+bool CryptoUtils_buffersMatchWordAligned(const volatile uint32_t *volatile buffer0,
+                                         const volatile uint32_t *volatile buffer1,
                                          size_t bufferByteLength);
 
 /**
@@ -150,10 +150,10 @@ void CryptoUtils_reverseBufferBytewise(void * buffer, size_t bufferByteLength);
  *
  *  @param destination  Destination array
  *
- *  @param sourceLength Length of the source array (multiple of 4)
+ *  @param sourceLength Length of the source array
  */
 void CryptoUtils_copyPad(const void *source,
-                         void *destination,
+                         uint32_t *destination,
                          size_t sourceLength);
 
 /**
@@ -170,11 +170,27 @@ void CryptoUtils_copyPad(const void *source,
  *
  *  @param destination  Destination array
  *
- *  @param sourceLength Length of the source array (multiple of 4)
+ *  @param sourceLength Length of the source array
  */
 void CryptoUtils_reverseCopyPad(const void *source,
-                                void *destination,
+                                uint32_t *destination,
                                 size_t sourceLength);
+
+/**
+ *  @brief Reverses and copies an array of bytes.
+ *
+ *  The \c source array is reversed byte-wise and copied into the \c destination
+ *  array.
+ *
+ *  @param source       Source array
+ *
+ *  @param destination  Destination array
+ *
+ *  @param sourceLength Length of the source array
+ */
+void CryptoUtils_reverseCopy(const void *source,
+                             void *destination,
+                             size_t sourceLength);
 
 #ifdef __cplusplus
 }

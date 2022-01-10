@@ -9,7 +9,7 @@
         API and callback services for its client.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -82,11 +82,11 @@ extern "C"
 #if (NPI_FLOW_CTRL == 1)
   #ifdef NPI_USE_SPI
     //NOTE: Board_SPI1 SPI module must be used for NPI.
-    #define MRDY_PIN CONFIG_PIN_BTN1
-    #define SRDY_PIN CONFIG_PIN_BTN2
+    #define MRDY_PIN CONFIG_GPIO_BTN1
+    #define SRDY_PIN CONFIG_GPIO_BTN2
   #elif defined(NPI_USE_UART)
-    #define MRDY_PIN CONFIG_PIN_BTN1
-    #define SRDY_PIN CONFIG_PIN_BTN2
+    #define MRDY_PIN CONFIG_GPIO_BTN1
+    #define SRDY_PIN CONFIG_GPIO_BTN2
   #endif
   #define SRDY_ENABLE()                   PIN_setOutputValue(hNpiHandshakePins, SRDY_PIN, 0) /* RTS low */
   #define SRDY_DISABLE()                  PIN_setOutputValue(hNpiHandshakePins, SRDY_PIN, 1) /* RTS high */

@@ -5,7 +5,7 @@
  @brief Public interface file for 802.15.4 MAC.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -439,6 +439,11 @@ extern "C" {
 
 /* PA Type */
 #define MAC_RF_PA_TYPE                    0xF8  /* RF PA Type */
+
+/* Coex Debug Struct */
+#define MAC_COEX_METRICS                  0xF9  /* Coex Debug struct */
+
+#define MAC_STATISTICS                    0xFA  /* MAC Statistics struct */
 
 /* Frequency hopping PIB Get and Set Attributes */
 #define MAC_FHPIB_TRACK_PARENT_EUI        0x2000  /* The parent EUI address */
@@ -918,7 +923,7 @@ typedef struct
   uint8           channel;           /* Transmit the data frame on this channel */
   uint8           power;             /* Transmit the data frame at this power level */
   uint8*          pIEList;           /* pointer to the payload IE list, excluding termination IEs */
-  uint16          payloadIELen;      /* length of the payload IE’s */
+  uint16          payloadIELen;      /* length of the payload IEï¿½s */
   uint8           fhProtoDispatch;   /* Not Used, RESERVED for future. Shall be set to zero */
   uint32          includeFhIEs;      /* Bitmap indicates which FH IE's need to be included */
 } macDataReq_t;

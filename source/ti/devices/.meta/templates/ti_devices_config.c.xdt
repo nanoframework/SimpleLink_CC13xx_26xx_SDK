@@ -319,7 +319,7 @@
 % }
 % if(inst.disableRamParity) {
 // Disable parity (enabled by default)
-#define SET_CCFG_SRAM_CFG_PARITY                        0x0
+#define SET_CCFG_SRAM_CFG_PARITY_DIS                    0x0
 
 % }
 

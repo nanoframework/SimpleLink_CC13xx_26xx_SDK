@@ -228,7 +228,7 @@ function getTxPowerRFConfig(inst, freqBand, phyType, phyGroup)
         || (((board.includes("CC1352P-2") || board.includes("CC1352P_2"))
         || (board.includes("CC1352P-4") || board.includes("CC1352P_4"))
         || (board.includes("CC1352P7-4") || board.includes("CC1352P7_4"))
-        || (board.includes("CC2652PSIP")))
+        || (board.includes("CC2652PSIP")) || board.includes("CC2651P3"))
         && (freqBand === "freqBand24")))
     {
         // On 1352P1 the high PA is enabled for Sub-1 GHz

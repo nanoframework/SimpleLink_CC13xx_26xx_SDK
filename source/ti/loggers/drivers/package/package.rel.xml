@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--  This file conforms to the DTD xdc/bld/release.dtd -->
-<release name="ti_loggers_drivers" label="default" date="1616165908392" buildCount="5" producerId="undefined">
+<release name="ti_loggers_drivers" label="default" date="1635151480456" buildCount="5" producerId="undefined">
 <package name="ti.loggers.drivers"
     version="1, 0, 0"/>
 <imports>
@@ -8,7 +8,7 @@
 <references>
     <package name="xdc"
         version="1, 1, 1, 1601763860975"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="IPackage.xdc"/>
         <file name="IPackage.xs"/>
         <file name="Warnings.xs"/>
@@ -23,14 +23,14 @@
     </package>
     <package name="xdc.services.global"
         version="1, 0, 0, 1601763907358"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="Clock.xs"/>
         <file name="Trace.xs"/>
         <file name="java/package.jar"/>
     </package>
     <package name="xdc.bld"
         version="1, 0, 2, 1601763865498"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="BuildEnvironment.xs"/>
         <file name="Configuration.xs"/>
         <file name="Executable.xs"/>
@@ -49,8 +49,8 @@
         <file name="package.xs"/>
     </package>
     <package name="ti.targets"
-        version="1, 0, 3, 1599169865067"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 3, 1627480657801"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="C28_float.xs"/>
         <file name="C28_large.xs"/>
         <file name="ITarget.xs"/>
@@ -59,22 +59,22 @@
         <file name="std.h"/>
     </package>
     <package name="ti.targets.arm.elf"
-        version="1, 0, 0, 1599169867739"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 0, 1627480660277"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="IArm.xs"/>
         <file name="package.xs"/>
         <file name="std.h"/>
     </package>
     <package name="ti.targets.arm.clang"
-        version="1, 0, 0, 1599169878684"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 0, 1627480669652"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="ITarget.xs"/>
         <file name="package.xs"/>
         <file name="std.h"/>
     </package>
     <package name="gnu.targets.arm"
-        version="1, 0, 0, 1599169857633"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 0, 1627480650338"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="A15F.xs"/>
         <file name="A53F.xs"/>
         <file name="A72F.xs"/>
@@ -86,6 +86,7 @@
         <file name="ITarget.xs"/>
         <file name="M0.xs"/>
         <file name="M3.xs"/>
+        <file name="M33F.h"/>
         <file name="M4.h"/>
         <file name="M4F.h"/>
         <file name="_utils.xs"/>
@@ -121,21 +122,21 @@
         <file name="std.h"/>
     </package>
     <package name="iar.targets.arm"
-        version="1, 0, 0, 1599169862691"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 0, 1627480655543"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="ITarget.xs"/>
         <file name="package.xs"/>
     </package>
     <package name="ti.drivers"
-        version="1, 0, 0, 1616165723000"
-        providerId="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.50.02.00/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
+        version="1, 0, 0, 1635151171000"
+        providerId="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.70.02.02/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
         <file name="ITM.h"/>
         <file name="dpl/HwiP.h"/>
         <file name="libBuilder.xs"/>
     </package>
     <package name="xdc.shelf"
         version="1, 0, 0, 1601763947085"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="java/antlr.jar"/>
         <file name="java/ecj.jar"/>
         <file name="java/js.jar"/>
@@ -143,45 +144,45 @@
     </package>
     <package name="xdc.services.intern.cmd"
         version="1, 0, 0, 1601763919130"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="java/package.jar"/>
     </package>
     <package name="xdc.services.intern.gen"
         version="1, 0, 0, 1601763921211"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="java/package.jar"/>
     </package>
     <package name="xdc.services.intern.xsr"
         version="1, 0, 0, 1601763923273"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="java/package.jar"/>
     </package>
     <package name="xdc.services.spec"
         version="1, 0, 0, 1601763932623"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="java/package.jar"/>
     </package>
     <package name="iar.targets"
-        version="1, 0, 1, 1599169860602"
-        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.03.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
+        version="1, 0, 1, 1627480653547"
+        providerId="/scratch/xlibrary/.conan/data/sysbios/6.81.04.02/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/kernel/tirtos/packages">
         <file name="select.h"/>
     </package>
     <package name="gnu.targets"
         version="1, 0, 1, 1601763975492"
-        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
+        providerId="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/packages">
         <file name="select.h"/>
     </package>
     <package name="ti.utils.runtime"
-        version="1, 0, 0, 1615210540267"
-        providerId="/scratch/xlibrary/.conan/data/tiutils/1.25.00.03/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
+        version="1, 0, 0, 1631180694359"
+        providerId="/scratch/xlibrary/.conan/data/tiutils/1.30.00.05/library-sb/ga/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
         <file name="ILogger.h"/>
     </package>
     <package name="ti.loggers.drivers"
         version="1, 0, 0"
-        providerId="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.50.02.00/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
+        providerId="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.70.02.02/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/source">
         <file name="LoggerITM.h"/>
     </package>
-    <targetRoot base="/scratch/xlibrary/.conan/data/ticodegen/20.2.4.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/"
+    <targetRoot base="/scratch/xlibrary/.conan/data/ticodegen/20.2.5.LTS-0/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/"
         trgs="ti.targets.arm.elf.M4,ti.targets.arm.elf.M4F">
         <file name="include/_stdint40.h"/>
         <file name="include/_ti_config.h"/>
@@ -201,18 +202,18 @@
         <file name="include/xlocale/_stdio.h"/>
     </targetRoot>
     <targetRoot base="/scratch/xlibrary/.conan/data/arm-none-eabi-gcc/9.2019.q4.major-0/library-msp/ga/package/44fcf6b9a7fb86b2586303e3db40189d3b511830/"
-        trgs="gnu.targets.arm.M4,gnu.targets.arm.M4F">
+        trgs="gnu.targets.arm.M4,gnu.targets.arm.M4F,gnu.targets.arm.M33F">
         <file name="arm-none-eabi/include/sys/config.h"/>
         <file name="lib/gcc/arm-none-eabi/9.2.1/include/stdarg.h"/>
         <file name="lib/gcc/arm-none-eabi/9.2.1/include/stdbool.h"/>
         <file name="lib/gcc/arm-none-eabi/9.2.1/include/stddef.h"/>
     </targetRoot>
-    <xdcRoot base="/scratch/xlibrary/.conan/data/xdctools/3.62.00.08/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/">
+    <xdcRoot base="/scratch/xlibrary/.conan/data/xdctools/3.62.01.15/library-msp/ga/package/be241241e9d4718e5bab4eb33935bbb69606bb0c/">
         <file name="/packages/xdc/package.xdc"/>
         <xdcCorePkg version="16, 0, 2, 1601763875727" producerId="/db/ztree/library/trees/xdc/xdc-K04/src/packages" buildCount="1" releaseName="xdc_corevers" label="default" date="1601763875727"/>
     </xdcRoot>
 </references>
 <orphans>
-    <file name="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.50.02.00/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/drivers.bld"/>
+    <file name="/scratch/xlibrary/.conan/data/tidrivers_cc13xx_cc26xx/5.70.02.02/library-sb/ga/build/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/drivers.bld"/>
 </orphans>
 </release>

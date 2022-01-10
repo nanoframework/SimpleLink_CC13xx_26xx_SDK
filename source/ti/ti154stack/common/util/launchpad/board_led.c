@@ -5,7 +5,7 @@
  @brief This file contains the interface to the SRF06EB LED Service
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -50,7 +50,7 @@
 
 #include <xdc/std.h>
 
-#include <ti/drivers/PIN.h>
+#include <ti/drivers/GPIO.h>
 
 #include <ti/drivers/dpl/HwiP.h>
 
@@ -91,23 +91,6 @@ static Clock_Struct blinkClkStruct;
 
 static board_led_status_t ledStatus[NO_OF_LEDS];
 
-static PIN_Config ledPinTable[] =
-{
-    CONFIG_PIN_RLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
-            | PIN_DRVSTR_MAX, /* LED1 initially off */
-    CONFIG_PIN_GLED | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
-            | PIN_DRVSTR_MAX, /* LED2 initially off */
-    /* To Do */
-    /* LED2 and LED3 should be added later */
-    PIN_TERMINATE /* Terminate list     */
-};
-
-/* LED pin state */
-static PIN_State ledPinState;
-
-/* LED Pin Handle */
-static PIN_Handle ledPinHandle;
-
 /******************************************************************************
  Local Function Prototypes
  *****************************************************************************/
@@ -132,8 +115,9 @@ void Board_Led_initialize(void)
     unsigned int index;
     uint32_t value;
 
-    /* Open LED PIN driver */
-    ledPinHandle = PIN_open(&ledPinState, ledPinTable);
+    /* Initialize GPIO settings */
+    GPIO_setConfig(CONFIG_GPIO_RLED, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(CONFIG_GPIO_GLED, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
     value = board_led_convertLedValue(board_led_state_OFF);
 
@@ -144,7 +128,7 @@ void Board_Led_initialize(void)
 
         index = board_led_convertLedType((board_led_type) x);
 
-        PIN_setOutputValue(ledPinHandle, index, value);
+        GPIO_write(index, value);
     }
 
     UtilTimer_construct(&blinkClkStruct, board_led_blinkTimeoutCB,
@@ -162,11 +146,6 @@ void Board_Led_control(board_led_type led, board_led_state state)
     unsigned int gpioType;
     uint32_t value;
     uint32_t key;
-
-    if (ledPinHandle == NULL)
-    {
-        return;
-    }
 
     /* Convert to GPIO types */
     gpioType = board_led_convertLedType(led);
@@ -189,7 +168,7 @@ void Board_Led_control(board_led_type led, board_led_state state)
     key = HwiP_disable();
 
     /* Update hardware LEDs */
-    PIN_setOutputValue(ledPinHandle, gpioType, value);
+    GPIO_write(gpioType, value);
 
     /* Exit critical section */
     HwiP_restore(key);
@@ -313,7 +292,7 @@ static void board_led_blinkLed(void)
             /* Enter critical section so this function is thread safe*/
             key = HwiP_disable();
 
-            PIN_setOutputValue(ledPinHandle, index, value);
+            GPIO_write(index, value);
 
             /* Exit critical section */
             HwiP_restore(key);
@@ -329,7 +308,7 @@ static void board_led_blinkLed(void)
             /* Enter critical section so this function is thread safe*/
             key = HwiP_disable();
 
-            PIN_setOutputValue(ledPinHandle, index, value);
+            GPIO_write(index, value);
 
             /* Exit critical section */
             HwiP_restore(key);
@@ -348,9 +327,9 @@ static unsigned int board_led_convertLedType(board_led_type led)
 {
     if (led == board_led_type_LED1)
     {
-        return(CONFIG_PIN_RLED);
+        return(CONFIG_GPIO_RLED);
     }
-    return(CONFIG_PIN_GLED);
+    return(CONFIG_GPIO_GLED);
 }
 
 /*!

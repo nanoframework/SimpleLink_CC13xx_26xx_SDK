@@ -1,7 +1,7 @@
 /******************************************************************************
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -1830,8 +1830,22 @@ hciStatus_t HCI_LE_SetExtAdvData( aeSetDataCmd_t *pCmdParams );
  *
  * @return @ref HCI_SUCCESS
  */
-
 hciStatus_t HCI_LE_SetExtScanRspData( aeSetDataCmd_t *pCmdParams );
+
+/**
+ * Set the Advertising status.
+ * This function will be called only when BLE3_CMD compilation flag
+ * is set
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_LE_MAKE_DISCOVERABLE_DONE or
+ * @HCI_LE_END_DISCOVERABLE_DONE
+ *
+ * @param pCmdParams - Pointer to input parameters
+ *
+ * @return @ref HCI_SUCCESS
+ */
+hciStatus_t HCI_LE_SetAdvStatus( aeEnableCmd_t *pCmdParams );
 
 /**
  * Set the Advertising Scan Response data.
@@ -2033,8 +2047,7 @@ extern hciStatus_t HCI_LE_ConnUpdateCmd( uint16 connHandle,
  * Update the current data channel map.
  *
  * @par Corresponding Events
- * @ref hciEvt_CmdComplete_t with cmdOpcode
- *      @ref HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION
  *
  * @param chanMap Pointer to the new channel map.
  *
@@ -2043,11 +2056,35 @@ extern hciStatus_t HCI_LE_ConnUpdateCmd( uint16 connHandle,
 extern hciStatus_t HCI_LE_SetHostChanClassificationCmd( uint8 *chanMap );
 
 /**
+ * Update the default channel map.
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_EXT_SET_HOST_DEFAULT_CHANNEL_CLASSIFICATION
+ *
+ * @param chanMap Pointer to the new channel map.
+ *
+ * @return @ref HCI_SUCCESS
+ */
+extern hciStatus_t HCI_EXT_SetHostDefChanClassificationCmd( uint8 *chanMap );
+
+/**
+ * Update the channel map of specific connection.
+ *
+ * @par Corresponding Events
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_EXT_SET_HOST_CONNECTION_CHANNEL_CLASSIFICATION
+ *
+ * @param chanMap Pointer to the new channel map.
+ * @param connID  connection handle
+ *
+ * @return @ref HCI_SUCCESS
+ */
+extern hciStatus_t HCI_EXT_SetHostConnChanClassificationCmd( uint8 *chanMap , uint16 connID );
+
+/**
  * Read a connection's data channel map.
  *
  * @par Corresponding Events
- * @ref hciEvt_CmdComplete_t with cmdOpcode
- *      @ref HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION
+ * @ref hciEvt_CmdComplete_t with cmdOpcode @ref HCI_LE_SET_HOST_CHANNEL_CLASSIFICATION
  *
  * @param connHandle Connection handle.
  *
@@ -2190,7 +2227,7 @@ extern hciStatus_t HCI_LE_ReceiverTestCmd( uint8 rxChan );
 /**
  * This LE API is used to start the transmit Direct Test Mode test.
  *
- * @note The BLE device is to transmit at maximum power.
+ * The Controller shall transmit at maximum power.
  *
  * @warning An HCI reset should be issued when done using DTM.
  *

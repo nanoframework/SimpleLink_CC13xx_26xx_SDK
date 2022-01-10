@@ -6,7 +6,7 @@
  @brief This file contains the interface of the Common User Interface. (CUI)
 
  Group: LPRF SW RND
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

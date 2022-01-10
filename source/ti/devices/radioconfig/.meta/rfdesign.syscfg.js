@@ -51,12 +51,13 @@ const Prefix = "fb";
 // Mapping official names to internal SmartRF Studio names (where these are not equal)
 const LaunchPadMap = {
     "LAUNCHXL-CC1352P1": "LAUNCHXL-CC1352P",
-    "LAUNCHXL-CC1352P-2": "LAUNCHXL-CC1352P-2_4GHZ"
+    "LAUNCHXL-CC1352P-2": "LAUNCHXL-CC1352P-2_4GHZ",
+    "LP_CC1352P7-1": "LP_CC1352P7",
+    "LP_CC1352P7-2": "LP_CC1352P7-2_4GHZ"
 };
 
 // Targets with 10 dBm High PA
-const TargetPA10 = ["LAUNCHXL-CC1352P-4", "LP_CC2652PSIP", "LP_CC1352P7-4",
-    "LP_CC2651P", "LP_CC2651P3"];
+const TargetPA10 = ["LAUNCHXL-CC1352P-4", "LP_CC2652PSIP", "LP_CC1352P7-4", "LP_EM_CC1354P10_6"];
 
 // Load board info
 let TiBoard = Common.getBoardName();
@@ -149,9 +150,12 @@ const config = [
             inst.fbSub1g = getDefaultSub1g();
 
             //  Update 2.4G selection
+            ui.fb24g.hidden = rfDesign169;
             if (rfDesign169) {
                 inst.fb24g = "none";
-                ui.fe24g.hidden = true;
+            }
+            else {
+                inst.fb24g = Common.HAS_24G ? "fb2400" : "none";
             }
 
             // Special handling of CC1352P/CC2652P
@@ -262,6 +266,10 @@ function getDefaultSub1g() {
     if (CurrentDesign.isOptimizedFor(169)) {
         return "fb169";
     }
+    if (DeviceInfo.getDeviceName().includes("cc2674")) {
+        return "none";
+    }
+
     if (DeviceInfo.hasHighPaSupport()) {
         if (DeviceInfo.getDeviceName().includes("cc2652p")) {
             return "none";
@@ -285,8 +293,12 @@ function onPaChange(inst) {
     if (inst.pa20 !== "none") {
         const devName = DeviceInfo.getDeviceName();
 
-        if (name === "LAUNCHXL-CC1352P-4" && (devName === "cc1352p" || devName === "cc2672p")) {
+        if (name === "LAUNCHXL-CC1352P-4" && devName === "cc1352p") {
             name = "LAUNCHXL-CC1352P-2_4GHZ";
+        }
+
+        if (name === "LP_CC1352P7-4" && devName.match(/cc..52p7/)) {
+            name = "LP_CC1352P7-2_4GHZ";
         }
 
         name += "-HIGH-PA_10DBM";
@@ -431,30 +443,29 @@ function isFreqBandSelected(inst, target) {
  *  @param freq - frequency in MHz
  */
 function getFreqBandShortName(freq) {
-    let name = null;
     const fb = getFrequencyBandByFreq(freq, false);
 
     if (fb !== null) {
-        switch (fb.min) {
-        case 169:
-            name = "169";
-            break;
-        case 420:
-        case 431:
-            name = "433";
-            break;
-        case 770:
-            name = "868";
-            break;
-        case 2360:
-        case 2400:
-            name = "2400";
-            break;
-        default:
-            throw Error("Invalid configurable: " + Prefix + freq + " " + fb.min);
+        const fmin = fb.min;
+        if (fmin === 169) {
+            return "169";
         }
+
+        if (fmin >= 420 && fmin <= 510) {
+            return "433";
+        }
+
+        if (fmin >= 770 && fmin < 921) {
+            return "868";
+        }
+
+        if (fmin >= 2360) {
+            return "2400";
+        }
+
+        throw Error("Unknown frequency band: " + Prefix + freq + " " + fmin);
     }
-    return name;
+    return null;
 }
 
 /*!
@@ -675,6 +686,10 @@ function getTxPowerOptionsDefault(freq, highPA) {
             TargetName = "LAUNCHXL-CC1352P1";
             Has10dBmPA = false;
         }
+        if (TargetName === "LP_CC1352P7-4") {
+            TargetName = "LP_CC1352P7-1";
+            Has10dBmPA = false;
+        }
     }
 
     const paList = getPaTable(freq, highPA);
@@ -798,7 +813,7 @@ function loadTargetInfo() {
                 const targetName = data.target.Name;
                 const highPaTarget = targetName.includes("HIGH-PA");
                 const paSuffix = highPaTarget ? "P" : "";
-                const onlySub1G = targetName.includes("CC1312R1");
+                const onlySub1G = targetName.match(/CC131[12]/);
 
                 // Load PA table
                 const paTable = _.cloneDeep(system.getScript(PaPath + "pasettings.json"));
@@ -897,7 +912,8 @@ function getFrequencyBands() {
 
     function insertTaTable(dest, data) {
         if (data.hiPa) {
-            if (data.paTable[0]._text === "10") {
+            const paDefault = data.paTable[0]._text;
+            if (paDefault === "10" || paDefault === "11") {
                 dest.paTable10 = data.paTable;
             }
             else {
@@ -953,7 +969,7 @@ function getDesignData() {
     // Add dropdown options
     const options = [];
     for (const td in rfDesign) {
-        if (!(td.includes("HIGH-PA") || td.includes("CC1352R1-2_4GHZ") || td.match("CC1352P7.*-2_4GHZ"))) {
+        if (!(td.includes("HIGH-PA") || td.includes("CC1352R1-2_4GHZ") || td.includes("LP_CC2672P3-2_4GHZ"))) {
             const map = _.invert(LaunchPadMap);
             let name;
             if (td in map) {
@@ -1120,36 +1136,34 @@ function generateTxPowerCode(inst, target, nTable) {
         const typeName = "RF_TxPowerTable_Entry ";
         const tableTerminate = "    RF_TxPowerTable_TERMINATION_ENTRY\n};\n";
 
-        // Generate code for high PA
-        const highPaSupported = isHighPaSupported(inst, target.min);
-
         // Standard PA table
-        let info = getPaTableInfo(target, false);
+        const infoStd = getPaTableInfo(target, false);
 
-        let code = "\n// " + info.description + "\n";
-        code += typeName + info.symTxPower + "[" + info.symTxPowerSize + "] =\n{\n";
+        let code = "\n// " + infoStd.description + "\n";
+        code += typeName + infoStd.symTxPower + "[" + infoStd.symTxPowerSize + "] =\n{\n";
         code += generatePaTableCode(target.paTable, false);
         code += tableTerminate;
+
+        // Need to generate code for high PA ?
+        const infoHiPa = getPaTableInfo(target, true); // HighPA for current frequency band
+        const highPaSupported = isHighPaSupported(inst, target.min) && infoHiPa !== null;
 
         if (highPaSupported) {
             if (paExport.separate > 0) {
                 // High PA table
-                info = getPaTableInfo(target, true);
-
-                code += "\n// " + info.description + "\n";
-                code += typeName + info.symTxPower
-                    + "[" + info.symTxPowerSize + "] =\n{\n";
-                code += generatePaTableCode(info.paTable, false);
+                code += "\n// " + infoHiPa.description + "\n";
+                code += typeName + infoHiPa.symTxPower
+                    + "[" + infoHiPa.symTxPowerSize + "] =\n{\n";
+                code += generatePaTableCode(infoHiPa.paTable, false);
                 code += tableTerminate;
             }
+
             if (paExport.combined > 0) {
                 // Combined PA table
-                const infoStd = getPaTableInfo(target, false);
-                const infoHiPa = getPaTableInfo(target, true);
                 const paTable = combinePaTable(target.paTable, infoHiPa.paTable);
                 const codeComb = generatePaTableCode(paTable, true);
 
-                info = mergePaTableInfo(infoStd, infoHiPa);
+                const info = mergePaTableInfo(infoStd, infoHiPa);
                 code += "\n// " + info.description + "\n";
                 code += typeName + info.symTxPower + "[" + info.symTxPowerSize + "] =\n{\n";
                 code += codeComb;
@@ -1180,32 +1194,30 @@ function generateTxPowerHeader(inst, target) {
         // Struct declaration
         const typeName = "extern RF_TxPowerTable_Entry ";
 
-        // Need to generate code for high PA ?
-        const highPaSupported = isHighPaSupported(inst, target.min);
-
         // Standard PA table (always present)
-        let info = getPaTableInfo(target, false);
-        let codeSz = "#define " + info.symTxPowerSize + " " + (info.paTable.length + 1)
-            + " // " + info.description + "\n";
-        let code = typeName + info.symTxPower + "[]; // " + info.description + "\n";
+        const infoStd = getPaTableInfo(target, false);
+        let codeSz = "#define " + infoStd.symTxPowerSize + " " + (infoStd.paTable.length + 1)
+            + " // " + infoStd.description + "\n";
+        let code = typeName + infoStd.symTxPower + "[]; // " + infoStd.description + "\n";
+
+        // Need to generate code for high PA ?
+        const infoHiPa = getPaTableInfo(target, true); // HighPA for current frequency band
+        const highPaSupported = isHighPaSupported(inst, target.min) && infoHiPa !== null;
 
         if (highPaSupported) {
             if (paExport.separate > 0) {
                 // High PA table
-                info = getPaTableInfo(target, true);
-                codeSz += "#define " + info.symTxPowerSize + " " + (info.paTable.length + 1)
-                    + " // " + info.description + "\n";
-                code += typeName + info.symTxPower + "[]; // " + info.description + "\n";
+                codeSz += "#define " + infoHiPa.symTxPowerSize + " " + (infoHiPa.paTable.length + 1)
+                        + " // " + infoHiPa.description + "\n";
+                code += typeName + infoHiPa.symTxPower + "[]; // " + infoHiPa.description + "\n";
             }
-            if (paExport.combined > 0) {
+            if (paExport.combined) {
                 // Combined PA table
-                const infoStd = getPaTableInfo(target, false);
-                const infoHiPa = getPaTableInfo(target, true);
                 const paList = combinePaTable(target.paTable, infoHiPa.paTable);
 
-                info = mergePaTableInfo(infoStd, infoHiPa);
+                const info = mergePaTableInfo(infoStd, infoHiPa);
                 codeSz += "#define " + info.symTxPowerSize + " " + (paList.length + 1)
-                    + " // " + info.description + "\n";
+                        + " // " + info.description + "\n";
                 code += typeName + info.symTxPower + "[]; // " + info.description + "\n";
             }
         }
@@ -1235,7 +1247,7 @@ function combinePaTable(paListStd, paListHi) {
     _.eachRight(paListComb, (item) => {
         const val = parseFloat(item._text);
         // Throw away items that break the ascending order
-        if (val > high) {
+        if (val > high + 0.5) {
             ret.unshift(item);
             high = val;
             item._text = val;
@@ -1281,6 +1293,18 @@ function getPaTableInfo(target, highPa) {
 
     if (pa > 12 && pa < 15) {
         pa = "13";
+    }
+    else if (pa > 5 && pa < 7) {
+        // PA-tables may contain 6.5 and 5.5
+        pa = "5";
+    }
+    else if (pa > 20) {
+        // PA-table for High PA may contain 20.5
+        pa = "20";
+    }
+    else if (pa > 9.5 && pa < 11.5) {
+        // PA-table for High PA may contain 11
+        pa = "10";
     }
 
     const fbName = getFreqBandShortName(target.min);

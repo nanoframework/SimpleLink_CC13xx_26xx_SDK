@@ -11,7 +11,7 @@
         ignoreDefaultCCSSettings="true"
         description="TI-RTOS debug configuration project">
 
-        <property name="products" value="com.ti.SIMPLELINK_CC13X2_26X2_SDK"/>
+        <property name="products" value="com.ti.SIMPLELINK_CC13XX_CC26XX_SDK"/>
         <property name="xdcToolsVersion" value="3.62.999"/> <!-- use 999 to pickup latest 3.62 version -->
         <property name="target" value="gnu.targets.arm.M4"/>
         <property name="platform" value="ti.platforms.simplelink:CC13X1_CC26X1"/>

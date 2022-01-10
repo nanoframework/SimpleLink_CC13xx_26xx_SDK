@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,18 +65,6 @@ function filterHardware(component)
 }
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  @param inst       - ADC instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -109,7 +97,6 @@ via simple and portable APIs.
 
     defaultInstanceName: "CONFIG_ADC_",
     config: Common.addNameConfig(config, "/ti/drivers/ADC", "CONFIG_ADC_"),
-    validate: validate,
     filterHardware: filterHardware,
     modules: Common.autoForceModules(["Board"]),
 

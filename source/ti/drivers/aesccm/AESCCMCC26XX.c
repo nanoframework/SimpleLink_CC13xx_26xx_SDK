@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, Texas Instruments Incorporated
+ * Copyright (c) 2017-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -115,7 +115,7 @@ static void AESCCM_hwiFxn (uintptr_t arg0) {
          */
         object->callbackFxn((AESCCM_Handle)arg0,
                             object->returnStatus,
-                            object->operation,
+                            (AESCCM_OperationUnion *)object->operation,
                             object->operationType);
     }
 }
@@ -205,8 +205,6 @@ AESCCM_Handle AESCCM_construct(AESCCM_Config *config, const AESCCM_Params *param
         params = (AESCCM_Params *)&AESCCM_defaultParams;
     }
 
-    /* This is currently not supported. Eventually it will make the TRNG generate the nonce */
-    DebugP_assert(!params->nonceInternallyGenerated);
     DebugP_assert(params->returnBehavior == AESCCM_RETURN_BEHAVIOR_CALLBACK ? params->callbackFxn : true);
 
     object->returnBehavior = params->returnBehavior;
@@ -243,20 +241,29 @@ void AESCCM_close(AESCCM_Handle handle) {
 static int_fast16_t AESCCM_startOperation(AESCCM_Handle handle,
                                           AESCCM_Operation *operation,
                                           AESCCM_OperationType operationType) {
+    DebugP_assert(handle);
+    DebugP_assert(operation);
+
+    /* Internally generated nonces aren't supported for now */
+    DebugP_assert(!operation->nonceInternallyGenerated);
+
+    DebugP_assert(operation->nonce && (operation->nonceLength >= 7 && operation->nonceLength <= 13));
+    DebugP_assert((operation->aad && operation->aadLength) || (operation->input && operation->inputLength));
+    DebugP_assert(operation->mac && (operation->macLength <= 16));
+
+    DebugP_assert(operationType == AESCCM_OPERATION_TYPE_DECRYPT ||
+                  operationType == AESCCM_OPERATION_TYPE_ENCRYPT);
+
     AESCCMCC26XX_Object *object = handle->object;
     AESCCMCC26XX_HWAttrs const *hwAttrs = handle->hwAttrs;
     SemaphoreP_Status resourceAcquired;
 
     /* Only plaintext CryptoKeys are supported for now */
+    DebugP_assert(operation->key);
+    DebugP_assert(operation->key->encoding == CryptoKey_PLAINTEXT);
+
     uint16_t keyLength = operation->key->u.plaintext.keyLength;
     uint8_t *keyingMaterial = operation->key->u.plaintext.keyMaterial;
-
-    DebugP_assert(handle);
-    DebugP_assert(key);
-    DebugP_assert(nonce && (nonceLength >= 7 && nonceLength <= 13));
-    DebugP_assert((aad && aadLength) || (input && inputLength));
-    DebugP_assert(mac && (macLength <= 16));
-    DebugP_assert(key->encoding == CryptoKey_PLAINTEXT);
 
     /* Try and obtain access to the crypto module */
     resourceAcquired = SemaphoreP_pend(&CryptoResourceCC26XX_accessSemaphore,
@@ -398,6 +405,108 @@ int_fast16_t AESCCM_oneStepDecrypt(AESCCM_Handle handle, AESCCM_Operation *opera
 }
 
 /*
+ *  ======== AESCCM_setupEncrypt ========
+ */
+int_fast16_t AESCCM_setupEncrypt(AESCCM_Handle handle,
+                                 const CryptoKey *key,
+                                 size_t totalAADLength,
+                                 size_t totalPlaintextLength,
+                                 size_t macLength)
+{
+
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_setupDecrypt ========
+ */
+int_fast16_t AESCCM_setupDecrypt(AESCCM_Handle handle,
+                                 const CryptoKey *key,
+                                 size_t totalAADLength,
+                                 size_t totalPlaintextLength,
+                                 size_t macLength)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_setLengths ========
+ */
+int_fast16_t AESCCM_setLengths(AESCCM_Handle handle,
+                               size_t aadLength,
+                               size_t plaintextLength,
+                               size_t macLength)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_setNonce ========
+ */
+int_fast16_t AESCCM_setNonce(AESCCM_Handle handle,
+                             const uint8_t *nonce,
+                             size_t nonceLength)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_generateNonce ========
+ */
+int_fast16_t AESCCM_generateNonce(AESCCM_Handle handle,
+                                  uint8_t *nonce,
+                                  size_t nonceSize,
+                                  size_t* nonceLength)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_addAAD ========
+ */
+int_fast16_t AESCCM_addAAD(AESCCM_Handle handle,
+                           AESCCM_SegmentedAADOperation *operation)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_addData ========
+ */
+int_fast16_t AESCCM_addData(AESCCM_Handle handle,
+                            AESCCM_SegmentedDataOperation *operation)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_finalizeEncrypt ========
+ */
+int_fast16_t AESCCM_finalizeEncrypt(AESCCM_Handle handle,
+                                    AESCCM_SegmentedFinalizeOperation *operation)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
+ *  ======== AESCCM_finalizeDecrypt ========
+ */
+int_fast16_t AESCCM_finalizeDecrypt(AESCCM_Handle handle,
+                                    AESCCM_SegmentedFinalizeOperation *operation)
+{
+    /* Segmented operations aren't supported by the HW on this device */
+    return(AESCCM_STATUS_FEATURE_NOT_SUPPORTED);
+}
+
+/*
  *  ======== AESCCM_cancelOperation ========
  */
 int_fast16_t AESCCM_cancelOperation(AESCCM_Handle handle) {
@@ -441,7 +550,7 @@ int_fast16_t AESCCM_cancelOperation(AESCCM_Handle handle) {
         /* Call the callback function provided by the application. */
         object->callbackFxn(handle,
                             AESCCM_STATUS_CANCELED,
-                            object->operation,
+                            (AESCCM_OperationUnion *)object->operation,
                             object->operationType);
     }
 

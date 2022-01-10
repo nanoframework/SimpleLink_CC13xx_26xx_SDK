@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -309,7 +309,6 @@
 #include <stdbool.h>
 
 #include <ti/drivers/I2C.h>
-#include <ti/drivers/pin/PINCC26XX.h>
 #include <ti/drivers/Power.h>
 
 #include <ti/drivers/dpl/SwiP.h>
@@ -366,7 +365,10 @@ typedef struct {
  *
  *  sdaPin and sclPin define the SDA and SCL pin mapping, respectively. These
  *  are typically defined with a macro in a header file, which maps to an
- *  IOID.  For example, CC1350_LAUNCHXL.h defines BOARD_I2C0_SDA0 to be IOID_5.
+ *  IOID. For example, CC1350_LAUNCHXL.h defines BOARD_I2C0_SDA0 to be IOID_5.
+ *
+ *  sdaPinMux and sclPinMux are values drawn from driverlib's IOC module, and
+ *  map directly to a pin hardware code that selects I2C mode.
  *
  *  A sample structure is shown below:
  *  @code
@@ -378,7 +380,9 @@ typedef struct {
  *          .intPriority = ~0,
  *          .swiPriority = 0,
  *          .sdaPin = CONFIG_I2C0_SDA0,
+ *          .sdaPinMux = IOC_PORT_MCU_I2C_MSSDA,
  *          .sclPin = CONFIG_I2C0_SCL0,
+ *          .sclPinMux = IOC_PORT_MCU_I2C_MSSCL,
  *      },
  *  };
  *  @endcode
@@ -397,10 +401,12 @@ typedef struct {
      *  Swi.numPriorities in the kernel configuration file.
      */
     uint32_t            swiPriority;
-    /* I2C SDA pin mapping */
+    /* SDA pin index and mux */
     uint8_t             sdaPin;
-    /* I2C SCL pin mapping */
+    uint8_t             sdaPinMux;
+    /* SCL pin index and mux */
     uint8_t             sclPin;
+    uint8_t             sclPinMux;
 } I2CCC26XX_HWAttrsV1;
 
 /*!
@@ -417,9 +423,9 @@ typedef struct {
     /* Bitrate of the I2C module */
     uint32_t           bitRate;
 
-    /* PIN driver state object and handle */
-    PIN_State          pinState;
-    PIN_Handle         hPin;
+    /* Pin indexes. We need to cache these because we might have custom pins */
+    uint8_t            sdaPin;
+    uint8_t            sclPin;
 
     /* I2C power notification */
     void              *i2cPostFxn;

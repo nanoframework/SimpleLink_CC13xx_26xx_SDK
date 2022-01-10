@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 FH finite state machine API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

@@ -5,7 +5,7 @@
  @brief TI-15.4 Stack API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

@@ -208,10 +208,6 @@ extern "C" {
   #define CONCENTRATOR_DISCOVERY_TIME  0
 #endif
 
-#if !defined ( CONCENTRATOR_RADIUS )
-  #define CONCENTRATOR_RADIUS          0x0a
-#endif
-
 #if !defined ( CONCENTRATOR_ROUTE_CACHE )
   #define CONCENTRATOR_ROUTE_CACHE     false // true if concentrator has route cache
 #endif
@@ -306,6 +302,12 @@ extern "C" {
 // Determines whether or not we will attempt to perform unsecure rejoins
 #if !defined (BDB_ATTEMPT_UNSECURE_REJOIN)
 #define BDB_ATTEMPT_UNSECURE_REJOIN TRUE
+#endif
+
+// Determines whether or not routers will perform silent rejoin
+// By default, routers will perform silent rejoins
+#if !defined (ZR_SILENT_REJOIN)
+#define ZR_SILENT_REJOIN TRUE
 #endif
 
 //--------------------------------------------------------------------
@@ -408,6 +410,10 @@ extern uint16_t zgApscDupRejTimeoutInc;
 extern uint8_t  zgApscDupRejTimeoutCount;
 extern uint16_t zgApsMinDupRejTableSize;
 
+#if defined ( APP_TP2 )
+extern uint8_t guApsMaxFragBlockSize;
+#endif
+
 /*********************************************************************
  * SECURITY GLOBAL VARIABLES
  */
@@ -424,11 +430,15 @@ extern uint8_t zgUseDefaultTCLK;
 
 extern uint8_t guTxApsSecON;
 extern uint8_t guEnforceRxApsSec;
+extern uint8_t guEnableKeyExchange;
+extern uint16_t guNextJoinerNwkAddr;
 #endif
 
 extern uint8_t zgApsAllowR19Sec;
 extern uint8_t zgSwitchCoordKey;
 extern uint8_t zgSwitchCoordKeyIndex;
+
+extern uint8_t zgClearTCLKOnDeviceLeft;
 
 /*********************************************************************
  * ZDO GLOBAL VARIABLES
@@ -453,6 +463,8 @@ extern uint8_t zgBdbMaxSecureRejoinAttempts;
  */
 
 extern uint8_t zgNwkMgrMode;
+
+extern uint8_t zgRouterSilentRejoin;
 
 /*********************************************************************
  * FUNCTIONS

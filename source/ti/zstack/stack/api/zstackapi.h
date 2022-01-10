@@ -219,7 +219,7 @@
        - Zstackapi_bdbNwkDescFreeReq()
        - Zstackapi_bdbTouchlinkSetAllowStealingReq()
        - Zstackapi_bdbTouchlinkGetAllowStealingReq()
-       - Zstackapi_bdbZedAttemptRecoverNwkReq()
+       - Zstackapi_bdbRecoverNwkReq()
 
 
    ZStack Indications (callbacks)
@@ -1956,9 +1956,8 @@ extern zstack_ZStatusValues  Zstackapi_bdbTouchlinkGetAllowStealingReq(
     uint8_t srcEntityID, zstack_bdbTouchlinkGetAllowStealingRsp_t *pRsp );
 
 /**
- * @brief       Call to send a BDB ZED Attempt Recover Network Request (to instruct the
- *              ZED to try to rejoin its previews network)
- *              ZED only
+ * @brief       Call to send a BDB Recover Network Request (to instruct the
+ *              joiner to try to rejoin its previews network)
  *
  * @param       appEntity - Calling thread's task ID.
  * @param       pReq - Pointer to the Request structure.  Make sure
@@ -1966,8 +1965,8 @@ extern zstack_ZStatusValues  Zstackapi_bdbTouchlinkGetAllowStealingReq(
  *
  * @return      zstack_ZStatusValues
  */
-extern zstack_ZStatusValues  Zstackapi_bdbZedAttemptRecoverNwkReq(
-    uint8_t srcEntityID, zstack_bdbZedAttemptRecoverNwkRsp_t *pRsp );
+extern zstack_ZStatusValues  Zstackapi_bdbRecoverNwkReq(
+    uint8_t srcEntityID, zstack_bdbRecoverNwkRsp_t *pRsp );
 
 /**
  * @brief       Call to free the memory used by an Indication message, messages

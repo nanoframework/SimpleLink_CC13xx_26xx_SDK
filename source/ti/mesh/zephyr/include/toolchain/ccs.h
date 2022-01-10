@@ -456,5 +456,11 @@ static inline unsigned int popcount(unsigned int v)
 		_value_a_ < _value_b_ ? _value_a_ : _value_b_; \
 	})
 
+/* @breif: Re-define __used macro to align with
+ * TI's compiler
+ */
+#undef __used
+#define __used __attribute__((retain))
+
 #endif /* !_LINKER */
 #endif /* ZEPHYR_INCLUDE_TOOLCHAIN_GCC_H_ */

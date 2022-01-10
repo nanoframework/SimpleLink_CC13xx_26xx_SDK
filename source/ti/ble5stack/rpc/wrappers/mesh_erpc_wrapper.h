@@ -4,7 +4,7 @@
 @brief Definitions and prototypes for the eRPC wrapper functions
 
 Group: WCS, BTS
-Target Device: cc13x2_26x2
+Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
@@ -57,6 +57,8 @@ extern "C"
 
 #include "autoconf.h"
 #include <bluetooth/mesh/proxy.h>
+#include <bluetooth/mesh/heartbeat.h>
+#include "mesh.h"
 
 /*********************************************************************
 *  EXTERNAL VARIABLES
@@ -126,9 +128,8 @@ typedef struct bt_mesh_model_raw        vnd_model_raw;
 typedef struct bt_mesh_model_pub_raw    pub_raw;
 typedef struct bt_mesh_model_op_raw     op_raw;
 typedef struct bt_mesh_model_cb_raw     cb_raw;
-typedef struct bt_mesh_hb_pub_raw       hb_pub_raw;
-typedef struct bt_mesh_hb_sub_raw       hb_sub_raw;
-typedef struct bt_mesh_cfg_srv_raw      cfg_srv_raw;
+typedef struct bt_mesh_hb_sub           bt_mesh_hb_sub;
+typedef enum   bt_mesh_key_evt          bt_mesh_key_evt;
 
 // Callbacks definition
 typedef void        (*BLEmesh_output_number)(bt_mesh_output_action act, uint32_t num);
@@ -143,14 +144,13 @@ typedef void        (*BLEmesh_link_close)(bt_mesh_prov_bearer bearer);
 typedef void        (*BLEmesh_complete)(uint16_t net_idx, uint16_t addr);
 typedef void        (*BLEmesh_node_added)(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem);
 typedef void        (*BLEmesh_reset)(void);
-typedef void        (*BLEmesh_cb)(uint16_t friend_addr, bool established);
 typedef void        (*BLEmesh_start_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_init_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_reset_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 typedef void        (*BLEmesh_update)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
+typedef void        (*BLEmesh_settings_set_cb)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index, const char * name, const uint8_t * data, uint8_t data_len);
 typedef void        (*BLEmesh_func)(uint32_t opcode, uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index,
                                     struct bt_mesh_msg_ctx_raw * ctx, struct net_buf_simple_raw * buf);
-typedef void        (*BLEmesh_hb_sub_cb_func)(uint8_t hops, uint16_t feat);
 typedef int32_t     (*BLEmesh_fault_get_cur)(uint16_t elem_idx, uint16_t model_index, uint8_t * test_id,
                                              uint16_t * company_id, uint8_t * faults, uint8_t * fault_count);
 typedef int32_t     (*BLEmesh_fault_get_reg)(uint16_t elem_idx, uint16_t model_index, uint16_t company_id,
@@ -333,7 +333,8 @@ struct bt_mesh_model_op_raw {
 };
 
 struct bt_mesh_model_cb_raw {
-//    uint32_t settings_set_placeholder;
+    void (*settings_set)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index,
+            const char * name, const uint8_t * data, uint8_t data_len);
     void (*start)(uint16_t elem_idx, uint8_t is_vnd,
             uint16_t model_index);
     void (*init)(uint16_t elem_idx, uint8_t is_vnd,
@@ -341,57 +342,6 @@ struct bt_mesh_model_cb_raw {
     void (*reset)(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 };
 
-/** Heartbeat Publication parameters */
-struct bt_mesh_hb_pub_raw {
-    uint32_t timer_placeholder;
-
-    /** Destination address. */
-    uint16_t dst;
-    /** Remaining publish count. */
-    uint16_t count;
-    /** Logarithmic publish interval in seconds. */
-    uint8_t  period;
-    /** Time To Live value. */
-    uint8_t  ttl;
-    /**
-     * Bitmap of features that trigger a Heartbeat publication if
-     * they change. Legal values are
-     * @ref BT_MESH_FEAT_RELAY, @ref BT_MESH_FEAT_PROXY,
-     * @ref BT_MESH_FEAT_FRIEND and @ref BT_MESH_FEAT_LOW_POWER.
-     */
-    uint16_t feat;
-    /** Network index used for publishing. */
-    uint16_t net_idx;
-};
-
-/** Heartbeat Subscription parameters. */
-struct bt_mesh_hb_sub_raw {
-    int64_t  expiry;
-    uint16_t src;
-    uint16_t dst;
-    uint16_t count;
-    uint8_t  min_hops;
-    uint8_t  max_hops;
-
-    void (*func)(uint8_t hops, uint16_t feat);
-};
-
-/** Mesh Configuration Server Model Context */
-struct bt_mesh_cfg_srv_raw {
-    /** Composition data model entry pointer. */
-    uint32_t model_placeholder;
-
-    uint8_t net_transmit;         /**< Network Transmit state */
-    uint8_t relay;                /**< Relay Mode state */
-    uint8_t relay_retransmit;     /**< Relay Retransmit state */
-    uint8_t beacon;               /**< Secure Network Beacon state */
-    uint8_t gatt_proxy;           /**< GATT Proxy state */
-    uint8_t frnd;                 /**< Friend state */
-    uint8_t default_ttl;          /**< Default TTL */
-
-    struct bt_mesh_hb_pub_raw * hb_pub;
-    struct bt_mesh_hb_sub_raw * hb_sub;
-};
 
 /** Callback function for the Health Server model */
 struct bt_mesh_health_srv_cb_raw {
@@ -457,13 +407,13 @@ int bt_mesh_init_elem_raw_init(uint16_t elem_index, const struct bt_mesh_elem_ra
 int bt_mesh_cfg_cli_raw_init(uint16_t elem_index, uint16_t model_index);
 int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const struct bt_mesh_model_raw *model_raw,
                                 const struct bt_mesh_model_op_raw *op_raw, uint16_t op_len);
-int bt_mesh_cfg_srv_raw_init(uint16_t model_index, const struct bt_mesh_cfg_srv_raw * cfg_srv);
+int bt_mesh_cfg_srv_raw_init(uint16_t model_index);
 int bt_mesh_health_srv_raw_init(uint16_t elem_index, uint16_t model_index,
                                 const struct bt_mesh_health_srv_raw * health_srv, uint8_t max_faults);
 
 // APIs to configure the node after static provisioning
 int bt_mesh_cfg_app_key_add_wrapper(uint16_t net_idx, uint16_t addr, uint16_t key_net_idx,
-                 uint16_t key_app_idx, uint8_t app_key[16]);
+                 uint16_t key_app_idx, const uint8_t app_key[16]);
 int bt_mesh_cfg_mod_app_bind_vnd_wrapper(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
                  uint16_t mod_app_idx, uint16_t mod_id, uint16_t cid);
 int bt_mesh_cfg_mod_app_bind_wrapper(uint16_t net_idx, uint16_t addr, uint16_t elem_addr,
@@ -505,6 +455,12 @@ int bt_mesh_prov_disable_wrapper(bt_mesh_prov_bearer bearers);
 // settings_load wrapper
 int settings_load_wrapper(void);
 
+// NV store wrapper
+int store_data_wrapper(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index, const char *name, uint8_t data_len, uint8_t *data);
+
+struct bt_mesh_model * get_model_data(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
+model_info_t get_model_info(struct bt_mesh_model *model);
+
 // Callbacks declaration - used by the eRPC
 void output_number_cb(bt_mesh_output_action act, uint32_t num);
 void output_string_cb(const char *str);
@@ -518,14 +474,13 @@ void link_close_cb(bt_mesh_prov_bearer bearer);
 void complete_cb(uint16_t net_idx, uint16_t addr);
 void node_added_cb(uint16_t net_idx, uint8_t uuid[16], uint16_t addr, uint8_t num_elem);
 void reset_prov_cb(void);
-void lpn_set_cb(uint16_t friend_addr, bool established);
 void start_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void init_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void reset_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
 void update_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index);
+void settings_set_cb(uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index, const char * name, const uint8_t * data, uint8_t data_len);
 void func_cb(uint32_t opcode, uint16_t elem_idx, uint8_t is_vnd, uint16_t model_index,
              struct bt_mesh_msg_ctx_raw * ctx, struct net_buf_simple_raw * buf);
-void hb_sub_cb(uint8_t hops, uint16_t feat);
 int32_t fault_get_cur_cb(uint16_t elem_idx, uint16_t model_index, uint8_t * test_id,
                          uint16_t * company_id, uint8_t * faults, uint8_t * fault_count);
 int32_t fault_get_reg_cb(uint16_t elem_idx, uint16_t model_index, uint16_t company_id,
@@ -534,6 +489,14 @@ int  fault_clear_cb(uint16_t elem_idx, uint16_t model_index, uint16_t company_id
 int  fault_test_cb(uint16_t elem_idx, uint16_t model_index, uint8_t test_id, uint16_t company_id);
 void attn_on_cb(uint16_t elem_idx, uint16_t model_index);
 void attn_off_cb(uint16_t elem_idx, uint16_t model_index);
+void hb_recv_cb(const bt_mesh_hb_sub * sub, uint8_t hops, uint16_t feat);
+void hb_sub_end_cb(const bt_mesh_hb_sub * sub);
+void lpn_friendship_established_cb(uint16_t net_idx, uint16_t friend_addr, uint8_t queue_size, uint8_t recv_window);
+void lpn_friendship_terminated_cb(uint16_t net_idx, uint16_t friend_addr);
+void lpn_polled_cb(uint16_t net_idx, uint16_t friend_addr, bool retry);
+void friend_friendship_established_cb(uint16_t net_idx, uint16_t lpn_addr, uint8_t recv_delay, uint32_t polltimeout);
+void friend_friendship_terminated_cb(uint16_t net_idx, uint16_t lpn_addr);
+void appkey_evt_cb(uint16_t app_idx, uint16_t net_idx, bt_mesh_key_evt evt);
 
 /*********************************************************************
 *********************************************************************/

@@ -34,10 +34,6 @@
  *  coprocessor.syscfg
  */
 
-/* ======== RTOS ======== */
-var RTOS = scripting.addModule("/ti/drivers/RTOS");
-RTOS.name = "TI-RTOS";
-
 /* ======== RF ======== */
 var RF = scripting.addModule("/ti/drivers/RF");
 
@@ -56,9 +52,8 @@ if (system.deviceData.board && system.deviceData.board.components.XDS110UART) {
 }
 
 Display_UART.$name = "CONFIG_DISPLAY";                         // Descriptive name for Display
+Display_UART.useUART2 = false;
 Display_UART.uart.$name = "CONFIG_DISPLAY_UART";               // Descriptive name for Display_UART
-Display_UART.uart.txPinInstance.$name = "CONFIG_PIN_UART_TX";  // Descriptive name for UART TX PIN
-Display_UART.uart.rxPinInstance.$name = "CONFIG_PIN_UART_RX";  // Descriptive name for UART RX PIN
 
 
 /* ======== LED Red ======== */
@@ -75,7 +70,6 @@ else
 }
 
 LED_R.$name = "CONFIG_GPIO_RLED";                     // Descriptive name for the LED_R GPIO
-LED_R.pinInstance.$name = "CONFIG_PIN_RLED";          // Descriptive name for LED_R PIN
 
 /* ======== LED Green ======== */
 var GPIO = scripting.addModule("/ti/drivers/GPIO");  // Add a GPIO module for use by LEDs
@@ -91,7 +85,6 @@ else
 }
 
 LED_G.$name = "CONFIG_GPIO_GLED";                     // Descriptive name for the LED_G GPIO
-LED_G.pinInstance.$name = "CONFIG_PIN_GLED";          // Descriptive name for LED_G PIN
 
 /* ======== Left Button ======== */
 var GPIO = scripting.addModule("/ti/drivers/GPIO");  // Add a GPIO module for use by buttons
@@ -102,10 +95,8 @@ if (system.deviceData.board && system.deviceData.board.components["BTN-1"]) {
     BUTTON_L.$hardware = system.deviceData.board.components["BTN-1"];
 }
 
-BUTTON_L.pinInstance.mode = "Input";                  // Ensure the pin is in input mode
 BUTTON_L.pull = "Pull Up";                            // Use Pull up resistor
 BUTTON_L.$name = "CONFIG_GPIO_BTN1";                  // Descriptive name for the BUTTON_L GPIO
-BUTTON_L.pinInstance.$name = "CONFIG_PIN_BTN1";       // Descriptive name for the BUTTON_L PIN
 
 /* ======== Right Button ======== */
 var GPIO = scripting.addModule("/ti/drivers/GPIO");   // Add a GPIO module for use by buttons
@@ -116,10 +107,8 @@ if (system.deviceData.board && system.deviceData.board.components["BTN-2"]) {
     BUTTON_R.$hardware = system.deviceData.board.components["BTN-2"];
 }
 
-BUTTON_R.pinInstance.mode = "Input";                   // Ensure the pin is in input mode
 BUTTON_R.pull = "Pull Up";                             // Use Pull up resistor
 BUTTON_R.$name = "CONFIG_GPIO_BTN2";                   // Descriptive name for the BUTTON_R GPIO
-BUTTON_R.pinInstance.$name = "CONFIG_PIN_BTN2";        // Descriptive name for the BUTTON_R PIN
 
 /* ======== NVS ======== */
 var NVS = scripting.addModule("/ti/drivers/NVS");        // Add a NVS module

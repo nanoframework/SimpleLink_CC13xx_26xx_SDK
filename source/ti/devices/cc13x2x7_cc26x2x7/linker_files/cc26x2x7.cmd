@@ -1,9 +1,6 @@
 //*****************************************************************************
 //! @file       cc26x2x7.cmd
 //! @brief      CC26x2x7 rev1 linker file for Code Composer Studio.
-//!
-//! Revised     $Date$
-//! Revision    $Revision$
 //
 //  This file is auto-generated.
 //

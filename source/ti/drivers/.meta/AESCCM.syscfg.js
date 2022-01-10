@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,18 +47,6 @@ let family = Common.device2Family(system.deviceData, "AESCCM");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - AESCCM instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base AESCCM properties and methods
  */
@@ -81,7 +69,6 @@ multiples of the block cipher block size.
 [3]: /drivers/doxygen/html/_a_e_s_c_c_m_8h.html#ti_drivers_AESCCM_Examples "C usage examples"
 [4]: /drivers/syscfg/html/ConfigDoc.html#AESCCM_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     defaultInstanceName : "CONFIG_AESCCM_",
     config              : Common.addNameConfig(config, "/ti/drivers/AESCCM", "CONFIG_AESCCM_"),
     modules: Common.autoForceModules(["Board", "Power", "DMA"])

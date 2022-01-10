@@ -259,18 +259,25 @@ bStatus_t mesh_portingLayer_convertZephAdvParam(const struct bt_le_adv_param *in
     outParam->primIntMax = inParam->interval_max;
   }
 
+  // Set the event properties to Non-connectable Non-scannable
+  outParam->eventProps = 0;
+#ifndef ZEPHYR_ADV_EXT
+  // Set the event properties to Legacy Advertise
+  outParam->eventProps |= GAP_ADV_PROP_LEGACY;
+#endif
+
   // Set Event Properties
   if (inParam->options != 0)
   {
-    outParam->eventProps = GAP_ADV_PROP_LEGACY;
-
     if(inParam->options & BT_LE_ADV_OPT_CONNECTABLE)
     {
 
       outParam->eventProps |= GAP_ADV_PROP_CONNECTABLE;
 
+#ifndef ZEPHYR_ADV_EXT
       // If the adv is connectable is has to be scannable
       outParam->eventProps |= GAP_ADV_PROP_SCANNABLE;
+#endif
     }
   }
 

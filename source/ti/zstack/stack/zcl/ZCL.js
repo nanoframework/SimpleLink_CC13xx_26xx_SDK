@@ -116,6 +116,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0009",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0009",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -718,6 +747,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0301",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0301",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -1238,6 +1298,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0000",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0000",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -2472,6 +2563,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0300",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0300",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -2808,6 +2930,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0203",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0203",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -3042,6 +3195,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0002",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0002",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -3856,6 +4040,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0b05",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0b05",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"_name": "None",
@@ -4730,6 +4945,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0101",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0101",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -7271,6 +7515,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0b04",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0b04",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -7368,6 +7641,37 @@ const ZCL =
 						"_required": "true"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0202",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0202",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -7540,6 +7844,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0404",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0404",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -7655,6 +7990,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0004",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0004",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -8149,6 +8513,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0501",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0501",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -8563,6 +8956,37 @@ const ZCL =
 						"_required": "true"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0502",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0502",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -8996,6 +9420,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0500",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0500",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -9365,6 +9818,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0003",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0003",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -9780,6 +10262,37 @@ const ZCL =
 						"_required": "true"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0401",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0401",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -10226,6 +10739,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0008",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0008",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -10758,6 +11302,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0406",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0406",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -10933,6 +11508,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0006",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0006",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -11345,6 +11951,33 @@ const ZCL =
 			"client": {
 				"attribute": [
 					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0019",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0019",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					},
+					{
 						"_id": "0x0000",
 						"_name": "UpgradeServerID",
 						"_type": "EUI64",
@@ -11744,6 +12377,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0020",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0020",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -12902,6 +13564,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0001",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0001",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -13391,6 +14084,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0403",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0403",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -13758,6 +14482,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0200",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0200",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -14041,6 +14796,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0005",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0005",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -14550,6 +15334,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0100",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0100",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"_name": "None",
 				"_register": "None"
@@ -14648,6 +15463,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0402",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0402",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -15434,6 +16280,35 @@ const ZCL =
 				]
 			},
 			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0201",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0201",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 				"command": [
 					{
 						"_id": "0x00",
@@ -15610,6 +16485,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0204",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0204",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -15866,6 +16772,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x000a",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x000a",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [
@@ -16288,6 +17225,37 @@ const ZCL =
 					}
 				]
 			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0405",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0405",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
+			},
 			"appcallback": {
 				"callbacks": [
 					{
@@ -16683,6 +17651,37 @@ const ZCL =
 						"_required": "false"
 					}
 				]
+			},
+			"client": {
+				"attribute": [
+					{
+						"_id": "0xfffd",
+						"_name": "ClusterRevision",
+						"_type": "uint16",
+						"_zigbeetype": "ZCL_DATATYPE_UINT16",
+						"_definition": "ATTRID_CLUSTER_REVISION",
+						"_location": "zcl.h",
+						"_clusterID": "0x0102",
+						"_default": "1",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "true"
+					},
+					{
+						"_id": "0xfffe",
+						"_name": "AttributeReportingStatus",
+						"_type": "enum8",
+						"_zigbeetype": "ZCL_DATATYPE_ENUM8",
+						"_definition": "ATTRID_ATTRIBUTE_REPORTING_STATUS",
+						"_location": "zcl.h",
+						"_clusterID": "0x0102",
+						"_readable": "true",
+						"_writable": "false",
+						"_reportable": "false",
+						"_required": "false"
+					}
+				],
 			},
 			"appcallback": {
 				"callbacks": [

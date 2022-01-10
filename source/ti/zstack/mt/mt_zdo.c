@@ -1273,9 +1273,9 @@ static void MT_ZdoRemoveLinkKey(uint8_t *pBuf)
       TCLinkKeyRAMEntry[i].txFrmCntr = 0;
       TCLinkKeyRAMEntry[i].rxFrmCntr = 0;
 
-      if(TCLKDevEntry.keyAttributes == ZG_PROVISIONAL_KEY)
+      if(TCLKDevEntry.IcIndex & APSME_IC_SET_MASK)
       {
-        APSME_EraseICEntry(&TCLKDevEntry.SeedShift_IcIndex);
+        APSME_EraseICEntry(&TCLKDevEntry.IcIndex);
       }
 
       memset(&TCLKDevEntry,0,sizeof(APSME_TCLinkKeyNVEntry_t));

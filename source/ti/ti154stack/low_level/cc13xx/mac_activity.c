@@ -8,7 +8,7 @@
         Note: Only utilized in DMM applications.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -65,7 +65,7 @@
 
 /* CM0 related */
 #include "mac_settings.h"
-
+#if defined(USE_DMM) || defined(IEEE_COEX_3_WIRE)
 /*******************************************************************************
  * CONSTANTS
  */
@@ -100,6 +100,9 @@ static void activityPreemptCb(void *arg);
 static void startActivityProfilingTimer(RF_Handle handle);
 static void printActivityInfo(uint32_t activity, uint32_t priority, uint8_t frameType, sAddr_t destAddr);
 #endif /* MAC_ACTIVITY_PROFILING */
+static bool getCoexActivityTx(void);
+static bool getCoexActivityRx(void);
+
 
 const activityObject_t activityObject = {
     .pSetActivityTrackingTxFn = setActivityTrackingTx,
@@ -112,8 +115,10 @@ const activityObject_t activityObject = {
     .pGetActivityRxFn = getActivityRx,
 #ifdef MAC_ACTIVITY_PROFILING
     .pStartActivityProfilingTimerFn = startActivityProfilingTimer,
-    .pPrintActivityInfoFn = printActivityInfo
+    .pPrintActivityInfoFn = printActivityInfo,
 #endif
+    .pGetCoexActivityTxFn = getCoexActivityTx,
+    .pGetCoexActivityRxFn = getCoexActivityRx,
 };
 
 /*******************************************************************************
@@ -756,4 +761,64 @@ static void printActivityInfo(uint32_t activity, uint32_t priority, uint8_t fram
 }
 #endif /* MAC_ACTIVITY_PROFILING */
 
+/*******************************************************************************
+ * @fn          getCoexActivityTx
+ *
+ * @brief       This call is used by the LMAC to obtain the current tx COEX status
+ *
+ * input parameters
+ *
+ * @param       None.
+ *
+ * output parameters
+ *
+ * @param       bool    true if Link Establishment in process
+ *
+ */
+static bool getCoexActivityTx(void)
+{
+#ifdef IEEE_COEX_3_WIRE
+    if (txActivityData.txActivity == MAC_ACTIVITY_LINK_EST)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    return false;
+#endif // IEEE_COEX_3_WIRE
+}
+
+/*******************************************************************************
+ * @fn          getCoexActivityRx
+ *
+ * @brief       This call is used by the LMAC to obtain the current rx COEX status
+ *
+ * input parameters
+ *
+ * @param       None.
+ *
+ * output parameters
+ *
+ * @param       bool    true if Link Establishment in process
+ *
+ */
+static bool getCoexActivityRx(void)
+{
+#ifdef IEEE_COEX_3_WIRE
+    if (rxActivityData.rxActivity == MAC_ACTIVITY_LINK_EST)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    return false;
+#endif // IEEE_COEX_3_WIRE
+}
+#endif
 /********************************************************************************/

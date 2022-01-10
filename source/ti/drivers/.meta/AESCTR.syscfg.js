@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,18 +47,6 @@ let family = Common.device2Family(system.deviceData, "AESCTR");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - AESCTR instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base AESCTR properties and methods
  */
@@ -79,7 +67,6 @@ entire message when the message is larger than one block.
 [3]: /drivers/doxygen/html/_a_e_s_c_t_r_8h.html#ti_drivers_AESCTR_Examples "C usage examples"
 [4]: /drivers/syscfg/html/ConfigDoc.html#AESCTR_Configuration_Options "Configuration options reference"
 `,
-    validate            : validate,
     defaultInstanceName : "CONFIG_AESCTR_",
     config              : Common.addNameConfig(config, "/ti/drivers/AESCTR", "CONFIG_AESCTR_"),
     modules: Common.autoForceModules(["Board", "Power", "DMA"])

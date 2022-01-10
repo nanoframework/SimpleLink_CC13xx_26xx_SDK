@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -199,7 +199,7 @@
  *  SPI slaves, the chip select pin can be reallocated at runtime to select the
  *  appropriate slave device. See [Master Mode With Multiple Slaves](@ref USE_CASE_MMMS_X2) use case below.
  *  This is only relevant when chip select is a hardware chip select. Otherwise the application
- *  can control the chip select pins directly using the PIN driver.
+ *  can control the chip select pins directly using the GPIO driver.
  *
  *  ## Data Frames #
  *
@@ -412,9 +412,12 @@
  *
  *  @code
  *  // From ti_drivers_config.c
- *  PIN_Config BoardGpioInitTable[] = {
- *      CONFIG_CSN_0   | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH   | PIN_PUSHPULL,   // Ensure SPI slave 0 is not selected
- *      CONFIG_CSN_1   | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH   | PIN_PUSHPULL    // Ensure SPI slave 1 is not selected
+ *  // Use the sysconfig settings to make sure both pins are set to HIGH when not in use
+ *  GPIO_PinConfig gpioPinConfigs[31] = {
+ *      ...
+ *      GPIO_CFG_OUT_STD | GPIO_CFG_OUT_HIGH, // CONFIG_CSN_0
+ *      ...
+ *      GPIO_CFG_OUT_STD | GPIO_CFG_OUT_HIGH, // CONFIG_CSN_1
  *  }
  *
  *  const SPICC26X2DMA_HWAttrs SPICC26X2DMAHWAttrs[CC2650_SPICOUNT] = {
@@ -439,7 +442,7 @@
  *      SPI_Handle handle;
  *      SPI_Params params;
  *      SPI_Transaction transaction;
- *      PIN_Id csnPin1  = PIN_ID(CONFIG_CSN_1);
+ *      uint_least8_t csnPin1 = CONFIG_CSN_1;
  *      uint8_t txBuf[] = "Hello World";    // Transmit buffer
  *
  *      // Init SPI and specify non-default parameters
@@ -561,13 +564,10 @@
  *  matching pull on the SPI IOs. An example of how this can be done is shown below.
  *
  *  @code
- *  PIN_Handle pinHandle;
- *  SPI_Handle handle;
  *  SPI_Params params;
  *  SPI_Transaction transaction;
  *  uint8_t txBuf[] = "Heartbeat";    // Transmit buffer
  *  uint8_t rxBuf[9];                 // Receive buffer
- *  PIN_Id misoPinId;
  *  uint32_t standbyDurationMs = 100;
  *
  *  // Init SPI and specify non-default parameters
@@ -582,14 +582,10 @@
  *  transaction.rxBuf = rxBuf;
  *
  *  // Open the SPI and perform the transfer
- *  handle = SPI_open(CONFIG_SPI, &params);
- *  // Get pinHandle
- *  pinHandle = ((SPICC26X2DMA_Object *)spiHandle->object)->pinHandle;
- *  // Get miso pin id
- *  misoPinId = ((SPICC26X2DMA_HWAttrs *)spiHandle->hwAttrs)->misoPin;
+ *  handle = SPI_open(CONFIG_SPI_0, &params);
  *
  *  // Apply low power sleep pull config for MISO
- *  PIN_setConfig(pinHandle, PIN_BM_PULLING, PIN_PULLUP | misoPinId);
+ *  GPIO_setConfig(CONFIG_GPIO_SPI_0_MISO, GPIO_CFG_IN_PU);
  *
  *  // Do forever
  *  while(1) {
@@ -601,14 +597,12 @@
  *  @endcode
  *
  *  ### Wake Up On Chip Select Deassertion In Slave Mode Using #SPI_MODE_CALLBACK #
- *  To wake the SPI slave device up on deassertion of the chip select, the chip select
- *  pin must be controled outside of the SPI driver in between SPI transfers.
- *  The example below show how this can be implemented by registering the chip select pin
- *  with the PIN driver and configuring a callback on a falling edge.
- *  In the PIN callback, the chip select pin is released from the PIN driver,
- *  the SPI driver is opened, and a transaction started. During the SPI callback, the SPI
- *  driver is closed again and the chip select pin is reconfigured to trigger a callback on
- *  a falling edge again.
+ *  This example demonstrates using a GPIO callback on Chip Select to wake up the device
+ *  to allow low power modes while waiting for a chip select edge.
+ *
+ *  In sysconfig or the board file, the CSN GPIO should be configured
+ *  as input/pull up with an interrupt on falling edge. Otherwise, SPI_close()
+ *  will reset the pin to the wrong settings and you may see line glitches.
  *
  *  *Note: The SPI master must allow enough time between deasserting the chip select and the
  *  start of the transaction for the SPI slave to wake up and open up the SPI driver.
@@ -620,22 +614,13 @@
  *  SPI_Transaction spiTransaction;
  *  const uint8_t transferSize = 8;
  *  uint8_t txBuf[8];
- *  PIN_Handle pinHandle;
- *  PIN_Config pinConfig[] = {
- *              PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE | CS_PIN_ID,
- *              PIN_TERMINATE  // Terminate list
- *  };
  *
  *  // Chip select callback
- *  static void chipSelectCallback(PIN_Handle handle, PIN_Id pinId)
+ *  static void chipSelectCallback(uint_least8_t)
  *  {
- *      // Release the chip select pin
- *      PIN_remove(handle, pinId);
- *
- *      // Open SPI driver
+ *      // Open SPI driver, which will override any previous GPIO configuration
  *      spiHandle = SPI_open(CONFIG_SPI, &spiParams);
- *
- *      // Issue echo transfer
+ *      // Issue the transfer
  *      SPI_transfer(spiHandle, &spiTransaction);
  *  }
  *
@@ -645,18 +630,18 @@
  *      // Close the SPI driver
  *      SPI_close(handle);
  *
- *      // Add chip select back to the PIN driver
- *      PIN_add(pinHandle, pinConfig[0]);
+ *      // Note: SPI_close() will reset the pin configuration, so it is important to
+ *      // set the default values correctly in sysconfig. We just need to set the
+ *      // callback and enable the falling edge interrupt
  *
- *      // Register chip select callback
- *      PIN_registerIntCb(pinHandle, chipSelectCallback);
+ *      GPIO_setCallback(CS_PIN_INDEX, chipSelectCallback);
+ *      GPIO_enableInt(CS_PIN_INDEX);
  *  }
  *
  *  // From your_application.c
  *  static void taskFxn(uintptr_t a0, uintptr_t a1)
  *  {
  *      uint8_t i;
- *      PIN_State   pinState;
  *
  *      // Setup SPI params
  *      SPI_Params_init(&spiParams);
@@ -678,9 +663,9 @@
  *          txBuf[i] = i;
  *      }
  *
- *      // Open PIN driver and configure chip select pin callback
- *      pinHandle = PIN_open(&pinState, pinConfig);
- *      PIN_registerIntCb(pinHandle, chipSelectCallback);
+ *      // Configure chip select callback
+ *      GPIO_setCallback(CS_PIN_INDEX, chipSelectCallback);
+ *      GPIO_enableInt(CS_PIN_INDEX);
  *
  *      // Wait forever
  *      while(true);
@@ -695,7 +680,6 @@
 
 #include <stdint.h>
 #include <ti/drivers/SPI.h>
-#include <ti/drivers/pin/PINCC26XX.h>
 #include <ti/drivers/dma/UDMACC26XX.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
@@ -754,11 +738,26 @@ extern "C" {
 /*!
  * @brief Command used by SPI_control() to re-configure chip select pin
  *
- * This command specifies a chip select pin
- * With this command @b arg is of type @c PIN_Id and it return
- * #SPI_STATUS_SUCCESS
+ * Enables hardware control of the chip select pin @b arg should be a
+ * @c uint_least8_t indicating the device DIO to be used as the hardware CS pin.
+ *
+ * Passing GPIO_INVALID_INDEX or PIN_UNASSIGNED to this command is equivalent to
+ * calling #SPICC26X2DMA_CMD_CLEAR_CSN_PIN.
+ *
+ * Always returns #SPI_STATUS_SUCCESS.
  */
 #define SPICC26X2DMA_CMD_SET_CSN_PIN            (SPI_CMD_RESERVED + 2)
+
+/*!
+ * @brief Command used by SPI_control() to disable the hardware chip select pin
+ *
+ * @b arg should be NULL. This command will disable all hardware control and
+ * muxing of the csPin. It can then be controlled by user software using the
+ * GPIO driver, or configured later using #SPICC26X2DMA_CMD_SET_CSN_PIN.
+ *
+ * Always returns #SPI_STATUS_SUCCESS.
+ */
+#define SPICC26X2DMA_CMD_CLEAR_CSN_PIN          (SPI_CMD_RESERVED + 3)
 
 /*!
  * @brief Command used by SPI_control() to enable manual start mode
@@ -773,7 +772,7 @@ extern "C" {
  *
  * Returns #SPI_STATUS_SUCCESS or #SPI_STATUS_ERROR.
  */
-#define SPICC26X2DMA_CMD_SET_MANUAL             (SPI_CMD_RESERVED + 3)
+#define SPICC26X2DMA_CMD_SET_MANUAL             (SPI_CMD_RESERVED + 4)
 
 /*!
  * @brief Command used by SPI_control() to disable manual start mode
@@ -784,7 +783,7 @@ extern "C" {
  * Returns #SPI_STATUS_SUCCESS or #SPI_STATUS_ERROR.
  *
  */
-#define SPICC26X2DMA_CMD_CLR_MANUAL             (SPI_CMD_RESERVED + 4)
+#define SPICC26X2DMA_CMD_CLR_MANUAL             (SPI_CMD_RESERVED + 5)
 
 /*!
  * @brief Command used by SPI_control() to enable manual start mode
@@ -796,7 +795,7 @@ extern "C" {
  *
  * Returns #SPI_STATUS_SUCCESS or #SPI_STATUS_ERROR.
  */
-#define SPICC26X2DMA_CMD_MANUAL_START           (SPI_CMD_RESERVED + 5)
+#define SPICC26X2DMA_CMD_MANUAL_START           (SPI_CMD_RESERVED + 6)
 
 /** @}*/
 
@@ -896,9 +895,9 @@ typedef enum {
  */
 typedef struct {
     /*! @brief SPI Peripheral's base address */
-    uint32_t         baseAddr;
+    uint32_t                    baseAddr;
     /*! SPI CC26XXDMA Peripheral's interrupt vector */
-    uint8_t          intNum;
+    uint8_t                     intNum;
     /*! @brief SPI CC26XXDMA Peripheral's interrupt priority.
 
         The CC26xx uses three of the priority bits,
@@ -913,30 +912,46 @@ typedef struct {
         HWI's with priority 0 ignore the HWI dispatcher to support zero-latency
         interrupts, thus invalidating the critical sections in this driver.
     */
-    uint8_t          intPriority;
+    uint8_t                     intPriority;
     /*! @brief SPI SWI priority.
         The higher the number, the higher the priority.
         The minimum is 0 and the maximum is 15 by default.
         The maximum can be reduced to save RAM by adding or modifying
         Swi.numPriorities in the kernel configuration file.
     */
-    uint32_t         swiPriority;
+    uint32_t                    swiPriority;
     /*! SPI Peripheral's power manager ID */
-    PowerCC26XX_Resource   powerMngrId;
+    PowerCC26XX_Resource        powerMngrId;
     /*! Default TX value if txBuf == NULL */
-    uint16_t         defaultTxBufValue;
+    uint16_t                    defaultTxBufValue;
     /*! uDMA controlTable channel index */
-    uint32_t         rxChannelBitMask;
+    uint32_t                    rxChannelBitMask;
     /*! uDMA controlTable channel index */
-    uint32_t         txChannelBitMask;
+    uint32_t                    txChannelBitMask;
+    /*! uDMA controlTable primary tx entry */
+    volatile tDMAControlTable   *dmaTxTableEntryPri;
+    /*! uDMA controlTable primary tx entry */
+    volatile tDMAControlTable   *dmaRxTableEntryPri;
+    /*! uDMA controlTable alternate tx entry */
+    volatile tDMAControlTable   *dmaTxTableEntryAlt;
+    /*! uDMA controlTable alternate rx entry */
+    volatile tDMAControlTable   *dmaRxTableEntryAlt;
+    /*! Tx PIN mux value. Can be applied to either MOSI or MISO */
+    int32_t                     txPinMux;
+    /*! Rx PIN mux value. Can be applied to either MOSI or MISO */
+    int32_t                     rxPinMux;
+    /*! CLK PIN mux value for flow control */
+    int32_t                     clkPinMux;
+    /*! CSN PIN mux value for flow control */
+    int32_t                     csnPinMux;
     /*! SPI MOSI pin */
-    PIN_Id           mosiPin;
+    uint_least8_t               mosiPin;
     /*! SPI MISO pin */
-    PIN_Id           misoPin;
+    uint_least8_t               misoPin;
     /*! SPI CLK pin */
-    PIN_Id           clkPin;
+    uint_least8_t               clkPin;
     /*! SPI CSN pin */
-    PIN_Id           csnPin;
+    uint_least8_t               csnPin;
 
     /*! Minimum transfer size for DMA based transfer */
     uint32_t minDmaTransferSize;
@@ -949,8 +964,6 @@ typedef struct {
  */
 typedef struct {
     HwiP_Struct                hwi;
-    PIN_Handle                 pinHandle;
-    PIN_State                  pinState;
     Power_NotifyObj            spiPostObj;
     SwiP_Struct                swi;
     SemaphoreP_Struct          transferComplete;
@@ -978,7 +991,7 @@ typedef struct {
     SPI_TransferMode           transferMode;
     SPI_Mode                   mode;
     uint8_t                    format;
-    PIN_Id                     csnPin;
+    uint_least8_t              csnPin;
     SPICC26X2DMA_ReturnPartial returnPartial;
     bool                       isOpen;
     bool                       manualStart;

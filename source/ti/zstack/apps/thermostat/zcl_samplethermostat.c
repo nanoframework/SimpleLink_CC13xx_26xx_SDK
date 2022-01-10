@@ -47,29 +47,30 @@
   Application-specific UI peripherals being used:
 
   - LEDs:
-    LED1 on indicates that the system is heating.
-    LED1 blinking indicates that the system is cooling.
-    LED1 off indicates that the system is currently off.
+    LED1:
+      - Off: Indicates system is currently off.
+      - On: Indicates system is heating.
+      - Blinking: Indicates system is cooling.
 
   Application-specific menu system:
-
-    <REMOTE TEMP> View the temperature of the remote temperature sensor
-      Buttons have no affect on this screen
-      This screen shows the following information:
-        Line2:
-          Shows the temperature of the remote temperature sensor
-
     <SET HEAT TEMP> Changes the heating point temperature
       Up/Down changes the temperature at which heating will activate
-      This screen shows the following information:
-        Line2:
-          Shows current heating point temperature
 
     <SET COOL TEMP> Changes the cooling point temperature
       Up/Down changes the temperature at which cooling will activate
-      This screen shows the following information:
-        Line2:
-          Shows current cooling point temperature
+
+    The APP Info line will display the following information:
+      [Remote Temperature]
+        XXC - current temperature of the remote temperature sensor
+        Invalid - thermostat has not yet discovered a temperature sensor
+      [System Mode]
+        OFF - indicates the system is off
+        HEAT - indicates the system is heating
+        COOL - indicates the system is cooling
+      [Cooling Set Temp]
+        XXC - current cooling point temperature
+      [Heating Set Temp]
+        XXC - current heating point temperature
 
 *********************************************************************/
 
@@ -718,9 +719,9 @@ static void zclSampleThermostat_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

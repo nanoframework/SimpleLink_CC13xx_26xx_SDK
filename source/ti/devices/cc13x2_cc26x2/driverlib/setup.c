@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       setup.c
-*  Revised:        2021-01-12 10:04:07 +0100 (Tue, 12 Jan 2021)
-*  Revision:       60045
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Setup file for CC13xx/CC26xx devices.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@
 *
 ******************************************************************************/
 
+
 // Hardware headers
 #include "../inc/hw_types.h"
 #include "../inc/hw_memmap.h"
@@ -60,8 +61,11 @@
 #include "../inc/hw_prcm.h"
 #include "../inc/hw_vims.h"
 // Driverlib headers
+#include "aon_rtc.h"
+#include "interrupt.h"
 #include "aux_sysif.h"
 #include "chipinfo.h"
+#include "osc.h"
 #include "setup.h"
 #include "setup_rom.h"
 
@@ -207,11 +211,20 @@ SetupTrimDevice(void)
         HWREG( AON_PMCTL_BASE + AON_PMCTL_O_RESETCTL ) = ui32AonSysResetctl;
     }
 
+    // Reset the RTC
+    AONRTCReset();
+    // Configure the combined event
+    IntPendClear(INT_AON_RTC_COMB);
+    AONRTCCombinedEventConfig(AON_RTC_CH0 | AON_RTC_CH1 | AON_RTC_CH2);
+    // Start the RTC
+    AONRTCEnable();
+
     // Make sure there are no ongoing VIMS mode change when leaving SetupTrimDevice()
     // (There should typically be no wait time here, but need to be sure)
     while ( HWREGBITW( VIMS_BASE + VIMS_O_STAT, VIMS_STAT_MODE_CHANGING_BITN )) {
         // Do nothing - wait for an eventual ongoing mode change to complete.
     }
+
 }
 
 //*****************************************************************************
@@ -250,19 +263,16 @@ TrimAfterColdResetWakeupFromShutDown(uint32_t ui32Fcfg1Revision)
         // Using a single 4-bit masked write since layout is equal for both source and destination
         HWREGB( ADI3_BASE + ADI_O_MASK4B + ( ADI_3_REFSYS_O_DCDCCTL5 * 2 )) = ( 0xF0 |
             ( HWREG( CCFG_BASE + CCFG_O_MODE_CONF_1 ) >> CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_S ));
-
     }
 
-    // TBD - Temporarily removed for CC13x2 / CC26x2
-
-        // Force DCDC to use RCOSC before starting up XOSC.
-        // Clock loss detector does not use XOSC until SCLK_HF actually switches
-        // and thus DCDC is not protected from clock loss on XOSC in that time frame.
-        // The force must be released when the switch to XOSC has happened. This is done
-        // in OSCHfSourceSwitch().
-        HWREG(AUX_DDI0_OSC_BASE + DDI_O_MASK16B + (DDI_0_OSC_O_CTL0 << 1) + 4) = DDI_0_OSC_CTL0_CLK_DCDC_SRC_SEL_M | (DDI_0_OSC_CTL0_CLK_DCDC_SRC_SEL_M >> 16);
-        // Dummy read to ensure that the write has propagated
-        HWREGH(AUX_DDI0_OSC_BASE + DDI_0_OSC_O_CTL0);
+    // Force DCDC to use RCOSC before starting up XOSC.
+    // Clock loss detector does not use XOSC until SCLK_HF actually switches
+    // and thus DCDC is not protected from clock loss on XOSC in that time frame.
+    // The force must be released when the switch to XOSC has happened. This is done
+    // in OSCHfSourceSwitch().
+    HWREG(AUX_DDI0_OSC_BASE + DDI_O_MASK16B + (DDI_0_OSC_O_CTL0 << 1) + 4) = DDI_0_OSC_CTL0_CLK_DCDC_SRC_SEL_M | (DDI_0_OSC_CTL0_CLK_DCDC_SRC_SEL_M >> 16);
+    // Dummy read to ensure that the write has propagated
+    HWREGH(AUX_DDI0_OSC_BASE + DDI_0_OSC_O_CTL0);
 
     // read the MODE_CONF register in CCFG
     ccfg_ModeConfReg = HWREG( CCFG_BASE + CCFG_O_MODE_CONF );
@@ -287,6 +297,10 @@ TrimAfterColdResetWakeupFromShutDown(uint32_t ui32Fcfg1Revision)
 #else
     NOROM_SetupAfterColdResetWakeupFromShutDownCfg2( ui32Fcfg1Revision, ccfg_ModeConfReg );
 #endif
+
+    // Do workaround if both enabled and needed (enabled by setting CCFG_SIZE_AND_DIS_FLAGS_DIS_LINEAR_CAPARRAY_DELTA_WORKAROUND = 0)
+    // Special XOSC_HF workaround adjustment for CC13x2 / CC26x2 XOSC_CAPARRAY_DELTA setting in CCFG (Customer configuration)
+    OSC_CapArrayAdjustWorkaround_Boot();
 
     {
         uint32_t  trimReg        ;

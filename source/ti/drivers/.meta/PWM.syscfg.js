@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,18 +46,6 @@ let family = Common.device2Family(system.deviceData, "PWM");
 let pwmConfig = []; /* nothing (yet) beyond generic driver configs */
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  param inst       - PWM instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -89,7 +77,6 @@ via simple and portable APIs.
 `,
     defaultInstanceName: "CONFIG_PWM_",
     config: Common.addNameConfig(pwmConfig, "/ti/drivers/PWM", "CONFIG_PWM_"),
-    validate: validate,
     modules: Common.autoForceModules(["Board", "Power"]),
 
     _getPinResources: _getPinResources

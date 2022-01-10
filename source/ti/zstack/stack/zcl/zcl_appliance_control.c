@@ -579,7 +579,7 @@ static ZStatus_t zclApplianceControl_ProcessInCmd_SignalStateRsp( zclIncoming_t 
   {
     cmd.applianceStatus = pInMsg->pData[0];
     cmd.remoteEnableFlagsDeviceStatus2 = pInMsg->pData[1];
-    cmd.applianceStatus2 = BUILD_UINT32( pInMsg->pData[2], pInMsg->pData[3], pInMsg->pData[4], NULL );
+    cmd.applianceStatus2 = BUILD_UINT32( pInMsg->pData[2], pInMsg->pData[3], pInMsg->pData[4], 0 );
 
     return ( pCBs->pfnApplianceControl_SignalStateRsp( &cmd ) );
   }
@@ -606,7 +606,7 @@ static ZStatus_t zclApplianceControl_ProcessInCmd_SignalStateNotification( zclIn
   {
     cmd.applianceStatus = pInMsg->pData[0];
     cmd.remoteEnableFlagsDeviceStatus2 = pInMsg->pData[1];
-    cmd.applianceStatus2 = BUILD_UINT32( pInMsg->pData[2], pInMsg->pData[3], pInMsg->pData[4], NULL );
+    cmd.applianceStatus2 = BUILD_UINT32( pInMsg->pData[2], pInMsg->pData[3], pInMsg->pData[4], 0 );
 
     return ( pCBs->pfnApplianceControl_SignalStateNotification( &cmd ) );
   }

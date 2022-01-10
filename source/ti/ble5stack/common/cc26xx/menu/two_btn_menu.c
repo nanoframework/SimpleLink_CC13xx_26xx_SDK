@@ -5,7 +5,7 @@
  @brief This file contains implementations of two-button menu module.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -331,8 +331,8 @@ bool tbm_buttonRight(void)
 void tbm_displayItem(uint32 itemIndex, uint8 row)
 {
   uint8* pDesc;
-  uint8* pPrefix = (uint8 *)"";
-  uint8* pPostfix = (uint8 *)"";
+  uint8* pPrefix = (void*)"";
+  uint8* pPostfix =(void*)"";
 
   if (itemIndex == ptbmMenuObj->attrib.numItem)
   {
@@ -364,12 +364,12 @@ void tbm_displayItem(uint32 itemIndex, uint8 row)
       if (TBM_IS_SUBMENU(ptbmMenuObj, itemIndex))
       {
         /* If this is an active submenu, '+' should prefix the text. */
-        pPrefix = (uint8 *)"+";
+        pPrefix =(void*) "+";
       }
       else
       {
         /* If this is an active action, a space should prefix the text. */
-        pPrefix = (uint8 *)" ";
+        pPrefix = (void*)" ";
       }
     }
   }
@@ -377,7 +377,7 @@ void tbm_displayItem(uint32 itemIndex, uint8 row)
   if (row == TBM_ROW_ITEM_FIRST)
   {
     /* If the current item, postfix with " >" */
-    pPostfix = (uint8 *)" >";
+    pPostfix = (void*)" >";
   }
 
   /* Display the description with the prefix and the postfix */

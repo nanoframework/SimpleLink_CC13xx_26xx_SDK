@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,6 @@
 #include DeviceFamily_constructPath(driverlib/cpu.h)
 #include DeviceFamily_constructPath(driverlib/vims.h)
 #include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
-#include DeviceFamily_constructPath(driverlib/driverlib_release.h)
 #include DeviceFamily_constructPath(driverlib/setup.h)
 #include DeviceFamily_constructPath(driverlib/ccfgread.h)
 
@@ -123,7 +122,6 @@ PowerCC26X2_ModuleState PowerCC26X2_module = {
     .enablePolicy = false,          /* default value is false              */
     .initialized = false,           /* whether Power_init has been called  */
     .constraintCounts = { 0, 0, 0, 0, 0, 0, 0 },
-    .resourceCounts = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     .resourceHandlers = {
       configureRFCoreClocks,
       configureXOSCHF,
@@ -159,8 +157,18 @@ const PowerCC26XX_ResourceRecord resourceDB[PowerCC26X2_NUMRESOURCES] = {
     {PowerCC26XX_DOMAIN  | PowerCC26XX_NOPARENT, PRCM_DOMAIN_SERIAL},           /* DOMAIN_SERIAL */
     {PowerCC26XX_DOMAIN  | PowerCC26XX_NOPARENT, PRCM_DOMAIN_RFCORE},           /* DOMAIN_RFCORE */
     {PowerCC26XX_SPECIAL | PowerCC26XX_NOPARENT, 2},                            /* DOMAIN_SYSBUS */
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2 || \
+     DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
     {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_PKA},         /* PERIPH_PKA */
     {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_UART1},       /* PERIPH_UART1 */
+#endif
+#if (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+    {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_UART2},       /* PERIPH_UART2 */
+    {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_UART3},       /* PERIPH_UART3 */
+    {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_SSI2},        /* PERIPH_SSI2 */
+    {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_SSI3},        /* PERIPH_SSI3 */
+    {PowerCC26XX_PERIPH  | PowerCC26XX_DOMAIN_PERIPH, PRCM_PERIPH_I2C1},        /* PERIPH_I2C1 */
+#endif
 };
 
 /* Defines */
@@ -341,8 +349,6 @@ int_fast16_t Power_init()
     HwiP_construct(&PowerCC26X2_module.tdcHwi,
                    INT_AUX_COMB,
                    PowerCC26X2_auxISR, NULL);
-
-    DRIVERLIB_ASSERT_CURR_RELEASE();
 
     /* read the LF clock source from CCFG */
     ccfgLfClkSrc = CCFGRead_SCLK_LF_OPTION();
@@ -1496,4 +1502,3 @@ static void switchToTCXO(void)
     /* Switch to TCXO */
     switchXOSCHF();
 }
-

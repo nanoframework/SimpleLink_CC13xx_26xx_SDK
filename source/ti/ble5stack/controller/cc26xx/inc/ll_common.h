@@ -7,7 +7,7 @@
         internally common to LL routines.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -79,7 +79,11 @@ extern "C"
 #include "ll.h"
 #include "ll_scheduler.h"
 #include "hal_assert.h"
+#if !defined(DeviceFamily_CC26X1)
 #include <driverlib/rf_bt5_iq_autocopy.h>
+#else
+#include <ti/devices/cc13x2_cc26x2/driverlib/rf_bt5_iq_autocopy.h>
+#endif
 
 /*******************************************************************************
  * MACROS
@@ -218,7 +222,7 @@ extern "C"
 #define LL_EVT_PERIODIC_SCAN_CANCELLED                 0x0100
 #define LL_EVT_RESET_SYSTEM_HARD                       0x0200
 #define LL_EVT_RESET_SYSTEM_SOFT                       0x0400
-#define LL_RESERVED                                    0x0800
+#define LL_EVT_CONN_DISCONNECTED_IMMED                 0x0800
 #define LL_EVT_ADDRESS_RESOLUTION_TIMEOUT              0x1000
 #define LL_EVT_INIT_DONE                               0x2000
 #define LL_EVT_OUT_OF_MEMORY                           0x4000
@@ -1222,10 +1226,8 @@ struct llConnExtraParams_t
   uint32  connMaxTimeLength:31;           // connection maximum time length
   /* Starvation Handling */
   uint8   StarvationMode:1;               // connection starvation mode on/off
-  uint8   prevTransmitSeqNum:1;           // connection previous TransmitSeqNum (SN BIT received)
-  uint8   currTransmitSeqNum:1;           // connection current TransmitSeqNum (SN BIT received)
   uint8   numLSTORetries:3;               // connection number of retries in LSTO state
-  uint8   reserved:2;					  // reserved
+  uint8   reserved:4;					  // reserved
 }; 
 
 // Connection Data
@@ -1833,6 +1835,7 @@ extern uint8  qosDefaultPriorityScnParameter;
 extern uint8  qosDefaultPriorityInitParameter;
 extern uint8  qosDefaultPriorityPerAdvParameter;
 extern uint8  qosDefaultPriorityPerScnParameter;
+extern uint8  defaultChannelMap[LL_NUM_BYTES_FOR_CHAN_MAP];
 
 /*******************************************************************************
  * FUNCTIONS
@@ -1905,6 +1908,7 @@ extern uint8                llMoveBackCtrlPkt( llConnState_t *, uint8 *, uint8 )
 extern void                 llSendReject( llConnState_t *, uint8, uint8 );
 extern uint8                llPendingUpdateParam( void );
 extern void                 llInitFeatureSet( void );
+extern void                 llRemoveFromFeatureSet( uint8 feature );
 extern void                 llConvertCtrlProcTimeoutToEvent( llConnState_t * );
 extern uint8                llVerifyConnParamReqParams( uint16, uint16, uint16, uint8, uint16, uint16 *);
 extern uint8                llValidateConnParams( llConnState_t *, uint16, uint16, uint16, uint16, uint16, uint8, uint16, uint16 *);

@@ -11,7 +11,7 @@
         V4.1.0, Vol. 6.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -666,7 +666,7 @@ extern "C"
 #define LL_TOTAL_MARGIN_TIME_FOR_MIN_CONN_RAT_TICKS             (LL_MARGIN_TIME_FOR_MIN_TIME_RF_PROCESSING_RAT_TICKS + LL_MARGIN_TIME_FOR_MIN_CONN_ESTIMATE_RAT_TICKS)
 #define LL_MAX_COLLISION_COMPRISON                              5
 #define LL_MIN_MAX_CONN_TIME_LENGTH_MASK                        0x7FFFFFFF
-#define LL_MAX_SLAVE_NUM_LSTO_RETRIES                           5
+#define LL_MAX_SLAVE_NUM_LSTO_RETRIES                           2
 #define LL_MAX_MASTER_NUM_LSTO_RETRIES                          1
 #define LL_MIN_NUM_EVENTS_LEFT_LSTO_MARGIN                      3
 #define LL_SET_STARVATION_MODE_OFF                              0
@@ -1733,32 +1733,36 @@ extern llStatus_t LL_ConnUpdate( uint16 connId,
                                  uint16 minLength,
                                  uint16 maxLength );
 
-
 /*******************************************************************************
  * @fn          LL_ChanMapUpdate API
  *
- * @brief       This API is called by the HCI to update the Host data channels
- *              initiating an Update Data Channel control procedure.
+ * @brief       This API is called by the HCI to update the Host data channels initiating an
+ *              Update Data Channel control procedure.
+ *              (For a specific connection, or for all active connections)
  *
- *              Note: While it isn't specified, it is assumed that the Host
- *                    expects an update channel map on all active connections.
- *
- *              Note: This API currently only supports one connection.
+ *              Note: Can only send if the active connection is Master.
  *
  * input parameters
  *
  * @param       chanMap - A five byte array containing one bit per data channel
  *                        where a 1 means the channel is "used".
+ * @param       connID  - The connection handle. If equals to maxNumConns, it is
+ *                        assumed  that the Host expects an update channel map
+ *                        on all active Master connections. if connID > maxNumConns
+ *                        or connection isnt active,LL_STATUS_ERROR_BAD_PARAMETER
+ *                        status will return. When in specific connection mode, if the
+ *                        channel map control procedure is already pending,
+ *                        LL_STATUS_ERROR_CTRL_PROC_ALREADY_ACTIVE will return.
  *
  * output parameters
  *
  * @param       None.
  *
  * @return      LL_STATUS_SUCCESS, LL_STATUS_ERROR_BAD_PARAMETER,
- *              LL_STATUS_ERROR_ILLEGAL_PARAM_COMBINATION
+ *              LL_STATUS_ERROR_ILLEGAL_PARAM_COMBINATION,
+ *              LL_STATUS_ERROR_CTRL_PROC_ALREADY_ACTIVE
  */
-extern llStatus_t LL_ChanMapUpdate( uint8 *chanMap );
-
+extern llStatus_t LL_ChanMapUpdate( uint8 *chanMap , uint16 connID );
 
 /*******************************************************************************
  * @fn          LL_StartEncrypt API
@@ -4874,6 +4878,29 @@ extern void LL_EXT_ScanReqReportCback( uint8  peerAddrType,
                                        uint8 *peerAddr,
                                        uint8  chan,
                                        int8   rssi );
+
+/*******************************************************************************
+ * @fn          LL_SetDefChanMap API
+ *
+ * @brief       This API is called by the HCI to update the default channel map initiating an
+ *              Update Default Channel Map procedure.
+ *              The Default Channel Map is the channel map every new connection
+ *              will use since the connection initialization. It will not effect
+ *              active connections.
+ *
+ * input parameters
+ *
+ * @param       chanMap - A five byte array containing one bit per data channel
+ *                        where a 1 means the channel is "used".
+ *
+ * output parameters
+ *
+ * @param       None.
+ *
+ * @return      LL_STATUS_SUCCESS, LL_STATUS_ERROR_BAD_PARAMETER,
+ *              LL_STATUS_ERROR_ILLEGAL_PARAM_COMBINATION
+ */
+extern llStatus_t LL_SetDefChanMap( uint8 *chanMap );
 
 /*******************************************************************************
  * @fn          LL_SetSecAdvChanMap API

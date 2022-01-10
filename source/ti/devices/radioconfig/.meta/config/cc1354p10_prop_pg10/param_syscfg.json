@@ -312,18 +312,17 @@
                     "longDescription": ""
                 },
                 {
-                    "name": "txPower169",
+                    "name": "txPowerHi",
                     "displayName": "TX Power (dBm)",
                     "description": "TX Power",
-                    "default": "10",
+                    "default": "20",
                     "hidden": true
                 },
                 {
-                    "name": "txPower433",
-                    "displayName": "TX Power (dBm)",
-                    "description": "TX Power",
-                    "default": "10",
-                    "hidden": true
+                    "name": "highPA",
+                    "displayName": "High PA",
+                    "description": "Select if the High Power Amplifier on the device should be used",
+                    "default": false
                 },
                 {
                     "name": "txPower2400",
@@ -748,7 +747,7 @@
                 "file": "setting_tc152_154g.json",
                 "name": "2gfsk100kbps154g",
                 "description": "100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
+                "options": "ieee_15_4g,disable_high_pa"
             },
             {
                 "file": "setting_tc746_154g.json",

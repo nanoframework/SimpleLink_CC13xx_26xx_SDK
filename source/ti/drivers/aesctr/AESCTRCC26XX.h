@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Texas Instruments Incorporated
+ * Copyright (c) 2018-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@
  *  # Runtime Parameter Validation #
  *  The driver implementation does not perform runtime checks for most input parameters.
  *  Only values that are likely to have a stochastic element to them are checked (such
- *  as whether a driver is already open). Higher input paramter validation coverage is
+ *  as whether a driver is already open). Higher input parameter validation coverage is
  *  achieved by turning on assertions when compiling the driver.
  */
 
@@ -73,6 +73,9 @@
 #include <stdbool.h>
 
 #include <ti/drivers/AESCTR.h>
+
+#include <ti/devices/DeviceFamily.h>
+#include DeviceFamily_constructPath(driverlib/aes.h)
 
 #ifdef __cplusplus
 extern "C" {
@@ -106,17 +109,34 @@ typedef struct {
  *  The application must not access any member variables of this structure!
  */
 typedef struct {
-    bool                            isOpen;
-    bool                            operationInProgress;
-    bool                            operationCanceled;
-    bool                            threadSafe;
-    int_fast16_t                    returnStatus;
-    AESCTR_ReturnBehavior           returnBehavior;
-    AESCTR_OperationType            operationType;
-    uint32_t                        semaphoreTimeout;
-    AESCTR_CallbackFxn              callbackFxn;
-    AESCTR_Operation                *operation;
+    uint32_t                counter[AES_BLOCK_SIZE / 4];
+    uint32_t                semaphoreTimeout;
+    AESCTR_CallbackFxn      callbackFxn;
+    AESCTR_OperationUnion   *operation;
+    const uint8_t           *input;
+    uint8_t                 *output;
+    size_t                  inputLength;
+    CryptoKey               key;
+    volatile int_fast16_t   returnStatus;
+    AESCTR_ReturnBehavior   returnBehavior;
+    AESCTR_OperationType    operationType;
+    bool                    isOpen;
+    bool                    threadSafe;
+    volatile bool           cryptoResourceLocked;
+    volatile bool           hwBusy;
+    volatile bool           operationInProgress;
 } AESCTRCC26XX_Object;
+
+/*!
+ *  @cond NODOC
+ *  @brief   Internal functions which may be called by other drivers to handle
+ *           thread safety directly.
+ */
+bool AESCTR_acquireLock(AESCTR_Handle handle, uint32_t timeout);
+void AESCTR_releaseLock(AESCTR_Handle handle);
+void AESCTR_enableThreadSafety(AESCTR_Handle handle);
+void AESCTR_disableThreadSafety(AESCTR_Handle handle);
+/*! @endcond */
 
 #ifdef __cplusplus
 }

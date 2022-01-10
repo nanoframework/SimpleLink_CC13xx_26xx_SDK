@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,18 +63,32 @@ control requires a PWM.
 function _getPinResources(inst)
 {
     let mod;
-    let pin;
 
-    if (inst.pwmPin) {
+    if (inst.dimmable) {
         mod = system.getScript("/ti/drivers/PWM.syscfg.js");
-        pin = mod._getPinResources(inst.pwmPin);
-    }
-    else if (inst.gpioPin) {
-        mod = system.getScript("/ti/drivers/GPIO.syscfg.js");
-        pin = mod._getPinResources(inst.gpioPin);
+        return mod._getPinResources(inst.pwmPin);
     }
 
-    return (pin);
+    return null;
+}
+
+/*
+ *  ======== pinmuxRequirements ========
+ */
+function pinmuxRequirements(inst)
+{
+    if (!inst.dimmable) {
+        let ledRequirements = {
+            name: "ledPin",
+            hidden: true,
+            displayName: "LED Pin",
+            interfaceName: "GPIO",
+            signalTypes: ["DOUT"]
+        };
+
+        return [ledRequirements];
+    }
+    return [];
 }
 
 /*
@@ -113,8 +127,6 @@ function supportsPWM(comp)
  */
 function validate(inst, validation)
 {
-    Common.validateNames(inst, validation);
-
     if (inst.$hardware) {
         if (inst.dimmable && !supportsPWM(inst.$hardware)) {
             var name = inst.$hardware.displayName
@@ -162,7 +174,10 @@ function moduleInstances(inst)
                 $name: inst.$name + "_GPIO"
             },
             requiredArgs: {
-                mode : "Output"
+                mode : "Output",
+                parentInterfaceName: "GPIO",
+                parentSignalName: "ledPin",
+                parentSignalDisplayName: "LED GPIO"
             }
         };
     }
@@ -233,6 +248,7 @@ The [__LED driver__][1] provides a simple interface to control LEDs.
     modules: Common.autoForceModules(["Board"]),
     moduleInstances: moduleInstances,
     filterHardware: filterHardware,
+    pinmuxRequirements: pinmuxRequirements,
 
     /* make GUI changes in response to HW model changes */
     onHardwareChanged: onHardwareChanged,

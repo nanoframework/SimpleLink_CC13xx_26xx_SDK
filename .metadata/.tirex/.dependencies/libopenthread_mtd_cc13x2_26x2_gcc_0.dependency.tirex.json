@@ -288,7 +288,7 @@
             "+../../../../../../../third_party/openthread/src/core/utils/static_assert.hpp -> src/core/utils/static_assert.hpp",
             "+../../../../../../../third_party/openthread/src/lib/platform/exit_code.h -> src/lib/platform/exit_code.h",
             "+../../../../../../../third_party/openthread/src/lib/platform/exit_code.c -> src/lib/platform/exit_code.c",
-            "+../../../config/openthread-config-cc13x2_26x2-gcc-mtd.h -> config/openthread-config-cc13x2_26x2-gcc-mtd.h",
+            "+../../../config/openthread-config-cc13x2_26x2-mtd.h -> config/openthread-config-cc13x2_26x2-mtd.h",
             "+../../../config/openthread-core-cc13x2_26x2-config.h -> config/openthread-core-cc13x2_26x2-config.h"
         ]
     }

@@ -6,7 +6,7 @@
         TIRTOS Applications.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -64,9 +64,17 @@ extern "C" {
  * INCLUDES
  */
 #include <stdbool.h>
-#include <ti/sysbios/knl/Clock.h>
+#ifdef FREERTOS
+#include <mqueue.h>
+#include <pthread.h>
+    #ifndef Event_Handle
+    #define Event_Handle void*
+    #endif
+#else
 #include <ti/sysbios/knl/Queue.h>
+#include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Event.h>
+#endif
 
 /*********************************************************************
 *  EXTERNAL VARIABLES
@@ -83,11 +91,27 @@ extern "C" {
  * queue, an event must be posted.  Util reserved Event Id 30 for a generic
  * queue event.
  */
+#ifdef FREERTOS
+#define UTIL_QUEUE_EVENT_ID (0x40000000)//Event_Id_30
+#else
 #define UTIL_QUEUE_EVENT_ID Event_Id_30
-
+#endif
 /*********************************************************************
  * TYPEDEFS
  */
+
+#ifdef FREERTOS
+typedef struct Clock_Struct
+{
+    timer_t clock;
+    void *cback;
+    void *arg;
+    sigevent evnt;
+    pthread_attr_t timerThrdAttr;
+    struct itimerspec timeVal;
+    uint8_t isActive;
+}Clock_Struct;
+#endif
 
 typedef struct
 {
@@ -116,12 +140,20 @@ typedef struct
  *
  * @return  Clock_Handle  - a handle to the clock instance.
  */
+#ifdef FREERTOS
+void* Util_constructClock(Clock_Struct *entry, void *clockCB,
+                          uint32_t clockDuration, uint32_t clockPeriod,
+                          uint8_t startFlag, void *arg);
+
+void Clock_destruct(Clock_Struct *structP);
+#else
 extern Clock_Handle Util_constructClock(Clock_Struct *pClock,
                                         Clock_FuncPtr clockCB,
                                         uint32_t clockDuration,
                                         uint32_t clockPeriod,
                                         uint8_t startFlag,
                                         UArg arg);
+#endif
 
 /**
  * @brief   Start a clock.
@@ -177,7 +209,11 @@ extern void Util_rescheduleClock(Clock_Struct *pClock, uint32_t clockPeriod);
  *
  * @return  A queue handle.
  */
+#ifdef FREERTOS
+extern void Util_constructQueue(mqd_t *pQueue);
+#else
 extern Queue_Handle Util_constructQueue(Queue_Struct *pQueue);
+#endif
 
 /**
  * @brief   Creates a queue node and puts the node in RTOS queue.
@@ -191,9 +227,16 @@ extern Queue_Handle Util_constructQueue(Queue_Struct *pQueue);
  *
  * @return  TRUE if message was queued, FALSE otherwise.
  */
+#ifdef FREERTOS
+uint8_t Util_enqueueMsg(mqd_t msgQueue,
+                        Event_Handle event,
+                        uint8_t *pMsg);
+#else
+
 extern uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
                                Event_Handle event,
                                uint8_t *pMsg);
+#endif
 
 /**
  * @brief   Dequeues the message from the RTOS queue.
@@ -202,7 +245,11 @@ extern uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
  *
  * @return  pointer to dequeued message, NULL otherwise.
  */
+#ifdef FREERTOS
+uint8_t *Util_dequeueMsg(mqd_t msgQueue);
+#else
 extern uint8_t *Util_dequeueMsg(Queue_Handle msgQueue);
+#endif
 
 /**
  * @brief   Convert Bluetooth address to string. Only needed when

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2018-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -313,16 +313,17 @@ function moduleInstances(inst)
         pinInstances.push(
             {
                 name: "txPinInstance",
-                displayName: "TX PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "TX Configuration While Not In Use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "txPin",
-                        parentSignalDisplayName: "TX",
-                        mode: "Output",
-                        outputState: "Low",
-                        pull: "None" }
+                args: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "txPin",
+                    parentSignalDisplayName: "TX",
+                    mode: "Output",
+                    initialOutputState: "Low",
+                    pull: "None"
+                }
             }
         );
     }
@@ -330,15 +331,16 @@ function moduleInstances(inst)
     if (inst.dataDirection != "Send Only") {
         pinInstances.push({
                 name: "rxPinInstance",
-                displayName: "RX PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "RX Configuration While Not In Use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "rxPin",
-                        parentSignalDisplayName: "RX",
-                        mode: "Input",
-                        pull: "Pull Down" }
+                args: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "rxPin",
+                    parentSignalDisplayName: "RX",
+                    mode: "Input",
+                    pull: "Pull Down"
+                }
             }
         );
     }
@@ -346,30 +348,32 @@ function moduleInstances(inst)
     if (inst.flowControl) {
         pinInstances.push({
                 name: "ctsPinInstance",
-                displayName: "CTS PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "CTS Configuration While Not In Use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "ctsPin",
-                        parentSignalDisplayName: "CTS",
-                        mode: "Input",
-                        pull: "Pull Down" }
+                args: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "ctsPin",
+                    parentSignalDisplayName: "CTS",
+                    mode: "Input",
+                    pull: "Pull Down"
+                }
             }
         );
 
         pinInstances.push({
                 name: "rtsPinInstance",
-                displayName: "RTS PIN Configuration While Pin is Not In Use",
-                moduleName: "/ti/drivers/PIN",
+                displayName: "RTS Configuration While Not In Use",
+                moduleName: "/ti/drivers/GPIO",
                 collapsed: true,
-                args: { parentMod: "/ti/drivers/UART",
-                        parentInterfaceName: "uart",
-                        parentSignalName: "rtsPin",
-                        parentSignalDisplayName: "RTS",
-                        mode: "Output",
-                        outputState: "Low",
-                        pull: "None" }
+                args: {
+                    parentInterfaceName: "uart",
+                    parentSignalName: "rtsPin",
+                    parentSignalDisplayName: "RTS",
+                    mode: "Output",
+                    initialOutputState: "Low",
+                    pull: "None"
+                }
             }
         );
     }

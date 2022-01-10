@@ -36,6 +36,7 @@
 #include DeviceFamily_constructPath(driverlib/prcm.h)
 
 #include <ti/drivers/dpl/DebugP.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/drivers/I2S.h>
 #include <ti/drivers/i2s/I2SCC26XX.h>
 #include <ti/drivers/Power.h>
@@ -51,7 +52,8 @@
 
 /* Forward declarations */
 static bool initObject(I2S_Handle handle, I2S_Params *params);
-static bool initIO(I2S_Handle handle);
+static void initIO(I2S_Handle handle);
+static void finalizeIO(I2S_Handle handle);
 static void initHw(I2S_Handle handle);
 static void I2S_hwiIntFxn(uintptr_t arg);
 static int i2sPostNotify(unsigned int eventType, uintptr_t eventArg, uintptr_t clientArg);
@@ -115,17 +117,11 @@ I2S_Handle I2S_open(uint_least8_t index, I2S_Params *params) {
         /* The parameters provided are not correct. */
         handle = NULL;
     }
-
-    /* Configure IOs, make sure it was successful. */
-    else if (!initIO(handle)) {
-        /* Another driver or application already using these pins. */
-        handle =  NULL;
-    }
-
-    /* Set Power and register interrupts */
     else {
+        /* Configure IOs, always succeeds */
+        initIO(handle);
 
-       object->isOpen = (bool)true;
+        object->isOpen = (bool)true;
 
         /* Register power dependency - i.e. power up and enable clock for I2S. */
         Power_setDependency(PowerCC26XX_PERIPH_I2S);
@@ -180,7 +176,7 @@ void I2S_close(I2S_Handle handle)
     PRCMAudioClockDisable();
 
     /* Deallocate pins */
-    PIN_close(object->hPin);
+    finalizeIO(handle);
 
     /* Unregister power notification objects */
     Power_unregisterNotify(&object->i2sPostObj);
@@ -633,61 +629,49 @@ static bool initObject(I2S_Handle handle, I2S_Params *params) {
 /*
  *  ======== initIO ========
  */
-static bool initIO(I2S_Handle handle) {
-
-    I2SCC26XX_Object    *object;
+static void initIO(I2S_Handle handle)
+{
     I2SCC26XX_HWAttrs   const *hwAttrs;
-    PIN_Config          i2sPinTable[6];
-
-    bool retVal = (bool)true;
-
-    uint32_t     pinCLKstatus;
-    uint32_t     pinSD0status;
-    uint32_t     pinSD1status;
 
     /* Get the pointer to the object and hwAttrs */
-    object  = handle->object;
     hwAttrs = handle->hwAttrs;
 
-    if(object->moduleRole == I2S_MASTER) {pinCLKstatus = (uint32_t)IOC_STD_OUTPUT;}
-    else                                 {pinCLKstatus = (uint32_t)IOC_STD_INPUT;}
+    GPIO_setMux(hwAttrs->pinWS, IOC_PORT_MCU_I2S_WCLK);
+    GPIO_setMux(hwAttrs->pinSCK, IOC_PORT_MCU_I2S_BCLK);
 
-    if(object->dataInterfaceSD0.interfaceConfig == I2S_SD0_INPUT) {pinSD0status = (uint32_t)IOC_STD_INPUT;}
-    else                                                          {pinSD0status = (uint32_t)IOC_STD_OUTPUT;}
+    if (hwAttrs->pinMCLK != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->pinMCLK, IOC_PORT_MCU_I2S_MCLK);
+    }
+    if (hwAttrs->pinSD0 != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->pinSD0, IOC_PORT_MCU_I2S_AD0);
+    }
+    if (hwAttrs->pinSD1 != GPIO_INVALID_INDEX) {
+        GPIO_setMux(hwAttrs->pinSD1, IOC_PORT_MCU_I2S_AD1);
+    }
+}
 
-    if(object->dataInterfaceSD1.interfaceConfig == I2S_SD1_INPUT) {pinSD1status = (uint32_t)IOC_STD_INPUT;}
-    else                                                          {pinSD1status = (uint32_t)IOC_STD_OUTPUT;}
+/*
+ *  ======== finalizeIO ========
+ */
+static void finalizeIO(I2S_Handle handle)
+{
+    I2SCC26XX_HWAttrs   const *hwAttrs;
 
-    i2sPinTable[0] = hwAttrs->pinMCLK | pinCLKstatus;
-    i2sPinTable[1] = hwAttrs->pinWS   | pinCLKstatus;
-    i2sPinTable[2] = hwAttrs->pinSCK  | pinCLKstatus;
-    i2sPinTable[3] = hwAttrs->pinSD0  | pinSD0status;
-    i2sPinTable[4] = hwAttrs->pinSD1  | pinSD1status;
-    i2sPinTable[5] = PIN_TERMINATE;
-    object->hPin = PIN_open(&object->pinState, i2sPinTable);
+    /* Get the pointer to the object and hwAttrs */
+    hwAttrs = handle->hwAttrs;
 
-    if(hwAttrs->pinMCLK <= (PIN_Id)PINCC26XX_DIO30){
-        if(PIN_setOutputEnable(object->hPin, hwAttrs->pinMCLK, (bool)true) != (PIN_SUCCESS)) {retVal = (bool)false;}
-        if(PINCC26XX_setMux(object->hPin, hwAttrs->pinMCLK, IOC_PORT_MCU_I2S_MCLK) != (PIN_SUCCESS)) {retVal = (bool)false;}
-    }
-    if(hwAttrs->pinWS   <= (PIN_Id)PINCC26XX_DIO30){
-        if(PIN_setOutputEnable(object->hPin, hwAttrs->pinWS,   (bool)true) != (PIN_SUCCESS)) {retVal = (bool)false;}
-        if(PINCC26XX_setMux(object->hPin, hwAttrs->pinWS,   IOC_PORT_MCU_I2S_WCLK) != (PIN_SUCCESS)) {retVal = (bool)false;}
-    }
-    if(hwAttrs->pinSCK  <= (PIN_Id)PINCC26XX_DIO30){
-        if(PIN_setOutputEnable(object->hPin, hwAttrs->pinSCK,  (bool)true) != (PIN_SUCCESS)) {retVal = (bool)false;}
-        if(PINCC26XX_setMux(object->hPin, hwAttrs->pinSCK,  IOC_PORT_MCU_I2S_BCLK) != (PIN_SUCCESS)) {retVal = (bool)false;}
-    }
-    if(hwAttrs->pinSD0  <= (PIN_Id)PINCC26XX_DIO30){
-        if(PIN_setOutputEnable(object->hPin, hwAttrs->pinSD0,  (bool)true) != (PIN_SUCCESS)) {retVal = (bool)false;}
-        if(PINCC26XX_setMux(object->hPin, hwAttrs->pinSD0,  IOC_PORT_MCU_I2S_AD0)  != (PIN_SUCCESS)) {retVal = (bool)false;}
-    }
-    if(hwAttrs->pinSD1  <= (PIN_Id)PINCC26XX_DIO30){
-        if(PIN_setOutputEnable(object->hPin, hwAttrs->pinSD1,  (bool)true) != (PIN_SUCCESS)) {retVal = (bool)false;}
-        if(PINCC26XX_setMux(object->hPin, hwAttrs->pinSD1,  IOC_PORT_MCU_I2S_AD1)  != (PIN_SUCCESS)) {retVal = (bool)false;}
-    }
+    GPIO_resetConfig(hwAttrs->pinWS);
+    GPIO_resetConfig(hwAttrs->pinSCK);
 
-    return retVal;
+    if (hwAttrs->pinMCLK != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->pinMCLK);
+    }
+    if (hwAttrs->pinSD0 != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->pinSD0);
+    }
+    if (hwAttrs->pinSD1 != GPIO_INVALID_INDEX) {
+        GPIO_resetConfig(hwAttrs->pinSD1);
+    }
 }
 
 /*

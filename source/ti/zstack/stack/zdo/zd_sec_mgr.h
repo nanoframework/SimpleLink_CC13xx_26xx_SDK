@@ -72,6 +72,10 @@ typedef enum
   #endif
 #endif
 
+// number of install codes needed at a given point in time
+// (install codes are deleted after device has successfully joined)
+// must be less than 0x7F / 127 in order to not conflict with
+// APSME_IC_SET_MASK
 #if !defined (ZDSECMGR_TC_DEVICE_IC_MAX)
   #if (ZG_BUILD_COORDINATOR_TYPE)
     #define ZDSECMGR_TC_DEVICE_IC_MAX 40

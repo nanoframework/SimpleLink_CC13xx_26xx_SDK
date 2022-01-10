@@ -5,7 +5,7 @@
  @brief NPI Transport Layer Module for UART Master
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

@@ -134,6 +134,18 @@ public class ti_drivers
             sb.append("'lib/ccs/m4f/drivers_cc26x2x7.a',\n");
             sb.append("'lib/gcc/m4f/drivers_cc26x2x7.a',\n");
             sb.append("'lib/iar/m4f/drivers_cc26x2x7.a',\n");
+            sb.append("'lib/ticlang/m33f/drivers_cc13x4.a',\n");
+            sb.append("'lib/gcc/m33f/drivers_cc13x4.a',\n");
+            sb.append("'lib/iar/m33f/drivers_cc13x4.a',\n");
+            sb.append("'lib/ticlang/m33f/drivers_cc13x4_spe.a',\n");
+            sb.append("'lib/gcc/m33f/drivers_cc13x4_spe.a',\n");
+            sb.append("'lib/iar/m33f/drivers_cc13x4_spe.a',\n");
+            sb.append("'lib/ticlang/m33f/drivers_cc26x4.a',\n");
+            sb.append("'lib/gcc/m33f/drivers_cc26x4.a',\n");
+            sb.append("'lib/iar/m33f/drivers_cc26x4.a',\n");
+            sb.append("'lib/ticlang/m33f/drivers_cc26x4_spe.a',\n");
+            sb.append("'lib/gcc/m33f/drivers_cc26x4_spe.a',\n");
+            sb.append("'lib/iar/m33f/drivers_cc26x4_spe.a',\n");
         sb.append("];\n");
         sb.append("pkg.build.libDesc = [\n");
             sb.append("['lib/ticlang/m4/drivers_cc13x1.a', {target: 'ti.targets.arm.clang.M4', suffix: 'm4'}],\n");
@@ -160,6 +172,18 @@ public class ti_drivers
             sb.append("['lib/ccs/m4f/drivers_cc26x2x7.a', {target: 'ti.targets.arm.elf.M4F', suffix: 'em4f'}],\n");
             sb.append("['lib/gcc/m4f/drivers_cc26x2x7.a', {target: 'gnu.targets.arm.M4F', suffix: 'm4fg'}],\n");
             sb.append("['lib/iar/m4f/drivers_cc26x2x7.a', {target: 'iar.targets.arm.M4F', suffix: 'rm4f'}],\n");
+            sb.append("['lib/ticlang/m33f/drivers_cc13x4.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
+            sb.append("['lib/gcc/m33f/drivers_cc13x4.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/iar/m33f/drivers_cc13x4.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
+            sb.append("['lib/ticlang/m33f/drivers_cc13x4_spe.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
+            sb.append("['lib/gcc/m33f/drivers_cc13x4_spe.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/iar/m33f/drivers_cc13x4_spe.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
+            sb.append("['lib/ticlang/m33f/drivers_cc26x4.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
+            sb.append("['lib/gcc/m33f/drivers_cc26x4.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/iar/m33f/drivers_cc26x4.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
+            sb.append("['lib/ticlang/m33f/drivers_cc26x4_spe.a', {target: 'ti.targets.arm.clang.M33F', suffix: 'm33f'}],\n");
+            sb.append("['lib/gcc/m33f/drivers_cc26x4_spe.a', {target: 'gnu.targets.arm.M33F', suffix: 'm33fg'}],\n");
+            sb.append("['lib/iar/m33f/drivers_cc26x4_spe.a', {target: 'iar.targets.arm.M33F', suffix: 'rm33f'}],\n");
         sb.append("];\n");
         Global.eval(sb.toString());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@
 const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
 
 // Other dependencies
+const DeviceInfo = Common.getScript("device_info.js");
 const CmdHandler = Common.getScript("cmd_handler.js");
 const RfDesign = Common.getScript("rfdesign");
 
@@ -53,12 +54,12 @@ const RfDesign = Common.getScript("rfdesign");
  *
  *  @param inst - module instance
  *  @param ui - module UI state
- *  @phyType - currently selected setting (PHY)
- *  @phyGroup - currently used PHY group
+ *  @phyName - currently selected setting (PHY)
+ *  @phyGroup - currently used PHY group (BLE, PROP, IEEE..)
  *  @preserve - list of configurables to preserve the value of
  */
-function reloadInstanceFromPhy(inst, ui, phyType, phyGroup, preserve) {
-    const cmdHandler = CmdHandler.get(phyGroup, phyType);
+function reloadInstanceFromPhy(inst, ui, phyName, phyGroup, preserve) {
+    const cmdHandler = CmdHandler.get(phyGroup, phyName);
     const rfData = cmdHandler.getRfData();
     _.each(rfData, (value, key) => {
         // Do NOT refresh preserved configurables
@@ -67,7 +68,21 @@ function reloadInstanceFromPhy(inst, ui, phyType, phyGroup, preserve) {
         }
         inst[key] = value;
     });
-    updateTxPowerVisibility(inst, ui);
+
+    if ("highPA" in inst) {
+        updateTxPowerVisibility(inst, ui);
+
+        const settingMap = DeviceInfo.getSettingMap(phyGroup);
+        const settingInfo = _.find(settingMap, (s) => s.name === phyName);
+        let hidden = false;
+
+        if ("options" in settingInfo) {
+            if (settingInfo.options.includes("disable_high_pa")) {
+                hidden = true;
+            }
+        }
+        ui.highPA.hidden = hidden;
+    }
 }
 
 /*
@@ -127,24 +142,24 @@ function validateFrontendSettings(inst, validation, phyGroup) {
  *  @param ui - module UI state
  */
 function updateTxPowerVisibility(inst, ui) {
-    if ("highPA" in inst) {
-        let prop24 = false;
-        let freqBand = "2400";
+    let prop24 = false;
+    let freqBand = "2400";
 
-        if ("freqBand" in inst) {
-            // This is a proprietary setting
-            freqBand = inst.freqBand;
-            prop24 = freqBand === "2400";
-        }
-        const fbLow = freqBand === "433" || freqBand === "169";
+    if ("freqBand" in inst) {
+        // This is a proprietary setting
+        freqBand = inst.freqBand;
+        prop24 = freqBand === "2400";
+    }
+    const fbLow = freqBand === "433" || freqBand === "169";
 
-        // Visibility of power tables
-        ui.txPower.hidden = inst.highPA || fbLow || prop24;
-        ui.txPowerHi.hidden = !inst.highPA || fbLow || prop24;
+    // Visibility of power tables
+    ui.txPower.hidden = inst.highPA || fbLow || prop24;
+    ui.txPowerHi.hidden = !inst.highPA || fbLow || prop24;
 
-        if ("phyType433" in inst) {
-            const otherFreqband = freqBand !== "433";
-            ui.txPower433.hidden = inst.highPA || otherFreqband;
+    if ("phyType433" in inst) {
+        const otherFreqband = freqBand !== "433";
+        ui.txPower433.hidden = inst.highPA || otherFreqband;
+        if ("txPower433Hi" in inst) {
             ui.txPower433Hi.hidden = !inst.highPA || otherFreqband;
         }
     }
@@ -234,7 +249,9 @@ function highPaOnChange(inst, ui) {
     }
     if ("phyType433" in inst) {
         ui.txPower433.hidden = inst.highPA || ui.phyType433.hidden;
-        ui.txPower433Hi.hidden = !inst.highPA || ui.phyType433.hidden;
+        if ("txPower433Hi" in inst) {
+            ui.txPower433Hi.hidden = !inst.highPA || ui.phyType433.hidden;
+        }
     }
 }
 

@@ -5,7 +5,7 @@
  @brief Function pointer interface to the NV API
 
  Group: CMCU, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -101,6 +101,8 @@ status = nvFps.readItem(id, 0, len, buf);
 #define NVINTF_SYSID_APP    7
 #define NVINTF_SYSID_WBMS   8
 #define NVINTF_SYSID_BMESH  9
+#define NVINTF_SYSID_SIDWK  10
+#define NVINTF_SYSID_WISUN  11
 
 // NV driver status codes
 #define NVINTF_SUCCESS      0

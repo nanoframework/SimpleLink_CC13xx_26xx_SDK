@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,10 @@ function getLibs()
     var targetSuffix = "";
 
     /* Determine libraries required by device name. */
-    if (Program.cpu.deviceName.match(/CC13.2/)) {
+    if (Program.cpu.deviceName.match(/CC13.4/)) {
+        driverString = "_cc13x4";
+    }
+    else if (Program.cpu.deviceName.match(/CC13.2/)) {
         driverString = "_cc13x2";
     }
     else if (Program.cpu.deviceName.match(/CC13.0/)) {
@@ -54,6 +57,9 @@ function getLibs()
     }
     else if (Program.cpu.deviceName.match(/CC26.0R2/)) {
         driverString = "_cc26x0r2";
+    }
+    else if (Program.cpu.deviceName.match(/CC26.4/)) {
+        driverString = "_cc26x4";
     }
     else if (Program.cpu.deviceName.match(/CC26.2/)) {
         driverString = "_cc26x2";

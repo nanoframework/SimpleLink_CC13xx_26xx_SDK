@@ -65,18 +65,6 @@ function filterHardware(component)
 }
 
 /*
- *  ======== validate ========
- *  Validate this inst's configuration
- *
- *  @param inst       - DAC instance to be validated
- *  @param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== _getPinResources ========
  */
 /* istanbul ignore next */
@@ -108,7 +96,6 @@ via simple and portable APIs.
 `,
     defaultInstanceName: "CONFIG_DAC_",
     config: Common.addNameConfig(config, "/ti/drivers/DAC", "CONFIG_DAC_"),
-    validate: validate,
     filterHardware: filterHardware,
     modules: Common.autoForceModules(["Board"]),
 

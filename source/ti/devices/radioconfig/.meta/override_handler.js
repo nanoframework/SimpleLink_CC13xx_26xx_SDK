@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 
 /*
  *  ======== override_handler.js ========
- *  Module to store process Override data
+ *  Module to process and store Override data
  */
 
 "use strict";
@@ -42,14 +42,13 @@
 const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
 
 // Other dependencies
-const DevInfo = Common.getScript("device_info.js");
 const RfDesign = Common.getScript("rfdesign");
 
 // Populated during init()
-let OverridePath = "/";
-let Overrides = [];
-let TxPowerOverrideFile = "none.json";
-let ccfg;
+let Overrides;
+let VddrBoost;
+
+let CCFG;
 
 // Exported functions
 exports = {
@@ -65,98 +64,51 @@ exports = {
  *  Load overrides from settings file
  *
  *  @param cmds - RF commands from settings file
- *  @phy - current PHY group
  *  @highPA - true if High PA enabled
  */
-function init(cmds, phy, highPA) {
+function init(cmds, highPA) {
     // Override table must be re-generated for each setting
-    OverridePath = DevInfo.getOverridePath(phy);
     Overrides = [];
+    VddrBoost = false;
+
     _.each(cmds, (gcmd) => {
         const cmd = _.cloneDeep(gcmd);
-        _.merge(cmd.OverrideField, cmd.OverridePatch);
-        delete gcmd.OverridePatch;
 
         if ("OverrideField" in cmd) {
-            const block = cmd.OverrideField.Block;
             const cmdName = cmd._name;
-            let ovrField;
 
-            if (typeof (block) === "string") {
-                // Single block, single entry
-                const entry = {};
-                const file = block;
-                const path = OverridePath + file;
-                entry[file] = system.getScript(path);
-                entry.ptrName = cmd.OverrideField._name;
-                entry.cmdName = cmdName;
+            // Iterate override fields
+            const overrideFields = Common.forceArray(cmd.OverrideField);
+            for (let i = 0; i < overrideFields.length; i++) {
+                const ovrField = overrideFields[i];
+
+                // Skip empty override
+                if (!("Block" in ovrField)) {
+                    // eslint-disable-next-line no-continue
+                    continue;
+                }
+
+                const ovrName = ovrField._name;
+
+                // Skip TxPower overrides unless High PA is set.
+                if (ovrName.includes("pRegOverrideTx") && !highPA) {
+                    return;
+                }
+
+                const entry = {
+                    ptrName: ovrName,
+                    cmdName: cmdName
+                };
+
+                // Iterate blocks (files)
+                const blocks = Common.forceArray(ovrField.Block);
+                for (let j = 0; j < blocks.length; j++) {
+                    const block = blocks[j];
+                    entry[block._name] = block;
+                }
                 Overrides.push(entry);
             }
-            else if (typeof (block) === "object") {
-                // Single block, multiple entries
-                const entry = {};
-                entry.ptrName = cmd.OverrideField._name;
-                entry.cmdName = cmdName;
-                _.each(cmd.OverrideField.Block, (file) => {
-                    const path = OverridePath + file;
-                    entry[file] = system.getScript(path);
-                });
-                Overrides.push(entry);
-            }
-            else if (typeof block === "undefined") {
-                // There is no block; only pointer names
-                ovrField = cmd.OverrideField;
-
-                // Assume array of entries
-                _.each(ovrField, (item) => {
-                    // Filter away TxPower overrides unless High PA is set.
-                    if (item._name.includes("pRegOverrideTx") && !highPA) {
-                        return;
-                    }
-
-                    const entry = {};
-                    let blocks = [];
-
-                    if (typeof item.Block === "string") {
-                        blocks.push(item.Block);
-                    }
-                    else {
-                        blocks = item.Block;
-                    }
-
-                    _.each(blocks, (file) => {
-                        const path = OverridePath + file;
-                        entry[file] = system.getScript(path);
-                        entry.ptrName = item._name;
-                        entry.cmdName = cmdName;
-                        Overrides.push(entry);
-                    });
-                });
-            }
-            else {
-                throw Error("Unexpected override data type");
-            }
         }
-    });
-}
-
-/*!
- *  ======== updateTxPowerOverrideFile ========
- *  Update the TX Power overrides according to
- *  the current TX Power setting.
- *
- *  @param ovrFile - file containing the overrides
- */
-function updateTxPowerOverrideFile(ovrFile) {
-    _.each(Overrides, (override) => {
-        // Remove current override
-        if (TxPowerOverrideFile in override) {
-            delete override[TxPowerOverrideFile];
-        }
-        // Add new override
-        TxPowerOverrideFile = ovrFile;
-        const path = OverridePath + ovrFile;
-        override[ovrFile] = system.getScript(path);
     });
 }
 
@@ -172,10 +124,11 @@ function updateTxPowerOverrideFile(ovrFile) {
 function generateCode(symName, data, custom) {
     const ret = {
         code: "",
-        stackOffset: 0
+        stackOffset: 0,
+        appOffset: 0
     };
     const ovrTmp = {};
-    ccfg = system.modules["/ti/devices/CCFG"];
+    CCFG = system.modules["/ti/devices/CCFG"];
 
     _.each(Overrides, (ovr) => {
         ovrTmp[ovr.ptrName] = ovr;
@@ -187,6 +140,7 @@ function generateCode(symName, data, custom) {
         ret.code += struct.code;
         if (tmpCustom !== null) {
             ret.stackOffset = struct.stackOffset;
+            ret.appOffset = struct.appOffset;
         }
         // Custom override only applies to the common structure (first in the list)
         tmpCustom = null;
@@ -211,8 +165,8 @@ function getRepetitionFactor() {
                     // eslint-disable-next-line no-continue
                     continue;
                 }
-                const obuf = ovr[key].overridebuffer;
-                const items = Common.forceArray(obuf.Element32b);
+                const obuf = ovr[key].Element32b;
+                const items = Common.forceArray(obuf);
                 // eslint-disable-next-line no-loop-func
                 _.each(items, (el) => {
                     if (el._type === "HW_REG_OVERRIDE") {
@@ -259,12 +213,14 @@ function getStructNames(symName) {
 function updateTxPowerOverride(txPower, freq, highPA) {
     // Find override for actual TxPower setting
     const paList = RfDesign.getPaTable(freq, highPA);
+    VddrBoost = false;
+
     _.each(paList, (pv) => {
-        if ("Command" in pv) {
+        // Check if current TX Power value has a VDDR boost option
+        if ("Option" in pv) {
             const val = pv._text;
-            if (val === txPower) {
-                const block = pv.Command.OverrideField.Block;
-                updateTxPowerOverrideFile(block);
+            if (val === txPower && pv.Option._name === "vddr" && pv.Option.$ === "HIGH") {
+                VddrBoost = true;
             }
         }
     });
@@ -281,7 +237,8 @@ function updateTxPowerOverride(txPower, freq, highPA) {
 function generateStruct(override, data, custom) {
     const ret = {
         code: "// Overrides for " + override.cmdName + "\n",
-        stackOffset: 0
+        stackOffset: 0,
+        appOffset: 0
     };
     ret.code += "uint32_t " + override.ptrName + "[] =\n{\n";
     let nEntries = 0;
@@ -293,19 +250,19 @@ function generateStruct(override, data, custom) {
             // eslint-disable-next-line no-continue
             continue;
         }
-        const obuf = override[key].overridebuffer;
+        const obuf = override[key].Element32b;
         if (obuf.length === 0) {
             // eslint-disable-next-line no-continue
             continue;
         }
-        // 14 dBm TX Power only apply  to default override
-        if (key.includes("14dbm") && override.ptrName !== "pRegOverride") {
+        // 14 dBm TX Power only apply to default override and skip unless VDDR enabled
+        if (key.includes("14dbm") && (override.ptrName !== "pRegOverride" || !VddrBoost)) {
             // eslint-disable-next-line no-continue
             continue;
         }
         // Skip HPOSC unless enabled in CCFG
         if (key.includes("override_hposc")) {
-            if (!ccfg.$static.enableXoscHfComp) {
+            if (!CCFG.$static.enableXoscHfComp) {
                 // eslint-disable-next-line no-continue
                 continue;
             }
@@ -328,10 +285,8 @@ function generateStruct(override, data, custom) {
         // Name of override file
         ret.code += "    // " + key + "\n";
 
-        const tmp = obuf.Element32b;
-
         // If there is more than one element, use array
-        const items = Common.forceArray(tmp);
+        const items = Common.forceArray(obuf);
 
         // Process override array
         ret.code = processOverrideArray(items, ret.code, data);
@@ -339,14 +294,20 @@ function generateStruct(override, data, custom) {
     }
     // Add app/stack specific overrides if applicable
     if (custom !== null) {
-        for (let i = 0; i < custom.length; i++) {
-            const path = custom[i].path;
-            if (path !== "") {
-                ret.code += "    // " + path + "\n";
-                ret.code += "    " + custom[i].macro + "(),\n";
-            }
+        let path = custom.stackOverride;
+        if (path !== "") {
+            ret.code += "    // " + path + "\n";
+            ret.code += "    " + custom.stackOverrideMacro + "(),\n";
+            ret.stackOffset = nEntries;
+            nEntries += 1;
         }
-        ret.stackOffset = nEntries;
+
+        path = custom.appOverride;
+        if (path !== "") {
+            ret.code += "    // " + path + "\n";
+            ret.code += "    " + custom.appOverrideMacro + "(),\n";
+            ret.appOffset = nEntries;
+        }
     }
     // Add termination
     ret.code += "    (uint32_t)0xFFFFFFFF\n};\n\n";
@@ -470,5 +431,4 @@ function calcAnaDiv(data, isTx20) {
     }
 
     return ((txSetting << 16) | 0x0703);
-    /* eslint-disable no-bitwise */
 }

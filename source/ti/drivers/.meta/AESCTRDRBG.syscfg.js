@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,18 +46,6 @@ let Common = system.getScript("/ti/drivers/Common.js");
 let config = []; /* nothing (yet) beyond generic driver configs */
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - AESCTRDRBG instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base AESCTRDRBG properties and methods
  */
@@ -78,7 +66,6 @@ related purposes.
 [2]: /drivers/doxygen/html/_a_e_s_c_t_r_d_r_b_g_8h.html#ti_drivers_AESCTRDRBG_Synopsis "Basic C usage summary"
 [3]: /drivers/doxygen/html/_a_e_s_c_t_r_d_r_b_g_8h.html#ti_drivers_AESCTRDRBG_Examples "C usage examples"
 `,
-    validate            : validate,
     config              : Common.addNameConfig(config, "/ti/drivers/aesctrdrbg", "CONFIG_AESCTRDRBG_"),
     defaultInstanceName : "CONFIG_AESCTRDRBG_"
 };

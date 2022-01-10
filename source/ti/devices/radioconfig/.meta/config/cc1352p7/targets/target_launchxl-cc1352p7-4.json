@@ -7,7 +7,7 @@
         "DevicePackage": "VQFN 7x7",
         "FrontEnd": "XD",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC1352PEM-XD4251-XD24",
+        "RfDesign": "LP-CC1352P7-4",
         "DefaultCategory": "Settings for 431 - 527 MHz band",
         "IoSettings": {
             "_name": "RF Switch",

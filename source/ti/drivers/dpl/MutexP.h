@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ extern "C" {
  */
 typedef union MutexP_Struct {
     uint32_t dummy;  /*!< Align object */
-    char     data[MutexP_STRUCT_SIZE];
+    uint8_t  data[MutexP_STRUCT_SIZE];
 } MutexP_Struct;
 
 /*!

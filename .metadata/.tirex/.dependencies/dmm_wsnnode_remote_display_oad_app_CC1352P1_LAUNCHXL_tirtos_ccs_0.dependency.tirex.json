@@ -1,10 +1,13 @@
 [
     {
         "files": [
-            "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_oad_release.cfg -> ble_oad_release.cfg",
-            "+../../../../../../../source/ti/dmm/apps/common/rfwsn/node/NodeRadioTask.c -> application/wsn_node/NodeRadioTask.c",
+            "+../../../../../../../source/ti/dmm/apps/dmm_wsnnode_remote_display/source/main.c -> application/main.c",
+            "+../../application/wsn_node/RadioProtocol.h -> application/wsn_node/RadioProtocol.h",
+            "+../../application/wsn_node/easylink/EasyLink.h -> application/wsn_node/easylink/EasyLink.h",
+            "+../../application/wsn_node/easylink/EasyLink.c -> application/wsn_node/easylink/EasyLink.c",
+            "+../../application/wsn_node/NodeRadioTask.c -> application/wsn_node/NodeRadioTask.c",
             "+../../application/wsn_node/NodeRadioTask.h -> application/wsn_node/NodeRadioTask.h",
-            "+../../../../../../../source/ti/dmm/apps/common/rfwsn/node/NodeTask.c -> application/wsn_node/NodeTask.c",
+            "+../../application/wsn_node/NodeTask.c -> application/wsn_node/NodeTask.c",
             "+../../application/wsn_node/NodeTask.h -> application/wsn_node/NodeTask.h",
             "+../../application/wsn_node/SceAdc.c -> application/wsn_node/SceAdc.c",
             "+../../application/wsn_node/SceAdc.h -> application/wsn_node/SceAdc.h",
@@ -33,6 +36,8 @@
             "+../../../../../../../source/ti/dmm/remote_display_profile/cc26xx/remote_display_gatt_profile.c -> software_stacks/ble_stack/profiles/remote_display_gatt_profile.c",
             "+../../../../../../../source/ti/dmm/remote_display_profile/remote_display_gatt_profile.h -> software_stacks/ble_stack/profiles/remote_display_gatt_profile.h",
             "+../../TOOLS/defines/dmm_wsnnode_remote_display_app.opts -> TOOLS/defines/dmm_wsnnode_remote_display_app.opts",
+            "+../../dmm_wsnnode_remote_display.syscfg -> dmm_wsnnode_remote_display.syscfg",
+            "+../../README.html -> README.html",
             "+../../../../../../../source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c -> application/ble_remote_display/startup/osal_icall_ble.c",
             "+../../../../../../../source/ti/ble5stack/rom/agama_r1/rom_init.c -> application/ble_remote_display/startup/rom_init.c",
             "+../../../../../../../source/ti/ble5stack/icall/stack/ble_user_config_stack.c -> application/ble_remote_display/startup/ble_user_config_stack.c",
@@ -63,7 +68,6 @@
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/cc26xx/devinfoservice.c -> software_stacks/ble_stack/profiles/devinfoservice.c",
             "+../../../../../../../source/ti/ble5stack/profiles/dev_info/devinfoservice.h -> software_stacks/ble_stack/profiles/devinfoservice.h",
             "+../../../../../../../source/ti/ble5stack/inc/gatt_profile_uuid.h -> software_stacks/ble_stack/profiles/gatt_profile_uuid.h",
-            "+../../../../../../../source/ti/ble5stack/host/gatt_uuid.c -> software_stacks/ble_stack/profiles/gatt_uuid.c",
             "+../../../../../../../source/ti/ble5stack/inc/gatt_uuid.h -> software_stacks/ble_stack/profiles/gatt_uuid.h",
             "+../../../../../../../source/ti/ble5stack/host/gattservapp_util.c -> software_stacks/ble_stack/profiles/gattservapp_util.c",
             "+../../TOOLS/build_components.opt -> TOOLS/build_components.opt",
@@ -83,12 +87,8 @@
             "+../../../../../../../source/ti/common/cc26xx/oad/oad_image_header.h -> OAD/oad_image_header.h",
             "+../../../../../../../source/ti/common/cc26xx/bim/bim_util.c -> OAD/bim_util.c",
             "+../../../../../../../source/ti/common/cc26xx/bim/bim_util.h -> OAD/bim_util.h",
-            "+../../README.html -> README.html",
-            "+../../dmm_wsnnode_remote_display.syscfg -> dmm_wsnnode_remote_display.syscfg",
-            "+../../../../../../../source/ti/dmm/apps/dmm_wsnnode_remote_display/source/main.c -> application/main.c",
-            "+../../application/wsn_node/RadioProtocol.h -> application/wsn_node/RadioProtocol.h",
-            "+../../application/wsn_node/easylink/EasyLink.c -> application/wsn_node/easylink/EasyLink.c",
-            "+../../application/wsn_node/easylink/EasyLink.h -> application/wsn_node/easylink/EasyLink.h",
+            "+../../../../../../../source/ti/dmm/apps/common/tirtos/ble_oad_release.cfg -> ble_oad_release.cfg",
+            "+../../../../../../../source/ti/ble5stack/common/cc26xx/ccs/cc26x2_app_oad_agama.cmd -> cc26x2_app_oad_agama.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

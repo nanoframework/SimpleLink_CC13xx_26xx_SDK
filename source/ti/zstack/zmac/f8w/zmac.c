@@ -552,6 +552,16 @@ uint8_t ZMacGetReq( uint8_t attr, uint8_t *value )
     osal_cpyExtAddr( value, &aExtendedAddress );
     return ZMacSuccess;
   }
+#ifdef IEEE_COEX_ENABLED
+  else if ( attr == ZMacCoexPIBMetrics )
+  {
+      ((coexMetricsStruct_t *)value)->dbgCoexGrants = coexMetricsStruct.dbgCoexGrants;
+      ((coexMetricsStruct_t *)value)->dbgCoexRejects = coexMetricsStruct.dbgCoexRejects;
+      ((coexMetricsStruct_t *)value)->dbgCoexContRejects = coexMetricsStruct.dbgCoexContRejects;
+      ((coexMetricsStruct_t *)value)->dbgCoexMaxContRejects = coexMetricsStruct.dbgCoexMaxContRejects;
+      return ZMacSuccess;
+  }
+#endif /* IEEE_COEX_ENABLED */
 
   return (ZMacStatus_t) MAP_MAC_MlmeGetReq( attr, value );
 }
@@ -580,6 +590,16 @@ uint8_t ZMacSetReq( uint8_t attr, byte *value )
       return ZFailure;
     }
   }
+#ifdef IEEE_COEX_ENABLED
+  else if ( attr == ZMacCoexPIBMetrics )
+  {
+      coexMetricsStruct.dbgCoexGrants = ((coexMetricsStruct_t *)value)->dbgCoexGrants;
+      coexMetricsStruct.dbgCoexRejects = ((coexMetricsStruct_t *)value)->dbgCoexRejects;
+      coexMetricsStruct.dbgCoexContRejects = ((coexMetricsStruct_t *)value)->dbgCoexContRejects;
+      coexMetricsStruct.dbgCoexMaxContRejects = ((coexMetricsStruct_t *)value)->dbgCoexMaxContRejects;
+      return ZMacSuccess;
+  }
+#endif /* IEEE_COEX_ENABLED */
 
   return (ZMacStatus_t) MAP_MAC_MlmeSetReq( attr, value );
 }
@@ -1370,7 +1390,7 @@ uint8_t ZMacEnhancedActiveScanReq( ZMacScanReq_t *pData )
   return ZMacScanReq(pData);
 }
 
-#/********************************************************************************************************
+/********************************************************************************************************
  * @fn      convertCapInfo
  *
  * @brief   Convert the bit oriented capability info to the structure based capability info
@@ -1442,4 +1462,25 @@ static void convertToTxOptions(ApiMac_txOptions_t *pDst, uint16_t srcTxOptions)
   {
     pDst->useGreenPower = true;
   }
+}
+
+/********************************************************************************************************
+ * @fn      ZMacSetZigbeeMACParams
+ *
+ * @brief   Sets MAC PIB values specific for Z-Stack (after calling ZMacReset)
+ *
+ * @return  None
+ ********************************************************************************************************/
+void ZMacSetZigbeeMACParams(void)
+{
+    uint8_t responseWaitTime = 16;
+    ZMacSetReq(MAC_RESPONSE_WAIT_TIME, &responseWaitTime);
+
+    uint16_t transactionPersistenceTime = 500;
+    ZMacSetReq(MAC_TRANSACTION_PERSISTENCE_TIME, (byte *)&transactionPersistenceTime);
+
+    uint8_t macFrameRetries = ZMAC_MAX_FRAME_RETRIES;
+    ZMacSetReq(MAC_MAX_FRAME_RETRIES, &macFrameRetries);
+
+    ZMacSetTransmitPower( (ZMacTransmitPower_t)TXPOWER );
 }

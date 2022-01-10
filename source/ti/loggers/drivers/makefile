@@ -18,14 +18,14 @@ include $(SDK_INSTALL_DIR)/imports.mak
 #     http://rtsc.eclipse.org/docs-tip/Command_-_xdc#Environment_Variables
 #
 XDCARGS= \
-    ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
-    ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
-    gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
-    ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
-    ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
-    gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\"
+	ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
+	gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
+	iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
+	ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
+	gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
+	iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\"
 
 #
 # Set XDCPATH to contain necessary repositories.
@@ -46,7 +46,7 @@ j = 1
 # the arguments specified by XDCARGS
 #
 XDC = $(XDC_INSTALL_DIR)/xdc -j $(j) \
-        XDCBUILDCFG=$(SDK_INSTALL_DIR)/source/ti/utils/tiutils.bld
+		XDCBUILDCFG=$(SDK_INSTALL_DIR)/source/ti/utils/tiutils.bld
 
 all:
 	@ echo building packages ...

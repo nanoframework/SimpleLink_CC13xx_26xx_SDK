@@ -70,7 +70,8 @@
 union setupCmd_t{
 #if ((defined LAUNCHXL_CC1352P1) || (defined LAUNCHXL_CC1352P_2) || \
      (defined LAUNCHXL_CC1352P_4)|| (defined LP_CC1352P7_1)      || \
-	 (defined LP_CC1352P7_4))
+	 (defined LP_CC1352P7_4)     || (defined CONFIG_LP_CC2652PSIP) || \
+     (defined CONFIG_CC2652P1FSIP))
     rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t divSetup;
 #else
     rfc_CMD_PROP_RADIO_DIV_SETUP_t divSetup;
@@ -998,7 +999,8 @@ EasyLink_Status EasyLink_init(EasyLink_Params *params)
     {
 #if ((defined LAUNCHXL_CC1352P1) || (defined LAUNCHXL_CC1352P_2) || \
      (defined LAUNCHXL_CC1352P_4)|| (defined LP_CC1352P7_1)      || \
-	 (defined LP_CC1352P7_4))
+	 (defined LP_CC1352P7_4)     || (defined CONFIG_LP_CC2652PSIP) || \
+     (defined CONFIG_CC2652P1FSIP))
         memcpy(&EasyLink_cmdPropRadioSetup.divSetup, (rfSetting->RF_uCmdPropRadio.RF_pCmdPropRadioDivSetup), sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_PA_t));
 #else
         memcpy(&EasyLink_cmdPropRadioSetup.divSetup, (rfSetting->RF_uCmdPropRadio.RF_pCmdPropRadioDivSetup), sizeof(rfc_CMD_PROP_RADIO_DIV_SETUP_t));

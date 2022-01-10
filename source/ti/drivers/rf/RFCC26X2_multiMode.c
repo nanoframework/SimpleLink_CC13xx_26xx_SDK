@@ -773,9 +773,19 @@ static bool RF_cmdDispatchTime(uint32_t* dispatchTimeClockTicks, bool conflict, 
             }
             else
             {
-                nTotalDuration = pCmd->pClient->clientConfig.nPowerUpDuration
-                                      + pCmd->pClient->clientConfig.nPowerUpDurationMargin
-                                      + (RF_RAT_COMPENSATION_TIME_US * RF_ratModule.numActiveChannels);
+                /* If radio wakes up to execute an FS command use nPowerUpDurationFs */
+                if ((pCmd->pOp->commandNo == CMD_FS) || (pCmd->pOp->commandNo == CMD_FS_OFF))
+                {
+                    nTotalDuration = pCmd->pClient->clientConfig.nPowerUpDurationFs
+                                    + pCmd->pClient->clientConfig.nPowerUpDurationMargin
+                                    + (RF_RAT_COMPENSATION_TIME_US * RF_ratModule.numActiveChannels);
+                }
+                else
+                {
+                    nTotalDuration = pCmd->pClient->clientConfig.nPowerUpDuration
+                                    + pCmd->pClient->clientConfig.nPowerUpDurationMargin
+                                    + (RF_RAT_COMPENSATION_TIME_US * RF_ratModule.numActiveChannels);
+                }
             }
 
             /* Calculate the remained time until this absolute event. The calculation takes
@@ -2098,9 +2108,10 @@ static void RF_dispatchNextCmd(void)
            doDispatchNow = true;
        }
        /* Or the current client wants to execute in the foreground on top of a background command */
-       else if (RF_cmdQ.pCurrCmdBg 
+       else if (RF_cmdQ.pCurrCmdBg
                 && (RF_cmdQ.pCurrCmdBg->pClient == pNextCmd->pClient)
-                && (pNextCmd->flags & RF_CMD_FG_CMD_FLAG))
+                && (pNextCmd->flags & RF_CMD_FG_CMD_FLAG)
+                && (NULL == RF_cmdQ.pCurrCmdFg))
        {
             /* Try to execute the foreground command. */
             doDispatchNow = true;
@@ -2123,7 +2134,7 @@ static void RF_dispatchNextCmd(void)
         SwiP_or(&RF_swiFsmObj, RF_FsmEventLastCommandDone);
     }
 
-    /* 
+    /*
      * Calculate the timestamp of the next command in the command queue.
      * `conflict` parameter (here opposite of doDistpatch) implicitly used to determine margin needed to execute incoming command.
      */
@@ -2175,7 +2186,7 @@ static void RF_dispatchNextCmd(void)
             case RF_ExecuteActionNone:
             default:
             {
-                /* 
+                /*
                  * Ignore command if conflict, and pick it up after current finishes.
                  * If no conflict, dispatch.
                  */
@@ -2228,7 +2239,7 @@ static void RF_dispatchNextCmd(void)
 
                 /* Invoke global callback to indicate start of command chain */
                 RF_invokeGlobalCallback(RF_GlobalEventCmdStart, (void*)pNextCmd);
-                
+
                 /* Send the radio operation to the RF core. */
                 RFCDoorbellSendTo((uint32_t)pOp);
 
@@ -2551,7 +2562,8 @@ static void RF_hposcRfCompensateFxn(int16_t currentTemperature,
                                              (uintptr_t)NULL);
 
     if (status != Temperature_STATUS_SUCCESS) {
-        while(1);
+        /* Invoke global callback to indicate unsuccessful registration of temperature notification */
+        RF_invokeGlobalCallback(RF_GlobalEventTempNotifyFail, NULL);
     }
 }
 
@@ -2983,6 +2995,47 @@ static bool RF_isStateTransitionAllowed(void)
 }
 
 /*
+ *  Measure radio powerup time. If it is lesser than the previous run, update
+ *  the powerup duration value so that it can be used during next wake up.
+ *
+ *  Input:  *powerupDuration    Pointer to the powerup duration that needs updating
+ *  Return: none
+ */
+static void RF_updatePowerupDuration(uint32_t *powerupDuration)
+{
+    uint32_t rtcValTmp1;
+    uint32_t rtcValTmp2;
+    uint32_t prevPowerUpDuration;
+    /* Temporary storage to be able to compare the new value to the old measurement */
+    prevPowerUpDuration = *powerupDuration;
+
+    /* Take wake up timestamp and the current timestamp */
+    rtcValTmp1  = (uint32_t) RF_rtcTimestampA;
+    rtcValTmp2  = (uint32_t) AONRTCCurrent64BitValueGet();
+
+    /* Calculate the difference of the timestamps and convert it to us units */
+    *powerupDuration = UDIFF(rtcValTmp1, rtcValTmp2);
+    *powerupDuration >>= RF_RTC_CONV_TO_US_SHIFT;
+
+    /* Low pass filter on power up durations less than in the previous cycle */
+    if (prevPowerUpDuration > *powerupDuration)
+    {
+        /* Expect that the values are small and the calculation can be done in 32 bits */
+        *powerupDuration = (prevPowerUpDuration + *powerupDuration)/2;
+    }
+
+    /* Power up duration should be within certain upper and lower bounds */
+    if (*powerupDuration > RF_DEFAULT_POWER_UP_TIME)
+    {
+        *powerupDuration = RF_DEFAULT_POWER_UP_TIME;
+    }
+    else if (*powerupDuration < RF_DEFAULT_MIN_POWER_UP_TIME)
+    {
+        *powerupDuration = RF_DEFAULT_MIN_POWER_UP_TIME;
+    }
+}
+
+/*
  *  RF state machine function during power up state.
  *
  *  Input:  pObj - Pointer to RF object.
@@ -3138,8 +3191,7 @@ static void RF_fsmSetupState(RF_Object *pObj, RF_FsmEvent e)
         RF_Cmd* pCmdFirstPend = (RF_Cmd*)List_head(&RF_cmdQ.pPend);
         if (pCmdFirstPend && ((pCmdFirstPend->pOp->commandNo == CMD_FS) || (pCmdFirstPend->pOp->commandNo == CMD_FS_OFF)))
         {
-            /* First command is FS command so no need to chain an implicit FS command -> Reset nRtc1 */
-            RF_rtcTimestampA = 0;
+            /* Do Nothing */
         }
         else
         {
@@ -3234,8 +3286,6 @@ static void RF_fsmXOSCState(RF_Object *pObj, RF_FsmEvent e)
 static void RF_fsmActiveState(RF_Object *pObj, RF_FsmEvent e)
 {
     volatile RF_Cmd* pCmd;
-    uint32_t rtcValTmp1;
-    uint32_t rtcValTmp2;
     RF_EventMask events;
     bool transitionAllowed;
     uint32_t key;
@@ -3291,36 +3341,40 @@ static void RF_fsmActiveState(RF_Object *pObj, RF_FsmEvent e)
         /* Enter critical section */
         key = HwiP_disable();
 
-        /* Update power up duration if coming from the clkPowerUpFxn. Skip the calcualtion
-           if coming from boot, since the LF clock is derived from RCOSC_HF without calibration. */
-        if ((OSCClockSourceGet(OSC_SRC_CLK_LF) != OSC_RCOSC_HF)
+        /* Init last LF clock source to default boot source */
+        static uint32_t lfClockSourceLast = OSC_RCOSC_HF;
+
+        uint32_t lfClockSource = OSCClockSourceGet(OSC_SRC_CLK_LF);
+
+        /* Update power up duration if the LF clock is derived from the same source as the last check.
+            Reset the calculation if the LF clock source has changed */
+        if ((lfClockSource == lfClockSourceLast)
              && pObj->clientConfig.bMeasurePowerUpDuration
              && RF_rtcTimestampA)
         {
-            /* Temporary storage to be able to compare the new value to the old measurement */
-            uint32_t prevPowerUpDuration = pObj->clientConfig.nPowerUpDuration;
+            /* Dereference the active background command */
+            pCmd = (RF_Cmd*)RF_cmdQ.pCurrCmdBg;
 
-            /* Take wake up timestamp and the current timestamp */
-            rtcValTmp1  = (uint32_t) RF_rtcTimestampA;
-            rtcValTmp2  = (uint32_t) AONRTCCurrent64BitValueGet();
-
-            /* Calculate the difference of the timestamps and convert it to us units */
-            pObj->clientConfig.nPowerUpDuration   = UDIFF(rtcValTmp1, rtcValTmp2);
-            pObj->clientConfig.nPowerUpDuration >>= RF_RTC_CONV_TO_US_SHIFT;
-
-            /* Low pass filter on power up durations less than in the previous cycle */
-            if (prevPowerUpDuration > pObj->clientConfig.nPowerUpDuration)
+            /* If CMD_FS is the first command executed after powerup, a cached FS cmd is not executed,
+               thus the powerupduration is expected to be shorter and is stored in nPowerUpDurationFs */
+            if (pCmd && ((pCmd->pOp->commandNo == CMD_FS) || (pCmd->pOp->commandNo == CMD_FS_OFF)))
             {
-                /* Expect that the values are small and the calculation can be done in 32 bits */
-                pObj->clientConfig.nPowerUpDuration = (prevPowerUpDuration + pObj->clientConfig.nPowerUpDuration)/2;
+                RF_updatePowerupDuration(&(pObj->clientConfig.nPowerUpDurationFs));
             }
-
-            /* Power up duration should be within certain upper and lower bounds */
-            if ((pObj->clientConfig.nPowerUpDuration > RF_DEFAULT_POWER_UP_TIME) ||
-                (pObj->clientConfig.nPowerUpDuration < RF_DEFAULT_MIN_POWER_UP_TIME))
+            /* Any other command executed on powerup would mean an implicit FS command is executed
+               by the RF driver, so update nPowerUpduration. This duration includes the time required to
+               execute the implicit FS cmd previously cached by the RF Driver */
+            else
             {
-                pObj->clientConfig.nPowerUpDuration = RF_DEFAULT_POWER_UP_TIME;
+                RF_updatePowerupDuration(&(pObj->clientConfig.nPowerUpDuration));
             }
+        }
+        else
+        {
+            /* LF Clock source changed, reset power up duration measurement */
+            pObj->clientConfig.nPowerUpDuration = RF_DEFAULT_POWER_UP_TIME;
+            pObj->clientConfig.nPowerUpDurationFs = RF_DEFAULT_POWER_UP_TIME;
+            lfClockSourceLast = lfClockSource;
         }
 
         /* Exit critical section */
@@ -3498,14 +3552,14 @@ static void RF_fsmActiveState(RF_Object *pObj, RF_FsmEvent e)
             pErrCb(RF_currClient, RF_ERROR_CMDFS_SYNTH_PROG, RF_EventError);
         }
 
-        /* Only compute PHY switching time if rtcValTmp1 is not zero (was initialized) */
+        /* Only compute PHY switching time if RF_rtcBeginSequence is not zero (was initialized) */
         if (RF_rtcBeginSequence)
         {
             /* Record the timestamp for switching time measurement. */
-            rtcValTmp2 = (uint32_t) AONRTCCurrent64BitValueGet();
+            uint32_t RF_rtcEndSequence = (uint32_t) AONRTCCurrent64BitValueGet();
 
             /* Calculate how long it took to reconfigure the radio to a new phy. */
-            RF_currClient->clientConfig.nPhySwitchingDuration = UDIFF(RF_rtcBeginSequence, rtcValTmp2);
+            RF_currClient->clientConfig.nPhySwitchingDuration = UDIFF(RF_rtcBeginSequence, RF_rtcEndSequence);
             RF_currClient->clientConfig.nPhySwitchingDuration >>= RF_RTC_CONV_TO_US_SHIFT;
 
             /* Reset RF_rtcBeginSequence value at the end of phy switching sequence. */
@@ -4290,11 +4344,6 @@ static void RF_updateHpOscOverride(uint32_t *pRegOverride)
             pRegOverride[index] = HPOSC_OVERRIDE(relFreqOffsetConverted);
         }
     }
-    else
-    {
-        /* Hange here if HPOSC_OVERRIDE override is not available. */
-        while(1);
-    }
 }
 
 /*
@@ -4427,11 +4476,51 @@ static RF_Stat RF_updatePaConfiguration(RF_RadioSetup* radioSetup, RF_TxPowerTab
  */
 RF_Handle RF_open(RF_Object *pObj, RF_Mode* pRfMode, RF_RadioSetup* pRadioSetup, RF_Params *params)
 {
+    /* Local variables. */
+    uint8_t index;
+    uint16_t* pTxPower          = NULL;
+    uint32_t* pRegOverride      = NULL;
+    uint32_t* pRegOverrideTxStd = NULL;
+    uint32_t* pRegOverrideTx20  = NULL;
+
     /* Assert */
     DebugP_assert(pObj != NULL);
 
     /* Read available RF modes from the PRCM register */
     uint32_t availableRfModes = HWREG(PRCM_BASE + PRCM_O_RFCMODEHWOPT);
+
+    /* Check for illegal PHY mode in CC2672 device */
+    #if defined(DeviceFamily_PARENT) && (DeviceFamily_PARENT == DeviceFamily_PARENT_CC13X2_CC26X2)
+    /* Check for chip ID */
+    if ((ChipInfo_GetChipType() == CHIP_TYPE_CC2672P3) ||
+        (ChipInfo_GetChipType() == CHIP_TYPE_CC2672R3))
+    {
+        /* Check if Sub-1G frequency band is used */
+        if (pRadioSetup->commandId.commandNo == CMD_PROP_RADIO_DIV_SETUP)
+        {
+            if (pRadioSetup->prop_div.loDivider > 2)
+                /* If the data rate is NOT 100kbps or 500 kbps return NULL handle
+                   as this is an unsupported setting on this device */
+                if (! ((pRadioSetup->prop_div.symbolRate.preScale == 0x0F &&
+                        pRadioSetup->prop_div.symbolRate.rateWord == 0x10000) ||
+                       (pRadioSetup->prop_div.symbolRate.preScale == 0x0F &&
+                        pRadioSetup->prop_div.symbolRate.rateWord == 0x50000)))
+                {
+                    return(NULL);
+                }
+        }
+        else if (pRadioSetup->commandId.commandNo == CMD_RADIO_SETUP)
+        {
+            if (pRadioSetup->common.loDivider > 2)
+                return(NULL);
+        }
+        else if (pRadioSetup->commandId.commandNo == CMD_BLE5_RADIO_SETUP)
+        {
+            if (pRadioSetup->ble5.loDivider > 2)
+                return(NULL);
+        }
+    }
+    #endif
 
     /* Verify that the provided configuration is supported by this device.
        Reject any request which is not compliant. */
@@ -4450,6 +4539,22 @@ RF_Handle RF_open(RF_Object *pObj, RF_Mode* pRfMode, RF_RadioSetup* pRadioSetup,
     {
         /* Return with null if the device do not support the requested configuration */
         return(NULL);
+    }
+
+    /* Verify that the HPOSC_OVERRIDE exists in the override list if SW TCXO is enabled */
+    if (pfnUpdateHposcOverride)
+    {
+        /* Get pointer to override list */
+        RF_decodeOverridePointers(pRadioSetup, &pTxPower, &pRegOverride, &pRegOverrideTxStd, &pRegOverrideTx20);
+
+        /* Search override list for HPOSC_OVERRIDE */
+        index = RFCOverrideSearch(pRegOverride, RF_HPOSC_OVERRIDE_PATTERN, RF_HPOSC_OVERRIDE_MASK, RF_OVERRIDE_SEARCH_DEPTH);
+
+        /* Return NULL if HPOSC_OVERRIDE is not found on the override list */
+        if (index == 0xFF)
+        {
+            return(NULL);
+        }
     }
 
     /* Enter critical section */
@@ -4487,11 +4592,15 @@ RF_Handle RF_open(RF_Object *pObj, RF_Mode* pRfMode, RF_RadioSetup* pRadioSetup,
         if (params->nPowerUpDuration)
         {
             pObj->clientConfig.nPowerUpDuration        = params->nPowerUpDuration;
+            /* Use same value of user provided power up duration even if the first cmd
+               is an Fs command */
+            pObj->clientConfig.nPowerUpDurationFs      = params->nPowerUpDuration;
             pObj->clientConfig.bMeasurePowerUpDuration = false;
         }
         else
         {
             pObj->clientConfig.nPowerUpDuration        = RF_DEFAULT_POWER_UP_TIME;
+            pObj->clientConfig.nPowerUpDurationFs      = RF_DEFAULT_POWER_UP_TIME;
             pObj->clientConfig.bMeasurePowerUpDuration = true;
         }
 
@@ -4542,7 +4651,6 @@ RF_Handle RF_open(RF_Object *pObj, RF_Mode* pRfMode, RF_RadioSetup* pRadioSetup,
  */
 void RF_close(RF_Handle h)
 {
-    /* Assert */
     DebugP_assert(h != NULL);
 
     /* If there is at least one active client */
@@ -5493,6 +5601,7 @@ RF_Stat RF_control(RF_Handle h, int8_t ctrl, void *args)
                the nPowerUpDuration need to be increased */
             h->clientConfig.bUpdateSetup      = true;
             h->clientConfig.nPowerUpDuration += RF_ANALOG_CFG_TIME_US;
+            h->clientConfig.nPowerUpDurationFs += RF_ANALOG_CFG_TIME_US;
             break;
 
         case RF_CTRL_SET_POWERUP_DURATION_MARGIN:
@@ -5817,20 +5926,20 @@ RF_TxPowerTable_Value RF_TxPowerTable_findValue(RF_TxPowerTable_Entry table[], i
  *  ======== RF_enableHPOSCTemperatureCompensation ========
  * Initializes the temperature compensation monitoring (SW TCXO)
  * This function enables RF synthesizer temperature compensation
- * It is intended for use on the SIP or BAW devices where compensation 
+ * It is intended for use on the SIP or BAW devices where compensation
  * coefficients are available inside the chip.
- * 
- * The name of the function is a misnomer, as it does not only apply to 
+ *
+ * The name of the function is a misnomer, as it does not only apply to
  * HPOSC (BAW) configuration, but will generically enable SW TCXO.
  */
-void RF_enableHPOSCTemperatureCompensation(void)
+RF_Stat RF_enableHPOSCTemperatureCompensation(void)
 {
     int_fast16_t status;
 
     Temperature_init();
 
     int16_t currentTemperature = Temperature_getTemperature();
-    
+
     status = Temperature_registerNotifyRange(&RF_hposcRfCompNotifyObj,
                                                 currentTemperature + RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
                                                 currentTemperature - RF_TEMP_LIMIT_3_DEGREES_CELSIUS,
@@ -5842,6 +5951,7 @@ void RF_enableHPOSCTemperatureCompensation(void)
 
     if (status != Temperature_STATUS_SUCCESS)
     {
-        while(1);
+        return(RF_StatInvalidParamsError);
     }
+    return(RF_StatSuccess);
 }

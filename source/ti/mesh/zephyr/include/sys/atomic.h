@@ -392,13 +392,11 @@ extern atomic_val_t atomic_and(atomic_t *target, atomic_val_t value);
 //extern atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
 //#endif
 
-
 #ifdef __IAR_SYSTEMS_ICC__
 extern atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
-#else /* __IAR_SYSTEMS_ICC__ */
+#else  /* __IAR_SYSTEMS_ICC__ */
 __syscall atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
 #endif /* __IAR_SYSTEMS_ICC__ */
-
 
 /**
  * @brief Initialize an atomic variable.
@@ -415,7 +413,7 @@ __syscall atomic_val_t atomic_nand(atomic_t *target, atomic_val_t value);
  */
 
 #define ATOMIC_BITS (sizeof(atomic_val_t) * 8)
-#define ATOMIC_MASK(bit) (1 << ((uint32_t)(bit) & (ATOMIC_BITS - 1)))
+#define ATOMIC_MASK(bit) (1U << ((uint32_t)(bit) & (ATOMIC_BITS - 1U)))
 #define ATOMIC_ELEM(addr, bit) ((addr) + ((bit) / ATOMIC_BITS))
 
 /**

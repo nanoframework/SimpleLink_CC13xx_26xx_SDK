@@ -5,7 +5,7 @@
  @brief Sensor Specific Functions API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -94,7 +94,7 @@ void shutDownSensors(Lpstk_SensorMask sensors);
 float Lpstk_getTemperature(void);
 float Lpstk_getHumidity(void);
 void Lpstk_getAccelerometer(Lpstk_Accelerometer *accel);
-float Lpstk_getMagFlux(void);
+bool Lpstk_getHallEffectSwitch(void);
 float Lpstk_getLux(void);
 
 #ifdef __cplusplus

@@ -1,9 +1,6 @@
 //*****************************************************************************
 //! @file       cc26x1x3.icf
 //! @brief      CC26x1x3 rev1 linker file for Code Composer Studio.
-//!
-//! Revised     $Date$
-//! Revision    $Revision$
 //
 //  This file is auto-generated.
 //

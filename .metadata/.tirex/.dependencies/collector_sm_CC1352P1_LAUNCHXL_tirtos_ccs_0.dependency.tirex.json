@@ -1,8 +1,14 @@
 [
     {
         "files": [
-            "+../../cc13x2_cc26x2.cmd -> cc13x2_cc26x2.cmd",
-            "+../../collector.syscfg -> collector.syscfg",
+            "+../../README.md -> README.md",
+            "+../../README.html -> README.html",
+            "+../../../../../../../source/ti/ti154stack/apps/collector/main.c -> application/main.c",
+            "+../../../../../../../source/ti/ti154stack/apps/collector/collector.c -> application/collector/collector.c",
+            "+../../../../../../../source/ti/ti154stack/apps/collector/collector.h -> application/collector/collector.h",
+            "+../../../../../../../source/ti/ti154stack/apps/collector/csf.c -> application/collector/csf.c",
+            "+../../../../../../../source/ti/ti154stack/apps/collector/csf.h -> application/collector/csf.h",
+            "+../../application/collector/advanced_config.h -> application/collector/advanced_config.h",
             "+../../../../../../../source/ti/ti154stack/common/cllc/cllc.c -> application/collector/link_controller/cllc.c",
             "+../../../../../../../source/ti/ti154stack/common/inc/cllc.h -> application/collector/link_controller/cllc.h",
             "+../../../../../../../source/ti/ti154stack/common/inc/llc.h -> application/collector/link_controller/llc.h",
@@ -27,7 +33,7 @@
             "+../../../../../../../source/ti/ti154stack/services/saddr/saddr.h -> software_stack/ti15_4stack/mac/saddr.h",
             "+../../../../../../../source/ti/ti154stack/services/sdata/sdata.h -> software_stack/ti15_4stack/mac/sdata.h",
             "+../../application/defines/collector.opts -> application/defines/collector.opts",
-            "+../../../../../../../source/ti/ti154stack/common/boards/CC13X2_LAUNCHXL/app.cfg -> app.cfg",
+            "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_activity.c -> software_stack/ti15_4stack/mac/low_level/mac_activity.c",
             "+../../../../../../../source/ti/ti154stack/high_level/mac_cfg.c -> software_stack/ti15_4stack/mac/mac_settings/mac_cfg.c",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.c -> software_stack/ti15_4stack/mac/mac_settings/mac_settings.c",
             "+../../../../../../../source/ti/ti154stack/low_level/cc13xx/mac_settings.h -> software_stack/ti15_4stack/mac/mac_settings/mac_settings.h",
@@ -39,14 +45,10 @@
             "+../../../../../../../source/ti/ti154stack/common/osal_port/api_mac.h -> software_stack/ti15_4stack/mac/api_mac.h",
             "+../../../../../../../source/ti/ti154stack/common/util/util_timer.h -> software_stack/ti15_4stack/osal/util_timer.h",
             "+../../../../../../../source/ti/ti154stack/common/util/mac_util.h -> software_stack/ti15_4stack/osal/mac_util.h",
-            "+../../README.md -> README.md",
-            "+../../application/collector/advanced_config.h -> application/collector/advanced_config.h",
-            "+../../../../../../../source/ti/ti154stack/apps/collector/collector.c -> application/collector/collector.c",
-            "+../../../../../../../source/ti/ti154stack/apps/collector/collector.h -> application/collector/collector.h",
-            "+../../../../../../../source/ti/ti154stack/apps/collector/csf.c -> application/collector/csf.c",
-            "+../../../../../../../source/ti/ti154stack/apps/collector/csf.h -> application/collector/csf.h",
-            "+../../../../../../../source/ti/ti154stack/apps/collector/main.c -> application/main.c",
+            "+../collector.syscfg -> collector.syscfg",
+            "+../../../../../../../source/ti/ti154stack/common/boards/CC13X2_LAUNCHXL/app.cfg -> app.cfg",
             "+../../../../../../../source/ti/boards/CC1352P1_LAUNCHXL/Board.html -> Board.html",
+            "+cc13x2_cc26x2.cmd -> cc13x2_cc26x2.cmd",
             "+../makefile.defs -> makefile.defs"
         ]
     }

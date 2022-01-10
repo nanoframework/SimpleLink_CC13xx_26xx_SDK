@@ -42,7 +42,6 @@
 #include <ti/drivers/I2S.h>
 #include <ti/drivers/dpl/SemaphoreP.h>
 #include <ti/drivers/dpl/HwiP.h>
-#include <ti/drivers/PIN.h>
 #include <ti/drivers/pin/PINCC26XX.h>
 #include <ti/drivers/Power.h>
 
@@ -75,14 +74,13 @@ extern "C" {
  *  @endcode
  */
 typedef struct {
-    PIN_Id                           pinSD1;                  /*!< Pin used for SD1 signal. */
-    PIN_Id                           pinSD0;                  /*!< Pin used for SD0 signal. */
-    PIN_Id                           pinSCK;                  /*!< Pin used for SCK signal. */
-    PIN_Id                           pinMCLK;                 /*!< Pin used for MCLK signal. Non used in most of the applications. */
-    PIN_Id                           pinWS;                   /*!< Pin used for WS signal. */
-    uint8_t                          intPriority;             /*!< I2S Peripheral's interrupt priority. */
-
-}I2SCC26XX_HWAttrs;
+    uint_least8_t       pinSD1;         /*!< Pin used for SD1 signal. */
+    uint_least8_t       pinSD0;         /*!< Pin used for SD0 signal. */
+    uint_least8_t       pinSCK;         /*!< Pin used for SCK signal. */
+    uint_least8_t       pinMCLK;        /*!< Pin used for MCLK signal. Non used in most of the applications. */
+    uint_least8_t       pinWS;          /*!< Pin used for WS signal. */
+    uint8_t             intPriority;    /*!< I2S Peripheral's interrupt priority. */
+} I2SCC26XX_HWAttrs;
 
 /*!
  *  @cond NODOC

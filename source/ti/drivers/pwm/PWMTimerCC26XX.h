@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -131,7 +131,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <ti/drivers/PIN.h>
 #include <ti/drivers/PWM.h>
 #include <ti/drivers/timer/GPTimerCC26XX.h>
 
@@ -164,26 +163,12 @@ extern const PWM_FxnTable PWMTimerCC26XX_fxnTable;
 /*!
  *  @brief  PWMTimer26XX Hardware attributes
  *
- *  These fields are used by the driver to set up underlying PIN and GPTimer
- *  driver statically. A sample structure is shown below:
- *
- *  @code
- *  // PWM configuration, one per PWM output
- *  PWMTimerCC26XX_HwAttrs pwmtimerCC26xxHWAttrs[CC2650_PWMCOUNT] = {
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN0, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER0A } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN1, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER0B } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN2, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER1A } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN3, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER1B } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN4, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER2A } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN5, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER2B } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN6, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER3A } ,
- *   { .pwmPin = CC2650_LAUNCHXL_PWMPIN7, .gpTimerUnit = CC2650_LAUNCHXL_GPTIMER3B } ,
- *  };
- *    @endcode
+ *  These fields are used by the driver to set up underlying GPIO and GPTimer
+ *  driver statically.
  */
 typedef struct PWMTimerCC26XX_HwAttrs
 {
-    PIN_Id  pwmPin;               /*!< PIN to output PWM signal on */
+    uint8_t pwmPin;               /*!< Pin to output PWM signal on */
     uint8_t gpTimerUnit;          /*!< GPTimer unit index (0A, 0B, 1A..) */
 } PWMTimerCC26XX_HwAttrs;
 
@@ -195,11 +180,6 @@ typedef struct PWMTimerCC26XX_HwAttrs
  * The application must not edit any member variables of this structure.
  * Appplications should also not access member variables of this structure
  * as backwards compatibility is not guaranteed.
- * A sample structure is shown below:
- * @code
- * // PWM object, one per PWM output
- * PWMTimerCC26XX_Object pwmtimerCC26xxObjects[CC2650_PWMCOUNT];
- * @endcode
  */
 typedef struct PWMTimerCC26XX_Object
 {

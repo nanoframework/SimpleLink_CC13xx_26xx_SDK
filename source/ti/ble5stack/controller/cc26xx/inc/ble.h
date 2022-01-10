@@ -6,7 +6,7 @@
         RF Core Firmware Specification for Bluetooth Low Energy.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -266,6 +266,7 @@
 #define RAT_TICKS_IN_1_006MS           4024      // AUX_CONNECT_REQ in Coded S2
 #define RAT_TICKS_IN_1_225MS           4900      // Adv HDC offset time from rf count command in case ch.39 excluded
 #define RAT_TICKS_IN_1_25MS            5000      // Fundamental BLE Time Unit
+#define RAT_TICKS_IN_1_5MS             6000      // max RX window size for periodic scan
 #define RAT_TICKS_IN_1_875MS           7500      // DTM Packet Interval
 #define RAT_TICKS_IN_2MS               8000      // Max time in 1M phy for fragments periodic adv
 #define RAT_TICKS_IN_2_5MS             10000     // DTM Packet Interval
@@ -277,11 +278,13 @@
 #define RAT_TICKS_IN_1_28S             5120000   // Directed Advertising Timeout
 #define RAT_TICKS_IN_32S               128000000 // Max LSTO
 //
-#define RAT_TICKS_FOR_CONNECT_IND      RAT_TICKS_IN_352US
-#define RAT_TICKS_FOR_AUX_CONN_REQ_1M  RAT_TICKS_IN_352US
-#define RAT_TICKS_FOR_AUX_CONN_REQ_2M  RAT_TICKS_IN_180US
-#define RAT_TICKS_FOR_AUX_CONN_REQ_S2  RAT_TICKS_IN_1_006MS
-#define RAT_TICKS_FOR_AUX_CONN_REQ_S8  RAT_TICKS_IN_2_896MS
+#define RAT_TICKS_FOR_CONNECT_IND             RAT_TICKS_IN_352US
+#define RAT_TICKS_FOR_AUX_CONN_REQ_1M         RAT_TICKS_IN_352US
+#define RAT_TICKS_FOR_AUX_CONN_REQ_2M         RAT_TICKS_IN_180US
+#define RAT_TICKS_FOR_AUX_CONN_REQ_S2         RAT_TICKS_IN_1_006MS
+#define RAT_TICKS_FOR_AUX_CONN_REQ_S8         RAT_TICKS_IN_2_896MS
+#define RAT_TICKS_FOR_PERIODIC_SCAN_WIN_SIZE  RAT_TICKS_IN_1_5MS
+#define RAT_TICKS_FOR_SCHED_PROCESS_TIME      RAT_TICKS_IN_200US
 
 // Radio Timer (RAT) Channels
 #define RAT_CHAN_5                     5

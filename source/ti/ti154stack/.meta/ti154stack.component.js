@@ -40,7 +40,8 @@ let topModules = [];
 let templates = [];
 
 /* Only export 15.4 module if device is supported */
-if(system.deviceData.deviceId.match(/CC2652|CC13.2(R|P)/))
+const deviceId = system.deviceData.deviceId;
+if(deviceId.match(/CC265(2|1)|CC13.(2|1)(R|P)/) && !deviceId.match(/CC1311/))
 {
     topModules = [
         {
@@ -53,6 +54,14 @@ if(system.deviceData.deviceId.match(/CC2652|CC13.2(R|P)/))
         {
             name: "/ti/ti154stack/templates/ti_154stack_config.h.xdt",
             outputPath: "ti_154stack_config.h"
+        },
+        {
+            name: "/ti/ti154stack/templates/ti_154stack_config.c.xdt",
+            outputPath: "ti_154stack_config.c"
+        },
+        {
+            name: "/ti/ti154stack/templates/ti_154stack_config.opts.xdt",
+            outputPath: "ti_154stack_config.opts"
         },
         {
             name: "/ti/ti154stack/templates/ti_154stack_oad_config.h.xdt",

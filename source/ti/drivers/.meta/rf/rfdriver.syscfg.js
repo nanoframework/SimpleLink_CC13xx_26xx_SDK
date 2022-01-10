@@ -46,10 +46,14 @@ const Docs = system.getScript("/ti/drivers/rf/RF.docs.js");
 /* Pin symbol default prefix */
 const SYM_PREFIX = "CONFIG_RF_";
 
+/* Device information */
+const deviceData = system.deviceData;
+
 /* HW supported for antenna switch code generation */
 const hwSupported = [
-    "SKY13317-373LF", // CC1352P
-    "XMSSJJ3G0PA-054" // CC2652PSIP
+    "SKY13317-373LF",  // CC13X2_CC26X2
+    "XMSSJJ3G0PA-054", // CC13X2_CC26X2, SIP
+    "RTC6608OU"        // CC13X1_CC26X1
 ];
 
 /* Options for global event mask */
@@ -77,6 +81,10 @@ const globalEventOptions = [
     {
         name: "RF_GlobalEventCoexControl",
         description: Docs.globalEvent.coexControl.description
+    },
+    {
+        name: "RF_GlobalEventTempNotifyFail",
+        description: Docs.globalEvent.radioSetup.description
     }
 ];
 
@@ -95,6 +103,19 @@ const requiredGlobalEvents = {
     ]
 };
 
+/* Supported coex mode per PHY */
+const coexModeSupport = {
+    ble: [
+        "coexMode3Wire",
+        "coexMode1WireRequest",
+        "coexMode1WireGrant"
+    ],
+    ieee_15_4: [
+        "coexMode3Wire",
+        "coexMode2Wire"
+    ]
+}
+
 /* Structure for coex config */
 const coexConfig = {
     coExEnable: {
@@ -106,48 +127,83 @@ const coexConfig = {
     },
     coExTxRxIndication: 1,
     priorityIndicationTime: 20,
-    overrideConfig: {
-        bUseOverridePriority: 0,
-        overridePriority: 0,
-        bUseOverrideRequestForRx: 0,
-        overrideRequestForRx: 0
+    ble: {
+        overrideConfig: {
+            bUseOverridePriority: 0,
+            overridePriority: 0,
+            bUseOverrideRequestForRx: 0,
+            overrideRequestForRx: 0
+        },
+        cmdBleMasterSlaveConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdBleAdvConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdBleScanConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdBleInitConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdBleGenericRxConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdBleTxTestConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        }
     },
-    cmdBleMasterSlaveConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
+    ieee_15_4: {
+        overrideConfig: {
+            bUseOverridePriority: 0,
+            overridePriority: 0,
+            bUseOverrideRequestForRx: 0,
+            overrideRequestForRx: 0
+        },
+        cmdIeeeRxConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdIeeeRxAckConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdIeeeCcaConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        },
+        cmdIeeeTxConfig: {
+            defaultPriority: 0,
+            bAssertRequestForRx: 1,
+            bIgnoreGrantInRx: 0,
+            bKeepRequestIfNoGrant: 0
+        }
     },
-    cmdBleAdvConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
-    },
-    cmdBleScanConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
-    },
-    cmdBleInitConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
-    },
-    cmdBleGenericRxConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
-    },
-    cmdBleTxTestConfig: {
-        defaultPriority: 0,
-        bAssertRequestForRx: 1,
-        bIgnoreGrantInRx: 0,
-        bKeepRequestIfNoGrant: 0
-    }
+    grantLatencyTime: 60
 };
 
 /* Map option to enum name */
@@ -189,13 +245,23 @@ swiPriority.description = Docs.swiPriority.description;
 /* Configurables for the rfdriver module */
 const config = [
     {
+        name: "$hardware",
+        filterHardware: filterHardware,
+        onChange: onHardwareChanged,
+        getUIDefault: (components) => {
+            const [key, value] = Object.entries(components).find(c => c[1].type == "RF") || [];
+            return key ? components[key] : null;
+        }
+    },
+    {
         name: "pinSelectionAntenna",
         displayName: Docs.pinSelectionAntenna.displayName,
         description: Docs.pinSelectionAntenna.description,
         longDescription: Docs.pinSelectionAntenna.longDescription,
-        default: 0,
+        default: isAntennaSwitchInPackage() ? Object.keys(getRfHardware().signals).length : 0,
         options: Array.from(Array(N_MAX_ANTENNA_PINS+1), (x,i) => i).map(i => ({name:i})),
         hidden: false,
+        readOnly: isAntennaSwitchInPackage(),
         onChange: onPinSelectionAntennaChanged
     },
     {
@@ -217,8 +283,9 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
         displayName: Docs.coex.enable.displayName,
         description: Docs.coex.enable.description,
         longDescription: Docs.coex.enable.longDescription,
+        skipTests: ["configLongDescription"],
         default: false,
-        onChange: onCoexEnableChanged
+        onChange: (inst, ui) => onCoexEnableChanged(inst, ui, "coexEnable")
     },
     {
         name: "coexConfigGroup",
@@ -226,10 +293,33 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
         collapsed: false,
         config: [
             {
+                name: "coexPhy",
+                displayName: Docs.coex.phy.displayName,
+                description: Docs.coex.phy.description,
+                longDescription: Docs.coex.phy.longDescription,
+                hidden: true,
+                default: ["ble"],
+                minSelections: 1,
+                options: [
+                    {
+                        name: "ble",
+                        displayName: Docs.coex.phy.ble.displayName,
+                        description: Docs.coex.phy.ble.description
+                    },
+                    {
+                        name: "ieee_15_4",
+                        displayName: Docs.coex.phy.ieee_15_4.displayName,
+                        description: Docs.coex.phy.ieee_15_4.description
+                    }
+                ],
+                onChange: (inst, ui) => onCoexEnableChanged(inst, ui, "coexPhy")
+            },
+            {
                 name: "coexMode",
                 displayName: Docs.coex.mode.displayName,
                 description: Docs.coex.mode.description,
                 longDescription: Docs.coex.mode.longDescription,
+                getDisabledOptions: getDisabledCoexModeOptions,
                 hidden: true,
                 default: "coexMode3Wire",
                 options: [
@@ -237,6 +327,11 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                         name: "coexMode3Wire",
                         displayName: Docs.coex.mode.threeWire.displayName,
                         description: Docs.coex.mode.threeWire.description
+                    },
+                    {
+                        name: "coexMode2Wire",
+                        displayName: Docs.coex.mode.twoWire.displayName,
+                        description: Docs.coex.mode.twoWire.description
                     },
                     {
                         name: "coexMode1WireRequest",
@@ -289,13 +384,22 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                 options: coexLevelOptions
             },
             {
-                name: "coexUseCaseConfigGroup",
-                displayName: Docs.coex.useCaseConfigGroup.displayName,
+                name: "coexGrantLatencyTime",
+                displayName: Docs.coex.grantLatencyTime.displayName,
+                description: Docs.coex.grantLatencyTime.description,
+                longDescription: Docs.coex.grantLatencyTime.longDescription,
+                hidden: true,
+                default: 60,
+                onChange: onCoexGrantLatencyTimeChanged
+            },
+            {
+                name: "coexUseCaseConfigGroupBle",
+                displayName: Docs.coex.useCaseConfigGroupBle.displayName,
                 collapsed: true,
                 config: [
                     {
                         name: "bleIniGroup",
-                        displayName: Docs.coex.useCaseConfigGroup.ini.displayName,
+                        displayName: Docs.coex.useCaseConfigGroupBle.ini.displayName,
                         collapsed: false,
                         config: [
                             {
@@ -321,7 +425,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                     },
                     {
                         name: "bleConGroup",
-                        displayName: Docs.coex.useCaseConfigGroup.con.displayName,
+                        displayName: Docs.coex.useCaseConfigGroupBle.con.displayName,
                         collapsed: false,
                         config: [
                             {
@@ -345,7 +449,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                     },
                     {
                         name: "bleBroGroup",
-                        displayName: Docs.coex.useCaseConfigGroup.bro.displayName,
+                        displayName: Docs.coex.useCaseConfigGroupBle.bro.displayName,
                         collapsed: false,
                         config: [
                             {
@@ -369,7 +473,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                     },
                     {
                         name: "bleObsGroup",
-                        displayName: Docs.coex.useCaseConfigGroup.obs.displayName,
+                        displayName: Docs.coex.useCaseConfigGroupBle.obs.displayName,
                         collapsed: false,
                         config: [
                             {
@@ -410,7 +514,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
         description: Docs.globalEventMask.description,
         longDescription: Docs.globalEventMask.longDescription,
         minSelections: 0,
-        default: [],
+        default: isAntennaSwitchInPackage() ? requiredGlobalEvents.antennaSwitch : [],
         onChange: onGlobalEventMaskChanged,
         options: globalEventOptions
     },
@@ -419,8 +523,8 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
         displayName: Docs.globalCallbackFunction.displayName,
         description: Docs.globalCallbackFunction.description,
         longDescription: Docs.globalCallbackFunction.longDescription,
-        default: "NULL",
-        readOnly: true
+        default: isAntennaSwitchInPackage() ? "rfDriverCallback" : "NULL",
+        readOnly: !isAntennaSwitchInPackage()
     },
     {
         name: "pinSymGroup",
@@ -439,7 +543,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
 /*
  *  ======== filterHardware ========
  *  Check component signals for compatibility with RF.
- *  
+ *
  *  @param component    - A hardware component
  *  @return             - Bool
  */
@@ -447,21 +551,20 @@ function filterHardware(component) {
     return (Common.typeMatches(component.type, ["RF"]));
 }
 
-/* 
+/*
  *  ======== isCustomDesign ========
  *  Check if device used is custom (i.e. not LaunchPad).
- *  
+ *
  *  @return - Bool
  */
 function isCustomDesign() {
-    const deviceData = system.deviceData;
     return !("board" in deviceData);
 }
 
 /*
  *  ======== isPhy ========
  *  Check if module is shared by (i.e. child of) a specific phy.
- *  
+ *
  *  @param inst - Module instance object
  *  @param phy  - "ble", "ieee_15_4" or "prop"
  *  @return     - Bool
@@ -474,13 +577,27 @@ function isPhy(inst, phy) {
 /*
  *  ======== isConfigDefaultValue ========
  *  Check if specified configuration option has its default value.
- *  
+ *
  *  @param inst     - Module instance object containing the config
  *  @param config   - Config option to get default value of
  *  @return         - Bool
  */
 function isConfigDefaultValue(inst, config){
     return (inst[config] === getDefaultValue(inst, config));
+}
+
+/*
+ *  ======== isAntennaSwitchInPackage ========
+ *  Check if antenna switch is in device package.
+ *
+ *  @return - Bool
+ */
+function isAntennaSwitchInPackage() {
+    /* If P device and SIP package */
+    return (
+        !!deviceData.deviceId.match(/CC....P/)
+        && (deviceData.package === "SIP")
+    );
 }
 
 /*
@@ -492,7 +609,7 @@ function isConfigDefaultValue(inst, config){
 /*
  *  ======== getDefaultValue ========
  *  Get default value for specified configuration option.
- *  
+ *
  *  @param inst     - Module instance object containing the config
  *  @param config   - Config option to get default value of
  *  @return         - Default/initial value used for config
@@ -502,14 +619,82 @@ function getDefaultValue(inst, config){
 }
 
 /*
+ *  ======== getRfHardware ========
+ *  Get $hardware configurable.
+ *
+ *  This function will return a $hardware object, regardless of
+ *  it being defined as a component in the board metadata or
+ *  defined withing the RF module (RF.hardware.js).
+ *
+ *  Note: When fetched from RF.hardware.js, the configurable returned will have less
+ *        members than the original $hardware definition, but an additional signal `.dio`.
+ *
+ *  @param inst     - Module instance object containing the config
+ *  @return         - A $hardware configurable
+ */
+function getRfHardware(inst=null) {
+    let hardware = inst ? inst.$hardware : null;
+
+    /* If P device SIP package */
+    if (isAntennaSwitchInPackage()) {
+        /* Device information */
+        const RfHardware = system.getScript("/ti/drivers/rf/hardware/RF.hardware.js");
+        const DriverLib = system.getScript("/ti/devices/DriverLib");
+        const deviceFamily = DriverLib.getAttrs(deviceData.deviceId).deviceDir.replace(/x2x7/g, "x2");
+
+        /* Hardware definition stored with RF module */
+        hardware = RfHardware.antennaSwitch[deviceFamily][deviceData.package]
+    }
+
+    return hardware;
+}
+
+/*
+ *  ======== getDisabledCoexModeOptions ========
+ *  Generates a list of options that should be disabled in the coex mode
+ *  drop-down.
+ *
+ * @param inst     - Module instance object containing the config
+ * @returns        - Array of options that should be disabled
+ */
+function getDisabledCoexModeOptions(inst)
+{
+    const coexPhy = inst.coexPhy;
+    const disabledOptions = [];
+    const reason = "Coex mode not supported by the current PHY configuration";
+
+    if(coexPhy.includes("ble"))
+    {
+        disabledOptions.push({
+                name: "coexMode2Wire",
+                reason: reason
+        });
+    }
+
+    if(coexPhy.includes("ieee_15_4"))
+    {
+        disabledOptions.push({
+            name: "coexMode1WireRequest",
+            reason: reason
+        });
+
+        disabledOptions.push({
+        name: "coexMode1WireGrant",
+        reason: reason
+        });
+    }
+
+    return(disabledOptions);
+}
+
+/*
  *  ======== getPinByDIO ========
  *  Get a pin description.
- *  
+ *
  *  @param   dio - Formatted "DIO_XX"
- *  @return      - Pin object 
+ *  @return      - Pin object
  */
 function getPinByDIO(dio) {
-    const deviceData = system.deviceData;
     const ipin = _.findKey(deviceData.devicePins, pin => pin.designSignalName === dio);
     if (ipin === undefined) {
         throw Error("Pin not found: " + dio);
@@ -520,13 +705,12 @@ function getPinByDIO(dio) {
 /*
  *  ======== getPinOptions ========
  *  Get a list of available DIO pins.
- * 
- *  @return - Array of pin options {name, displayName} 
+ *
+ *  @return - Array of pin options {name, displayName}
  */
 function getPinOptions() {
-    const deviceData = system.deviceData;
     const dioPins = Object.values(deviceData.devicePins).filter(pin => pin.designSignalName.includes("DIO_"));
-    
+
     const pinOptions = dioPins.map(pin => ({
             name: pin.designSignalName,
             /* Display as "DIO_X / Pin Y" */
@@ -539,12 +723,12 @@ function getPinOptions() {
 /*
  *  ======== getPinSymbolConfigurables ========
  *  Get pin symbol configurables based on device pin options.
- *  
+ *
  *  @return - Array of pin symbol objects
  */
 function getPinSymbolConfigurables() {
     const config = [];
-    
+
     /*
     *  ======== NOT USED ========
     *  The following was used to map custom symbols to DIOs,
@@ -564,14 +748,20 @@ function getPinSymbolConfigurables() {
     });
     /* ==========================
 
+    /* Specific pin symbol names, if antenna switch required for device */
+    const antennaSwitch = getRfHardware();
+    const antennaSwitchRequired = isAntennaSwitchInPackage();
+    const signalNames = antennaSwitch ? Object.keys(antennaSwitch.signals) : [];
+
     /* Add pin symbol config for antenna pins */
     for(let index = 0; index < N_MAX_ANTENNA_PINS; index++) {
         config.push({
             name: `rfAntennaPinSymbol${index}`,
             displayName: `RF Antenna Pin ${index}`,
-            default: SYM_PREFIX + `ANTENNA_PIN_${index}`,
-            hidden: true
-        })
+            default: SYM_PREFIX + ((index < signalNames.length) ? signalNames[index] : `ANTENNA_PIN_${index}`),
+            hidden: !(index < signalNames.length),
+            readOnly: ((index < signalNames.length) && antennaSwitchRequired)
+        });
     }
 
     /* Add pin symbol config for coex pins*/
@@ -590,9 +780,26 @@ function getPinSymbolConfigurables() {
 }
 
 /*
+ *  ======== getGrantIntTrigger ========
+ *  Get the interrupt trigger for the grant signal
+ *
+ *  @param inst     - Module instance object containing the config
+ *  @return         - Interrupt trigger in string format e.g. "Rising Edge"
+ */
+function getGrantIntTrigger(inst) {
+
+    if (inst["coexPinGrantIdleLevel"]) {
+        return "Rising Edge";
+    }
+    else {
+        return "Falling Edge";
+    }
+}
+
+/*
  *  ======== getCoexPinInfo ========
  *  Get list with info on enabled coex signals.
- *  
+ *
  *  @param inst     - Module instance object containing the config
  *  @return         - Array of coex pin objects
  */
@@ -603,8 +810,12 @@ function getCoexPinInfo(inst) {
         name: "rfCoexRequestPin",
         displayName: "RF Coex REQUEST Pin",
         signal: "REQUEST",
-        pinArgs: {
-            $name: inst["rfCoexRequestPinSymbol"]
+        requiredArgs: {
+            $name: inst["rfCoexRequestPinSymbol"],
+            mode: "Output",
+            initialOutputState: "Low",
+            outputStrength: "High",
+            invert: inst["coexPinRequestIdleLevel"] ? true : false
         }
     };
 
@@ -612,8 +823,12 @@ function getCoexPinInfo(inst) {
         name: "rfCoexPriorityPin",
         displayName: "RF Coex PRIORITY Pin",
         signal: "PRIORITY",
-        pinArgs: {
-            $name: inst["rfCoexPriorityPinSymbol"]
+        requiredArgs: {
+            $name: inst["rfCoexPriorityPinSymbol"],
+            mode: "Output",
+            initialOutputState: "Low",
+            outputStrength: "High",
+            invert: inst["coexPinPriorityIdleLevel"] ? true : false
         }
     };
 
@@ -621,17 +836,24 @@ function getCoexPinInfo(inst) {
         name: "rfCoexGrantPin",
         displayName: "RF Coex GRANT Pin",
         signal: "GRANT",
-        pinArgs: {
-            $name: inst["rfCoexGrantPinSymbol"]
+        requiredArgs: {
+            $name: inst["rfCoexGrantPinSymbol"],
+            mode: "Input",
+            interruptTrigger: getGrantIntTrigger(inst),
+            callbackFunction: "rfDriverCoexPinsHwi",
+            invert: inst["coexPinGrantIdleLevel"] ? false : true
         }
     };
-    
+
     const coexPinInfo = [];
     if(enable){
         switch(mode) {
             case "coexMode3Wire":
                 coexPinInfo.push(request, priority, grant);
                 break;
+            case "coexMode2Wire":
+                    coexPinInfo.push(request, grant);
+                    break;
             case "coexMode1WireRequest":
                 coexPinInfo.push(request);
                 break;
@@ -659,6 +881,23 @@ function onHardwareChanged(inst, ui) {
         inst[`rfAntennaPinSymbol${index}`] = SYM_PREFIX + hardware.signals[signal].name;
     });
 
+    /* 
+     * Temporary workaround:
+     * Correction of signal mapping for the antenna switch
+     * on board LP_CC1311P3. The antenna switch logic will be
+     * wrong if signal "HIGH_PA" is mapped to device ball 42.
+     */
+    if (
+        hasHardware
+        && !!deviceData.deviceId.match(/CC1311P3/)
+        && (hardware.signals["HIGH_PA"].devicePin.ball === "42")
+    ) {
+        /* Swap antenna pin symbol defines to adjust signal mapping */
+        const tmp                = inst.rfAntennaPinSymbol0;
+        inst.rfAntennaPinSymbol0 = inst.rfAntennaPinSymbol1;
+        inst.rfAntennaPinSymbol1 = tmp;
+    }
+
     /* Update antenna pin selection to number of HW signals */
     updateConfigValue(inst, ui, "pinSelectionAntenna", hwSignals.length);
     ui.pinSelectionAntenna.readOnly = hasHardware;
@@ -667,7 +906,7 @@ function onHardwareChanged(inst, ui) {
 /*
  *  ======== onPinSelectionChanged ========
  *  Called when config pinSelection changes.
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
@@ -684,7 +923,7 @@ function onPinSelectionChanged(inst, ui) {
 /*
  *  ======== onPinSelectionAntennaChanged ========
  *  Called when config pinSelectionAntenna changes.
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
@@ -707,7 +946,7 @@ function onPinSelectionAntennaChanged(inst, ui) {
 /*
  *  ======== onGlobalEventMaskChanged ========
  *  Called when config globalEventMask changes
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
@@ -728,20 +967,39 @@ function onGlobalEventMaskChanged(inst, ui) {
 /*
  *  ======== onCoexEnableChanged ========
  *  Called when config coexEnable changes
- * 
- *  @param inst - Module instance object containing config that changed
- *  @param ui   - User Interface state object
+ *
+ *  @param inst   - Module instance object containing config that changed
+ *  @param ui     - User Interface state object
+ *  @param config - Name of calling config
  */
-function onCoexEnableChanged(inst, ui) {
-    const enabled = inst.coexEnable;
-    const coexInstances = Object.keys(ui).filter(key => ((key.includes("coex") || key.includes("ble")) && key !== "coexEnable"));
+function onCoexEnableChanged(inst, ui, config) {
+    const {coexEnable: enabled, coexPhy: coexPhy} = inst;
+
+    const coexInstances = Object.keys(ui).filter(key => ((key.includes("coex")
+        || key.includes("ble") || key.includes("ieee")) && key !== "coexEnable" && key !== config));
 
     /* Show coex config instances according to coexEnable state */
-    coexInstances.forEach(instance => ui[instance].hidden = !enabled);
+    coexInstances.forEach(instance => {
+        if(instance.includes("ble"))
+        {
+            ui[instance].hidden = !(enabled && coexPhy.includes("ble"));
+        }
+        else if (instance.includes("ieee"))
+        {
+            ui[instance].hidden = !(enabled && coexPhy.includes("ieee_15_4"));
+        }
+        else if (instance.includes("Latency"))
+        {
+            ui[instance].hidden = !(enabled && coexPhy.includes("ieee_15_4"));
+        }
+        else {
+            ui[instance].hidden = !enabled;
+        }
+    });
 
     /* Reset config instances to default value if hidden */
     coexInstances.filter(instance => ui[instance].hidden).forEach(instance => resetDefaultValue(inst, instance));
-    
+
     /* Update global event mask */
     let events = [];
     if(enabled) {
@@ -764,12 +1022,12 @@ function onCoexEnableChanged(inst, ui) {
 /*
  *  ======== onCoexModeChanged ========
  *  Called when config coexMode changes
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
 function onCoexModeChanged(inst, ui) {
-    const mode = inst.coexMode;
+    const {coexPhy: coexPhy, coexMode: mode} = inst;
     const coexPinInstances = Object.keys(ui).filter(key => key.includes("coexPin"));
 
     /* Update pin config visibility according to mode */
@@ -787,14 +1045,29 @@ function onCoexModeChanged(inst, ui) {
 
     /* Update ble config visibility according to mode */
     const coexBleInstances = Object.keys(ui).filter(key => key.substring(0,3) === "ble");
-    coexBleInstances.forEach(instance => {
-        if(instance.includes("DefaultPriority")) {
-            ui[instance].hidden = (mode !== "coexMode3Wire");
-        }
-        else if(instance.includes("AssertRequestForRx")) {
-            ui[instance].hidden = (mode == "coexMode1WireGrant");
-        }
-    });
+    if(coexPhy.includes("ble"))
+    {
+        coexBleInstances.forEach(instance => {
+            if(instance.includes("DefaultPriority")) {
+                ui[instance].hidden = (mode !== "coexMode3Wire");
+            }
+            else if(instance.includes("AssertRequestForRx")) {
+                ui[instance].hidden = (mode == "coexMode1WireGrant");
+            }
+        });
+    }
+    else
+    {
+        const coexIeeeInstances = Object.keys(ui).filter(key => key.substring(0,3) === "ieee");
+        coexIeeeInstances.forEach(instance => {
+            if(instance.includes("DefaultPriority")) {
+                ui[instance].hidden = (mode !== "coexMode3Wire");
+            }
+            else if(instance.includes("AssertRequestForRx")) {
+                ui[instance].hidden = (mode == "coexMode2Wire");
+            }
+        });
+    }
 
     /* Reset config instance to default value if hidden */
     const hiddenInstances = coexPinInstances.concat(coexBleInstances).filter(instance => ui[instance].hidden);
@@ -810,13 +1083,23 @@ function onCoexModeChanged(inst, ui) {
 /*
  *  ======== onCoexPriorityIndicationTimeChanged ========
  *  Called when config coexPinPriorityIndicationTime changes
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
 function onCoexPriorityIndicationTimeChanged(inst, ui) {
     /* Update coex config structure */
     updateCoexConfig(inst);
+}
+
+/*
+ *  ======== onCoexGrantLatencyChanged ========
+ *  Called when config coexGrantLatencyTime changes
+ *
+ *  @param inst - Module instance object containing config that changed
+ */
+function onCoexGrantLatencyTimeChanged(inst) {
+    coexConfig.grantLatencyTime = inst.coexGrantLatencyTime;
 }
 
 /*
@@ -828,7 +1111,7 @@ function onCoexPriorityIndicationTimeChanged(inst, ui) {
 /*
  *  ======== resetDefaultValue ========
  *  Set specified configuration option to it's default value
- *  
+ *
  *  @param inst     - Module instance object containing the config
  *  @param config   - Config option to reset
  */
@@ -841,7 +1124,7 @@ function resetDefaultValue(inst, config){
 /*
  *  ======== updateConfigValue ========
  *  Update config value and trigger onChange member function.
- *  
+ *
  *  @param inst     - Module instance object containing the config
  *  @param ui       - UI state object
  *  @param config   - Config option part of module
@@ -857,7 +1140,7 @@ function updateConfigValue(inst, ui, config, value){
 /*
  *  ======== updatePinSymbols ========
  *  Update pin symbol visibility according to selected pins.
- * 
+ *
  *  @param inst - Module instance object containing config that changed
  *  @param ui   - User Interface state object
  */
@@ -869,13 +1152,13 @@ function updatePinSymbols(inst, ui) {
 
     /* Show enabled antenna pins */
     const nPins = inst.pinSelectionAntenna;
-    const hasHardware = (inst.$hardware !== null);
+    const hasHardware = (getRfHardware(inst) !== null);
     for(let i = 0; i < nPins; i++) {
         const symInst = `rfAntennaPinSymbol${i}`
         ui[symInst].hidden = false;
         ui[symInst].readOnly = hasHardware;
     }
-    
+
     /* Show enabled coex pins */
     const coexPinInfo = getCoexPinInfo(inst);
     coexPinInfo.forEach(pin => {
@@ -898,14 +1181,17 @@ function updatePinSymbols(inst, ui) {
 *  @param inst - Module instance object containing config that changed
 */
 function updateCoexConfig(inst) {
-    const {coexEnable: enable, coexMode: mode, coexPinPriorityIndicationTime: priIndicationTime} = inst;
+    const {coexEnable: enable, coexPhy: coexPhy, coexMode: mode, coexPinPriorityIndicationTime: priIndicationTime} = inst;
 
     /* Coex state info */
     coexConfig.coExEnable = {
         bCoExEnable: Number(enable),
-        bUseREQUEST: Number(enable && (mode === "coexMode3Wire" || mode === "coexMode1WireRequest")),
-        bUseGRANT: Number(enable && (mode === "coexMode3Wire" || mode === "coexMode1WireGrant")),
-        bUsePRIORITY: Number(enable && mode === "coexMode3Wire")
+        bUseREQUEST: Number(enable && (mode === "coexMode3Wire"
+            || mode === "coexMode2Wire" || mode === "coexMode1WireRequest")),
+        bUseGRANT: Number(enable && (mode === "coexMode3Wire"
+            || mode === "coexMode2Wire"|| mode === "coexMode1WireGrant")),
+        bUsePRIORITY: Number(enable && mode === "coexMode3Wire"),
+        bRequestForChain: Number(enable && coexPhy.includes("ieee_15_4"))
     };
     coexConfig.priorityIndicationTime = priIndicationTime;
 
@@ -940,10 +1226,13 @@ function updateCoexConfig(inst) {
  *  - modules(...)
  */
 
+/* Store filter functions to keep static between pinmux requirement changes */
+const filterFunctions = [];
+
 /*!
  *  ======== pinmuxRequirements ========
  *  Return peripheral pin requirements as a function of config.
- * 
+ *
  *  Called when a configuration changes in the module.
  *
  *  @param inst - Module instance containing the config that changed
@@ -953,10 +1242,11 @@ function pinmuxRequirements(inst) {
     const rfArray = [];
 
     /* Requirements for antenna pins */
-    const hardware = inst.$hardware;
+    const hardware = getRfHardware(inst);
     const hasHardware = hardware !== null;
-    const signalTypes = hasHardware ? Object.values(hardware.signals).map(s => s.type) : [];
-    
+    const signals = hasHardware ? Object.values(hardware.signals) : [];
+    const antennaSwitchInPackage = isAntennaSwitchInPackage();
+
     const nPins = inst.pinSelectionAntenna;
     for(let i = 0; i < nPins; i++) {
         const pinReq = {
@@ -965,8 +1255,18 @@ function pinmuxRequirements(inst) {
             hidden: false,
             interfaceName: "GPIO"
         };
-        if(hasHardware) {
-            pinReq.signalTypes = signalTypes[i];
+        if (antennaSwitchInPackage) {
+            /* Protect against out of bounds indexing when migrating from any device to PSIP */
+            if (i < signals.length) {
+                /* Only provide the correct 1:1 mapping as the option */
+                if(!filterFunctions[i]) {
+                    filterFunctions[i] = (pin) => pin.designSignalName === signals[i].dio;
+                }
+                pinReq.filter = filterFunctions[i];
+            }
+        } else if (hasHardware) {
+            /* Map pins to the correct unique signal type */
+            pinReq.signalTypes = signals[i].type;
         }
         rfArray.push(pinReq);
     }
@@ -978,7 +1278,7 @@ function pinmuxRequirements(inst) {
             name: pin.name,
             displayName: pin.displayName,
             interfaceName: "GPIO",
-            signalTypes: ["RF"]
+            signalTypes: ["external-to-hardware"]
         });
     });
 
@@ -988,7 +1288,7 @@ function pinmuxRequirements(inst) {
 /*
  *  ======== moduleInstances ========
  *  Determines what modules are added as non-static submodules.
- * 
+ *
  *  Called when a configuration changes in the module.
  *
  *  @param inst - Module instance containing the config that changed
@@ -1002,15 +1302,18 @@ function moduleInstances(inst) {
     for(let i = 0; i < nPins; i++) {
         const pinInstance = {
             name: `rfAntennaPin${i}Instance`,
-            displayName: `PIN Configuration While Antenna Pin ${i} Is Not In Use`,
-            moduleName: "/ti/drivers/PIN",
+            displayName: `GPIO Configuration For Antenna ${i} Pin`,
+            moduleName: "/ti/drivers/GPIO",
             readOnly: false,
             collapsed: true,
-            args: {
+            requiredArgs: {
                 $name: inst[`rfAntennaPinSymbol${i}`],
-                parentMod: "/ti/drivers/RF",
+                parentInterfaceName: "GPIO",
                 parentSignalName: `rfAntennaPin${i}`,
                 parentSignalDisplayName: `RF Antenna Pin ${i}`,
+                mode: "Output",
+                initialOutputState: "Low",
+                outputStrength: "High",
             }
         };
         dependencyModules.push(pinInstance);
@@ -1021,17 +1324,19 @@ function moduleInstances(inst) {
     coexPinInfo.forEach(pin => {
         const pinInstance = {
             name: pin.name + "Instance",
-            displayName: `PIN Configuration While Coex ${pin.signal} Pin Is Not In Use`,
-            moduleName: "/ti/drivers/PIN",
+            displayName: `GPIO Configuration For Coex ${pin.signal} Pin`,
+            moduleName: "/ti/drivers/GPIO",
             readOnly: false,
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/RF",
+            requiredArgs: {
+                parentInterfaceName: "GPIO",
                 parentSignalName: pin.name,
                 parentSignalDisplayName: pin.displayName,
             }
         };
-        pinInstance.args = {...pinInstance.args, ...pin.pinArgs};
+
+        /* We don't expect users to change these, so set as required */
+        pinInstance.requiredArgs = {...pinInstance.requiredArgs, ...pin.requiredArgs};
         dependencyModules.push(pinInstance);
     })
 
@@ -1041,7 +1346,7 @@ function moduleInstances(inst) {
 /*
  *  ======== sharedModuleInstances ========
  *  Determines what modules are added as shared static sub-modules.
- * 
+ *
  *  Called when a configuration changes in the module.
  *
  *  @param inst - Module instance containing the config that changed
@@ -1056,12 +1361,16 @@ function sharedModuleInstances(inst){
  *  Determines what modules are added as static sub-modules.
  *
  *  Called when a configuration changes in the module.
- * 
+ *
  *  @param inst - Module instance containing the config that changed
  *  @return     - Array containing static dependency modules
  */
 function modules(inst) {
-    const dependencies = ["Board", "Power", "Temperature"];
+
+    /* Here we rely on the CCFG module to pull in temperature if the user
+     * has selected temperature compensation (SW TCXO)
+     */
+    const dependencies = ["Board", "Power"];
 
     return Common.autoForceModules(dependencies)();
 }
@@ -1093,15 +1402,11 @@ function getLibs(mod) {
         family = family.replace(/^DeviceFamily_/, "").replace(/X2X7/, "X2").toLowerCase();
     }
 
-    /* Determine lib name */
-    const prefix = "rf_multiMode_"
-    const suffix = Common.getLibSuffix(isa, toolchain);
-
     /* Create a GenLibs input argument */
     return {
         name: mod.$name,
         libs: [
-            `ti/drivers/rf/lib/${prefix}${family}${suffix}`
+            `ti/drivers/rf/lib/${toolchain}/${isa}/rf_multiMode_${family}.a`
         ],
         deps: [
             "/ti/drivers"
@@ -1118,18 +1423,61 @@ function getLibs(mod) {
 /*!
  *  ======== validate ========
  *  Validate rfdriver module configuration.
- * 
+ *
  *  @param inst         - Module instance containing the config that changed
  *  @param validation   - Object to hold detected validation issues
  */
 function validate(inst, validation) {
-    const {$hardware: hardware, coexEnable: coexEnable, globalCallbackFunction: cbFxn, pinSelectionAntenna: nAntennaPins} = inst;
-    
+    const {
+        coexEnable: coexEnable,
+        coexPhy: coexPhy,
+        coexMode: coexMode,
+        coexGrantLatencyTime: coexGrantLatencyTime,
+        globalEventMask: globalEventMask,
+        globalCallbackFunction: cbFxn,
+        pinSelectionAntenna: nAntennaPins
+    } = inst;
+    const hardware = getRfHardware(inst);
+
     if(coexEnable) {
-        /* Coexistence feature is dependent on BLE */
-        if(!isPhy(inst, "ble")){
+        /* Coexistence feature is dependent on BLE or IEEE 15.4 */
+        if(!isPhy(inst, "ble") && !isPhy(inst, "ieee_15_4")) {
             Common.logError(validation, inst, "coexEnable",
-            "'RF Coexistence' is only supported with BLE PHY.");
+            "'RF Coexistence' is only supported with BLE and IEEE 15.4");
+        }
+
+        /* Coex not supported on both PHYs simultaneously */
+        if(coexPhy.length !== 1)
+        {
+            Common.logError(validation, inst, "coexPhy",
+            "Only one PHY can be selected for 'RF Coexistence'");
+        }
+        else
+        {
+            /* Coex PHY needs to match RF configuration  */
+            coexPhy.forEach(phy => {
+                if(!isPhy(inst, phy))
+                {
+                    Common.logError(validation, inst, "coexPhy",
+                    `${Docs.coex.phy[phy].displayName} PHY not selected in current RF configuration`);
+                }
+            });
+        }
+
+        /* Coex mode support depend on PHY */
+        coexPhy.forEach(phy => {
+            if(!coexModeSupport[phy].includes(coexMode))
+            {
+                Common.logError(validation, inst, "coexMode",
+                "Please select a valid mode for coexistence configuration");
+            }
+        });
+
+        /* Coex Grant Latency Time should not exceed 80us */
+        if (coexGrantLatencyTime > 80 || coexGrantLatencyTime < 20)
+        {
+            Common.logError(validation, inst, "coexGrantLatencyTime",
+            "Grant Latency Time must be between 20-80 usec");
         }
     }
 
@@ -1139,12 +1487,28 @@ function validate(inst, validation) {
         "'" + cbFxn + "' is not a valid a C identifier");
     }
 
+    /* Warn user when a feature requires missing events */
+    if (hardware !== null) {
+        const missingEventsAntennaSwitch = requiredGlobalEvents.antennaSwitch.filter(event => !globalEventMask.includes(event));
+        if (!(requiredGlobalEvents.antennaSwitch.every(event => globalEventMask.includes(event)))) {
+            Common.logWarning(validation, inst, "globalEventMask",
+                `Event(s) missing required for antenna switching: ${missingEventsAntennaSwitch.join(", ")}.`);
+        }
+    }
+    if (coexEnable) {
+        const missingEventsCoex = requiredGlobalEvents.coex.filter(event => !globalEventMask.includes(event));
+        if (!(requiredGlobalEvents.coex.every(event => globalEventMask.includes(event)))) {
+            Common.logWarning(validation, inst, "globalEventMask",
+                `Event(s) missing required for coex: ${missingEventsCoex.join(", ")}.`);
+        }
+    }
+
+    /* Notify user when the antenna switching callback function must be implemented */
     if (
-        (cbFxn !== "NULL") && 
-        (nAntennaPins > 0) && 
-        ((hardware === null) || (!hwSupported.includes(hardware.name)))
+        (cbFxn !== "NULL")
+        && (nAntennaPins > 0)
+        && ((hardware === null) || (!hwSupported.includes(hardware.name)))
     ) {
-        /* Notify user that the antenna switching callback function must be implemented */
         Common.logInfo(validation, inst, "globalCallbackFunction",
         `Please see function '${cbFxn}AntennaSwitching' in 'ti_drivers_config.c'. The antenna switching functionality must be implemented by the user.`);
     }
@@ -1161,10 +1525,12 @@ function validate(inst, validation) {
         }
     });
 
-    /* Antenna switch is required for PSIP board*/
+    /* Antenna switch is required for P boards */
     const board = isCustomDesign() ? null : system.deviceData.board;
-    if ((board !== null) && (board.name.match(/PSIP/i)) && (hardware === null)) {
-        Common.logError(validation, inst, "$hardware", `The board '${board.displayName}' requires the 'RF Antenna Switch' to be selected.`);
+    if ((board !== null) && (!!board.name.match(/CC....P/i)) && (deviceData.package !== "SIP")) {
+        if (inst.$hardware === null) {
+            Common.logWarning(validation, inst, "$hardware", `The board '${board.displayName}' requires the 'RF Antenna Switch' to be selected.`);
+        }
     }
 }
 
@@ -1178,7 +1544,7 @@ function validate(inst, validation) {
  *  ======== rfdriverModule ========
  *  Define the RF Driver module properties and methods.
  */
-const rfdriverModule = {
+let rfdriverModule = {
     moduleStatic: {
         config,
         pinmuxRequirements,
@@ -1190,8 +1556,15 @@ const rfdriverModule = {
         onHardwareChanged
     },
     isCustomDesign: isCustomDesign,
-    getCoexConfig: function() {
-        return coexConfig;
+    getRfHardware: getRfHardware,
+    getCoexConfig: function(phy = "ble") {
+        return {
+            coExEnable: coexConfig.coExEnable,
+            coExTxRxIndication: coexConfig.coExTxRxIndication,
+            priorityIndicationTime: coexConfig.priorityIndicationTime,
+            grantLatencyTime: coexConfig.grantLatencyTime,
+            ...coexConfig[phy]
+        };
     },
     getCoexConfigBle: function() {
         return coexConfigBle;
@@ -1206,6 +1579,16 @@ const rfdriverModule = {
         boardc: "/ti/drivers/rf/RF.Board.c.xdt",
         board_initc: "/ti/drivers/rf/RF.Board_init.c.xdt",
         boardh: "/ti/drivers/rf/RF.Board.h.xdt"
+    }
+}
+
+/* Config for internal use */
+try {
+    rfdriverModule = system.getScript("rfc.syscfg.js").extend(rfdriverModule);
+}
+catch(e) {
+    if (!((e instanceof Error) && e.message.includes("No such resource"))) {
+        throw e;
     }
 }
 

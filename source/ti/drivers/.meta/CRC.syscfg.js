@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,18 +47,6 @@ let family = Common.device2Family(system.deviceData, "CRC");
 let config = [];
 
 /*
- *  ======== validate ========
- *  Validate this instance's configuration
- *
- *  param inst       - CRC instance to be validated
- *  param validation - object to hold detected validation issues
- */
-function validate(inst, validation)
-{
-    Common.validateNames(inst, validation);
-}
-
-/*
  *  ======== base ========
  *  Define the base CRC properties and methods
  */
@@ -81,7 +69,6 @@ supported on each platform. Common CRC pre- and post-processing options are also
 `,
     defaultInstanceName : "CONFIG_CRC_",
     config: Common.addNameConfig(config, "/ti/drivers/CRC", "CONFIG_CRC_"),
-    validate : validate,
     modules: Common.autoForceModules(["Board", "Power"])
 };
 

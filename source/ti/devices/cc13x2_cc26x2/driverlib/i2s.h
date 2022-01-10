@@ -1,11 +1,11 @@
 /******************************************************************************
 *  Filename:       i2s.h
-*  Revised:        2018-11-16 11:16:53 +0100 (Fri, 16 Nov 2018)
-*  Revision:       53356
+*  Revised:        $Date$
+*  Revision:       $Revision$
 *
 *  Description:    Defines and prototypes for the I2S.
 *
-*  Copyright (c) 2015 - 2020, Texas Instruments Incorporated
+*  Copyright (c) 2015 - 2021, Texas Instruments Incorporated
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without

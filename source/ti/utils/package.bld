@@ -40,7 +40,6 @@ var Pkg = xdc.useModule('xdc.bld.PackageContents');
 Pkg.otherFiles = [
     ".meta/Common.js",
     ".meta/JSON.syscfg.js",
-    ".meta/RTOS.syscfg.js",
     ".meta/tiutils.component.js",
     "package.bld"
 ];

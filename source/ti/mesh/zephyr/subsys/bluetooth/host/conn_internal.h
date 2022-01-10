@@ -117,6 +117,19 @@ struct bt_conn_tx {
 	uint32_t pending_no_cb;
 };
 
+#if 0 // Not being used by TI's import
+struct acl_data {
+	/* Extend the bt_buf user data */
+	struct bt_buf_data buf_data;
+
+	/* Index into the bt_conn storage array */
+	uint8_t  index;
+
+	/** ACL connection handle */
+	uint16_t handle;
+};
+#endif /* if 0 */
+
 struct bt_conn {
 	uint16_t			handle;
 	uint8_t			type;
@@ -158,10 +171,12 @@ struct bt_conn {
 	/* Active L2CAP/ISO channels */
 	sys_slist_t		channels;
 
-	atomic_t		ref;
-
-	/* Delayed work for connection update and other deferred tasks */
-	struct k_delayed_work	update_work;
+	/* Delayed work deferred tasks:
+	 * - Peripheral delayed connection update.
+	 * - Initiator connect create cancel.
+	 * - Connection cleanup.
+	 */
+	struct k_delayed_work	deferred_work;
 
 	union {
 		struct bt_conn_le	le;
@@ -181,6 +196,10 @@ struct bt_conn {
 		uint16_t subversion;
 	} rv;
 #endif
+	/* Must be at the end so that everything else in the structure can be
+	 * memset to zero without affecting the ref.
+	 */
+	atomic_t		ref;
 };
 
 void bt_conn_reset_rx_state(struct bt_conn *conn);
@@ -361,9 +380,9 @@ int bt_conn_init(void);
 /* Selects based on connecton type right semaphore for ACL packets */
 struct k_sem *bt_conn_get_pkts(struct bt_conn *conn);
 
-#if !(defined __clang__) && !defined(__IAR_SYSTEMS_ICC__)
 /* k_poll related helpers for the TX thread */
-#pragma diag_suppress 233
+#if !(defined __clang__) && !defined(__IAR_SYSTEMS_ICC__)
+#pragma diag_suppress 233 // TODO: Check if this is valid suppression
 int bt_conn_prepare_events(struct k_poll_event events[]);
-#endif // !(defined __clang__) && !defined(__IAR_SYSTEMS_ICC__)
+#endif /* #if !(defined __clang__) && !defined(__IAR_SYSTEMS_ICC__) */
 void bt_conn_process_tx(struct bt_conn *conn);

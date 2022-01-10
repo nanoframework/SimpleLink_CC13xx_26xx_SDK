@@ -79,12 +79,13 @@
 #include "gpd.h"
 #include "gpd_memory.h"
 
+#include "ti_zstack_config.h"
+
 /*********************************************************************
  * MACROS
  */
 
 #define CONFIG_FH_ENABLE             false
-#define CONFIG_TRANSMIT_POWER        0
 
 /*********************************************************************
  * TYPEDEFS
@@ -268,7 +269,7 @@ static void gpdSampleSw_Init(void)
 
     /* Set the transmit power */
     ApiMac_mlmeSetReqUint8(ApiMac_attribute_phyTransmitPowerSigned,
-                           (uint8_t)CONFIG_TRANSMIT_POWER);
+                           (uint8_t)TXPOWER);
 #ifdef NV_RESTORE
     gp_appNvInit(pfnZdlNV);
 #endif
@@ -498,9 +499,9 @@ static Button_Handle Initialize_UI(void)
     Button_Handle key = NULL;
     Button_Params bparams;
     Button_Params_init(&bparams);
-    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, NULL, &bparams);
+    gLeftButtonHandle = Button_open(CONFIG_BTN_LEFT, &bparams);
     // Open Right button without appCallBack
-    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, NULL, &bparams);
+    gRightButtonHandle = Button_open(CONFIG_BTN_RIGHT, &bparams);
 
 #ifdef BATTERYLESS_DEVICE
     if (!GPIO_read(((Button_HWAttrs*)gRightButtonHandle->hwAttrs)->gpioIndex))

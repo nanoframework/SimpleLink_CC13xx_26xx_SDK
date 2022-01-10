@@ -12,7 +12,7 @@
         names.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -53,12 +53,13 @@
 
 #include <string.h>
 #include <stdint.h>
+#ifndef FREERTOS
 #include <ti/sysbios/heaps/HeapCallback.h>
 #include <ti/sysbios/heaps/HeapMem.h>
 #include <xdc/runtime/System.h>
 #include <xdc/runtime/Memory.h>
 #include <xdc/cfg/global.h>
-
+#endif
 /* macros to override the function names for efficient linking and multiple instantiations */
 #ifndef HEAPMGR_INIT
 #define HEAPMGR_INIT   heapmgrInit

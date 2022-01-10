@@ -289,7 +289,9 @@ const threadCCFGSettings = {
     },
     LP_CC2652PSIP_CCFG_SETTINGS: {
     },
-    LP_CC265RPSIP_CCFG_SETTINGS: {
+    LP_CC2652RPSIP_CCFG_SETTINGS: {
+    },
+    LP_CC2674R10_CCFG_SETTINGS: {
     }
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Texas Instruments Incorporated
+ * Copyright (c) 2020-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -339,9 +339,6 @@ typedef enum
 /**
  * @brief Open and configure the ITM, DWT, and TPIU. This includes muxing
  *        pins as needed
- *
- * @warning    On CC13xx/26xx this must be called from the task context.
- *             This is because PIN_open pends forever on a semaphore.
  *
  * @return true - The ITM was successfully configured and the pins were acquired
  * @return false - Pin muxing failed and the ITM was not configured

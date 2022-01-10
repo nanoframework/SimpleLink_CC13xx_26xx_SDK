@@ -8,7 +8,7 @@
         * 4. register sensor into local DB
 
 Group: WCS, BTS
-Target Device: cc13x2_26x2
+Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
@@ -55,6 +55,7 @@ Target Device: cc13x2_26x2
 #include "simple_mesh_node_menu.h"
 #include "autoconf.h"
 #include "sensor_models.h"
+#include "mesh_erpc_wrapper.h"
 
 /*********************************************************************
  * EXTERNS
@@ -175,7 +176,7 @@ void sensorModels_send_buf(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *
         net_buf_simple_add_mem(&msg, (void *)pData, dataLen);
     }
 
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -265,7 +266,7 @@ void sensor_desc_get(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -350,7 +351,7 @@ void sensorModels_send_status(struct bt_mesh_model *model,
         net_buf_simple_add_mem(&msg, (void *)pSensorState, sensorDataLen);
     }
 
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -494,7 +495,7 @@ void sensor_get(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 
@@ -617,7 +618,7 @@ void sensor_Column_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
     if (bufLen < sizeof(sensorColumnGet_t))
     {
         net_buf_simple_add_mem(&msg, (void *)&pColumnGet->propertyId, sizeof(pColumnGet->propertyId));
-        bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+        bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
         return;
     }
 
@@ -629,7 +630,7 @@ void sensor_Column_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
         {
             // Column data is not implemented, send status with only propertyId and x
             net_buf_simple_add_mem(&msg, (void *)pColumnGet, sizeof(sensorColumnGet_t));
-            bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+            bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
             return;
         }
     }
@@ -637,7 +638,7 @@ void sensor_Column_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
     // unknown propertyId
     // Column data is not implemented, send status with only propertyId
     net_buf_simple_add_mem(&msg, (void *)pColumnGet, sizeof(pColumnGet->propertyId)/* only propertyId sizeof(sensorColumnGet_t) */);
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -729,7 +730,7 @@ void sensor_Series_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
     if (bufLen < sizeof(sensorSeriesGet_t))
     {
         net_buf_simple_add_mem(&msg, (void *)&pSeriesGet->propertyId, sizeof(pSeriesGet->propertyId));
-        bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+        bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
         return;
     }
 
@@ -741,7 +742,7 @@ void sensor_Series_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
         {
             // Series data is not implemented, send status with only propertyId and x
             net_buf_simple_add_mem(&msg, (void *)pSeriesGet, sizeof(pSeriesGet->propertyId)/* only propertyId sizeof(sensorSeriesGet_t) */);
-            bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+            bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
             return;
         }
     }
@@ -749,7 +750,7 @@ void sensor_Series_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx,
     // unknown propertyId
     // Series data is not implemented, send status with only propertyId
     net_buf_simple_add_mem(&msg, (void *)pSeriesGet, sizeof(pSeriesGet->propertyId)/* only propertyId sizeof(sensorSeriesGet_t) */);
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -863,7 +864,7 @@ void sensor_settings_get(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -1024,7 +1025,7 @@ void sensor_setting_get(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -1117,7 +1118,7 @@ void sensor_setting_set(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -1272,7 +1273,7 @@ void sensor_Cadence_get(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************
@@ -1355,7 +1356,7 @@ void sensor_Cadence_set(struct bt_mesh_model *model,
     }
 
     // Send the message
-    bt_mesh_model_send(model, ctx, &msg, NULL, NULL);
+    bt_mesh_model_send_data_wrapper(model->elem_idx, (get_model_info(model)).is_vnd, model->mod_idx, (msg_ctx_raw *)ctx, (buf_simple_raw *)&msg);
 }
 
 /*********************************************************************

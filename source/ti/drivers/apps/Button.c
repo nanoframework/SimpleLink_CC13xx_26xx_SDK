@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, Texas Instruments Incorporated
+ * Copyright (c) 2016-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -99,34 +99,30 @@ static uint32_t timediff(uint32_t startTick)
  */
 static uint32_t msToTicks(uint32_t ms)
 {
-    uint32_t ticks;
-
-    if(ms == 0)
-    {
-        return(0);
+    if (ms == 0) {
+        return 0;
     }
 
-    ticks = (ms * 1000)/ClockP_getSystemTickPeriod();
-    if(ticks == 0)
-    {
-        ticks = 1;
-    }
-    return(ticks);
+    uint32_t ticks = (ms * 1000)/ClockP_getSystemTickPeriod();
+
+    /* If ticks is 0, return 1 (the smallest representable value) */
+    return ticks ? ticks : 1;
 }
 
 /*
  *  ======== Button_close ========
  *  Closes an instance of a Button
  */
-bool Button_close(Button_Handle handle)
+void Button_close(Button_Handle handle)
 {
     Button_Object *obj = (Button_Object *)(handle->object);
     Button_HWAttrs *hw = (Button_HWAttrs *)handle->hwAttrs;
-    GPIO_disableInt(hw->gpioIndex);
+
+    GPIO_resetConfig(hw->gpioIndex);
+
     ClockP_stop(obj->clockHandle);
     ClockP_delete(obj->clockHandle);
     obj->clockHandle = NULL;
-    return(true);
 }
 
 /*
@@ -201,15 +197,13 @@ static void Button_clockTimeoutHandler(uintptr_t arg)
     Button_Object *obj;
     Button_HWAttrs *hw;
     Button_Handle buttonHandle;
-    GPIO_PinConfig pinConfig;
     Button_EventMask buttonEvents = 0;
 
     buttonHandle = (Button_Handle)arg;
     obj = (Button_Object *)buttonHandle->object;
     hw  = (Button_HWAttrs*)buttonHandle->hwAttrs;
-    GPIO_getConfig(hw->gpioIndex,&pinConfig);
 
-    if(GPIO_read(hw->gpioIndex) == obj->buttonPull)
+    if(GPIO_read(hw->gpioIndex) == hw->pullMode)
     {
         /*
          * Getting a debounce duration timeout callback. The button is
@@ -263,6 +257,9 @@ static void Button_clockTimeoutHandler(uintptr_t arg)
                 if(obj->buttonEventMask & Button_EV_LONGCLICKED)
                 {
                     buttonEvents |= Button_EV_LONGCLICKED;
+                }
+                if(obj->buttonEventMask & Button_EV_RELEASED)
+                {
                     buttonEvents |= Button_EV_RELEASED;
                 }
                 obj->buttonStateVariables.state = Button_RELEASED;
@@ -294,17 +291,13 @@ static void Button_clockTimeoutHandler(uintptr_t arg)
                 obj->buttonStateVariables.state = Button_RELEASED;
                 break;
         }
-        if(obj->buttonPull == Button_PULL_DOWN)
+        if(hw->pullMode == Button_PULL_DOWN)
         {
-            GPIO_setConfig(hw->gpioIndex,
-                          ((pinConfig & (~GPIO_CFG_INT_MASK))|
-                            GPIO_CFG_IN_INT_RISING));
+            GPIO_setInterruptConfig(hw->gpioIndex, GPIO_CFG_IN_INT_RISING | GPIO_CFG_INT_ENABLE);
         }
-        else if(obj->buttonPull == Button_PULL_UP)
+        else if(hw->pullMode == Button_PULL_UP)
         {
-            GPIO_setConfig(hw->gpioIndex,
-                          ((pinConfig & (~GPIO_CFG_INT_MASK))|
-                          GPIO_CFG_IN_INT_FALLING));
+            GPIO_setInterruptConfig(hw->gpioIndex, GPIO_CFG_IN_INT_FALLING | GPIO_CFG_INT_ENABLE);
         }
     }
     /*
@@ -360,8 +353,7 @@ static void Button_clockTimeoutHandler(uintptr_t arg)
             * We're releasing, but isn't released after debounce.
             * Start count down again if interest in long-press
             */
-            if(obj->buttonEventMask &
-               (Button_EV_LONGPRESSED | Button_EV_LONGCLICKED))
+            if(obj->buttonEventMask & (Button_EV_LONGPRESSED | Button_EV_LONGCLICKED))
             {
                 obj->buttonStateVariables.state = Button_LONGPRESSING;
                 ClockP_setTimeout(obj->clockHandle, obj->longPressDuration - obj->debounceDuration);
@@ -381,33 +373,26 @@ static void Button_clockTimeoutHandler(uintptr_t arg)
                  obj->buttonStateVariables.state = Button_PRESSED;
                  break;
         }
-        if(obj->buttonPull == Button_PULL_DOWN)
+        if(hw->pullMode == Button_PULL_DOWN)
         {
-            GPIO_setConfig(hw->gpioIndex,
-                          ((pinConfig & (~GPIO_CFG_INT_MASK))
-                          |GPIO_CFG_IN_INT_FALLING));
+            GPIO_setInterruptConfig(hw->gpioIndex, GPIO_CFG_IN_INT_FALLING | GPIO_CFG_INT_ENABLE);
         }
-        else if(obj->buttonPull == Button_PULL_UP)
+        else if(hw->pullMode == Button_PULL_UP)
         {
-            GPIO_setConfig(hw->gpioIndex,
-                          ((pinConfig & (~GPIO_CFG_INT_MASK))|
-                          GPIO_CFG_IN_INT_RISING));
+            GPIO_setInterruptConfig(hw->gpioIndex, GPIO_CFG_IN_INT_RISING | GPIO_CFG_INT_ENABLE);
         }
     }
     if((buttonEvents != 0) && (obj->buttonCallback != NULL))
     {
         obj->buttonCallback(buttonHandle,buttonEvents);
     }
-    GPIO_enableInt(hw->gpioIndex);
 }
 
 /*
  *  ======== Button_open ========
  *  Open a Button instance
  */
-Button_Handle Button_open(uint_least8_t buttonIndex,
-                          Button_Callback buttonCallback,
-                          Button_Params *params)
+Button_Handle Button_open(uint_least8_t buttonIndex, Button_Params *params)
 {
     Button_Params localParams;
     Button_Handle handle;
@@ -422,7 +407,7 @@ Button_Handle Button_open(uint_least8_t buttonIndex,
      */
     if(buttonIndex >= Button_count)
     {
-        return(NULL);
+        return NULL;
     }
 
     /* If params is null then use the default params */
@@ -436,63 +421,22 @@ Button_Handle Button_open(uint_least8_t buttonIndex,
         params = &localParams;
     }
 
-    /* Call init in case user forgot */
-    Button_init();
-
     /* Get instance state structure */
     handle = (Button_Handle)&Button_config[buttonIndex];
     obj = (Button_Object*)(Button_config[buttonIndex].object);
     hw  = (Button_HWAttrs*)(Button_config[buttonIndex].hwAttrs);
 
-    /* If instance already has a clock then it is already open */
-    if(obj->clockHandle != NULL)
-    {
-        return(NULL);
-    }
-
     /* Set internal variables */
     obj->debounceDuration            = msToTicks(params->debounceDuration);
     obj->longPressDuration           = msToTicks(params->longPressDuration);
-    obj->doublePressDetectiontimeout = msToTicks(params->
-                                                 doublePressDetectiontimeout);
-    obj->buttonCallback              = buttonCallback;
+    obj->doublePressDetectiontimeout = msToTicks(params->doublePressDetectiontimeout);
+    obj->buttonCallback              = params->buttonCallback;
     obj->buttonEventMask             = params->buttonEventMask;
 
-    /* Get button configuration from GPIO pin config */
-    obj->buttonPull = Button_PULL_NOTSET;
-    GPIO_getConfig(hw->gpioIndex, &pinConfig);
-    if(pinConfig & GPIO_CFG_IN_NOPULL)
+    /* If instance already has a clock then it is already open */
+    if(obj->clockHandle != NULL)
     {
-        /*
-         * Must infer pull from trigger edge. There is likely an external pull
-         * up/down attached to the button
-         */
-        if(pinConfig & GPIO_CFG_IN_INT_FALLING)
-        {
-            obj->buttonPull = Button_PULL_UP;
-        }
-        else if(pinConfig & GPIO_CFG_IN_INT_RISING)
-        {
-            obj->buttonPull = Button_PULL_DOWN;
-        }
-    }
-    else
-    {
-        /* Using an internal pull up/down */
-        if(pinConfig & GPIO_CFG_IN_PU)
-        {
-            obj->buttonPull = Button_PULL_UP;
-        }
-        else if(pinConfig & GPIO_CFG_IN_PD)
-        {
-            obj->buttonPull = Button_PULL_DOWN;
-        }
-    }
-
-    /* If read incorrect gpio settings, fail to open */
-    if(obj->buttonPull == Button_PULL_NOTSET)
-    {
-        return(NULL);
+        return NULL;
     }
 
     /* Create one shot clock for handling debounce */
@@ -501,15 +445,30 @@ Button_Handle Button_open(uint_least8_t buttonIndex,
     clockParams.startFlag = false;
     clockParams.arg = (uintptr_t) handle;
     obj->clockHandle = ClockP_create(Button_clockTimeoutHandler, 0, &clockParams);
-    if(NULL == obj->clockHandle)
+    if (NULL == obj->clockHandle)
     {
-        return(NULL);
+        return NULL;
     }
 
-    /* Enable gpio interrupt */
+    /* Enable interrupt by default */
+    pinConfig = GPIO_CFG_INT_ENABLE;
+    pinConfig |= hw->pullMode == Button_PULL_DOWN ? GPIO_CFG_IN_INT_RISING : GPIO_CFG_IN_INT_FALLING;
+
+    /* Configure input mode with or without pull */
+    if (hw->internalPullEnabled)
+    {
+        pinConfig |= hw->pullMode == Button_PULL_DOWN ? GPIO_CFG_IN_PD : GPIO_CFG_IN_PU;
+    }
+    else
+    {
+        pinConfig |= GPIO_CFG_IN_NOPULL;
+    }
+
+    /* Set callback first in case we have a pending interrupt */
     GPIO_setCallback(hw->gpioIndex, &Button_gpioCallbackFxn);
-    GPIO_enableInt(hw->gpioIndex);
-    return(handle);
+    GPIO_setConfig(hw->gpioIndex, pinConfig);
+
+    return handle;
 }
 
 /*
@@ -538,7 +497,7 @@ void Button_setCallback(Button_Handle handle,Button_Callback buttonCallback)
  */
 extern uint32_t Button_getLastPressedDuration(Button_Handle handle)
 {
-    uint32_t ticks = ((Button_Object *)(handle->object))->
-        buttonStateVariables.lastPressedDuration;
-    return(ticksToMs(ticks));
+    Button_Object *obj = (Button_Object *)handle->object;
+    uint32_t ticks = obj->buttonStateVariables.lastPressedDuration;
+    return ticksToMs(ticks);
 }

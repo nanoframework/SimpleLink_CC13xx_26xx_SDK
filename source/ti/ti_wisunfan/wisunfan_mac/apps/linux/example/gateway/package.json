@@ -1,0 +1,20 @@
+{
+  "name": "timacgatewayapp",
+  "version": "1.0.0",
+  "private": "true",
+  "dependencies": {
+    "bytebuffer": "*",
+    "events": "*",
+    "express": "^4.13.4",
+    "fs": "0.0.2",
+    "http": "0.0.0",
+    "net": "*",
+    "socket.io": "^1.4.5",
+    "util": "*"
+  },
+  "scripts": {
+    "start": "node gateway.js"
+  },
+  "author": "TI LPC",
+  "license": "BSD-3-Clause"
+}

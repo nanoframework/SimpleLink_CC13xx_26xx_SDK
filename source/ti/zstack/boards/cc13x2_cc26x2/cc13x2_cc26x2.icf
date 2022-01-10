@@ -2,7 +2,7 @@
 
  @file  cc13x2_cc26x2.icf
 
- @brief IAR Linker configuration file for MAC-Sensor on cc13x2_cc26x2 LaunchPad(2_4g)
+ @brief IAR Linker configuration file for cc13x2_cc26x2
 
  Group: WCS LPC
  Target Device: cc13x2_cc26x2
@@ -39,9 +39,6 @@
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ******************************************************************************
- Release Name: simplelink_cc26x2_sdk_2_10_00_44_s
- Release Date: 2018-04-09 12:59:57
  *****************************************************************************/
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,11 +56,6 @@ define symbol ROM_SIZE            = 0x00040000; // 256K
 // Memory Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-// CM3 FW
-//
-define symbol FW_START              = 0x10000000;
-define symbol FW_END                = 0x10004BFF;
 
 ////////////////////////////////////////////////////////////////////////////////
 // RAM
@@ -84,7 +76,6 @@ define symbol FLASH_MEM_ALIGN     = WORD_SIZE;
 
 define symbol FLASH_START           = FLASH_BASE;
 
-define symbol PAGE_MASK           = 0xFFFFE000;
 
 define symbol NUM_RESERVED_PAGES    = 1;  /*last page i define in FLASH_LAST_PAGE */
 
@@ -150,21 +141,13 @@ define block CSTACK with alignment = 8, size = STACK_SIZE { section .stack };
 
 place at address mem:ROM_TIMACDataAddr {section .data_RAM_BASE_ADDR };
 
-define block RWDATA with alignment = 8 { rw };
-
-define section .heap_start            { public heapStart: };
-define section .heap_end              { public heapEnd: };
-define block   HEAP_END with size = 1 { section .heap_end };
-
 define block END_OF_RAM with fixed order {
-                                        block HEAP_END,
                                         block CSTACK
                                       };
 
 place at end of RAM { block END_OF_RAM };
 
-place in RAM { block RWDATA,
-               last section .heap_start};
+place in RAM { rw };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialization

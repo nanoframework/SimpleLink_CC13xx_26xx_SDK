@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -776,7 +776,7 @@ extern UART2_Handle UART2_open(uint_least8_t index, UART2_Params *params);
  *      eventMask = 0;
  *      readCallback = NULL;
  *      writeCallback = NULL;
- *      readReturnMode = UART2_ReadReturnMode_FULL;
+ *      readReturnMode = UART2_ReadReturnMode_PARTIAL;
  *      baudRate = 115200;
  *      dataLength = UART2_DataLen_8;
  *      stopBits = UART2_StopBits_1;

@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,26 +62,21 @@ I2SCC26XX_Object i2sCC26XXObjects[`countDef`];
 const I2SCC26XX_HWAttrs i2sCC26XXHWAttrs[`countDef`] = {
 % for (let i = 0; i < instances.length; i++) {
     % let inst = instances[i];
-    % /* i2s is a hash of resources assigned to inst: SD1Pin, SD0Pin, SCKPin, MCLKPin, WSPin */
-    % let i2s = inst.i2s;
+    % let sckPin = inst.sckPinInstance.$name;
+    % let wsPin = inst.wsPinInstance.$name;
+    % let mclkPin = "GPIO_INVALID_INDEX";
+    % let sd0Pin = "GPIO_INVALID_INDEX";
+    % let sd1Pin = "GPIO_INVALID_INDEX";
     %
-    %
-    % let activateSD0 = (inst.sd0DataDirection != "Disabled")? true : false;
-    % let SD0Pin;
-    % if(activateSD0) {SD0Pin = "IOID_" + i2s.SD0Pin.$solution.devicePinName.substring(4);}
-    % else            {SD0Pin = "PIN_UNASSIGNED";}
-    %
-    % let activateSD1 = (inst.sd1DataDirection != "Disabled")? true : false;
-    % let SD1Pin;
-    % if(activateSD1) {SD1Pin = "IOID_" + i2s.SD1Pin.$solution.devicePinName.substring(4);}
-    % else            {SD1Pin = "PIN_UNASSIGNED";}
-    %
-    % let MCLKPin;
-    % if(inst.enableMCLK) {MCLKPin = "IOID_" + i2s.MCLKPin.$solution.devicePinName.substring(4);}
-    % else                  {MCLKPin = "PIN_UNASSIGNED";}
-    %
-    % let SCKPin      = "IOID_" + i2s.SCKPin.$solution.devicePinName.substring(4);
-    % let WSPin       = "IOID_" + i2s.WSPin.$solution.devicePinName.substring(4);
+    % if (inst.sd0PinInstance) {
+    %     sd0Pin = inst.sd0PinInstance.$name;
+    % }
+    % if (inst.sd1PinInstance) {
+    %     sd1Pin = inst.sd1PinInstance.$name;
+    % }
+    % if (inst.mclkPinInstance) {
+    %     mclkPin = inst.mclkPinInstance.$name;
+    % }
     %
     /* `inst.$name` */
     % if (inst.$hardware) {
@@ -90,11 +85,11 @@ const I2SCC26XX_HWAttrs i2sCC26XXHWAttrs[`countDef`] = {
     %    }
     % }
     {
-        .pinSD1      =  `SD1Pin`,
-        .pinSD0      =  `SD0Pin`,
-        .pinSCK      =  `SCKPin`,
-        .pinMCLK     =  `MCLKPin`,
-        .pinWS       =  `WSPin`,
+        .pinSD1      =  `sd1Pin`,
+        .pinSD0      =  `sd0Pin`,
+        .pinSCK      =  `sckPin`,
+        .pinMCLK     =  `mclkPin`,
+        .pinWS       =  `wsPin`,
         .intPriority =  `Common.intPriority2Hex(inst.interruptPriority)`
     }
 % }

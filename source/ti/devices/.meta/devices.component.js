@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ const displayName = "TI Devices";
 const description = "TI Device Configuration";
 const deviceId = system.deviceData.deviceId;
 
-if (deviceId.match(/CC13.[124]|CC26.[124]/)) {
+if (deviceId.match(/CC13.[124]|CC26.[1234]|CC23.0/)) {
     topModules = [
         {
             displayName: displayName,

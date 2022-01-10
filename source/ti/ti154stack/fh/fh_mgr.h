@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 FH manager API
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -60,11 +60,6 @@
 #include "fh_pib.h"
 #include "fh_data.h"
 #include "mac_low_level.h"
-
-/*! Clock tick period  */
-#define CLOCK_TICK_PERIOD     (10)
-/*! tick number for one ms  */
-#define TICKPERIOD_MS_US      (1000/(CLOCK_TICK_PERIOD))
 
 #define FH_UC_DWELLTIME_BUF		(1)
 /* ------------------------------------------------------------------------------------------------

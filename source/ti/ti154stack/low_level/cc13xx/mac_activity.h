@@ -7,7 +7,7 @@
         Note: Only utilized in DMM applications.
 
  Group: WCS, LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -54,6 +54,11 @@
  * INCLUDES
  */
 #include "mac_user_config.h"
+
+#ifdef ZSTACK_SECURITY
+/* Using this define since it is common across all Zstack projects */
+#include "ti_zstack_config.h"
+#endif
 
 /*******************************************************************************
  * CONSTANTS
@@ -120,6 +125,8 @@ typedef void (*setActivityTx_t)(macTxIntData_t *txData);
 typedef void (*setActivityRx_t)(uint8_t rxEna_tbleFlags);
 typedef macActivity_t (*getActivityTx_t)(void);
 typedef macActivity_t (*getActivityRx_t)(void);
+typedef bool (*getCoexActivityTx_t)(void);
+typedef bool (*getCoexActivityRx_t)(void);
 
 #ifdef MAC_ACTIVITY_PROFILING
 typedef void (*startActivityProfilingTimer_t)(RF_Handle handle);
@@ -142,6 +149,8 @@ typedef const struct _activityObject
     startActivityProfilingTimer_t pStartActivityProfilingTimerFn;
     printActivityInfo_t pPrintActivityInfoFn;
 #endif
+    getCoexActivityTx_t pGetCoexActivityTxFn;
+    getCoexActivityRx_t pGetCoexActivityRxFn;
 } activityObject_t;
 
 

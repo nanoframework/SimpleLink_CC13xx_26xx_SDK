@@ -5,6 +5,7 @@
 SDK_INSTALL_DIR ?= $(abspath ../../../..)
 include $(SDK_INSTALL_DIR)/imports.mak
 
+#
 # Set XDCARGS to some of the variables above.  XDCARGS are passed
 # to the XDC build engine... which will load tiutils.bld... which will
 # extract these variables and use them to determine what to build and which
@@ -18,19 +19,26 @@ include $(SDK_INSTALL_DIR)/imports.mak
 #     http://rtsc.eclipse.org/docs-tip/Command_-_xdc#Environment_Variables
 #
 XDCARGS= \
-    ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
-    ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
-    gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
-    ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
-    ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
-    gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
-    iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\"
+	ti.targets.arm.elf.M4F=\"$(CCS_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M4F=\"$(TICLANG_ARMCOMPILER)\" \
+	gnu.targets.arm.M4F=\"$(GCC_ARMCOMPILER)\" \
+	iar.targets.arm.M4F=\"$(IAR_ARMCOMPILER)\" \
+	ti.targets.arm.elf.M4=\"$(CCS_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M4=\"$(TICLANG_ARMCOMPILER)\" \
+	gnu.targets.arm.M4=\"$(GCC_ARMCOMPILER)\" \
+	iar.targets.arm.M4=\"$(IAR_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M0=\"$(TICLANG_ARMCOMPILER)\" \
+	gnu.targets.arm.M0=\"$(GCC_ARMCOMPILER)\" \
+	iar.targets.arm.M0=\"$(IAR_ARMCOMPILER)\" \
+	iar.targets.arm.M33F=\"$(IAR_ARMCOMPILER)\" \
+	gnu.targets.arm.M33F=\"$(GCC_ARMCOMPILER)\" \
+	ti.targets.arm.clang.M33F=\"$(TICLANG_ARMCOMPILER)\" \
 
 #
-# Set XDCPATH to contain necessary repositories.
+# Set XDCPATH to contain necessary repositories.  tirtos7 for
+# the RTOS dependency, and tirtos for the XDC build support.
 #
-XDCPATH=$(SDK_INSTALL_DIR)/kernel/tirtos/packages
+XDCPATH=$(SDK_INSTALL_DIR)/kernel/tirtos7/packages;$(SDK_INSTALL_DIR)/kernel/tirtos/packages
 
 #
 # Set XDCOPTIONS.  Use -v for a verbose build.
@@ -45,13 +53,12 @@ j = 1
 # Note that XDCBUILDCFG points to the tiutils.bld file which uses
 # the arguments specified by XDCARGS
 #
-XDC = $(XDC_INSTALL_DIR)/xdc -j $(j) \
-        XDCBUILDCFG=$(SDK_INSTALL_DIR)/source/ti/utils/tiutils.bld
+XDC = $(XDC_INSTALL_DIR)/xdc -j $(j) XDCBUILDCFG=$(SDK_INSTALL_DIR)/source/ti/utils/tiutils.bld
 
 all:
 	@ echo building packages ...
 	@ $(XDC) XDCARGS="$(XDCARGS)" XDCPATH="$(XDCPATH)" all -PR .
 
-clean::
+clean:
 	@ echo cleaning packages ...
 	@ $(XDC) XDCARGS="$(XDCARGS)" XDCPATH="$(XDCPATH)" clean -PR .

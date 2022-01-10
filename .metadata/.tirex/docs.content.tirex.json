@@ -1,7 +1,7 @@
 [{
         "name": "Release Notes",
         "resourceType": "file",
-        "location": "../../release_notes_simplelink_cc13x2_26x2_sdk_5_10_00_48.html",
+        "location": "../../release_notes_simplelink_cc13xx_cc26xx_sdk_5_30_01_01.html",
         "devices": ["CC1352R1F3", "CC2642R1F"],
         "devtools": ["LAUNCHXL-CC13X2R1", "LAUNCHXL-CC26X2R1"],
         "categories": ["Documents"],

@@ -6,7 +6,7 @@
         CC2540. This is throw away code for 10/1 delivery.
 
  Group: WCS, LPC, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

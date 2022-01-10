@@ -97,6 +97,12 @@ const boardSpecificRfDesignSettings = {
     },
     LP_CC2652R7_RF_DESIGN_SETTINGS: {
         rfDesign: "LP_CC2652R7"
+    },
+    LP_CC2651R3_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2651R3"
+    },
+    LP_CC2651P3_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2651P3"
     }
 };
 

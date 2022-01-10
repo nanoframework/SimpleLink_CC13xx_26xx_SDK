@@ -5,7 +5,7 @@
  @brief ICall BLE Stack Dispatcher for embedded and NP/Serial messages.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  

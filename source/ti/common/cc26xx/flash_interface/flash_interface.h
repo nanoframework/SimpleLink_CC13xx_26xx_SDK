@@ -6,7 +6,7 @@
            this allows on-chip and off-chip OAD to use the same flash APIs
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -159,7 +159,9 @@ extern "C"
     #define INTFLASH_PAGE_SIZE              0x1000
     #define MAX_ONCHIP_FLASH_PAGES          32
     #define MAX_OFFCHIP_METADATA_PAGES      MAX_ONCHIP_FLASH_PAGES
-#elif defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC13X2) || defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7)
+#elif defined(DeviceFamily_CC26X2) || defined(DeviceFamily_CC13X2) || \
+      defined(DeviceFamily_CC26X2X7) || defined(DeviceFamily_CC13X2X7) || \
+      defined(DeviceFamily_CC26X1) || defined(DeviceFamily_CC13X1)
     #define FLASH_ADDRESS(page, offset)     (((page) << 13) + (offset))
     #define FLASH_PAGE(addr)                (addr >> 13)
     #define INTFLASH_PAGE_MASK              0xFFFFE000

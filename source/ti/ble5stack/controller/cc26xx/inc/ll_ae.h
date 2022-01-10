@@ -6,7 +6,7 @@
         RF Core Firmware Specification for Bluetooth Low Energy.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -470,15 +470,19 @@
 #define PERIODIC_SCAN_STATE_SYNCING_ACTIVE                  2
 #define PERIODIC_SCAN_STATE_SYNCED                          3
 
-// Margin time is rf and controller process time in usec of periodic advertising command (empirical calculation)
-#define PERIODIC_ADV_MARGIN_TIME_RAT_TICKS                  3120 // 780 usec
-#define PERIODIC_SCAN_MARGIN_TIME_RAT_TICKS                 2400 // 600 usec
+// Margin time is rf and controller process time in rat ticks (empirical calculation)
+#define PERIODIC_ADV_MARGIN_TIME_RAT_TICKS                  2400 + RAT_TICKS_FOR_SCHED_PROCESS_TIME // 800 usec
+#define PERIODIC_SCAN_MARGIN_TIME_RAT_TICKS                 1600 + RAT_TICKS_FOR_SCHED_PROCESS_TIME // 600 usec
 #define EXT_ADV_MARGIN_TIME_RAT_TICKS                       2800 // 700 usec
 #define EXT_SCAN_MARGIN_TIME_RAT_TICKS                      2400 // 350 usec
 #define EXT_INIT_MARGIN_TIME_RAT_TICKS                      2400 // 350 usec
+#define PERIODIC_SCAN_MAX_MARGIN_TIME_RAT_TICKS             (PERIODIC_SCAN_MARGIN_TIME_RAT_TICKS + LL_JITTER_CORRECTION + LL_RX_RAMP_OVERHEAD + RAT_TICKS_FOR_PERIODIC_SCAN_WIN_SIZE + LL_RX_SYNCH_OVERHEAD) // 2.576ms
 
 #define PERIODIC_SYNCING_LIMIT_NUM_EVENTS                  6
 #define PERIODIC_SCAN_MAX_HANDLES                          0x0EFF
+#define PERIODIC_SCAN_TERMINATE_LIST_MAX_HANDLES           4
+#define PERIODIC_SCAN_TERMINATE_LIST_CREATE_SYNC_INDEX     0
+#define PERIODIC_SCAN_TERMINATE_LIST_INVALID_HANDLE        0xFF
 
 /*******************************************************************************
  * @fn          LE Extended Advertising Start After Enable Event Callback
@@ -1518,7 +1522,7 @@ typedef struct llPeriodicAdvSet_t
 typedef struct
 {
   llPeriodicChanMap_t               current;               // current channel map
-  llPeriodicChanMap_t               new;                   // new channel map
+  llPeriodicChanMap_t               next;                  // new channel map
   uint8                             updated;               // channel map was updated
 } llPeriodicAdvChanMap_t;
 
@@ -1612,6 +1616,7 @@ typedef struct
   extScanOut_t                      rfOutput;              // shared Periodic Scanner RF Command Output
   llPeriodicWhiteList_t             whiteList;             // Periodic Scanner white list
   uint8                             scanNumActive;         // current number of active periodic scanners
+  uint8                             terminateList[PERIODIC_SCAN_TERMINATE_LIST_MAX_HANDLES]; // terminate handle array (first index reserved for create sync cancel)
 } llPeriodicScan_t;
 
 
@@ -1697,7 +1702,9 @@ extern llPeriodicScanSet_t *llGetCurrentPeriodicScan( uint8 state );
 extern uint8         llGetPeriodicScanCteTasks( void );
 extern void          llClearPeriodicAdvSets( void );
 extern void          llClearPeriodicScanSets( void );
-extern void          llSetRfCmdPreemptionStartTime( uint32 );
+extern void          llSetRfCmdPreemptionParams( uint32 );
+extern uint8         llGetRfCmdPreemptionEnable( void );
+extern void          llTerminatePeriodicScan(void);
 
 /*******************************************************************************
  * LL Internal API
@@ -1729,6 +1736,7 @@ extern uint8         llGetRandChannelMapIndex( uint8 );
 extern uint8         llSetPeriodicHdrFlags( llPeriodicAdvSet_t * );
 extern void          llSetupPeriodicHdr( llPeriodicAdvSet_t * );
 extern llStatus_t    llTrigPeriodicAdv( advSet_t *, llPeriodicAdvSet_t * );
+extern void          llPeriodicAdv_Config( advSet_t *pAdvSet );
 extern void          llEndPeriodicAdvTask( llPeriodicAdvSet_t * );
 extern void          llSetPeriodicSyncInfo( advSet_t *, uint8 * );
 extern llStatus_t    llSetupPeriodicScan( llPeriodicScanSet_t * );
@@ -1748,6 +1756,7 @@ extern void          llSendAdvSetTermEvent( advSet_t *, uint8, uint8 );
 extern void          llSendAdvSetEndEvent( advSet_t * );
 extern llStatus_t    llStartDurationTimer( uint16, uint32 );
 extern void          llProcessPeriodicScanRxFIFO( void );
+extern uint8         llCheckDuplicateFilteringLimit( void );
 // Scheduler Related
 extern ble5OpCmd_t  *llFindNextAdvSet( void );
 extern ble5OpCmd_t  *llFindNextSecCmd( taskInfo_t *llTask );

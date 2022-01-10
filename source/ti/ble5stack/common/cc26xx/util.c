@@ -6,7 +6,7 @@
         BLE applications for CC26xx with TIRTOS.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -48,11 +48,20 @@
 /*********************************************************************
  * INCLUDES
  */
+#ifdef FREERTOS
+#include <pthread.h> // Only for timer init - NOT FOR thread creation
+#include <mqueue.h>
 #include <stdbool.h>
-#include <ti/sysbios/knl/Clock.h>
+#include <time.h>
+#include <string.h>
+#include <mqueue.h>
+#else
 #include <ti/sysbios/knl/Event.h>
+#include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Queue.h>
 #include <ti/sysbios/hal/Hwi.h>
+#endif
+
 
 #ifdef USE_ICALL
 #include <icall.h>
@@ -63,21 +72,60 @@
 #include "bcomdef.h"
 #include "util.h"
 
+#ifdef FREERTOS
+#ifndef ICALL_TIMER_TASK_STACK_SIZE
+/**
+ * @internal
+ * Timer thread stack size
+ */
+#define ICALL_TIMER_TASK_STACK_SIZE (512)
+#endif //ICALL_TIMER_TASK_STACK_SIZE
+#endif//FREERTOS
 
+#ifdef FREERTOS
+extern mqd_t g_EventsQueueID;
+#endif
 /*********************************************************************
  * TYPEDEFS
  */
 
+#ifndef FREERTOS
 // RTOS queue for profile/app messages.
 typedef struct _queueRec_
 {
   Queue_Elem _elem;          // queue element
   uint8_t *pData;            // pointer to app data
 } queueRec_t;
-
+#endif
 /*********************************************************************
  * LOCAL FUNCTIONS
  */
+
+#ifdef FREERTOS
+typedef void (*UtilTimerCback)(void *arg);
+void Util_stopClock(Clock_Struct *pClock);
+
+/**
+ * @internal
+ * Clock event handler function.
+ * This function is used to implement the wakeup scheduler.
+ *
+ * @param arg  an @ref ICall_ScheduleEntry
+ */
+static void UtilclockFunc(union sigval sv)
+{
+    Clock_Struct *entry = (Clock_Struct *) (sv.sival_ptr);
+
+    /* this means that this timer is not periodic so we set the isActive to 0 */
+    if((entry->timeVal.it_interval.tv_nsec == 0) && (entry->timeVal.it_interval.tv_sec == 0))
+    {
+        entry->isActive = 0;
+    }
+
+    ((UtilTimerCback)(entry->cback))(entry->arg);
+}
+#endif
+
 
 /*********************************************************************
  * EXTERNAL VARIABLES
@@ -107,6 +155,75 @@ typedef struct _queueRec_
  *
  * @return  Clock_Handle  - a handle to the clock instance.
  */
+
+#ifdef FREERTOS
+void* Util_constructClock(Clock_Struct *entry, void *clockCB,
+                          uint32_t clockDuration, uint32_t clockPeriod,
+                          uint8_t startFlag, void *arg)
+{
+
+    int ret;
+   // entry = ICall_malloc(sizeof(Clock_Struct));
+    if (entry == NULL)
+    {
+        return (void *)(ICALL_ERRNO_NO_RESOURCE);
+    }
+
+    memset(entry, 0, sizeof(Clock_Struct));
+
+    //Clock_Params params
+    pthread_attr_init(&(entry->timerThrdAttr));
+
+    entry->timerThrdAttr.stacksize = ICALL_TIMER_TASK_STACK_SIZE;
+
+    entry->evnt.sigev_notify = SIGEV_THREAD;
+    entry->evnt.sigev_notify_function = &UtilclockFunc;
+    entry->evnt.sigev_notify_attributes = &(entry->timerThrdAttr);
+
+    entry->arg = arg;
+    entry->cback = clockCB;
+
+    entry->evnt.sigev_value.sival_ptr = entry;
+
+    ret = timer_create(CLOCK_MONOTONIC, &(entry->evnt), &(entry->clock));
+
+    if (ret < 0)
+    {
+        return (void*)-1;
+    }
+
+    if (clockDuration == 0)
+    {
+        return (void *)(ICALL_ERRNO_INVALID_PARAMETER);
+    }
+
+    entry->timeVal.it_value.tv_sec = clockDuration / 1000;
+    entry->timeVal.it_value.tv_nsec = 1000000 * (clockDuration % 1000);
+    entry->timeVal.it_interval.tv_sec = clockPeriod / 1000;
+    entry->timeVal.it_interval.tv_nsec = 1000000 * (clockPeriod % 1000);
+
+    if (startFlag)
+    {
+        entry->isActive = 1;
+        ret = timer_settime(entry->clock, 0, &(entry->timeVal), NULL);
+        if (ret < 0)
+        {
+            return (void *)(ICALL_ERRNO_NO_RESOURCE);
+        }
+    }
+
+    return (&(entry->clock));
+}
+
+void Clock_destruct(Clock_Struct *structP)
+{
+    Util_stopClock(structP);
+    timer_delete(structP->clock);
+
+    structP->clock = 0;
+}
+
+#else
 Clock_Handle Util_constructClock(Clock_Struct *pClock,
                                  Clock_FuncPtr clockCB,
                                  uint32_t clockDuration,
@@ -138,6 +255,9 @@ Clock_Handle Util_constructClock(Clock_Struct *pClock,
   return Clock_handle(pClock);
 }
 
+
+#endif // FREERTOS
+
 /*********************************************************************
  * @fn      Util_startClock
  *
@@ -149,10 +269,17 @@ Clock_Handle Util_constructClock(Clock_Struct *pClock,
  */
 void Util_startClock(Clock_Struct *pClock)
 {
-  Clock_Handle handle = Clock_handle(pClock);
+#ifdef FREERTOS
 
-  // Start clock instance
-  Clock_start(handle);
+    pClock->isActive = 1;
+    timer_settime(pClock->clock, 0, &(pClock->timeVal), NULL);
+
+#else
+    Clock_Handle handle = Clock_handle(pClock);
+
+    // Start clock instance
+    Clock_start(handle);
+#endif
 }
 
 /*********************************************************************
@@ -165,6 +292,7 @@ void Util_startClock(Clock_Struct *pClock)
  *
  * @return  none
  */
+#ifndef FREERTOS
 void Util_restartClock(Clock_Struct *pClock, uint32_t clockTimeout)
 {
   uint32_t clockTicks;
@@ -187,7 +315,7 @@ void Util_restartClock(Clock_Struct *pClock, uint32_t clockTimeout)
   // Start clock instance
   Clock_start(handle);
 }
-
+#endif
 /*********************************************************************
  * @fn      Util_isActive
  *
@@ -200,10 +328,20 @@ void Util_restartClock(Clock_Struct *pClock, uint32_t clockTimeout)
  */
 bool Util_isActive(Clock_Struct *pClock)
 {
-  Clock_Handle handle = Clock_handle(pClock);
+#ifdef FREERTOS
+    if(pClock->isActive == 1)
+    {
+        return TRUE;
+    }
+
+    // Start clock instance
+    return FALSE;
+#else
+    Clock_Handle handle = Clock_handle(pClock);
 
   // Start clock instance
   return Clock_isActive(handle);
+#endif
 }
 
 /*********************************************************************
@@ -217,10 +355,22 @@ bool Util_isActive(Clock_Struct *pClock)
  */
 void Util_stopClock(Clock_Struct *pClock)
 {
-  Clock_Handle handle = Clock_handle(pClock);
+#ifdef FREERTOS
+    struct itimerspec timeVal;
 
-  // Stop clock instance
-  Clock_stop(handle);
+    memset(&timeVal,0,sizeof(struct itimerspec));
+
+    /* stop the timer */
+    timer_settime(pClock->clock, 0, &(timeVal), NULL);
+
+    pClock->isActive = 0;
+
+#else
+    Clock_Handle handle = Clock_handle(pClock);
+
+    // Stop clock instance
+    Clock_stop(handle);
+#endif
 }
 
 /*********************************************************************
@@ -235,6 +385,23 @@ void Util_stopClock(Clock_Struct *pClock)
 void Util_rescheduleClock(Clock_Struct *pClock, uint32_t clockPeriod)
 {
   bool running;
+
+#ifdef FREERTOS
+  running = Util_isActive(pClock);
+
+  if (running)
+  {
+      Util_stopClock(pClock);
+  }
+
+  pClock->timeVal.it_interval.tv_sec = clockPeriod / 1000;
+  pClock->timeVal.it_interval.tv_nsec = 1000000 * (clockPeriod % 1000);
+  pClock->timeVal.it_value.tv_sec = clockPeriod / 1000;
+  pClock->timeVal.it_value.tv_nsec = 1000000 * (clockPeriod % 1000);
+
+  timer_settime(pClock->clock, 0, &(pClock->timeVal), NULL);
+
+#else
   uint32_t clockTicks;
   Clock_Handle handle;
 
@@ -256,6 +423,7 @@ void Util_rescheduleClock(Clock_Struct *pClock, uint32_t clockPeriod)
   {
     Clock_start(handle);
   }
+#endif
 }
 
 /*********************************************************************
@@ -267,6 +435,26 @@ void Util_rescheduleClock(Clock_Struct *pClock, uint32_t clockPeriod)
  *
  * @return  A queue handle.
  */
+#ifdef FREERTOS
+
+void Util_constructQueue(mqd_t *pQueue)
+{
+    struct mq_attr MRattr;
+
+    MRattr.mq_flags = O_NONBLOCK; //Blocking
+    MRattr.mq_curmsgs = 0;
+    MRattr.mq_maxmsg = 32;
+    MRattr.mq_msgsize = sizeof(uint8_t*);
+    /* Open the reply message queue */
+    *pQueue = mq_open("/AppQueue", O_CREAT | O_NONBLOCK , 0, &MRattr);
+    if (pQueue == (mqd_t) -1)
+    {
+        //handle_error("mq_open");
+
+        while(1);
+    }
+}
+#else // FREERTOS
 Queue_Handle Util_constructQueue(Queue_Struct *pQueue)
 {
   // Construct a Queue instance.
@@ -274,6 +462,7 @@ Queue_Handle Util_constructQueue(Queue_Struct *pQueue)
 
   return Queue_handle(pQueue);
 }
+#endif // FREERTOS
 
 /*********************************************************************
  * @fn      Util_enqueueMsg
@@ -287,6 +476,35 @@ Queue_Handle Util_constructQueue(Queue_Struct *pQueue)
  *
  * @return  TRUE if message was queued, FALSE otherwise.
  */
+#ifdef FREERTOS
+
+typedef struct {
+    uint8_t * pData;
+}queueMSG;
+
+uint8_t Util_enqueueMsg(mqd_t msgQueue,
+                        Event_Handle event,
+                        uint8_t *pMsg)
+{
+    queueMSG myMsg;
+
+    myMsg.pData = pMsg;
+    mq_send(msgQueue, (char*)&myMsg, sizeof(queueMSG), 1);
+
+    // Wake up the application thread event handler.
+    if (event)
+    {
+
+        uint32_t msg_ptr = UTIL_QUEUE_EVENT_ID;
+        mq_send(event, (char*)&msg_ptr, sizeof(msg_ptr), 1);
+    }
+
+    return TRUE;
+
+}
+#else
+
+
 uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
                         Event_Handle event,
                         uint8_t *pMsg)
@@ -308,9 +526,9 @@ uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
     // Wake up the application thread event handler.
     if (event)
     {
-      Event_post(event, UTIL_QUEUE_EVENT_ID);
-    }
 
+        Event_post(event, UTIL_QUEUE_EVENT_ID);
+    }
     return TRUE;
   }
 
@@ -323,6 +541,7 @@ uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
 
   return FALSE;
 }
+#endif
 
 /*********************************************************************
  * @fn      Util_dequeueMsg
@@ -333,6 +552,29 @@ uint8_t Util_enqueueMsg(Queue_Handle msgQueue,
  *
  * @return  pointer to dequeued message, NULL otherwise.
  */
+#ifdef FREERTOS
+extern ssize_t mq_receive(mqd_t mqdes, char *msg_ptr, size_t msg_len,
+                          unsigned int *msg_prio);
+uint8_t *Util_dequeueMsg(mqd_t msgQueue)
+{
+    uint32_t msg_prio;
+    queueMSG myMsg;
+    uint8_t *pData = NULL;
+    //* Non blocking queue */
+    int msgSize = mq_receive(msgQueue,(char *)&myMsg, sizeof(queueMSG),(void*) &msg_prio);
+
+    if(msgSize == (-1))
+    {
+        /*  The queue is empty which it's Ok*/
+        return NULL;
+    }
+    pData = myMsg.pData;
+    return pData;
+}
+
+#else
+
+
 uint8_t *Util_dequeueMsg(Queue_Handle msgQueue)
 {
   queueRec_t *pRec = Queue_get(msgQueue);
@@ -354,6 +596,7 @@ uint8_t *Util_dequeueMsg(Queue_Handle msgQueue)
 
   return NULL;
 }
+#endif
 
 /*********************************************************************
  * @fn      Util_convertBdAddr2Str
@@ -383,8 +626,11 @@ char *Util_convertBdAddr2Str(uint8_t *pAddr)
     *pStr++ = hex[*--pAddr >> 4];
     *pStr++ = hex[*pAddr & 0x0F];
   }
+#ifdef FREERTOS
+  pStr = NULL;
+#else
   *pStr = 0;
-
+#endif
   return str;
 }
 
@@ -402,12 +648,13 @@ char *Util_convertBdAddr2Str(uint8_t *pAddr)
 uint8_t Util_isBufSet(uint8_t *pBuf, uint8_t pattern, uint16_t len)
 {
   uint8_t result = FALSE;
+  uint16_t i = 0;
 
   if (pBuf)
   {
     result = TRUE;
 
-    for(uint16_t i = 0; i < len; i++)
+    for(i = 0; i < len; i++)
     {
       if (pBuf[i] != pattern)
       {

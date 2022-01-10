@@ -1,0 +1,5 @@
+hello world
+1 and 1 make 2
+Duane is here
+With CRLF
+Mac Newlineblah blah no newline at end

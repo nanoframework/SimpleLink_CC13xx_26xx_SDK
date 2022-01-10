@@ -158,12 +158,26 @@ function getLibs(inst)
     if(inst.$static.genLibs)
     {
         const toolchain = genLibs.getToolchainDir();
+        const isa = genLibs.getDeviceIsa();
 
         // Add mac lib
-        const dev = Common154.isSub1GHzDevice() ? "cc13x2" : "cc26x2";
-        let maclib = "ti/ti154stack/library/tirtos/"
-        maclib += toolchain + "/bin/"
-        maclib += "maclib_nosecure_" + dev + "_2_4g.a"
+        const deviceId = system.deviceData.deviceId;
+        var dev = "undefined";
+        if(deviceId.includes("CC13"))
+        {
+            dev = "cc13x2";
+        }
+        else if(deviceId.includes("CC2652"))
+        {
+            dev = "cc26x2";
+        }
+        else if(deviceId.includes("CC2651"))
+        {
+            dev = "cc26x1";
+        }
+        let maclib = "ti/ti154stack/lib/"
+        maclib += toolchain + "/" + isa + "/";
+        maclib += "maclib_nosecure_" + dev + "_2_4g.a";
         results.libs.push(maclib);
 
         // Add zstack lib
@@ -171,20 +185,20 @@ function getLibs(inst)
         let devType = inst.$static.deviceType;
         switch(devType) {
             case "zc":
-                devType = "nwk_zr_";
+                devType = "nwk_zr";
                 break;
             case "znp":
-                devType = "nwk_all_";
+                devType = "nwk_all";
                 break;
             case "gpd":
-                devType = "gpd_sec_";
+                devType = "gpd_sec";
                 break;
             default:
-                devType = "nwk_" + devType + "_"; // nwk_<zr/zed>_
+                devType = "nwk_" + devType; // nwk_<zr/zed>_
                 break;
         }
-        zlib += toolchain + "/";
-        zlib += "libZStack_" + devType + toolchain + ".a";
+        zlib += toolchain + "/" + isa + "/";
+        zlib += "libZStack_" + devType + ".a";
         results.libs.push(zlib);
     }
 

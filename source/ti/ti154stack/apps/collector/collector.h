@@ -5,7 +5,7 @@
  @brief TIMAC 2.0 Collector Example Application Header
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -96,13 +96,23 @@ extern "C"
 #define COLLECTOR_RESUME_EVT              0x0200
 #endif
 
+#ifdef LPSTK
+/* LPSTK configuration frame control */
+#define CONFIG_FRAME_CONTROL (Smsgs_dataFields_tempSensor | \
+                              Smsgs_dataFields_lightSensor | \
+                              Smsgs_dataFields_humiditySensor | \
+                              Smsgs_dataFields_msgStats | \
+                              Smsgs_dataFields_configSettings | \
+                              Smsgs_dataFields_hallEffectSensor | \
+                              Smsgs_dataFields_accelSensor)
+#else
 /* Default configuration frame control */
 #define CONFIG_FRAME_CONTROL (Smsgs_dataFields_tempSensor | \
                               Smsgs_dataFields_lightSensor | \
                               Smsgs_dataFields_humiditySensor | \
                               Smsgs_dataFields_msgStats | \
                               Smsgs_dataFields_configSettings)
-
+#endif
 /*! Collector Status Values */
 typedef enum
 {
@@ -221,6 +231,17 @@ typedef struct
     /* Total broadcast messages sent */
     uint16_t broadcastMsgSentCnt;
 } Collector_statistics_t;
+
+#ifdef IEEE_COEX_METRICS
+typedef struct
+{
+    uint32_t dbgCoexGrants;
+    uint32_t dbgCoexRejects;
+    uint16_t dbgCoexContRejects;
+    uint16_t dbgCoexMaxContRejects;
+} Collector_coexStatistics_t;
+
+#endif
 
 /******************************************************************************
  Global Variables

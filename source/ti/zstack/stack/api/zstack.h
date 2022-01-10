@@ -1505,11 +1505,6 @@ typedef struct _zstack_devzdocbreq_t
     /** Set to true to receive Device State Change Indication */
     bool devStateChange;
 
-    /** Set to true if devJammerInd is available, false if not */
-    bool has_devJammerInd;
-    /** Set to true to receive the Device Jammer Indication */
-    bool devJammerInd;
-
     /** Set to true if tcDeviceInd is available, false if not */
     bool has_tcDeviceInd;
     /** Set to true to receive the Trust Center Device Indication */
@@ -1552,15 +1547,6 @@ typedef struct _zstack_devnwkcheckroutereq_t
 } zstack_devNwkCheckRouteReq_t;
 
 /**
- * Structure to send a Device Jammer Indication.
- */
-typedef struct _zstack_devjammerind_t
-{
-    /** True if a jammer is detected, false if jammer no longer detected */
-    bool jammed;
-} zstack_devJammerInd_t;
-
-/**
  * Structure to send a Device Permit Join Indication.
  */
 typedef struct _zstack_devpermitjoinind_t
@@ -1599,6 +1585,8 @@ typedef struct _zstack_devforcenetworksettingsreq_t
     uint16_t nwkAddr;
     //! Channel List (bit mask)
     uint32_t channelList;
+    //! logical channel
+    uint8_t logicalChannel;
     //! Parent's network address
     uint16_t parentNwkAddr;
     //! device's PAN ID
@@ -3255,14 +3243,14 @@ typedef struct _zstack_bdbtouchlinkgetallowstealingrsp_t
 } zstack_bdbTouchlinkGetAllowStealingRsp_t;
 
 /**
- * Structure to send a BDB ZED attempt to Recover Network Request.
+ * Structure to send a BDB to Recover Network Request.
  */
-typedef struct _zstack_bdbzedattemptrecovernwkrsp_t
+typedef struct _zstack_bdbRecoverNwkRsp_t
 {
   /** Indicate if the request was process or not. The request will fail
   if the device has not been commissioned yet */
   uint8_t status;
-}zstack_bdbZedAttemptRecoverNwkRsp_t;
+}zstack_bdbRecoverNwkRsp_t;
 
 
 /**

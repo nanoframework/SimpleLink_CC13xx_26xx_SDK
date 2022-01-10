@@ -95,43 +95,43 @@ function _getPinResources(inst)
  */
 function moduleInstances(inst)
 {
-    let pinInstances = new Array();
-
-    pinInstances.push(
+    let shortName = inst.$name.replace("CONFIG_", "");
+    let instances = [
         {
             name: "sdaPinInstance",
             displayName: "I2C SDA PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/I2C",
+            requiredArgs: {
                 parentInterfaceName: "i2c",
                 parentSignalName: "sdaPin",
-                parentSignalDisplayName: "SDA",
+                parentSignalDisplayName: "SDA"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_SDA",
                 mode: "Input",
                 pull: "Pull Up"
             }
-        }
-    );
-
-    pinInstances.push(
+        },
         {
-            name: "clkPinInstance",
+            name: "sclPinInstance",
             displayName: "I2C CLK PIN Configuration While Pin is Not In Use",
-            moduleName: "/ti/drivers/PIN",
+            moduleName: "/ti/drivers/GPIO",
             collapsed: true,
-            args: {
-                parentMod: "/ti/drivers/I2C",
+            requiredArgs: {
                 parentInterfaceName: "i2c",
                 parentSignalName: "sclPin",
-                parentSignalDisplayName: "SCL",
+                parentSignalDisplayName: "SCL"
+            },
+            args: {
+                $name: "CONFIG_GPIO_" + shortName + "_SCL",
                 mode: "Input",
                 pull: "Pull Up"
             }
         }
-    );
+    ];
 
-    return (pinInstances);
+    return instances;
 }
 
 /*

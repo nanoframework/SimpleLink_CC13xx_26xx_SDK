@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,14 +57,10 @@ function getLibs(mod)
 
     /* get device information from DriverLib */
     var DriverLib = system.getScript("/ti/devices/DriverLib");
-    let family = DriverLib.getAttrs(devId).deviceDefine;
+    let family = DriverLib.getAttrs(devId).libName;
 
     /* Get current RTOS configuration information */
-    var RTOS = system.modules["/ti/drivers/RTOS"];
-    let rtos = "TI-RTOS";
-    if (RTOS != undefined) {
-        rtos = RTOS.$static.name;
-    }
+    let rtos = system.getRTOS();
 
     /* Get toolchain specific information from GenLibs */
     let GenLibs = system.getScript("/ti/utils/build/GenLibs");
@@ -74,30 +70,23 @@ function getLibs(mod)
     let libs = [];
 
     if (family != "") {
-        family = family.replace(/^DeviceFamily_/, "").toLowerCase();
-        if (family.indexOf("cc32") == 0) {
-            family = "cc32xx";
-        }
-
         libs.push(libPath("ti/drivers","drivers_" + family + ".a"));
 
         if (!family.match(/cc.*4/)) {
 
             libs.push(libPath("ti/grlib", "grlib.a"));
 
-            if (rtos == "TI-RTOS") {
+            if (rtos == "tirtos" || rtos == "tirtos7") {
                 libs.push(libPath("ti/dpl","dpl_" + family + ".a"));
             }
-            else if (rtos == "NoRTOS") {
-                libs.push("lib/" + getToolchainDir() + "/" + getDeviceIsa() +
-                    "/nortos_" + family + ".a");
+            else if (rtos == "nortos") {
+                libs.push("lib/" + getToolchainDir() + "/" + getDeviceIsa() + "/nortos_" + family + ".a");
             }
         }
     }
 
     if (libs == null) {
-        throw Error("device2LinkCmd: unknown device family ('"
-            + family + "') for deviceId '" + devId + "'");
+        throw Error("device2LinkCmd: unknown device family ('" + family + "') for deviceId '" + devId + "'");
     }
 
     /* create a GenLibs input argument */
@@ -130,6 +119,12 @@ function getLibs(mod)
 function modules(mod)
 {
     let reqs = [];
+
+    reqs.push({
+        name      : "GPIO",
+        moduleName: "/ti/drivers/GPIO",
+        hidden    : false
+    });
 
     reqs.push({
         name      : "Driverlib",
@@ -238,6 +233,11 @@ module will execute.
         config   : config
     }
 };
+
+/* This should maybe go somewhere else, but until we get a FreeRTOS module it can stay here */
+if (system.getRTOS() == "freertos") {
+    base.templates["/ti/utils/rov/syscfg_c.rov.xs.xdt"] = "/kernel/freertos/rov/FreeRTOS.rov.js";
+}
 
 /* extend the base exports to include family-specific content */
 let deviceBoard = system.getScript("/ti/drivers/Board" + family);

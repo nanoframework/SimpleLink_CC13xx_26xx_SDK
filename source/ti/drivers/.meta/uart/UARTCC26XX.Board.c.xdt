@@ -97,6 +97,7 @@
 #include <ti/drivers/uart/UART`driver`.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/Power`powerDriver`.h>
+#include <ti/devices/`devicesDir`/driverlib/ioc.h>
 #include <ti/devices/`devicesDir`/inc/hw_memmap.h>
 #include <ti/devices/`devicesDir`/inc/hw_ints.h>
 
@@ -127,21 +128,19 @@ static const UART`driver`_HWAttrs`attrsVer` uart`driver`HWAttrs[`countDef`] = {
 %         errorFxn = 'NULL';
 %     }
 %     let peripheral  = system.deviceData.peripherals[solution.peripheralName];
-%     let rxPinName   = 'PIN_UNASSIGNED';
-%     let txPinName   = 'PIN_UNASSIGNED';
-%     let ctsPinName  = 'PIN_UNASSIGNED';
-%     let rtsPinName  = 'PIN_UNASSIGNED';
-%     if ('rxPin' in uart) {
-%         /* Replace 'DIO' with 'IOID' */
-%         rxPinName =  'IOID' + uart.rxPin.$solution.devicePinName.substring(3);
+%     let rxPinName   = 'GPIO_INVALID_INDEX';
+%     let txPinName   = 'GPIO_INVALID_INDEX';
+%     let ctsPinName  = 'GPIO_INVALID_INDEX';
+%     let rtsPinName  = 'GPIO_INVALID_INDEX';
+%     if (inst.txPinInstance) {
+%         txPinName = inst.txPinInstance.$name;
 %     }
-%     if ('txPin' in uart) {
-%         txPinName =  'IOID' + uart.txPin.$solution.devicePinName.substring(3);
+%     if (inst.rxPinInstance) {
+%         rxPinName = inst.rxPinInstance.$name;
 %     }
-%
 %     if (inst.flowControl) {
-%         ctsPinName    = 'IOID' + uart.ctsPin.$solution.devicePinName.substring(3);
-%         rtsPinName    = 'IOID' + uart.rtsPin.$solution.devicePinName.substring(3);
+%         ctsPinName    = inst.ctsPinInstance.$name;
+%         rtsPinName    = inst.rtsPinInstance.$name;
 %     }
   {
     .baseAddr           = `peripheral.name`_BASE,

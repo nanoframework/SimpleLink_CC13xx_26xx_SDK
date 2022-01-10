@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020, Texas Instruments Incorporated
+ * Copyright (c) 2019-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -654,6 +654,7 @@ void __attribute__((weak)) UART2_writeCancel(UART2_Handle handle)
                     object->bytesWritten, object->userArg,
                     UART2_STATUS_ECANCELLED);
         }
+        UART2Support_powerRelConstraint();
     }
 
     HwiP_restore(key);

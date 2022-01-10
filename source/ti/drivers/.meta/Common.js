@@ -82,8 +82,6 @@ exports = {
     typeMatches: typeMatches,
     setDefaults: setDefaults,
 
-    validateNames: validateNames, /* validate inst names are unique C names */
-
     addNameConfig: addNameConfig, /* add driver-specific $name config */
 
     autoForceModules: autoForceModules,
@@ -327,16 +325,30 @@ function device2Family(device, mod)
 {
     /* device.deviceId prefix -> /ti/drivers family name */
     let DEV2FAMILY = [
+        {prefix: "CC13.4",   family: "CC26X4"},
+        {prefix: "CC26.4",   family: "CC26X4"},
+        {prefix: "CC2653",   family: "CC26X4"},
         {prefix: "CC13.2",   family: "CC26X2"},
         {prefix: "CC26.2",   family: "CC26X2"},
-        {prefix: "CC13.4",   family: "CC26X2"},
-        {prefix: "CC26.4",   family: "CC26X2"},
         {prefix: "CC13.1",   family: "CC26X1"},
         {prefix: "CC26.1",   family: "CC26X1"},
         {prefix: "CC13",     family: "CC26XX"},
         {prefix: "CC26",     family: "CC26XX"},
+        {prefix: "CC23.0",   family: "CC23XX"},
         {prefix: "CC32",     family: "CC32XX"}
     ];
+
+    /* CC26X4 specific module delegates */
+    let cc26x4Mods = {
+        "ECDH" :        "CC26X2",
+        "ECDSA" :       "CC26X2",
+        "ECJPAKE" :     "CC26X2",
+        "EDDSA" :       "CC26X2",
+        "SHA2" :        "CC26X2",
+        "Temperature" : "CC26X2",
+        "AESCCM" :      "CC26X4",
+        "AESGCM" :      "CC26X4"
+    };
 
     /* CC26X2 and CC26X2R7 specific module delegates */
     let cc26x2Mods = {
@@ -356,6 +368,10 @@ function device2Family(device, mod)
         "Temperature" : "CC26X2"
     };
 
+    /* CC23X0 specific module delegates */
+    let cc23x0Mods = {
+    };
+
     /* deviceId is the directory name within the pinmux/deviceData */
     let deviceId = device.deviceId;
 
@@ -363,8 +379,16 @@ function device2Family(device, mod)
         let d2f = DEV2FAMILY[i];
 
         if (deviceId.match(d2f.prefix)) {
-            /* trap Agama specific mods */
-            if (d2f.family == "CC26X2") {
+            /* trap device specific mods */
+            if (d2f.family == "CC26X4") {
+                if (mod in cc26x4Mods) {
+                    return (cc26x4Mods[mod]);
+                }
+                else {
+                    return ("CC26XX");
+                }
+            }
+            else if (d2f.family == "CC26X2") {
                 if (mod in cc26x2Mods) {
                     return (cc26x2Mods[mod]);
                 }
@@ -378,6 +402,14 @@ function device2Family(device, mod)
                 }
                 else {
                     return ("CC26XX");
+                }
+            }
+            else if (d2f.prefix == "CC23.0") {
+                if (mod in cc23x0Mods) {
+                    return (cc23x0Mods[mod]);
+                }
+                else {
+                    return ("CC23XX");
                 }
             }
             else {
@@ -1319,81 +1351,6 @@ function setDefaults(inst, signal, type)
                 + "specified an unknown setting (" + cfg + " = " + settings[cfg]
                 + ") for " + inst.$name;
             throw new Error(msg); /* needed to detect bogus board data */
-        }
-    }
-}
-
-/*
- *  ======== validateNames ========
- *  Validate that all names defined by inst are globally unique and
- *  valid C identifiers.
- */
-function validateNames(inst, validation)
-{
-    let myNames = {}; /* all C identifiers defined by inst) */
-
-    /* check that $name is a C identifier */
-    if (inst.$name != "") {
-        let token = inst.$name;
-        if (!isCName(token)) {
-            logError(validation, inst, "$name",
-                "'" + token + "' is not a valid a C identifier");
-        }
-        myNames[token] = 1;
-    }
-
-    /* check that cAliases are all C identifiers and there are no dups */
-    let tokens = [];
-    if ("cAliases" in inst && inst.cAliases != "") {
-        tokens = inst.cAliases.split(/[,;\s]+/);
-    }
-
-    for (let i = 0; i < tokens.length; i++) {
-        let token = tokens[i];
-        if (!isCName(token)) {
-            logError(validation, inst, "cAliases",
-                "'" + token + "' is not a valid a C identifier");
-        }
-        if (myNames[token] != null) {
-            logError(validation, inst, "cAliases",
-                "'" + token + "' is defined twice");
-        }
-        myNames[token] = 1;
-    }
-
-    /* ensure all inst C identifiers are globally unique */
-    let mods = system.modules;
-    for (let i in mods) {
-        /* for all instances in all modules in /ti/drivers ... */
-        let instances = mods[i].$instances;
-        for (let j = 0; j < instances.length; j++) {
-            let other = instances[j];
-
-            /* skip self */
-            if (inst.$name == other.$name) {
-                continue;
-            }
-
-            /* compute all other names */
-            let name = other.$name;
-            if (name != "" && name in myNames) {
-                logError(validation, inst, "cAliases",
-                    "multiple instances with the same name: '"
-                         + name + "': " + inst.$name + " and " + other.$name);
-                break;
-            }
-            if (other.cAliases != null && other.cAliases != "") {
-                let tokens = other.cAliases.split(/[,;\s]+/);
-                for (let k = 0; k < tokens.length; k++) {
-                    name = tokens[k];
-                    if (name != "" && name in myNames) {
-                        logError(validation, inst, "cAliases",
-                            "multiple instances with the same name: '" + name
-                                 + "': " + inst.$name + " and " + other.$name);
-                        break;
-                    }
-                }
-            }
         }
     }
 }

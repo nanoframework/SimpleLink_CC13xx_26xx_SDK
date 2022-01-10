@@ -76,7 +76,7 @@
 
 #define SCRATCH_KEY_OFFSET 512
 #define SCRATCH_KEY_SIZE 96
-#define SCRATCH_PRIVATE_KEY ((uint8_t *)(PKA_RAM_BASE                         \
+#define SCRATCH_PRIVATE_KEY ((uint32_t *)(PKA_RAM_BASE                         \
                                          + SCRATCH_KEY_OFFSET))
 #define SCRATCH_PUBLIC_X ((uint8_t *)(PKA_RAM_BASE                            \
                                       + SCRATCH_KEY_OFFSET                    \
@@ -376,9 +376,7 @@ static int_fast16_t EDDSACC26X2_encodePublicKey(EDDSA_Handle handle,
      * Copy the y-coordinate to the buffer. The input and output
      * both are little endian.
      */
-    CryptoUtils_copyPad(yCoordinate,
-                        outputKey,
-                        ECCParams_Ed25519.length);
+    memcpy(outputKey, yCoordinate, ECCParams_Ed25519.length);
 
     /*
      * If the least significant bit of the x-coordinate is 0x1, then we set
@@ -690,7 +688,7 @@ static int_fast16_t EDDSACC26X2_runGeneratePublicKeyFSM(EDDSA_Handle handle)
              * Perform the point multiplication A = s*B to generate the public
              * key point in short Weierstrass form
              */
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                 ECCParams_Wei25519.generatorX,
                                 ECCParams_Wei25519.generatorY,
                                 ECCParams_Wei25519.prime,
@@ -870,7 +868,7 @@ static int_fast16_t EDDSACC26X2_runSignFSM(EDDSA_Handle handle) {
              * multiplication and also roughly doubles the speed of the point
              * multiplication
              */
-            PKABigNumModStart(SCRATCH_PRIVATE_KEY,
+            PKABigNumModStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                               2 * ECCParams_Ed25519.length,
                               ECCParams_Ed25519.order,
                               ECCParams_Ed25519.length,
@@ -1215,10 +1213,10 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
         case EDDSACC26X2_FSM_VERIFY1_A_IS_NOT_POINT_AT_INFINITY:
 
             /* Retrieve the public key */
-            CryptoUtils_copyPad(object->operation.verify->theirPublicKey->
-                                    u.plaintext.keyMaterial,
-                                object->EDDSACC26X2_GlobalWorkspace.publicKey,
-                                ECCParams_Ed25519.length);
+            memcpy(object->EDDSACC26X2_GlobalWorkspace.publicKey,
+                   object->operation.verify->theirPublicKey->u.plaintext.keyMaterial,
+                   ECCParams_Ed25519.length);
+
             /* The MSB of the public key indicates if sqrt(x) is even or odd */
             object->EDDSACC26X2_GlobalWorkspace.x_0 = object->
                     EDDSACC26X2_GlobalWorkspace.publicKey[31] >> 7;
@@ -2248,7 +2246,7 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
 
         case EDDSACC26X2_FSM_VERIFY2_MOD_SIG_DIGEST_RESULT:
 
-            pkaResult = PKABigNumModGetResult(SCRATCH_PRIVATE_KEY,
+            pkaResult = PKABigNumModGetResult((uint8_t*)SCRATCH_PRIVATE_KEY,
                                               ECCParams_Ed25519.length,
                                               EDDSACC26X2_resultAddress);
 
@@ -2261,7 +2259,7 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
              */
             PKABigNumSubStart(ECCParams_Ed25519.order,
                               ECCParams_Ed25519.length,
-                              SCRATCH_PRIVATE_KEY,
+                              (uint8_t*)SCRATCH_PRIVATE_KEY,
                               ECCParams_Ed25519.length,
                               &EDDSACC26X2_resultAddress);
 
@@ -2270,7 +2268,7 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
         case EDDSACC26X2_FSM_VERIFY2_NEGATE_SIG_DIGEST_RESULT:
 
             EDDSACC26X2_scratchPrivKeySize = SCRATCH_KEY_SIZE;
-            pkaResult = PKABigNumSubGetResult(SCRATCH_PRIVATE_KEY,
+            pkaResult = PKABigNumSubGetResult((uint8_t*)SCRATCH_PRIVATE_KEY,
                                               &EDDSACC26X2_scratchPrivKeySize,
                                               EDDSACC26X2_resultAddress);
 
@@ -2278,7 +2276,7 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
 
         case EDDSACC26X2_FSM_VERIFY2_MULT_PUBLIC_KEY_BY_NEG_SIG_DIGEST:
             /* Perform - H(R || A || M) * A using short Weierstrass curves */
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                 SCRATCH_PUBLIC_X,
                                 SCRATCH_PUBLIC_Y,
                                 ECCParams_Wei25519.prime,
@@ -2309,7 +2307,7 @@ static int_fast16_t EDDSACC26X2_runVerifyFSM(EDDSA_Handle handle) {
                                 ECCParams_Wei25519.length);
 
             /* Perform S * B using short Weierstrass curves */
-            PKAEccMultiplyStart(SCRATCH_PRIVATE_KEY,
+            PKAEccMultiplyStart((uint8_t*)SCRATCH_PRIVATE_KEY,
                                 ECCParams_Wei25519.generatorX,
                                 ECCParams_Wei25519.generatorY,
                                 ECCParams_Wei25519.prime,

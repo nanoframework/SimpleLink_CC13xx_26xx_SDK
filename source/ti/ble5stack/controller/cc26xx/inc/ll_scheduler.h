@@ -6,7 +6,7 @@
         Link Layer (LL) task scheduler.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -191,6 +191,7 @@ extern void        llScheduler_no_INIT_CFG_no_SCAN_CFG( void );
 extern void        llScheduler_no_INIT_CFG( void );
 extern void        llScheduleTask( taskInfo_t *llTask );
 extern uint8       llFindStartType( taskInfo_t *secTask, taskInfo_t *primTask );
+extern uint8       llFindStartTypeNoQos( taskInfo_t *secTask, taskInfo_t *primTask );
 extern taskInfo_t *llFindNextSecTask( uint8 secTaskID );
 extern taskInfo_t *llAllocTask( uint8 llTaskID );
 extern void        llFreeTask( taskInfo_t **llTask );

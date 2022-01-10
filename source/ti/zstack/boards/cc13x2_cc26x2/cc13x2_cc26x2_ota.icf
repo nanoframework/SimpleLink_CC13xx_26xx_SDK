@@ -2,7 +2,7 @@
 
  @file  cc13x2_cc26x2.icf
 
- @brief IAR Linker configuration file for MAC-Sensor on cc13x2_cc26x2 LaunchPad(2_4g)
+ @brief IAR Linker configuration file for cc13x2_cc26x2
 
  Group: WCS LPC
  Target Device: cc13x2_cc26x2
@@ -39,9 +39,6 @@
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ******************************************************************************
- Release Name: simplelink_cc26x2_sdk_2_10_00_44_s
- Release Date: 2018-04-09 12:59:57
  *****************************************************************************/
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,12 +57,7 @@ define symbol ROM_SIZE            = 0x00040000; // 256K
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
-// CM3 FW
-//
-define symbol FW_START              = 0x10000000;
-define symbol FW_END                = 0x10004BFF;
 
-////////////////////////////////////////////////////////////////////////////////
 // RAM
 //
 
@@ -84,7 +76,6 @@ define symbol FLASH_MEM_ALIGN     = WORD_SIZE;
 
 define symbol FLASH_START           = FLASH_BASE;
 
-define symbol PAGE_MASK           = 0xFFFFE000;
 
 // OAD specific
 
@@ -145,10 +136,6 @@ define region ENTRY_FLASH         = mem:[from ENTRY_START    to ENTRY_END];
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// CCFG
-//place at end of FLASH_LAST_PAGE { readonly section .ccfg };
-//keep { section .ccfg };
-
 // Flash OAD Image Header
 place at start of FLASH_IMG_HDR { readonly section .img_hdr };
 keep                            { readonly section .img_hdr };
@@ -163,26 +150,20 @@ define block ROSTK with alignment=WORD_SIZE{ ro };
 place in FLASH {block ROSTK };
 
 // RAM Vector Table
-define block VTABLE { section .vtable_ram };
+place at start of RAM { section .vtable_ram };
 
 // Runtime Stack
 define block CSTACK with alignment = 8, size = STACK_SIZE { section .stack };
 
 place at address mem:ROM_TIMACDataAddr {section .data_RAM_BASE_ADDR };
 
-define block RWDATA with alignment = 8 { rw };
+define block END_OF_RAM with fixed order {
+                                        block CSTACK
+                                      };
 
-define section .heap_start            { public heapStart: };
-define section .heap_end              { public heapEnd: };
-define block   HEAP_END with size = 1 { section .heap_end };
+place at end of RAM { block END_OF_RAM };
 
-place at end of RAM { block HEAP_END };
-
-place in RAM { first block VTABLE,
-                     block RWDATA,
-                     block CSTACK,
-               last  section .heap_start
-               };
+place in RAM { rw };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialization

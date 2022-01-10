@@ -9,7 +9,7 @@
         V4.2, Vol. 6.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -69,6 +69,15 @@
 #include <uble.h>
 #include <urfi.h>
 #include <ull.h>
+
+#if defined(RTLS_CTE)
+#if !defined(DeviceFamily_CC26X1)
+#include <driverlib/rf_bt5_iq_autocopy.h>
+#else
+#include <ti/devices/cc13x2_cc26x2/driverlib/rf_bt5_iq_autocopy.h>
+#endif
+#include <urtls.h>
+#endif /* RTLS_CTE */
 
 /*********************************************************************
  * MACROS
@@ -395,51 +404,6 @@ void ull_nextDataEntryDone( dataEntryQ_t *pDataEntryQ )
   return;
 }
 
-/*******************************************************************************
- * @fn          ull_flushAllDataEntry
- *
- * @brief       This function is used to mark the all System data entry on a
- *              data entry queue as Pending so that the radio can once again
- *              use all available data entry queue. It should be called after
- *              the user has processed after the Rx buffer full is reported.
- *              NOTE: this assumes a ring buffer is used.
- *
- * input parameters
- *
- * @param       dataEntryQueue_t - Pointer to data entry queue.
- *
- * output parameters
- *
- * @param       None.
- *
- * @return      None.
- */
-void ull_flushAllDataEntry( dataEntryQ_t *pDataEntryQ )
-{
-  dataQ_t         *pDataQueue;
-  port_key_t key;
-  port_key_t key_s;
-
-  key = port_enterCS_HW();
-  key_s = port_enterCS_SW();
-
-  /* point to data queue */
-  pDataQueue = (dataQ_t *)pDataEntryQ;
-
-  while ( pDataQueue->pNextDataEntry != NULL &&
-          pDataQueue->pNextDataEntry->status != DATA_ENTRY_PENDING)
-  {
-    /* mark the next System data entry as Pending */
-    pDataQueue->pNextDataEntry->status = DATA_ENTRY_PENDING;
-
-    /* advance to the next data entry in the data entry queue */
-    pDataQueue->pNextDataEntry = pDataQueue->pNextDataEntry->pNextEntry;
-  }
-
-  port_exitCS_SW(key_s);
-  port_exitCS_HW(key);
-}
-
 #endif /* FEATURE_SCANNER || FEATURE_MONITOR */
 
 /*********************************************************************
@@ -713,6 +677,13 @@ void ull_monitorDoneCb(RF_Handle rfHandle, RF_CmdHandle cmdHandle,
     /* Internal fatal errors */
     uble_buildAndPostEvt(UBLE_EVTDST_LL, ULL_EVT_MONITOR_RX_FAILED, NULL, 0);
   }
+
+#if defined(RTLS_CTE)
+  if (events & RF_EventSamplesEntryDone)
+  {
+    urtls_cteSamples.autoCopyCompleted ++;
+  }
+#endif /* RTLS_CTE */
 
   port_exitCS_SW(key);
 }
@@ -1471,6 +1442,35 @@ bStatus_t ull_monitorSchedule(uint8 mode)
     }
   }
 
+#if defined(RTLS_CTE)
+  if (urtls_cteSamples.pAutoCopyBuffers != NULL)
+  {
+    // in case the sampling is enable
+    if (urtls_cteInfo[ubleParams.monitorHandle-1].samplingEnable == URTLS_CTE_SAMPLING_ENABLE)
+    {
+      // Enable the Packet received with CRC error interrupt and copy samples interrupt
+      bmEvent |= (RF_EventSamplesEntryDone);
+      // Set the antenna switch
+      urtls_rfOverrideCteValue((uint32)(urtls_cteInfo[ubleParams.monitorHandle-1].pAntenna), RFC_FWPAR_CTE_ANT_SWITCH, RFC_CTE_ANT_SWITCH_OFFSET);
+      // set the auto copy struct pointer in RF memory
+      urtls_rfOverrideCteValue((uint32)(&urtls_cteSamples.autoCopy),RFC_FWPAR_CTE_AUTO_COPY, RFC_CTE_AUTO_COPY_OFFSET);
+      // reset the auto copy counter
+      urtls_cteSamples.autoCopyCompleted = 0;
+      // set the CTE max count as 1 CTE (relevant only to periodic scan)
+      urtls_cteSamples.autoCopy.cteCopyLimitCount = 1;
+    }
+    else
+    {
+      // Disable the Packet received with CRC error interrupt and copy samples interrupt
+      bmEvent &= ~(RF_EventSamplesEntryDone);
+      // disable the antenna switch
+      urtls_rfOverrideCteValue(0, RFC_FWPAR_CTE_ANT_SWITCH, RFC_CTE_ANT_SWITCH_OFFSET);
+      // disable the auto copy
+      urtls_rfOverrideCteValue(0, RFC_FWPAR_CTE_AUTO_COPY, RFC_CTE_AUTO_COPY_OFFSET);
+    }
+  }
+#endif /* RTLS_CTE */
+
   key = port_enterCS_HW();
 
   /* Save local session Id */
@@ -1539,44 +1539,6 @@ bStatus_t ull_monitorStart(uint8_t channel)
   return (status);
 }
 
-/*********************************************************************
- * @fn      ull_monitorStop
- *
- * @brief   Exit ULL_STATE_MONITORING
- *
- * @param   none
- *
- * @return  none
- */
-void ull_monitorStop(void)
-{
-  port_key_t key;
-  port_key_t key_h;
-
-  key_h = port_enterCS_HW();
-  key = port_enterCS_SW();
-
-  if (ulState == ULL_STATE_MONITORING)
-  {
-    ulState = ULL_STATE_STANDBY;
-
-    /* Cancel or stop generic Rx command */
-    if (urfiGenericRxHandle > 0)
-    {
-      /* flush RF commands */
-      RF_flushCmd(urfiHandle, urfiGenericRxHandle, 0);
-
-      /* flush RX queue data entries */
-      ull_flushAllDataEntry( (dataEntryQ_t *)urfiGenericRxCmd.pParams->pRxQ);
-
-      urfiGenericRxHandle = URFI_CMD_HANDLE_INVALID;
-    }
-  }
-
-  port_exitCS_SW(key);
-  port_exitCS_HW(key_h);
-}
-
 /*******************************************************************************
  * @fn          ull_getPDU
  *
@@ -1611,6 +1573,16 @@ void ull_getPDU( uint8 *len, uint8 *payload )
   if ((pPdu[0] & 0x20) == 0x20)
   {
       *len += 1;
+#if defined(RTLS_CTE)
+      if(urtls_cteInfo[ull_sessionId-1].requestEnable == TRUE)
+      {
+        uint8_t cteInfo = pPdu[2];
+        //save the CTE info received from peer
+        urtls_cteInfo[ull_sessionId-1].recvCte = TRUE;
+        urtls_cteInfo[ull_sessionId-1].recvInfo.length = cteInfo & URTLS_CTE_INFO_TIME_MASK;
+        urtls_cteInfo[ull_sessionId-1].recvInfo.type = (cteInfo & URTLS_CTE_INFO_TYPE_MASK) >> URTLS_CTE_INFO_TYPE_OFFSET;
+      }
+#endif /* RTLS_CTE */
   }
 
   /* The maximum length is ULL_PKT_HDR_LEN + ULL_MAX_BLE_PKT_SIZE +
@@ -1700,7 +1672,6 @@ void ull_rxEntryDoneCback(void)
   return;
 }
 #endif /* FEATURE_MONITOR */
-
 /*********************************************************************
  * @fn      uble_processLLMsg
  *
@@ -1837,9 +1808,6 @@ void uble_processLLMsg(ubleEvtMsg_t *pEvtMsg)
     scanRxStatus = ULL_SCAN_RX_NO_RF_RESOURCE;
     ull_notifyScanIndication( MSG_BUFFER_NOT_AVAIL, 0, NULL );
 
-    /* Flush RX queue data entries */
-    ull_flushAllDataEntry( (dataEntryQ_t *)urfiScanCmd.pParams->pRxQ );
-
     if (ulState == ULL_STATE_SCANNING)
     {
       /* reschedule the scanning */
@@ -1882,23 +1850,45 @@ void uble_processLLMsg(ubleEvtMsg_t *pEvtMsg)
   case ULL_EVT_MONITOR_RX_BUF_FULL:
     /* Monitoring scan Rx buffer full */
     monitorRxStatus = ULL_MONITOR_RX_NO_RF_RESOURCE;
-    ull_notifyMonitorIndication( MSG_BUFFER_NOT_AVAIL, ull_sessionId, 0, NULL );
-
-    /* flush RX queue data entries */
-    ull_flushAllDataEntry( (dataEntryQ_t *)urfiGenericRxCmd.pParams->pRxQ );
+    ull_notifyMonitorIndication(MSG_BUFFER_NOT_AVAIL, ull_sessionId, 0, NULL);
 
     /* reschedule the monitoring scan */
     ull_monitorSchedule(ULL_MONITOR_MODE_RESCHEDULE);
     break;
 
   case ULL_EVT_MONITOR_RX_WINDOW_COMPLETE:
-    /* Flush the data queue, we don't need whatever is there at this point
-     * since all packets should have been processed by now */
-    ull_flushAllDataEntry((dataEntryQ_t *)urfiGenericRxCmd.pParams->pRxQ);
+  {
+#if defined(RTLS_CTE)
+     // get the CTE information in case received CTE response packet
+    if ((urtls_cteSamples.autoCopyCompleted > 0) && (urtls_cteSamples.pAutoCopyBuffers != NULL))
+    {
+      dataEntry_t *pDataEntry;
+      port_key_t key;
+      port_key_t key_s;
+
+      key = port_enterCS_HW();
+      key_s = port_enterCS_SW();
+
+      // get the samples buffer
+      pDataEntry = ull_getNextDataEntry((dataEntryQ_t *)urtls_cteSamples.autoCopy.pSamplesQueue);
+
+      urtls_getCteInfo(pDataEntry, ull_sessionId, (uint8_t)ubleParams.monitorChan);
+
+      /* in all cases, mark the RX queue data entry as free
+       * Note: Even if there isn't any heap to copy to, this packet is considered
+       *       lost, and the queue entry is marked free for radio use.
+       */
+      ull_nextDataEntryDone((dataEntryQ_t *)urtls_cteSamples.autoCopy.pSamplesQueue);
+
+      port_exitCS_SW(key_s);
+      port_exitCS_HW(key);
+    }
+#endif /* RTLS_CTE */
 
     /* Monitoring scan rx window complete. */
       ull_notifyMonitorComplete(SUCCESS, ull_sessionId);
-    break;
+  }
+  break;
 
   case ULL_EVT_MONITOR_RX_RADIO_AVAILABLE:
     /* Rf radio resource available. This is caused by PHY preemption.
@@ -1916,7 +1906,6 @@ void uble_processLLMsg(ubleEvtMsg_t *pEvtMsg)
     break;
   }
 }
-
 
 /*********************************************************************
 *********************************************************************/

@@ -1,8 +1,20 @@
 TI 15.4-Stack Collector Example
 ==========================
 
-Example Summary
----------------
+## Table of Contents
+
+* [Example Summary](#ExampleSummary)
+* [Peripherals Exercised](#PeripheralsExercised)
+* [Resources & Jumper Settings](#Resources&JumperSettings)
+* [Example Application Dataflow](#ExampleApplicationDataflow)
+* [Example Usage](#ExampleUsage)
+* [Analyzing Network Traffic](#AnalyzingNetworkTraffic)
+* [Project Configuration](#ProjectConfiguration)
+  * [Disabling Common User Interface](#DisablingCommonUserInterface)
+  * [Multi-Page NV Configuration](#MultiPageNVConfiguration)
+  * [IAR Configuration](#IARConfiguration)
+
+## <a name="ExampleSummary"></a>Example Summary
 
 The collector example application demonstrates how to implement a Personal Area Network (PAN) Coordinator device using TI 15.4-Stack. A TI 15.4-Stack based star network consists of two types of logical devices: the PAN-Coordinator and the network devices, e.g. the Collector and Sensor applications, respectively.
 
@@ -14,11 +26,10 @@ The example applications in TI 15.4-Stack are developed for the CC13x2 Launchpad
 
 > Note that this also includes the CC1352P-X boards, where the X represents which board subset is used, and the power amplification range.
 
-Peripherals Exercised
----------------------
+## <a name="PeripheralsExercised"></a>Peripherals Exercised
 
 > To trigger various events, buttons can be used as well as the configurable user interface.
-> The Example Usage section of this document explains how to use the user interface, although both the button presses and the UART perform the
+> The [Example Usage](#ExampleUsage) section of this document explains how to use the user interface, although both the button presses and the UART perform the
 > same actions.
 
 * `CONFIG_GPIO_RLED` - Set when the collector application is initialized. Flashes when the network is open for joining.
@@ -27,25 +38,25 @@ Peripherals Exercised
 
 > If `CONFIG_GPIO_BTN2` is held while power is applied to the Launchpad, NV Flash will be erased.
 
-Resources & Jumper Settings
----------------------------
+## <a name="Resources&JumperSettings"></a>Resources & Jumper Settings
+
 The following hardware is required to run TI 15.4-Stack Out of Box (OOB) example applications:
+
 * Two [**CC13x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc1352r1) or two [**CC26x2 Launchpad development kits**](http://www.ti.com/tool/launchxl-cc26x2r1)
 
 > If you're using an IDE (such as CCS or IAR), please refer to `Board.html` in
 your project directory for resources used and board-specific jumper settings.
 Otherwise, you can find `Board.html` in the directory
-&lt;SDK_INSTALL_DIR&gt;/source/ti/boards/&lt;BOARD&gt;.
+`<SDK_INSTALL_DIR>/source/ti/boards/<BOARD>`.
 
 Please refer to the following link for helpful SimpleLink Academy guides for ramping up
 on TI 15.4-Stack: [TI 15.4-Stack SimpleLink Academy](https://dev.ti.com/tirex/explore/node?node=ABRXrYdFS1e-0P3PY6NmNg__pTTHBmu__LATEST).
 
 For an in-depth overview of the TI 15.4-Stack application, please refer to the TI 15.4-Stack User Guide at
-`<SDK_ROOT>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
+`<SDK_INSTALL_DIR>/docs/ti154stack/html/ti154stack/application-overview.html#application-overview`).
 
+## <a name="ExampleApplicationDataflow"></a>Example Application Dataflow
 
-Example Application Dataflow
----------------------------
 The collector application has three processing loops each handling a different set of
 events. These are as follows:
 
@@ -102,18 +113,17 @@ An overview of the collector cllc states and state transitions is as follows:
 	  Cllc_states_                Cllc_states_
 	  joiningNotAllowed           joiningAllowed
 
+## <a name="ExampleUsage"></a>Example Usage
 
-Example Usage
--------------
 This example project implements a collector device: the PAN-Coordinator for the network. This device creates a TI 15.4-Stack network, allows sensor devices to join the network, collects sensor information sent by devices running the sensor example application, and tracks if the devices are on the network or not by periodically sending tracking request messages.
 
 The example output can be viewed through the UART terminal.
 
-* Open a serial session (e.g. [`PuTTY`](http://www.putty.org/ "PuTTY's
+* Open a serial session (e.g. [PuTTY](http://www.putty.org/ "PuTTY's
 Homepage"), etc.) to the appropriate COM port with the following settings.
 
 * Note that if you are using Tera Term, by default, the Backspace key will be replaced with the delete key.
-If you go to Setup->Keyboard There is a section called `Transmitting DEL by:`
+If you go to Setup > Keyboard There is a section called `Transmitting DEL by:`
 Make sure that the backspace character is checked as well.
 
 > The COM port can be determined via Device Manager in Windows or via
@@ -161,6 +171,7 @@ Status: Waiting...
 Device Status: --
 Number of Joined Devices: --
 ```
+
 ```
  12 34 56 78 9A BC DE F0 00 00 00 00 00 00 00 00
 
@@ -171,7 +182,6 @@ Device Status: --
 Number of Joined Devices: --
 ```
 
-
 Note that these changes will only take effect if the collector is in a waiting state.
 Keys 0-F can be used to change the value when in edit mode, and left/right keys can be used for navigating the digits.
 Once the collector is started, the settings can only be changed if it is restarted.
@@ -179,10 +189,9 @@ Once the collector is started, the settings can only be changed if it is restart
 > If the **AUTO_START** symbol is defined in your application, then the application will automatically configure itself on startup.
 > This is not enabled by default with the project, but it can be configured as described below.
 
-**AUTO_START** can be defined by removing the x in the .opts file under the defines folder.
--DxAUTO_START -> -DAUTO_START
+**AUTO_START** can be defined by removing the x in the .opts file under the defines folder: `-DxAUTO_START > -DAUTO_START`
 
-> If **AUTO_START** is defined, the collector will display Starting... instead of Waiting...
+> If **AUTO_START** is defined, the collector will display `Starting...` instead of `Waiting...`
 After the collector has been started, permit join must be turned on, and this can be done either with the right button press on the collector, or through the user interface as shown below.
 
 > If **AUTO_START** is not defined, then the collector will not open a network unless it is started with the left button press, and permit join is turned on with the right button press.
@@ -245,7 +254,7 @@ Device Status: --
 Number of Joined Devices: 0
 ```
 
-* Now turn on permit join using `CONFIG_GPIO_BTN2` or by selecting OPEN NWK under the `NETWORK ACTIONS` tab.
+* Now turn on permit join using `CONFIG_GPIO_BTN2` or by selecting `OPEN NWK` under the `NETWORK ACTIONS` tab.
 Once the network is started, and sensors begin to join, each of the status lines will update accordingly.
 ```
  TI Collector
@@ -260,6 +269,7 @@ Number of Joined Devices: 1
 > The coordinator device state variable information can be seen in the Collector Logical Link Controller's header file (`cllc.h`), within the `Cllc_states_t` structure.
 
 On the sensor side:
+
 * Wait for the sensor device to join a network, after which the output will be updated with the channel number and device ID of the sensor that was started. After joining the network `CONFIG_GPIO_RLED` will be set.
 The settings that you selected above in the waiting state will then take effect.
 ```
@@ -278,14 +288,11 @@ The settings that you selected above in the waiting state will then take effect.
 > In order for the network device to join, it must have either the generic PAN Id (0xFFFF, default configuration)
 or the same PAN Id as the collector. These settings can be found in the application's SysConfig dashboard.
 
-
-Analyzing Network Traffic
--------------------------
+## <a name="AnalyzingNetworkTraffic"></a>Analyzing Network Traffic
 
 TI 15.4-Stack provides the means to analyze over-the-air traffic by including a packet sniffer firmware image. With an additional CC13x2 Launchpad, users can set up a packet sniffer with the software provided in the SDK. More information about this can be found in the TI 15.4-Stack documentation under **Packet Sniffer**.
 
-Project Configuration
---------------------------
+## <a name="ProjectConfiguration"></a>Project Configuration
 
 The System Configuration (SysConfig) tool is a graphical interface for configuring your TI 15.4-Stack project. Based on the parameters configured in the SysConfig dashboard, C source files and header files are generated. Further advanced parameters can be located in `advanced_config.h`.
 
@@ -303,7 +310,7 @@ Some important settings in the TI 15.4-Stack module include:
 
 More information about the configuration and feature options can be found in the TI 15.4-Stack documentation under **Example Applications > Configuration Parameters**.
 
-### Disabling Common User Interface
+### <a name="DisablingCommonUserInterface"></a>Disabling Common User Interface
 
 The common user interface (CUI) is a UART based interface that allows users to control and receive updates regarding the application. For various reasons, including reducing the memory footprint, the user is able to disable the common user interface (CUI). To disable the CUI, the following variable must be defined in the project-specific .opts file:
 
@@ -311,26 +318,25 @@ The common user interface (CUI) is a UART based interface that allows users to c
 -DCUI_DISABLE
 ```
 
-> Please Note: particular features that are dependednt on the CUI wil be unavailable when this feature is enabled.
+> Please Note: particular features that are dependent on the CUI wil be unavailable when this feature is enabled.
 
-### Multi-Page NV Configuration
+### <a name="MultiPageNVConfiguration"></a>Multi-Page NV Configuration
 
 By default, this project is configured to use four pages of NV. A maximum of five NV pages are supported. In order to modify the NV pages, update the following:
+
 * `NVOCMP_NVPAGES=4` in the project-specific .opts file
-* `NVOCMP_NVPAGES=4` in the linker options
 * SysConfig NVS module:
    * Set Region Size based on the formula `NVOCMP_NVPAGES * 0x2000`
    * Set Region Base based on the formula `0x56000 - (NVOCMP_NVPAGES * 0x2000)`
 
 A detailed description of the application architecture can be found in your installation within the
-TI-15.4 Stack Getting Started Guide's Application Overview section.
+TI-15.4 Stack Getting Started Guide's Application Overview section: `<SDK_INSTALL_DIR>/docs/ti154stack/ti154stack-getting-started-guide.html`.
 
-&lt;SDK_INSTALL_DIR&gt;/docs/ti154stack/ti154stack-getting-started-guide.html.
+### <a name="IARConfiguration"></a>IAR Configuration
 
-> For IAR users:
-When using the CC13x2SDK, the TI XDS110v3 USB Emulator must
+When using the CC13x2 SDK, the TI XDS110v3 USB Emulator must
 be selected. For the CC13x2_LAUNCHXL, select TI XDS110 Emulator. In both cases,
 select the cJTAG interface.
 
-In order to build from flash, within the IAR Project options-> Build Actions
+In order to build from flash, within the IAR Project options > Build Actions
 Update the "Pre-build command line" and change the "NO_ROM=0" to "NO_ROM=1".

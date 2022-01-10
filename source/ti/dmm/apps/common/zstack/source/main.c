@@ -5,7 +5,7 @@
  @brief Main entry of the 15.4 & BLE remote display sample application.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -74,6 +74,7 @@
 #include <prcm.h>
 
 #include <ti/display/Display.h>
+#include <ti/drivers/GPIO.h>
 
 //#include "crypto_board.h"
 #include "crypto_mac_api.h"
@@ -128,7 +129,6 @@
 #endif /* CUI_DISABLE */
 
 #ifdef DMM_OAD
-#include <ti/drivers/GPIO.h>
 #include <profiles/oad/cc26xx/mark_switch_factory_img.h>
 #endif
 
@@ -415,6 +415,8 @@ Void main()
     /* Register Application callback to trap asserts raised in the Stack */
     RegisterAssertCback(AssertHandler);
 
+    /* GPIO init must be called prior to Board_initGeneral for proper pin configuration */
+    GPIO_init();
     Board_initGeneral();
 
 #ifdef DMM_OAD

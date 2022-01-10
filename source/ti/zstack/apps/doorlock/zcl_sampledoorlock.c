@@ -48,28 +48,27 @@
   Application-specific UI peripherals being used:
 
   - LEDs:
-    LED1 reflect the current door lock state (locked = on)
+    LED1:
+      - Off: Indicates door is unlocked.
+      - On: Indicates door is locked.
 
   Application-specific menu system:
-	  <DISCOVERABLE> Press 'E' to become discoverable to Door Lock Controller device. Once the discovery process
-	    is done, Door Lock Controller can open/close the Door Lock.
+    <DISCOVER> Sets Door Lock device into Identify mode. Once the discovery process is done,
+      Door Lock Controller can open/close the Door Lock.
 
     <CHANGE PIN> Change the PIN used in the Lock/Unlock command
-      'S'/'W' keys changes the value of the current digit, 'E' sets the current digit
-      This screen shows the following information:
-        Line1:
-          After entering all 4 pin digits, briefly shows "PIN SAVED" message
-        Line2:
-          Shows the Enter PIN prompt with the current PIN digit visible
+      The user may type the digit using the number keys OR use Up/Down arrow keys to change the
+        value of the current digit.
 
-    <TOGGLE LOCK> Toggles the local door lock
-      'W' locks the door, 'S' unlocks the door
-      This screen shows the following information:
-        Line1:
-          Shows instructions normally, briefly displays INVALID PIN after receiving
-          a Lock/Unlock command with the incorrect pin
-        Line2:
-          Shows the current local lock state
+    <LOCK DOOR> Sends the Lock Door command
+
+    <UNLOCK DOOR> Sends the Unlock Door command
+
+    The APP Info line will display the following information:
+      [Lock State]
+        Locked/Unlocked/Not fully locked - current local lock state
+      [Current PIN]
+        XXXX - current PIN used in the Lock/Unlock command
 
 *********************************************************************/
 
@@ -751,9 +750,9 @@ static void zclSampleDoorLock_process_loop(void)
 #if ZG_BUILD_ENDDEVICE_TYPE
             if ( appServiceTaskEvents & SAMPLEAPP_END_DEVICE_REJOIN_EVT )
             {
-              zstack_bdbZedAttemptRecoverNwkRsp_t zstack_bdbZedAttemptRecoverNwkRsp;
+              zstack_bdbRecoverNwkRsp_t zstack_bdbRecoverNwkRsp;
 
-              Zstackapi_bdbZedAttemptRecoverNwkReq(appServiceTaskId,&zstack_bdbZedAttemptRecoverNwkRsp);
+              Zstackapi_bdbRecoverNwkReq(appServiceTaskId,&zstack_bdbRecoverNwkRsp);
 
               appServiceTaskEvents &= ~SAMPLEAPP_END_DEVICE_REJOIN_EVT;
             }

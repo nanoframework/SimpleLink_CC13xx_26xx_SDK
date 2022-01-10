@@ -5,7 +5,7 @@
  @brief User configurable variables for the TIMAC radio.
 
  Group: WCS LPC
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -397,7 +397,8 @@ void rfSelect(uint16_t phyId)
 /* CC26X2R1/CC2652RB Configuration */
 #if defined(LAUNCHXL_CC26X2R1) || defined(LP_CC2652RB) || \
     defined(LP_CC2652RSIP) || defined(LP_CC2652PSIP) || \
-    defined(LP_CC2652R7)
+    defined(LP_CC2652R7) || defined(LP_CC2651R3) || \
+    defined(LP_CC2651P3)
 void rfSelect(uint16_t phyId)
 {
     (void)phyId;

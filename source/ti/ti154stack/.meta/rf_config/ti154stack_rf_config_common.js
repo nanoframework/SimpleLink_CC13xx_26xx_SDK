@@ -80,6 +80,11 @@ const commonSlLr5KbpsSettings = {
     moduleName: "/ti/devices/radioconfig/settings/prop",
     args: {
         txPower: "0",
+        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
+16/32-bit CRC`,
+        preambleCount: "2 Bytes",
+        syncWordLength: "32 Bits",
+        syncWord: 0x5555904E,
         codeExportConfig: {
             symGenMethod: "Custom",
             useConst: true,
@@ -121,6 +126,11 @@ const common2Gfsk50KbpsSettings = {
     moduleName: "/ti/devices/radioconfig/settings/prop",
     args: {
         txPower: "0",
+        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
+16/32-bit CRC`,
+        preambleCount: "7 Bytes",
+        syncWordLength: "24 Bits",
+        syncWord: 0x55904E,
         codeExportConfig: {
             symGenMethod: "Custom",
             useConst: true,
@@ -162,6 +172,11 @@ const common2Gfsk200KbpsSettings = {
     moduleName: "/ti/devices/radioconfig/settings/prop",
     args: {
         txPower: "0",
+        whitening: `Dynamically IEEE 802.15.4g compatible whitener and \
+16/32-bit CRC`,
+        preambleCount: "7 Bytes",
+        syncWordLength: "24 Bits",
+        syncWord: 0x55904E,
         codeExportConfig: {
             symGenMethod: "Custom",
             useConst: true,

@@ -5,7 +5,7 @@
  @brief This file contains the RCOSC calibration routines.
 
  Group: WCS, BTS
- Target Device: cc13x2_26x2
+ Target Device: cc13xx_cc26xx
 
  ******************************************************************************
  
@@ -107,7 +107,7 @@ void RCOSC_enableCalibration(void)
     // Receive callback when device wakes up from Standby Mode.
     Power_registerNotify(&injectCalibrationPowerNotifyObj, PowerCC26XX_AWAKE_STANDBY,
                          (Power_NotifyFxn)rcosc_injectCalibrationPostNotify,
-                         NULL);
+                         (uintptr_t) NULL);
 
 
     // Start clock for the RCOSC calibration injection.  Calibration must be

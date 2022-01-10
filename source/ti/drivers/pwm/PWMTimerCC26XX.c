@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Texas Instruments Incorporated
+ * Copyright (c) 2015-2021, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,8 @@
 #include <ti/drivers/dpl/DebugP.h>
 #include <ti/drivers/dpl/ClockP.h>
 
-#include <ti/drivers/PIN.h>
-#include <ti/drivers/pin/PINCC26XX.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/gpio/GPIOCC26XX.h>
 
 #include "ti/drivers/PWM.h"
 #include "ti/drivers/pwm/PWMTimerCC26XX.h"
@@ -98,13 +98,6 @@ const PWM_FxnTable PWMTimerCC26XX_fxnTable =
     PWMTimerCC26XX_stop,
 };
 
-
-/* PIN configuration used for PWMTimerCC26XX implementation. Handle is shared
-   across all PWM peripherals
- */
-static PIN_Handle hPins = NULL;
-static PIN_State  pinState;
-
 /*!
  *  @brief PWM CC26XX initialization
  *
@@ -122,10 +115,9 @@ void PWMTimerCC26XX_init(PWM_Handle handle)
 
 
 /* Open the specific PWM peripheral with the settings given in params.
-   Will return a PWM handle if successfull, NULL if failed.
-   PWM will output configured idle level when opened.
-   Function sets a dependency on the underlying timer and adds the PWM pin to
-   its internal PIN handle.
+ * Will return a PWM handle if successfull, NULL if failed.
+ * PWM will output configured idle level when opened.
+ * Function sets a dependency on the underlying timer and muxes the PWM pin
  */
 PWM_Handle PWMTimerCC26XX_open(PWM_Handle handle, PWM_Params *params)
 {
@@ -160,34 +152,14 @@ PWM_Handle PWMTimerCC26XX_open(PWM_Handle handle, PWM_Params *params)
         return NULL;
     }
 
-    /* Open pin resource */
-    PIN_Config pinConfig;
-
-    /* Initial open of pin handle with no pins in it. Should never fail. */
-    if (hPins == NULL)
-    {
-        pinConfig = PIN_TERMINATE;
-        hPins     = PIN_open(&pinState, &pinConfig);
-    }
-
-    uint32_t idleLevel = PIN_GPIO_HIGH;
+    uint32_t idleLevel = GPIO_CFG_OUT_HIGH;
     if (params->idleLevel == PWM_IDLE_LOW)
     {
-        idleLevel = PIN_GPIO_LOW;
+        idleLevel = GPIO_CFG_OUT_LOW;
     }
 
-    /* Generate pin config for PWM pin. */
-    pinConfig = hwAttrs->pwmPin | PIN_INPUT_DIS | PIN_GPIO_OUTPUT_EN | idleLevel |
-                PIN_PUSHPULL | PIN_DRVSTR_MAX;
-
-    /* Fail if cannot add pin */
-    if (PIN_add(hPins, pinConfig) != PIN_SUCCESS)
-    {
-        DebugP_log2("PWM_open(%x): PIN (%d) already in use.", (uintptr_t) handle, hwAttrs->pwmPin);
-        GPTimerCC26XX_close(hTimer);
-        object->isOpen = false;
-        return NULL;
-    }
+    /* Set config for PWM pin. */
+    GPIO_setConfig(hwAttrs->pwmPin, GPIO_CFG_OUTPUT | idleLevel | GPIO_CFG_DRVSTR_HIGH_INTERNAL);
 
     /* Store configuration to object */
     object->periodUnit  = params->periodUnits;
@@ -204,7 +176,7 @@ PWM_Handle PWMTimerCC26XX_open(PWM_Handle handle, PWM_Params *params)
     if (PWMTimerCC26XX_setPeriod(handle, period) != PWM_STATUS_SUCCESS)
     {
         DebugP_log1("PWM_open(%x): Failed setting period", (uintptr_t) handle);
-        PIN_remove(hPins, hwAttrs->pwmPin);
+        GPIO_resetConfig(hwAttrs->pwmPin);
         GPTimerCC26XX_close(hTimer);
         object->isOpen = false;
         return NULL;
@@ -426,13 +398,12 @@ void PWMTimerCC26XX_stop(PWM_Handle handle)
     PWMTimerCC26XX_HwAttrs const *hwAttrs = handle->hwAttrs;
     PWMTimerCC26XX_Object        *object  = handle->object;
 
-    uint32_t key = HwiP_disable();
     object->isRunning = 0;
-    HwiP_restore(key);
 
     GPTimerCC26XX_stop(object->hTimer);
+
     /* Route PWM pin to GPIO module */
-    PINCC26XX_setMux(hPins, hwAttrs->pwmPin, IOC_PORT_GPIO);
+    GPIO_setMux(hwAttrs->pwmPin, IOC_PORT_GPIO);
 }
 
 /* Start PWM output for given PWM peripheral.
@@ -443,34 +414,31 @@ void PWMTimerCC26XX_start(PWM_Handle handle)
     PWMTimerCC26XX_HwAttrs const *hwAttrs = handle->hwAttrs;
     PWMTimerCC26XX_Object        *object  = handle->object;
 
-    uint32_t key = HwiP_disable();
     object->isRunning = 1;
-    HwiP_restore(key);
 
     /* Route PWM pin to timer output */
-    GPTimerCC26XX_PinMux pinMux = GPTimerCC26XX_getPinMux(object->hTimer);
-    PINCC26XX_setMux(hPins, hwAttrs->pwmPin, pinMux);
+    GPIO_setMux(hwAttrs->pwmPin, GPTimerCC26XX_getPinMux(object->hTimer));
+
     GPTimerCC26XX_start(object->hTimer);
 }
 
 /* Close the specific PWM peripheral. A running PWM must be stopped first.
-   PWM output will revert to output value given in PIN_init if any is defined.
+   PWM output will revert to output value if any is defined.
  */
 void PWMTimerCC26XX_close(PWM_Handle handle)
 {
     PWMTimerCC26XX_HwAttrs const *hwAttrs = handle->hwAttrs;
     PWMTimerCC26XX_Object        *object  = handle->object;
 
-    /* Restore PWM pin to GPIO module with default configuration from PIN_init */
-    PIN_remove(hPins, hwAttrs->pwmPin);
+    /* Restore PWM pin to GPIO module with default configuration */
+    GPIO_resetConfig(hwAttrs->pwmPin);
+
     /* Close and delete timer handle */
     GPTimerCC26XX_close(object->hTimer);
     object->hTimer = NULL;
 
     /* Clear isOpen flag */
-    uint32_t key = HwiP_disable();
     object->isOpen = 0;
-    HwiP_restore(key);
 }
 
 /* Driver specific control options. PWM peripheral must be opened before

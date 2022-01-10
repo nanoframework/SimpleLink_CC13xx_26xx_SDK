@@ -250,7 +250,10 @@ uint16_t zgApscDupRejTimeoutInc = DEFAULT_APS_DUP_REJ_TIMEOUT_INCREMENT;
 uint8_t  zgApscDupRejTimeoutCount = DEFAULT_APS_DUP_REJ_TIMEOUT;
 uint16_t zgApsMinDupRejTableSize = APS_DUP_REJ_ENTRIES;
 
-
+#if defined ( APP_TP2 )
+  // Maximum fragmentation block size (used only for GU certification testing)
+  uint8_t guApsMaxFragBlockSize = 0;
+#endif
 
 /*********************************************************************
  * SECURITY GLOBAL VARIABLES
@@ -282,12 +285,18 @@ uint8_t zgUseDefaultTCLK;
 
 #if defined ( APP_TP2_TEST_MODE )
 uint8_t guTxApsSecON = TP_GU_BOTH;
-uint8_t guEnforceRxApsSec = TP_GU_ALL;
+uint8_t guEnforceRxApsSec = TP_GU_SEC_ONLY;
+uint8_t guEnableKeyExchange = TRUE;
+uint16_t guNextJoinerNwkAddr = INVALID_NODE_ADDR;
 #endif
 
 uint8_t zgApsAllowR19Sec = FALSE;
 uint8_t zgSwitchCoordKey = FALSE;
 uint8_t zgSwitchCoordKeyIndex = 0;
+
+// If TRUE, the Trust Center automatically clears the TCLK entry upon receiving
+// an APS Update Device 'Device Left' indication
+uint8_t zgClearTCLKOnDeviceLeft = TRUE;
 
 /*********************************************************************
  * ZDO GLOBAL VARIABLES
@@ -327,6 +336,10 @@ uint8_t zgBdbMaxSecureRejoinAttempts = BDB_MAX_SECURE_REJOIN_ATTEMPTS;
 
 // Network Manager Mode
 uint8_t zgNwkMgrMode = ZDNWKMGR_ENABLE;
+
+// TRUE == router will perform silent rejoins
+// FALSE == router will perform standard rejoins
+uint8_t zgRouterSilentRejoin = ZR_SILENT_REJOIN;
 
 /*********************************************************************
  * NON-STANDARD GLOBAL VARIABLES
@@ -509,8 +522,18 @@ static CONST zgItem_t zgItemTable[] =
 
 static uint8_t zgItemInit( uint16_t id, uint16_t len, void *buf, uint8_t setDefault );
 
+#ifdef ZSTACK_NV_FORMAT_UPDATE
+
+static void zgUpdateNVFormat( void );
+
 #ifdef ZSTACK_NVOCMP_MIGRATION
-static void zgUpgradeNVDriver( void );
+static void zgMigrateToNVOCMP( void );
+#endif // ZSTACK_NVOCMP_MIGRATION
+
+#ifdef ZSTACK_5_30_NV_MIGRATION
+static void zgMigrateTo530SDK( void );
+#endif // ZSTACK_5_30_NV_MIGRATION
+
 #endif
 
 #ifndef NONWK
@@ -638,10 +661,13 @@ uint8_t zgInit( void )
     ZMacGetReq( ZMacExtAddr, zgExtendedPANID );
   }
 
-#ifdef ZSTACK_NVOCMP_MIGRATION
-  if(setDefault == FALSE)
+// USER TODO: depending on if field upgrades are supported and you plan on upgrading
+// between two versions of the SDK, you may need to enable certain NV format porting
+// See the SDK documentation for more information on this
+#ifdef ZSTACK_NV_FORMAT_UPDATE
+  if (setDefault == FALSE)
   {
-    zgUpgradeNVDriver();
+    zgUpdateNVFormat();
   }
 #endif
 
@@ -868,9 +894,113 @@ static uint8_t zgPreconfigKeyInit( uint8_t setDefault )
 }
 #endif
 
+#ifdef ZSTACK_NV_FORMAT_UPDATE
+/*********************************************************************
+ * @fn       zgUpdateNVFormat()
+ *
+ * @brief
+ *
+ *   Various NV update options
+ *
+ * @param   none
+ *
+ * @return  none
+ */
+static void zgUpdateNVFormat( void )
+{
+#ifdef ZSTACK_NVOCMP_MIGRATION
+  zgNVOCMPMigration();
+#endif // ZSTACK_NVOCMP_MIGRATION
+#ifdef ZSTACK_5_30_NV_MIGRATION
+  zgMigrateTo530SDK();
+#endif // ZSTACK_5_30_NV_MIGRATION
+}
+#endif
+
+#ifdef ZSTACK_5_30_NV_MIGRATION
+typedef struct
+{
+  uint32_t txFrmCntr;
+  uint32_t rxFrmCntr;
+  uint8_t  extAddr[Z_EXTADDR_LEN];
+  uint8_t  keyAttributes;
+  uint8_t  keyType;
+  uint8_t  SeedShift_IcIndex;
+} Legacy_APSME_TCLinkKeyNVEntry_t;
+
+/*********************************************************************
+ * @fn       zgMigrateTo530SDK()
+ *
+ * @brief
+ *
+ *   Migrate to the new format of TCLK items in the 5.30 SDK
+ *
+ * @param   none
+ *
+ * @return  none
+ */
+static void zgMigrateTo530SDK( void )
+{
+  uint8_t upgradeComplete = 0;
+
+  if( NV_ITEM_UNINIT == osal_nv_item_init( ZCD_NV_5_30_SDK_MIGRATION, sizeof(uint8_t), &upgradeComplete ) )
+  {
+    uint8_t i = 0;
+    for( i = 0; i < gZDSECMGR_TC_DEVICE_MAX; i++ )
+    {
+      Legacy_APSME_TCLinkKeyNVEntry_t oldEntry = {0};
+      APSME_TCLinkKeyNVEntry_t newEntry = {0};
+
+      // initialize the old TCLK NV entry
+      if( SUCCESS == osal_nv_item_init_ex( ZCD_NV_EX_TCLK_TABLE, i,
+                                           sizeof(Legacy_APSME_TCLinkKeyNVEntry_t),
+                                           &oldEntry) )
+      {
+        // read info from the old entry into a local variable
+        if( SUCCESS == osal_nv_read_ex( ZCD_NV_EX_TCLK_TABLE, i, 0,
+                                        sizeof(Legacy_APSME_TCLinkKeyNVEntry_t),
+                                        &oldEntry ) )
+        {
+          // delete the old entry
+          osal_nv_delete_ex(ZCD_NV_EX_TCLK_TABLE, i, sizeof(Legacy_APSME_TCLinkKeyNVEntry_t));
+
+          // populate a local variable using the new format
+          newEntry.txFrmCntr = oldEntry.txFrmCntr;
+          newEntry.rxFrmCntr = oldEntry.rxFrmCntr;
+          OsalPort_memcpy(newEntry.extAddr, oldEntry.extAddr, Z_EXTADDR_LEN);
+          newEntry.keyAttributes = oldEntry.keyAttributes;
+          newEntry.keyType = oldEntry.keyType;
+
+          // assume IC, so SeedShift_IcIndex will be IcIndex
+          if( oldEntry.keyAttributes == ZG_PROVISIONAL_KEY )
+          {
+            newEntry.SeedShift = 0;
+            newEntry.IcIndex = oldEntry.SeedShift_IcIndex;
+          }
+          // if not Provisional Key, assume Verified Key, SeedShift_IcIndex will be SeedShift
+          else
+          {
+            newEntry.SeedShift = oldEntry.SeedShift_IcIndex;
+            newEntry.IcIndex = 0;
+          }
+
+          // write the newly formatted entry back to NV
+          osal_nv_write_ex( ZCD_NV_EX_TCLK_TABLE, i,
+                            sizeof(APSME_TCLinkKeyNVEntry_t),
+                            &newEntry );
+        }
+      }
+    }
+
+    upgradeComplete = TRUE;
+    osal_nv_write( ZCD_NV_5_30_SDK_MIGRATION, sizeof(uint8_t), &upgradeComplete );
+  }
+}
+#endif // ZSTACK_5_30_NV_MIGRATION
+
 #ifdef ZSTACK_NVOCMP_MIGRATION
 /*********************************************************************
- * @fn       zgUpgradeNVDriver()
+ * @fn       zgNVOCMPMigration()
  *
  * @brief
  *
@@ -881,7 +1011,7 @@ static uint8_t zgPreconfigKeyInit( uint8_t setDefault )
  *
  * @return  none
  */
-static void zgUpgradeNVDriver( void )
+static void zgNVOCMPMigration( void )
 {
   uint8_t upgradeComplete = 0;
   // check if USE NVOCMP flag exists. If not, we must do a one-time
@@ -1131,7 +1261,7 @@ static void zgUpgradeNVDriver( void )
     osal_nv_write( ZCD_NV_USE_NVOCMP, sizeof(uint8_t), &upgradeComplete );
   }
 }
-#endif
+#endif // ZSTACK_NVOCMP_MIGRATION
 
 /*********************************************************************
 *********************************************************************/

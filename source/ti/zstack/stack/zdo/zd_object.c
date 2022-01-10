@@ -1877,8 +1877,8 @@ void ZDO_ProcessMgmtLeaveReq( zdoIncomingMsg_t *inMsg )
   }
   if ( ( ZG_BUILD_ENDDEVICE_TYPE ) && ( ZG_DEVICE_ENDDEVICE_TYPE ) )
   {
-    //Only the parent device can request to leave, otherwise silently discard the frame
-    if(inMsg->srcAddr.addr.shortAddr != _NIB.nwkCoordAddress)
+    // 3.6.1.10.3 R22 - silently discard leave frame not delivered by parent device
+    if(inMsg->macSrcAddr != _NIB.nwkCoordAddress)
     {
       return;
     }
@@ -1905,12 +1905,6 @@ void ZDO_ProcessMgmtLeaveReq( zdoIncomingMsg_t *inMsg )
 
   req.silent = FALSE;
 
-  //According to R21 spec sec2.4.3.3.5.2 Mgmt leave rsp must contain the status response from the nwk leave processing.
-  //Latest discussion in Zigbee indicates that mgmt leave rsp due to an OTA command must have status=success (9/12/16)
-  status = ZSuccess;
-
-  ZDP_MgmtLeaveRsp( inMsg->TransSeq, &(inMsg->srcAddr), status, FALSE );
-
   if ( ZG_BUILD_ENDDEVICE_TYPE )
   {
     //If rejoin is TRUE, the device will stop polling when processing rejoin.
@@ -1921,7 +1915,9 @@ void ZDO_ProcessMgmtLeaveReq( zdoIncomingMsg_t *inMsg )
     }
   }
 
-  NLME_LeaveReq(&req);
+  status = NLME_LeaveReq(&req);
+
+  ZDP_MgmtLeaveRsp( inMsg->TransSeq, &(inMsg->srcAddr), status, FALSE );
 
   if (! (option & ZDP_MGMT_LEAVE_REQ_REJOIN) )
   {

@@ -1,6 +1,6 @@
 %%{
 /*
- * Copyright (c) 2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ const phyHeader = system.getTemplate("/ti/devices/radioconfig/templates/phyheade
 /* RadioConfig instances */
 const module = args[0];
 const phyGroup = args[1];
-const useCoex = args[2];
+const coexType = args[2];
 const instances = module.$instances;
 
 %%}
@@ -63,23 +63,16 @@ const instances = module.$instances;
 %   const cmdHandler = CmdHandler.getUpdatedRfCommands(inst, phyGroup);
 %   const paramSummary = cmdHandler.getParameterSummary(inst);
 %   const symNames = CodeExportHandler.getSymNames(ceConfig, phy);
-%   let protocol = ceConfig.useMulti ? "multi" : "single";
-%   if (phyGroup === Common.PHY_BLE && useCoex) {
-%       protocol = "coex";
+%   let protocol;
+%   if (coexType) {
+%       protocol = coexType;
+%   }
+%   else {
+%       protocol = ceConfig.useMulti ? "multi" : "single"
 %   }
 %   const patchCode = cmdHandler.generatePatchCode(protocol);
 %   const legacy = ceConfig.symGenMethod === "Legacy";
 %   const qualifier = ceConfig.useConst ? 'const ' : '';
-%   const customOverride = [
-%       {
-%           "path": ceConfig.stackOverride,
-%           "macro": ceConfig.stackOverrideMacro
-%       },
-%       {
-%           "path": ceConfig.appOverride,
-%           "macro": ceConfig.appOverrideMacro
-%       }
-%   ];
 `phyHeader(cmdHandler)`
 // PARAMETER SUMMARY
 `paramSummary`
@@ -89,7 +82,7 @@ RF_Mode `symNames.rfMode` =
 `patchCode`
 };
 
-% const overrideCode = cmdHandler.generateOverrideCode(symNames.overrides, customOverride).code;
+% const overrideCode = cmdHandler.generateOverrideCode(symNames.overrides, ceConfig).code;
 `overrideCode`
 
 % cmdHandler.updateFrontendSettings();
@@ -122,3 +115,4 @@ rfc_`tn`_t `ps` =
 %     }
 %   }
 % }
+%
