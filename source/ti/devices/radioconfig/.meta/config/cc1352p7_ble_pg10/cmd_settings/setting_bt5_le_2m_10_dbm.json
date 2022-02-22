@@ -261,6 +261,26 @@
                                         "$": "0x018F02A3"
                                     }
                                 ]
+                            },
+                            {
+                                "_name": "override_ble5_symbol_error_tracking.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: timing correction",
+                                        "$": "0x50D4,0x00F9"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: reduce sample delay",
+                                        "$": "0x50E0,0x0087"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: demodulation order",
+                                        "$": "0x50F8,0x0014"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -268,15 +288,22 @@
                         "_name": "pRegOverride2Mbps",
                         "Block": [
                             {
-                                "_name": "override_ble5_setup_override_2mbps_mce.json",
-                                "Element32b": {
-                                    "_type": "MCE_RFE_OVERRIDE",
-                                    "_comment": "PHY: Use MCE RAM (patch), RFE ROM",
-                                    "$": "1,0,2,0,3,2"
-                                }
+                                "_name": "override_ble5_setup_override_2mbps_residual_per.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "MCE_RFE_OVERRIDE",
+                                        "_comment": "PHY: Use MCE RAM (patch), RFE ROM",
+                                        "$": "1,0,2,0,3,2"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Rx: increase AGC hysteresis (HIGH_GAIN=15, LOW_GAIN=11)",
+                                        "$": "0x6098,0x75FB"
+                                    }
+                                ]
                             },
                             {
-                                "_name": "override_ble5_setup_override_2mbps_coex.json",
+                                "_name": "override_ble5_setup_override_2mbps_coex_residual_per.json",
                                 "Element32b": {
                                     "_type": "MCE_RFE_OVERRIDE",
                                     "_comment": "PHY: Use MCE RAM patch (mode 2), RFE RAM patch (mode 2)",
@@ -293,11 +320,6 @@
                                     },
                                     {
                                         "_type": "HW_REG_OVERRIDE",
-                                        "_comment": "Rx: increase AGC hysteresis (HIGH_GAIN=15, LOW_GAIN=11)",
-                                        "$": "0x6098,0x75FB"
-                                    },
-                                    {
-                                        "_type": "HW_REG_OVERRIDE",
                                         "_comment": "Bluetooth 5: Set pilot tone length to 35 us",
                                         "$": "0x5320,0x690"
                                     },
@@ -309,7 +331,7 @@
                                 ]
                             },
                             {
-                                "_name": "override_ble5_residual_per.json",
+                                "_name": "override_ble5_symbol_error_tracking.json",
                                 "Element32b": [
                                     {
                                         "_type": "HW_REG_OVERRIDE",
@@ -589,7 +611,7 @@
                     },
                     {
                         "_name": "phyMode.mainMode",
-                        "$": "0"
+                        "$": "1"
                     },
                     {
                         "_name": "phyMode.coding",
@@ -758,7 +780,7 @@
                     },
                     {
                         "_name": "phyMode.mainMode",
-                        "$": "0"
+                        "$": "1"
                     },
                     {
                         "_name": "phyMode.coding",

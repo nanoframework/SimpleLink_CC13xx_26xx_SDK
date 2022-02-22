@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -83,6 +83,10 @@
 #include "mac_settings.h"
 #define TRACE_GROUP "MRsH"
 #include "ns_trace.h"
+
+#ifndef FREERTOS_SUPPORT
+#include <ti/sysbios/knl/Task.h>
+#endif
 /*!
  This module is the ICall interface for the application and all ICall
  activity must go through this module, no ICall activity anywhere else.
@@ -143,15 +147,14 @@ typedef struct mac_internal_s {
  */
 ApiMac_sAddrExt_t ApiMac_extAddr;
 extern uint8_t timacTaskId;
-extern Semaphore_Handle event_thread_sem_handle;
+extern sem_t event_thread_sem_handle;
 
 extern configurable_props_t cfg_props;
 /******************************************************************************
  Local variables
  *****************************************************************************/
 /*! Semaphore used to post events to the application thread */
-static Semaphore_Struct appSem;  /* not static so you can see in ROV */
-static Semaphore_Handle appSemHandle;
+static sem_t appSemHandle;
 
 /*! Storage for Events flags */
 static uint32_t appEvents = 0;
@@ -196,7 +199,6 @@ static void setGtkhash(uint8_t *gtkhash);
 /******************************************************************************
  Public Functions
  *****************************************************************************/
-extern Semaphore_Handle event_thread_sem_handle;
 
 /*!
  Initialize this module.
@@ -206,7 +208,16 @@ extern Semaphore_Handle event_thread_sem_handle;
 void *ApiMac_init(uint8_t macTaskIdParam, bool enableFH)
 {
     stackTaskId = macTaskIdParam;
-    appTaskId = OsalPort_registerTask(Task_self(), event_thread_sem_handle, &appEvents);
+    int                 retc;
+
+    /* create semaphores for messages / events
+     */
+    retc = sem_init(&appSemHandle, 0, 0);
+    if (retc != 0) {
+        while (1);
+    }
+
+    appTaskId = OsalPort_registerTask(pthread_self(), &appSemHandle, &appEvents);
 
     /* Allocate message buffer space */
     macStackInitParams_t *pMsg = (macStackInitParams_t *)OsalPort_msgAllocate(sizeof(macStackInitParams_t));
@@ -226,7 +237,9 @@ void *ApiMac_init(uint8_t macTaskIdParam, bool enableFH)
     }
 
     /* Let MAC task consume the message */
+#ifndef FREERTOS_SUPPORT
     Task_sleep(10);
+#endif
 
     /* Enable frequency hopping? */
     if(enableFH)
@@ -236,7 +249,7 @@ void *ApiMac_init(uint8_t macTaskIdParam, bool enableFH)
 
     /* Reset the MAC */
     ApiMac_mlmeResetReq(true);
-    return (0);
+    return (&appSemHandle);
 }
 
 /*!
@@ -249,7 +262,7 @@ void ApiMac_processIncoming(void)
     macCbackEvent_t *pMsg;
 
     /* Wait for response message */
-    if(Semaphore_pend(appSemHandle, BIOS_WAIT_FOREVER ))
+    if( sem_wait(&appSemHandle) == 0)
     {
         /* Retrieve the response message */
         if( (pMsg = (macCbackEvent_t*) OsalPort_msgReceive( appTaskId )) != NULL)
@@ -1512,7 +1525,7 @@ static int8_t macext_mac64_address_get(const mac_api_t *api, mac_extended_addres
 uint32_t ns_sw_mac_read_current_timestamp(struct mac_api_s *mac_api)
 {
     // get current time in microseconds to compare with utt_rx_timestamp in us
-    uint32_t currentTime   = MAP_ICall_getTicks() * Clock_tickPeriod;
+    uint32_t currentTime   = MAP_ICall_getTicks() * ClockP_getSystemTickPeriod();
     return currentTime;
 }
 

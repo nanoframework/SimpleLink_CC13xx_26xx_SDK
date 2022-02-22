@@ -49,6 +49,21 @@
             "default": "bt5le1m"
         },
         {
+            "name": "settingGroup",
+            "displayName": "RF Designation",
+            "description": "Prioritize selectivity or sensitivity",
+            "options": [
+                {
+                    "name": "Sensitivity"
+                },
+                {
+                    "name": "Selectivity"
+                }
+            ],
+            "default": "Sensitivity",
+            "hidden": true
+        },
+        {
             "name": "parent",
             "displayName": "Parent",
             "default": "Stack",
@@ -309,7 +324,8 @@
             "name": "highPA",
             "displayName": "High PA",
             "description": "Select if the High Power Amplifier on the device should be used",
-            "default": false
+            "default": false,
+            "hidden": false
         },
         {
             "name": "packetLengthBle",

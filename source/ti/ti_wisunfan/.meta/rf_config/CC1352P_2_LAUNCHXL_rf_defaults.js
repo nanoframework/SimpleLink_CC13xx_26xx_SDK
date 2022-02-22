@@ -39,13 +39,13 @@
 
 // Get common rf settings
 const rfCommon = system.getScript("/ti/ti_wisunfan/rf_config/"
-    + "ti154stack_rf_config_common.js");
+    + "ti_wisunfan_rf_config_common.js");
 
 /*
  *  ======== Device Specific PHY Settings ========
  *
  * These Objects will be used to extend the common phy settings defined
- * in ti154stack_rf_config_common.js.
+ * in ti_wisunfan_rf_config_common.js.
  *
  * These Objects must contain the following elements:
  *      - args: Phy setting arguments to be passed to the radio config module
@@ -145,7 +145,7 @@ const devSpecific2Gfsk200KbpsSettings = {
  *  ======== Device Specific IEEE PHY Settings ========
  *
  * These Objects will be used to extend the common IEEE phy settings defined in
- * ti154stack_rf_config_common.js.
+ * ti_wisunfan_rf_config_common.js.
  *
  * These Objects must contain the following elements:
  *      - args: Phy setting arguments to be passed to the radio config module
@@ -173,7 +173,7 @@ const devSpecificIEEESettings = {
  *  ======== Arrays Containing all PHY Settings ========
  *
  * These arrays will pull the common phy settings defined in
- * ti154stack_rf_config_common.js and merge them with the device specific phy
+ * ti_wisunfan_rf_config_common.js and merge them with the device specific phy
  * settings defined in this file.
  */
 

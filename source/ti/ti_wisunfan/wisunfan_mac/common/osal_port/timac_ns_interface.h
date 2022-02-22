@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -53,11 +53,6 @@
 //#include "smsgs.h"
 #include "osal_port.h"
 #include "stdbool.h"
-
-#ifdef OSAL_PORT2TIRTOS
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#endif
 
 #include "ns_types.h"
 #include "mac_mcps.h"

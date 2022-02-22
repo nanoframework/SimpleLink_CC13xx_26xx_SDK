@@ -43,6 +43,8 @@ const DmmStackRoles = {
     blePeripheral: "DMMPolicy_StackRole_BlePeripheral",
     wsnNode: "DMMPolicy_StackRole_WsnNode",
     ti154Sensor: "DMMPolicy_StackRole_154Sensor",
+    threadMTD: "DMMPolicy_StackRole_threadMtd",
+    threadFTD: "DMMPolicy_StackRole_threadFtd",
     ti154Collector: "DMMPolicy_StackRole_154Collector",
     zigbeeEndDevice: "DMMPolicy_StackRole_ZigbeeEndDevice",
     zigbeeRouter: "DMMPolicy_StackRole_ZigbeeRouter",
@@ -67,6 +69,10 @@ const DmmAppliedActivity154 = [
     "DMMPOLICY_APPLIED_ACTIVITY_154_FH",
     "DMMPOLICY_APPLIED_ACTIVITY_154_SCAN",
     "DMMPOLICY_APPLIED_ACTIVITY_154_RXON"
+];
+
+const DmmAppliedActivityThread = [
+    "DMMPOLICY_APPLIED_ACTIVITY_THREAD_ALL"
 ];
 
 const DmmAppliedActivityWSN = [
@@ -121,6 +127,14 @@ blePeripheralRole.appliedActivity = DmmAppliedActivityBLE;
 
 const custom1Role = new StackRole("custom", "Custom 1",
     "CUSTOM1_STACK_POLICY_IDX", DmmStackRoles.custom1);
+
+const threadMTDRole = new StackRole("tiop", "TI OpenThread MTD",
+    "TIOP_STACK_POLICY_IDX", DmmStackRoles.threadMTD);
+threadMTDRole.appliedActivity = DmmAppliedActivityThread;
+
+const threadFTDRole = new StackRole("tiop", "TI OpenThread FTD",
+    "TIOP_STACK_POLICY_IDX", DmmStackRoles.threadFTD);
+threadFTDRole.appliedActivity = DmmAppliedActivityThread;
 
 const custom2Role = new StackRole("custom", "Custom 2",
     "CUSTOM2_STACK_POLICY_IDX", DmmStackRoles.custom2);
@@ -178,6 +192,12 @@ function getInfo(stackRoleId)
         case ("rxAlwaysOn"):
         case ("rx_always_on"):
             return rxAlwaysOnRole;
+
+        case ("tiop"):
+        case ("threadMTD"):
+            return threadMTDRole;
+        case ("threadFTD"):
+            return threadFTDRole;
 
         case ("wsnNode"):
         case ("proprietary"):

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -81,6 +81,8 @@
 #else
 #define IDX_GAP_DeviceInit                            GAP_DeviceInit_noGAPBondMgr
 #endif
+#define IDX_GAP_DeInit                                GAP_DeInit
+#define IDX_GAP_ReInit                                GAP_ReInit
 #define IDX_GAP_RegisterForMsgs                       GAP_RegisterForMsgs
 #define IDX_GAP_SetParamValue                         GAP_SetParamValue
 #define IDX_GAP_GetParamValue                         GAP_GetParamValue

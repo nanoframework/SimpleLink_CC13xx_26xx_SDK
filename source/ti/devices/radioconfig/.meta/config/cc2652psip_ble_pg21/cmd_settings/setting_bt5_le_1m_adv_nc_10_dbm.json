@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "BLE, 1 Mbps, BT4, 10 dBm (Preview)",
-        "Description": "Bluetooth 5, LE 1M PHY (1 Msym\/s GFSK, 1 Mbps data rate) for the 2.4 GHz ISM band (Preview).",
+        "Name": "BLE, 1 Mbps, BT4 (Release Candidate)",
+        "Description": "Bluetooth 5, LE 1M PHY (1 Msym\/s GFSK, 1 Mbps data rate) for the 2.4 GHz ISM band (Release Candidate).",
         "Frequency": "2440",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -264,8 +264,29 @@
                                         "$": "0x018F02A3"
                                     }
                                 ]
+                            },
+                            {
+                                "_name": "override_ble5_symbol_error_tracking.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: timing correction",
+                                        "$": "0x50D4,0x00F9"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: reduce sample delay",
+                                        "$": "0x50E0,0x0087"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: demodulation order",
+                                        "$": "0x50F8,0x0014"
+                                    }
+                                ]
                             }
-                        ]
+                        ],
+                        "$": ">"
                     },
                     {
                         "_name": "pRegOverride2Mbps",
@@ -274,7 +295,7 @@
                                 "_name": "override_ble5_setup_override_2mbps_coex.json",
                                 "Element32b": {
                                     "_type": "MCE_RFE_OVERRIDE",
-                                    "_comment": "PHY: Use MCE ROM, RFE RAM",
+                                    "_comment": "PHY: Use MCE ROM, RFE RAM patch (mode 2)",
                                     "$": "0,3,2,1,0,2"
                                 }
                             },
@@ -295,6 +316,26 @@
                                         "_type": "HW_REG_OVERRIDE",
                                         "_comment": "Bluetooth 5: increase low gain AGC delay for 2 Mbps",
                                         "$": "0x60A4,0x7D00"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_ble5_symbol_error_tracking.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: timing correction",
+                                        "$": "0x50D4,0x00F9"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: reduce sample delay",
+                                        "$": "0x50E0,0x0087"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Symbol tracking: demodulation order",
+                                        "$": "0x50F8,0x0014"
                                     }
                                 ]
                             }
@@ -326,8 +367,8 @@
                                     },
                                     {
                                         "_type": "HW_REG_OVERRIDE",
-                                        "_comment": "Rx: Set AGC reference level to 0x1B (default: 0x2E)",
-                                        "$": "0x609C,0x001B"
+                                        "_comment": "Rx: Set AGC reference level to 0x21 (default: 0x2E)",
+                                        "$": "0x609C,0x0021"
                                     }
                                 ]
                             }

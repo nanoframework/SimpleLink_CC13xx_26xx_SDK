@@ -8,7 +8,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2016 $
+ $License: TI_TEXT 2016 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -1268,8 +1268,8 @@ extern uint8 MAP_llLastCmdDoneEventHandleStateTest( void );
 extern uint8 MAP_llRxEntryDoneEventHandleStateTest( void );
 extern void MAP_llProcessMasterControlPacket(void *, uint8 *);
 extern void MAP_llProcessSlaveControlPacket(void *, uint8 *);
-extern void MAP_llSetTaskInit( uint8, void *, void * );
-extern void MAP_llSetTaskScan( uint8, void *, void * );
+extern void MAP_llSetTaskInit( uint8, void *, void *, void * );
+extern void MAP_llSetTaskScan( uint8, void *, void *, void * );
 extern void MAP_llSetTaskAdv( uint8, void * );
 extern void MAP_llSetTaskMaster( uint8, void * );
 extern void MAP_llSetTaskSlave( uint8, void * );

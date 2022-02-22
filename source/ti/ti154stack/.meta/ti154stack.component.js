@@ -41,7 +41,7 @@ let templates = [];
 
 /* Only export 15.4 module if device is supported */
 const deviceId = system.deviceData.deviceId;
-if(deviceId.match(/CC265(2|1)|CC13.(2|1)(R|P)/) && !deviceId.match(/CC1311/))
+if(deviceId.match(/CC265(2|1)|CC13.(2|1)(R|P)/))
 {
     topModules = [
         {

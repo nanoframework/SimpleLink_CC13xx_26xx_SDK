@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -48,19 +48,10 @@
 #include "osal_port.h"
 #include "stdlib.h"
 
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/BIOS.h>
-
 #include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 #include <ti/drivers/utils/Random.h>
-
-// This include file will ensure HEAPMGR_CONFIG is properly setup in the ti-rtos
-// config file.
-#include <xdc/cfg/global.h>
 
 /***** Defines *****/
 /* Only 1 application can talk to the MAC */
@@ -86,9 +77,9 @@ typedef union _osal_port_state_union_t
 typedef struct
 {
     uint8_t taskId;
-    Task_Handle taskHndl;
+    pthread_t taskHndl;
     OsalPort_MsgQ qHandle;
-    Semaphore_Handle taskSem;
+    sem_t* taskSem;
     bool conservePower;
     uint32_t* pEventFlag;
 } TaskEntry;
@@ -114,7 +105,7 @@ uint16_t *macTasksEvents = 0;
  */
 typedef struct _osalPort_schedule_t
 {
-  Clock_Handle  clock;
+  ClockP_Handle  clock;
   OsalPort_TimerCback cback;
   void *arg;
 } OsalPort_ScheduleEntry;
@@ -122,8 +113,9 @@ typedef struct _osalPort_schedule_t
 #ifdef DBG_OSAL
 struct osal_debug osalDbg;
 #endif
-/***** Private function definitions *****/
 
+/***** Private function definitions *****/
+#ifndef FREERTOS_SUPPORT
 // DMM currently uses ICall Heap
 #ifdef USE_DMM
 extern void *ICall_heapMalloc(uint32_t size);
@@ -181,6 +173,7 @@ static uint32_t OsalPort_heapCSState;
 #include <rtos_heaposal.h>
 #endif
 #endif // USE_DMM
+#endif // FREERTOS_SUPPORT
 
 /*********************************************************************
  * @fn      OsalPort_registerTask
@@ -198,13 +191,13 @@ static uint32_t OsalPort_heapCSState;
  *
  * @return  Task ID
  */
-uint8_t OsalPort_registerTask(Task_Handle taskHndl, Semaphore_Handle taskSem, uint32_t* pEvent)
+uint8_t OsalPort_registerTask(void* taskHndl, void* taskSem, uint32_t* pEvent)
 {
     if(taskCnt < MAX_TASKS)
     {
         taskTbl[taskCnt].taskId = taskCnt;
         taskTbl[taskCnt].taskHndl = taskHndl;
-        taskTbl[taskCnt].taskSem = taskSem;
+        taskTbl[taskCnt].taskSem = (sem_t*) taskSem;
         taskTbl[taskCnt].qHandle = NULL;
         taskTbl[taskCnt].conservePower = false;
         taskTbl[taskCnt].pEventFlag = pEvent;
@@ -474,7 +467,7 @@ uint8_t OsalPort_setEvent( uint8_t destinationTask, uint32_t eventFlag )
 
             if(taskTbl[taskIdx].taskSem)
             {
-                Semaphore_post(taskTbl[taskIdx].taskSem);
+                sem_post(taskTbl[taskIdx].taskSem);
             }
 
             status = OsalPort_SUCCESS;
@@ -505,7 +498,7 @@ uint32_t OsalPort_waitEvent(uint8_t taskId)
     {
         if(taskTbl[taskIdx].taskId == taskId)
         {
-            Semaphore_pend(taskTbl[taskIdx].taskSem, BIOS_WAIT_FOREVER);
+            sem_wait(taskTbl[taskIdx].taskSem);
             return *taskTbl[taskIdx].pEventFlag;
         }
     }
@@ -523,7 +516,7 @@ uint32_t OsalPort_waitEvent(uint8_t taskId)
  *
  * @return  none
  */
-void OsalPort_blockOnEvent(Task_Handle taskHndl)
+void OsalPort_blockOnEvent(void* taskHndl)
 {
     uint8_t taskIdx;
 
@@ -531,7 +524,7 @@ void OsalPort_blockOnEvent(Task_Handle taskHndl)
     {
         if(taskTbl[taskIdx].taskHndl == taskHndl)
         {
-            Semaphore_pend(taskTbl[taskIdx].taskSem, BIOS_WAIT_FOREVER);
+            sem_wait(taskTbl[taskIdx].taskSem);
         }
     }
 
@@ -560,7 +553,7 @@ void OsalPort_clearEvent(uint8_t TaskID, uint32_t eventFlag)
     for(taskIdx = 0; taskIdx < taskCnt; taskIdx++)
     {
         if( ((TaskID != OsalPort_TASK_NO_TASK) && (taskTbl[taskIdx].taskId == TaskID)) ||
-            ((TaskID == OsalPort_TASK_NO_TASK) && (taskTbl[taskIdx].taskHndl == Task_self())))
+            ((TaskID == OsalPort_TASK_NO_TASK) && (taskTbl[taskIdx].taskHndl == pthread_self())))
         {
             key = OsalPort_enterCS();
             *taskTbl[taskIdx].pEventFlag &=  ~(uint32_t)eventFlag;
@@ -874,7 +867,7 @@ uint8_t OsalPort_pwrmgrTaskState( uint8_t destinationTask, uint8_t state )
  *
  * @param arg  an @ref ICall_ScheduleEntry
  */
-static Void OsalPort_clockFunc(UArg arg)
+static void OsalPort_clockFunc(uintptr_t arg)
 {
   OsalPort_ScheduleEntry *entry = (OsalPort_ScheduleEntry *) arg;
 
@@ -905,7 +898,7 @@ uint8_t OsalPort_setTimer(uint32_t ticks, OsalPort_TimerCback cback, void *arg, 
     if(*pClockHandle == NULL)
     {
         /* Construct BIOS Objects */
-        Clock_Params clkParams;
+        ClockP_Params clkParams;
 
         entry = (OsalPort_TimerID) OsalPort_malloc(sizeof(OsalPort_ScheduleEntry));
 
@@ -914,12 +907,12 @@ uint8_t OsalPort_setTimer(uint32_t ticks, OsalPort_TimerCback cback, void *arg, 
             return OsalPort_NO_TIMER_AVAIL;
         }
 
-        Clock_Params_init(&clkParams);
+        ClockP_Params_init(&clkParams);
         clkParams.period = 0;
-        clkParams.startFlag = FALSE;
-        clkParams.arg = (UArg) entry;
+        clkParams.startFlag = false;
+        clkParams.arg = (uintptr_t) entry;
 
-        entry->clock = Clock_create((Clock_FuncPtr)OsalPort_clockFunc, ticks, &clkParams, NULL);
+        entry->clock = ClockP_create((ClockP_Fxn)OsalPort_clockFunc, ticks, &clkParams);
         entry->cback = cback;
         entry->arg = arg;
 
@@ -935,16 +928,16 @@ uint8_t OsalPort_setTimer(uint32_t ticks, OsalPort_TimerCback cback, void *arg, 
         entry = (OsalPort_ScheduleEntry *) *pClockHandle;
         // Hold off interrupts so timer does not expire and call callback
         key = OsalPort_enterCS();
-        if(Clock_isActive(entry->clock))
+        if(ClockP_isActive(entry->clock))
         {
-            Clock_stop(entry->clock);
+            ClockP_stop(entry->clock);
         }
         // Re-enable interrupts
         OsalPort_leaveCS(key);
     }
 
-    Clock_setTimeout(entry->clock, ticks);
-    Clock_start(entry->clock);
+    ClockP_setTimeout(entry->clock, ticks);
+    ClockP_start(entry->clock);
 
     return OsalPort_SUCCESS;
 }
@@ -975,13 +968,13 @@ uint8_t OsalPort_deleteTimer(OsalPort_TimerID *pClockHandle)
 
         // Hold off interrupts so timer does not expire and call callback
         key = OsalPort_enterCS();
-        if(Clock_isActive(entry->clock))
+        if(ClockP_isActive(entry->clock))
         {
-            Clock_stop(entry->clock);
+            ClockP_stop(entry->clock);
         }
 
         // Clean up clock memory
-        Clock_delete(&entry->clock);
+        ClockP_delete(&entry->clock);
         OsalPort_free((void*)entry);
 
         /* Clear input pointer as memory is no longer valid */
@@ -1010,7 +1003,7 @@ void OsalPort_stopTimer(OsalPort_TimerID *pClockHandle)
 {
     if((pClockHandle != NULL) && (*pClockHandle != NULL))
     {
-        Clock_stop(*pClockHandle);
+        ClockP_stop(*pClockHandle);
     }
 }
 
@@ -1038,9 +1031,9 @@ uint8_t OsalPort_memcmp( const void *src1, const void *src2, uint32_t len )
   while ( len-- )
   {
     if( *pSrc1++ != *pSrc2++ )
-      return FALSE;
+      return false;
   }
-  return TRUE;
+  return true;
 }
 
 /*********************************************************************
@@ -1111,7 +1104,11 @@ void *OsalPort_revmemcpy( void *dst, const void *src, unsigned int len )
  */
 void* OsalPort_malloc(uint32_t size)
 {
+#ifdef FREERTOS_SUPPORT
+    return malloc(size);
+#else
     return (OsalPort_heapMalloc(size));
+#endif
 }
 
 /*********************************************************************
@@ -1127,7 +1124,11 @@ void* OsalPort_malloc(uint32_t size)
  */
 void OsalPort_free(void* buf)
 {
+#ifdef FREERTOS_SUPPORT
+    free(buf);
+#else
     OsalPort_heapFree(buf);
+#endif
 }
 
 /*********************************************************************
@@ -1144,7 +1145,6 @@ void OsalPort_free(void* buf)
 uint32_t OsalPort_enterCS(void)
 {
     OsalPort_CSStateUnion cu;
-    cu.each.taskkey = (uint_least16_t) Task_disable();
     cu.each.hwikey = (uint_least16_t) HwiP_disable();
     return cu.state;
 }
@@ -1162,8 +1162,7 @@ uint32_t OsalPort_enterCS(void)
 void OsalPort_leaveCS(uint32_t key)
 {
     OsalPort_CSStateUnion *cu = (OsalPort_CSStateUnion *) &key;
-    HwiP_restore((UInt) cu->each.hwikey);
-    Task_restore((UInt) cu->each.taskkey);
+    HwiP_restore((uintptr_t) cu->each.hwikey);
 }
 
 /*********************************************************************
@@ -1263,7 +1262,7 @@ uint8_t OsalPort_isBufSet( uint8_t *buf, uint8_t val, uint8_t len )
 
     if ( buf == NULL )
     {
-        return ( FALSE );
+        return ( false );
     }
 
     for ( x = 0; x < len; x++ )
@@ -1271,10 +1270,10 @@ uint8_t OsalPort_isBufSet( uint8_t *buf, uint8_t val, uint8_t len )
         // Check for non-initialized value
         if ( buf[x] != val )
         {
-            return ( FALSE );
+            return ( false );
         }
     }
-    return ( TRUE );
+    return ( true );
 }
 
 /*********************************************************************

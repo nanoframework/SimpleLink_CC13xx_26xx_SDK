@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -70,10 +70,6 @@ extern "C"
 
 /*! sensor minimum poll time = 10 ms */
 #define SENSOR_MIN_POLL_TIME        10
-
-/* The number of consecutive lost beacons that will cause MAC to declare
- * a sync loss */
-#define JDLLC_MAX_LOST_BEACONS          4
 
 /*! Event ID - LLC Event for PA Async command */
 #define JDLLC_PAS_EVT            0x0001

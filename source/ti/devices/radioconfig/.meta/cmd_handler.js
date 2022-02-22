@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2022 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ const BLE_DEVICE_ADDRESS_LENGTH = 6;
 const DeviationSteps = [250.0, 1000.0, 15.625, 62.5];
 
 // Ensure that Command Handlers are not created twice
-const cmdHandlerCache = {};
+const CmdHandlerCache = {};
 
 // TX power cache
 const TxPowerCache = {
@@ -84,13 +84,19 @@ exports = {
  *
  *  @param phyGroup - ble, prop, ieee_154
  *  @param phyName - short name for the PHY layer
+ *  @useSelectivity - set true if sensitivity preferred to selectivity
  */
-function get(phyGroup, phyName) {
-    if (!(phyName in cmdHandlerCache)) {
-        cmdHandlerCache[phyName] = create(phyGroup, phyName, true);
+function get(phyGroup, phyName, useSelectivity = false) {
+    let key = phyName;
+
+    if (useSelectivity) {
+        key += "H";
+    }
+    if (!(key in CmdHandlerCache)) {
+        CmdHandlerCache[key] = create(phyGroup, phyName, true, useSelectivity);
     }
 
-    return cmdHandlerCache[phyName];
+    return CmdHandlerCache[key];
 }
 
 /*!
@@ -103,12 +109,10 @@ function get(phyGroup, phyName) {
  */
 function getUpdatedRfCommands(inst, phyGroup) {
     const phyName = Common.getPhyType(inst, phyGroup);
-
-    // Ensure the PHY is loaded
-    get(phyGroup, phyName);
+    const useSelectivity = inst.settingGroup === "Selectivity";
 
     // Update performed on the duplicate instance
-    const cmdHandlerClone = create(phyGroup, phyName, false);
+    const cmdHandlerClone = create(phyGroup, phyName, false, useSelectivity);
     cmdHandlerClone.updateRfCommands(inst);
 
     return cmdHandlerClone;
@@ -142,13 +146,17 @@ function getFrontendSettings(phyGroup, id) {
  *  @param phyGroup - ble, prop, ieee_154
  *  @param phyName - short name for the corresponding PHY layer
  *  @param first - first time execution
+ *  @param useSelectivity - set true if sensitivity preferred to selectivity
  */
-function create(phyGroup, phyName, first) {
+function create(phyGroup, phyName, first, useSelectivity = false) {
     const PhyName = phyName;
     const PhyGroup = phyGroup;
     const devCfg = DeviceInfo.getConfiguration(phyGroup);
     const Config = devCfg.configs;
-    const SettingPath = DeviceInfo.getSettingPath(phyGroup);
+    let SettingPath = DeviceInfo.getSettingPath(phyGroup);
+    if (useSelectivity) {
+        SettingPath = SettingPath.replace("ble_pg21/cmd_settings/", "ble_f021/cmd_settings/");
+    }
     const SettingMap = DeviceInfo.getSettingMap(phyGroup);
     const settingsInfo = _.find(SettingMap, (s) => s.name === phyName);
     const SettingFileName = settingsInfo.file;
@@ -368,7 +376,9 @@ function create(phyGroup, phyName, first) {
                     // NB! Using dynamic enumerable due to 10 dBm PA table for P4 Launchpad and CC2652PSIP
                     const txOptions = RfDesign.getTxPowerOptionsDefault(freq, true);
                     item.options = (inst) => RfDesign.getTxPowerOptions(freq, true);
-                    item.default = txOptions[0].name;
+                    if (txOptions.length > 0) {
+                        item.default = txOptions[0].name;
+                    }
                     TxPowerCache.high = item.default;
                 }
                 break;
@@ -1585,6 +1595,9 @@ function create(phyGroup, phyName, first) {
         else {
             frontEndCmds = Common.forceArray(fe.Command);
         }
+
+        let hasFrontEndOverride = false;
+
         // Patch front-end setting into current setting
         const currentCmds = Setting.Command;
         _.each(frontEndCmds, (feCmd) => {
@@ -1608,11 +1621,17 @@ function create(phyGroup, phyName, first) {
                 });
 
                 if ("OverrideField" in feCmd) {
-                    // The patch is deleted after processing by the override handler
                     patchedCmd.OverridePatch = feCmd.OverrideField;
+                    hasFrontEndOverride = true;
                 }
             }
         });
+
+        if (hasFrontEndOverride) {
+            // Update override table
+            const highPA = getCmdFieldValue("txPower") === "0xFFFF";
+            OverrideHandler.init(Setting.Command, highPA);
+        }
     }
 
     /*!
@@ -1962,7 +1981,9 @@ function create(phyGroup, phyName, first) {
             if ("highPA" in inst) {
                 // TX Power high not used; set to default
                 const txOptions = RfDesign.getTxPowerOptionsDefault(freq, true);
-                TxPowerHi.dbm = txOptions[0].name;
+                if (txOptions.length > 0) {
+                    TxPowerHi.dbm = txOptions[0].name;
+                }
             }
         }
         else {
@@ -1971,7 +1992,9 @@ function create(phyGroup, phyName, first) {
             if ("highPA" in inst) {
                 // TX Power high not used; set to default
                 const txOptions = RfDesign.getTxPowerOptionsDefault(freq, true);
-                TxPowerHi.dbm = txOptions[0].name;
+                if (txOptions.length > 0) {
+                    TxPowerHi.dbm = txOptions[0].name;
+                }
             }
         }
     }

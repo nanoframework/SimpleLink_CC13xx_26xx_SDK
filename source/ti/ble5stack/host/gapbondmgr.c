@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2011-2021, Texas Instruments Incorporated
+ Copyright (c) 2011-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -415,16 +415,6 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
     case GAPBOND_MITM_PROTECTION:
       if((len == sizeof(uint8_t)) && (*((uint8_t *)pValue) <= TRUE))
       {
-        if (*((uint8_t *)pValue) == TRUE)
-        {
-          //For Authenticated pairing IO capabilities shall be different than No Input No Output
-          if (gapBond_IOCap == GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT)
-          {
-            ret = INVALIDPARAMETER;
-            break;
-          }
-        }
-
         gapBond_MITM = *((uint8_t *)pValue);
 
         //For Authenticated pairing MITM bit must be set to TRUE
@@ -446,14 +436,6 @@ bStatus_t GAPBondMgr_SetParameter(uint16_t param, uint8_t len, void *pValue)
           (*((uint8_t *)pValue) <= GAPBOND_IO_CAP_KEYBOARD_DISPLAY))
       {
         gapBond_IOCap = *((uint8_t *)pValue);
-
-        //For Authenticated pairing IO capabilities shall be different than No Input No Output
-        if (gapBond_IOCap == GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT)
-        {
-            gapBond_MITM = FALSE;
-            gapBond_authenPairingOnly = FALSE;
-            SM_SetAuthenPairingOnlyMode(gapBond_authenPairingOnly);
-        }
       }
       else
       {
@@ -1915,7 +1897,7 @@ static void gapBondMgr_LinkTerm(uint16_t connHandle)
       eraseAllBonds = FALSE;
 
       // Reset bonds to delete table
-      MAP_osal_memset(bondsToDelete, FALSE, sizeof(bondsToDelete));
+      MAP_osal_memset(bondsToDelete, FALSE, sizeof (uint8_t) * gapBond_maxBonds);
     }
     // See if we are to erase the local bond info
     else if(eraseLocalInfo == TRUE)
@@ -2732,7 +2714,9 @@ static uint8_t gapBondMgrFindEmpty(void)
   // use the LRU bond.
   if(gapBond_removeLRUBond)
   {
-    return  gapBondMgrGetLruBondIndex();
+    idx = gapBondMgrGetLruBondIndex();
+    gapBondMgrEraseBonding(idx);
+    return (idx);
   }
 
   return (gapBond_maxBonds);

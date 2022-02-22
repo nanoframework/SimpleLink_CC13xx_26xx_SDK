@@ -419,6 +419,13 @@ const maxLegacyDataLen = 31;
 
 // Maximum length of extended advertise data
 const maxExtDataLen = 1650;
+const maxExtConnDataLen = 254;
+
+// Minimum length of extended headers data
+const minExtHdrLen = 3; // Exntended Header Flags + AdvDataInfo
+const advAHdrLen = 6;
+const targetAHdrLen = 6;
+const txPowerHdrLen = 1;
 
 // Dictionary mapping a device name to default LaunchPad; used to discover the
 // appropriate RF settings when a device is being used without a LaunchPad
@@ -477,12 +484,20 @@ const supportedMigrations = {
   CC26X2R1_LAUNCHXL: [
     {target: "CC26X2R1_LAUNCHXL"},
     {target: "LP_CC2652RSIP"},
+    {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
     {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
     {target: "CC2652R1FSIP"},
   ],
   LP_CC2652RB: [
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
     {target: "LP_CC2652RB"},
-    {target: "CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
+    {target: "CC2652R1FSIP"},
   ],
   LP_CC2652PSIP: [
     {target: "LP_CC2652PSIP"},
@@ -491,7 +506,10 @@ const supportedMigrations = {
   LP_CC2652RSIP: [
     {target: "CC26X2R1_LAUNCHXL"},
     {target: "LP_CC2652RSIP"},
+    {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
     {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
     {target: "CC2652R1FSIP"},
   ],
 
@@ -507,27 +525,40 @@ const supportedMigrations = {
     {target: "CC1352P_4_LAUNCHXL"},
   ],
   CC2642R1FRGZ: [
-    {target: "CC2642R1FRGZ"},
     {target: "CC26X2R1_LAUNCHXL"},
     {target: "LP_CC2652RSIP"},
-    {target: "CC2652R1FSIP"},
+    {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
     {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
+    {target: "CC2652R1FSIP"},
   ],
   CC2652R1FRGZ: [
-    {target: "CC2652R1FRGZ"},
-    {target: "CC2652R1FSIP"},
     {target: "CC26X2R1_LAUNCHXL"},
     {target: "LP_CC2652RSIP"},
-  ],
-  CC2652RB: [
-    {target: "CC2652RB"},
     {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
+    {target: "CC2652R1FSIP"},
+  ],
+  CC2652RB1FRGZ: [
+    {target: "CC26X2R1_LAUNCHXL"},
+    {target: "LP_CC2652RSIP"},
+    {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
+    {target: "CC2652R1FSIP"},
   ],
   CC2652R1FSIP: [
-    {target: "CC2652R1FRGZ"},
-    {target: "CC2652R1FSIP"},
     {target: "CC26X2R1_LAUNCHXL"},
     {target: "LP_CC2652RSIP"},
+    {target: "LP_CC2652RB"},
+    {target: "CC2652RB1FRGZ"},
+    {target: "CC2652R1FRGZ"},
+    {target: "CC2642R1FRGZ"},
+    {target: "CC2652R1FSIP"},
   ],
   CC2652P1FSIP: [
     {target: "CC2652P1FSIP"},
@@ -1280,6 +1311,11 @@ exports = {
     maxNumAdvSets: maxNumAdvSets,
     maxLegacyDataLen: maxLegacyDataLen,
     maxExtDataLen: maxExtDataLen,
+    maxExtConnDataLen: maxExtConnDataLen,
+    minExtHdrLen: minExtHdrLen,
+    advAHdrLen: advAHdrLen,
+    targetAHdrLen: targetAHdrLen,
+    txPowerHdrLen: txPowerHdrLen,
     addPeerAddress: addPeerAddress,
     reverseBytes: reverseBytes,
     checkTXPower: checkTXPower,

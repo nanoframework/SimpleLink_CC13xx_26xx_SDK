@@ -9,7 +9,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2017 $
+ $License: TI_TEXT 2017 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -1929,12 +1929,10 @@ void ROM_Spinlock( void )
   while(i);
 }
 
-#if defined ( FLASH_ROM_BUILD )
-#if defined(__IAR_SYSTEMS_ICC__)
-#pragma optimize=none
-#else /* defined(__IAR_SYSTEMS_ICC__) */
+#if defined(__GNUC__) && !defined(__clang__)
 __attribute__((optimize("O0")))
-#endif /* defined(__IAR_SYSTEMS_ICC__) */
+#endif
+#if defined ( FLASH_ROM_BUILD )
 /*******************************************************************************
  * @fn          BLE ROM Initialization
  *
@@ -2015,8 +2013,8 @@ extern uint8 llLastCmdDoneEventHandleStateMaster( void );
 extern uint8 llRxEntryDoneEventHandleStateConnection( uint8 crcError );
 extern uint8 llLastCmdDoneEventHandleStateTest( void );
 extern uint8 llRxEntryDoneEventHandleStateTest( void );
-extern void llSetTaskInit( uint8 startType, ble5OpCmd_t *nextSecCmd, ble5OpCmd_t *nextConnCmd );
-extern void llSetTaskScan( uint8 startType, ble5OpCmd_t *nextSecCmd, ble5OpCmd_t *nextConnCmd );
+extern void llSetTaskInit( uint8 startType, taskInfo_t *nextSecTask, ble5OpCmd_t *nextSecCmd, ble5OpCmd_t *nextConnCmd );
+extern void llSetTaskScan( uint8 startType, taskInfo_t *nextSecTask, ble5OpCmd_t *nextSecCmd, ble5OpCmd_t *nextConnCmd );
 extern void llSetTaskAdv( uint8 startType, ble5OpCmd_t *nextSecCmd );
 extern void llSetTaskMaster( uint8 connId, ble5OpCmd_t *nextConnCmd );
 extern void llSetTaskSlave( uint8 connId, ble5OpCmd_t *nextConnCmd );
@@ -2266,17 +2264,17 @@ void MAP_llProcessSlaveControlPacket(void *connPtr, uint8 *pPkt)
 #endif
 }
 
-void MAP_llSetTaskInit( uint8 startType, void *nextSecCmd, void *nextConnCmd )
+void MAP_llSetTaskInit( uint8 startType, void *nextSecTask, void *nextSecCmd, void *nextConnCmd )
 {
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & INIT_CFG)
-  llSetTaskInit(startType, nextSecCmd,nextConnCmd);
+  llSetTaskInit(startType, nextSecTask, nextSecCmd,nextConnCmd);
 #endif
 }
 
-void MAP_llSetTaskScan( uint8 startType, void *nextSecCmd, void *nextConnCmd )
+void MAP_llSetTaskScan( uint8 startType, void *nextSecTask, void *nextSecCmd, void *nextConnCmd )
 {
 #if defined(CTRL_CONFIG) && (CTRL_CONFIG & SCAN_CFG)
-  llSetTaskScan(startType, nextSecCmd,nextConnCmd);
+  llSetTaskScan(startType, nextSecTask, nextSecCmd, nextConnCmd);
 #endif
 }
 
@@ -2753,50 +2751,6 @@ uint8 MAP_LL_EXT_SetLocationingAccuracy( uint16 handle, uint8  sampleRate1M, uin
                                         sampleRate2M, sampleSize2M, sampleCtrl);
 #else
   return 1;
-#endif
-}
-/*******************************************************************************
- * RF hooks
- */
-extern void  rf_patch_cpe_bt5();
-extern void  rf_patch_cpe_multi_protocol();
-extern void  rf_patch_cpe_multi_protocol_rtls();
-extern void  rf_patch_cpe_multi_bt5_coex(void);
-extern void  rf_patch_rfe_ble_coex(void);
-extern void  rf_patch_mce_bt5(void);
-
-void MAP_rf_patch_cpe( void )
-{
-#if !defined(DeviceFamily_CC26X1)
-  #if (defined RTLS_CTE || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
-    rf_patch_cpe_multi_protocol_rtls();
-  #else
-    #ifdef USE_DMM
-      rf_patch_cpe_multi_protocol();
-    #else
-      #ifdef USE_COEX
-        rf_patch_cpe_multi_bt5_coex();
-      #else
-          rf_patch_cpe_bt5();
-      #endif
-    #endif
-  #endif
-#else
-  rf_patch_cpe_multi_protocol();
-#endif
-}
-
-void MAP_rf_patch_rfe( void )
-{
-#ifdef USE_COEX
-  rf_patch_rfe_ble_coex();
-#endif
-}
-
-void MAP_rf_patch_mce( void )
-{
-#if defined(DeviceFamily_CC26X1) && !defined(RTLS_CTE)
-  rf_patch_mce_bt5();
 #endif
 }
 

@@ -7,23 +7,23 @@
             "options": [
                 {
                     "name": "bt5le1mp10",
-                    "displayName": "BLE, 1 Mbps, LE 1M, 10 dBm (Preview)"
+                    "displayName": "BLE, 1 Mbps, LE 1M (Release Candidate)"
                 },
                 {
                     "name": "bt5le1madvncp10",
-                    "displayName": "BLE, 1 Mbps, BT4, 10 dBm (Preview)"
+                    "displayName": "BLE, 1 Mbps, BT4 (Release Candidate)"
                 },
                 {
                     "name": "bt5le2mp10",
-                    "displayName": "BLE, 2 Mbps, LE 2M, 10 dBm (Preview)"
+                    "displayName": "BLE, 2 Mbps, LE 2M (Release Candidate)"
                 },
                 {
                     "name": "bt5lecodeds2p10",
-                    "displayName": "BLE, 500 kbps, LE Coded, 10 dBm (Preview)"
+                    "displayName": "BLE, 500 kbps, LE Coded (Release Candidate)"
                 },
                 {
                     "name": "bt5lecodeds8p10",
-                    "displayName": "BLE, 125 kbps, LE Coded, 10 dBm (Preview)"
+                    "displayName": "BLE, 125 kbps, LE Coded (Release Candidate)"
                 }
             ],
             "default": "bt5le1mp10"
@@ -289,7 +289,8 @@
             "name": "highPA",
             "displayName": "High PA",
             "description": "Select if the High Power Amplifier on the device should be used",
-            "default": false
+            "default": false,
+            "hidden": true
         },
         {
             "name": "packetLengthBle",
@@ -304,27 +305,32 @@
             {
                 "file": "setting_bt5_le_1m_10_dbm.json",
                 "name": "bt5le1mp10",
-                "description": "BLE, 1 Mbps, LE 1M, 10 dBm (Preview)"
+                "description": "BLE, 1 Mbps, LE 1M (Release Candidate)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_bt5_le_1m_adv_nc_10_dbm.json",
                 "name": "bt5le1madvncp10",
-                "description": "BLE, 1 Mbps, BT4, 10 dBm (Preview)"
+                "description": "BLE, 1 Mbps, BT4 (Release Candidate)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_bt5_le_2m_10_dbm.json",
                 "name": "bt5le2mp10",
-                "description": "BLE, 2 Mbps, LE 2M, 10 dBm (Preview)"
+                "description": "BLE, 2 Mbps, LE 2M (Release Candidate)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_bt5_le_coded_s2_10_dbm.json",
                 "name": "bt5lecodeds2p10",
-                "description": "BLE, 500 kbps, LE Coded, 10 dBm (Preview)"
+                "description": "BLE, 500 kbps, LE Coded (Release Candidate)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_bt5_le_coded_s8_10_dbm.json",
                 "name": "bt5lecodeds8p10",
-                "description": "BLE, 125 kbps, LE Coded, 10 dBm (Preview)"
+                "description": "BLE, 125 kbps, LE Coded (Release Candidate)",
+                "options": "disable_high_pa"
             }
         ]
     }

@@ -112,6 +112,9 @@ void setBleUserConfig( icall_userCfg_t *userCfg )
     llUserConfig.maxRlElems    = stackConfig->maxResolvListElems;
     llUserConfig.maxNumCteBufs = stackConfig->maxNumCteBuffers;
 
+    // Copy the RF_mode Object
+    memcpy(&rfMode, &RF_modeBle, sizeof(RF_Mode));
+
     // RF Front End Mode and Bias (based on package)
     llUserConfig.rfFeModeBias  = userCfg->boardConfig->rfFeModeBias;
 
@@ -295,6 +298,9 @@ void setBleUserConfig( bleUserCfg_t *userCfg )
     llUserConfig.maxNumConns   = userCfg->maxNumConns;
     llUserConfig.numTxEntries  = userCfg->maxNumPDUs;
     llUserConfig.maxPduSize    = userCfg->maxPduSize;
+
+    // Copy the RF_mode Object
+    memcpy(&rfMode, &RF_modeBle, sizeof(RF_Mode));
 
     // RF Front End Mode and Bias (based on package)
     llUserConfig.rfFeModeBias = userCfg->rfFeModeBias;

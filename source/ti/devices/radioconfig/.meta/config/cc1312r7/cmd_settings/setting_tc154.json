@@ -1,6 +1,6 @@
 {
     "setting": {
-        "Name": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth",
+        "Name": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 496 kHz RX Bandwidth",
         "Description": "300 kbps, 75 kHz deviation WiSUN mode #5 compatible PHY.",
         "Frequency": "915",
         "Patch": {

@@ -9,7 +9,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2009 $
+ $License: TI_TEXT 2009 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -1742,6 +1742,7 @@ extern llStatus_t    llSetupPeriodicScan( llPeriodicScanSet_t * );
 extern llStatus_t    llTrigPeriodicScan( llPeriodicScanSet_t * );
 extern void          llEndPeriodicScanTask( llPeriodicScanSet_t * );
 extern void          llSetPeriodicChanMap( llPeriodicChanMap_t *, uint8 * );
+extern uint32        llGetSecondaryTaskEndTime( taskInfo_t *, uint32 , llConnState_t *);
 extern uint8         llCompareSecondaryPrimaryTasksQoSParam( uint8 , taskInfo_t *, llConnState_t * );
 extern uint8         llCheckRfCmdPreemption( uint32, uint8 );
 extern uint32        llEstimatePeriodicAdvOtaTime(uint16 , uint8 , uint8 , uint8 , uint8 );

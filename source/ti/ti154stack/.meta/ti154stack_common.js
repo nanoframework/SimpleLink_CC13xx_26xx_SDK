@@ -86,12 +86,18 @@ const ti154stackCCFGSettings = {
     LP_CC2652R7_CCFG_SETTINGS: {
         forceVddr: false
     },
+    LP_CC1311R3_CCFG_SETTINGS: {
+        forceVddr: false
+    },
+    LP_CC1311P3_CCFG_SETTINGS: {
+        forceVddr: false
+    },
     LP_CC2651R3_CCFG_SETTINGS: {
         forceVddr: false
     },
     LP_CC2651P3_CCFG_SETTINGS: {
         forceVddr: false
-    }
+    },
 };
 
 // Dictionary mapping a device name to default LaunchPad
@@ -106,8 +112,10 @@ const deviceToBoard = {
     CC2652P1FSIP: "LP_CC2652PSIP",
     CC2652R1: "CC26X2R1_LAUNCHXL",
     CC2652RB: "LP_CC2652RB",
+    CC1311R3: "LP_CC1311R3",
+    CC1311P3: "LP_CC1311P3",
     CC2651R3: "LP_CC2651R3",
-    CC2651P3: "LP_CC2651P3"
+    CC2651P3: "LP_CC2651P3",
 };
 
 const currBoardName = getDeviceOrLaunchPadName(true);
@@ -167,15 +175,15 @@ const supportedMigrations = {
     "CC26.2R.*SIP": {
         CC2652R1FSIP: {},
         LP_CC2652RSIP: {},
-        CC2652R1FRGZ: () => isMigrationValidProject(),
-        CC26X2R1_LAUNCHXL: () => isMigrationValidProject()
+        CC2652R1FRGZ: {},
+        CC26X2R1_LAUNCHXL: {}
     },
     /* Represents 26X2R1 board and device */
     "CC26.2R1": {
         CC2652R1FRGZ: {},
         CC26X2R1_LAUNCHXL: {},
-        CC2652R1FSIP: () => isMigrationValidProject(),
-        LP_CC2652RSIP: () => isMigrationValidProject()
+        CC2652R1FSIP: {},
+        LP_CC2652RSIP: {}
     },
     /* Represents PSIP board and device */
     "CC2652P.*SIP": {
@@ -190,7 +198,15 @@ const supportedMigrations = {
         CC2652R7RGZ: {},
         LP_CC2652R7: {}
     },
-    CC2651P3: {
+    CC1311P3: {
+        CC1311P3RGZ: {},
+        LP_CC1311P3: {}
+    },
+    CC1311R3: {
+        CC1311R3RGZ: {},
+        LP_CC1311R3: {}
+    },
+    CC1311P3: {
         CC2651P3RGZ: {},
         LP_CC2651P3: {}
     },
@@ -232,38 +248,6 @@ function isMigrationValidFreq(migTarget)
         migSupported = {
             disable: "Cannot migrate from a 2.4 GHz device or project to a "
             + "Sub-1 GHz device"
-        };
-    }
-
-    return(migSupported);
-}
-
-/*
- * ======== isMigrationValidProject ========
- * Determines whether a migration from one board/device to another board/device
- * is supported by the 15.4 module based on the project
- *
- * @returns One of the following Objects:
- *    - {} <--- Empty object if migration is valid
- *    - {warn: "Warning markdown text"} <--- Object with warn property
- *                                           if migration is valid but
- *                                           might require user action
- *    - {disable: "Disable markdown text"} <--- Object with disable property
- *                                              if migration is not valid
- */
-function isMigrationValidProject()
-{
-    let migSupported = {};
-
-    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
-
-    if(inst.project === "coprocessor")
-    {
-        migSupported = {
-            disable: "Migrations are not supported on the coprocessor project. "
-            + "Consider starting from an example in "
-            + "<SDK_INSTALL_DIR>/examples/ that is closer to the desired "
-            + "migration target"
         };
     }
 
@@ -315,20 +299,16 @@ function isMigrationValidLPSTK()
  */
 function isMigrationValidFreqProject(migTarget)
 {
-    const migSupported = _.merge(isMigrationValidFreq(migTarget),
-        isMigrationValidProject());
+    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
 
-    if(migSupported.disable)
+    let migSupported = {};
+
+    if(inst.project !== "coprocessor")
     {
-        return({disable: migSupported.disable});
+        migSupported = isMigrationValidFreq(migTarget);
     }
 
-    if(migSupported.warn)
-    {
-        return({warn: migSupported.warn});
-    }
-
-    return({});
+    return(migSupported);
 }
 
 /*
@@ -354,9 +334,7 @@ function isMigrationValid(currentTarget, migrationTarget)
     + " <SDK_INSTALL_DIR>/examples/ that is closer to the desired migration "
     + "target";
 
-    // Migrations are not supported on CoP project
-    let migSupported = _.merge({disable: defaultDisableText},
-        isMigrationValidProject());
+    let migSupported = {disable: defaultDisableText};
 
     for(migRegex in supportedMigrations)
     {
@@ -388,16 +366,9 @@ function isMigrationValid(currentTarget, migrationTarget)
 */
 function getMigrationMarkdown(currTarget)
 {
-    const inst = system.modules["/ti/ti154stack/ti154stack"].$static;
-
     // May need to add guidelines when other boards are supported
-    let migrationText = "";
-
-    if(inst.project === "coprocessor")
-    {
-        migrationText = "* Migrations to different boards or devices are not "
-        + "currently supported on the CoProcessor project";
-    }
+    const migrationText = "* A limited set of migrations are "
+        + "currently supported on TI 15.4 Stack examples";
 
     return(migrationText);
 }
@@ -589,7 +560,7 @@ function isHighPADevice(boardName = null)
 {
     const board = getLaunchPadFromDevice(boardName);
     return(board.includes("CC1352P") || board.includes("CC2652PSIP")
-        || board.includes("CC2651P"));
+        || board.includes("CC2651P") || board.includes("CC1311P"));
 }
 
 /*!

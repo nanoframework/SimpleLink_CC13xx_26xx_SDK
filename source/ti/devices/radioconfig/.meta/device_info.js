@@ -39,7 +39,7 @@
 "use strict";
 
 // Module version
-const RADIO_CONFIG_VERSION = "1.11";
+const RADIO_CONFIG_VERSION = "1.12";
 
 // Common utility functions
 const Common = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
@@ -81,7 +81,7 @@ const DevNameMap = {
     CC2674R10RSK: "cc2674r10",
     CC2674P10RGZ: "cc2674p10",
     CC2674P10RSK: "cc2674p10",
-    CC2653P10RSL: "cc2674p10", // TBD
+    CC2653P10RSL: "cc2653p10",
     CC1314R10RGZ: "cc1314r10",
     CC1314R10RSK: "cc1314r10",
     CC1354R10RGZ: "cc1354r10",
@@ -99,9 +99,7 @@ const HighPaDevice = DeviceName.includes("cc1352p")
     || DeviceName.includes("cc2652p")
     || DeviceName.includes("cc2672p")
     || DeviceName.includes("cc1311p")
-    || DeviceName.includes("cc2651p")
-    || DeviceName.includes("cc1354p")
-    || DeviceName.includes("cc2674p");
+    || DeviceName.includes("cc2651p");
 
 // True if wBMS support
 const wbmsSupport = DeviceName === "cc2642r" || DeviceName === "cc2652r";

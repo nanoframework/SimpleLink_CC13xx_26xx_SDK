@@ -107,6 +107,22 @@ const moduleStatic = {
             hidden: true
         },
         {
+            name: "hidePtm",
+            displayName: "Hide PTM",
+            default: false,
+            hidden: true,
+            onChange: onHidePtmChange,
+            description: "Used to hide the PTM configurable. Always hidden"
+        },
+        {
+            name: "oadProject",
+            displayName: "OAD Project",
+            default: false,
+            hidden: true,
+            onChange: onOadProjectChange,
+            description: "Used to indicate that this is an OAD project. Always hidden"
+        },
+        {
             name: "deviceRole",
             displayName: "Device Role",
             description: "The BLE device role",
@@ -342,6 +358,12 @@ function validate(inst, validation)
                                     system.modules["/ti/devices/CCFG"].$static, "srcClkLF");
         }
     }
+    // Throw a warning on the useRcosc configurable when oadProject and useRcosc are set to true,
+    // to indicate the user that the CCFG LF clock configuration should be done at the BIM project
+    if(inst.oadProject && inst.useRcosc)
+    {
+        validation.logWarning("For OAD projects, the LF Clock configuration is set in the CCFG file of the BIM project", inst, "useRcosc");
+    }
 }
 
 /*
@@ -409,7 +431,7 @@ function ondeviceRoleChange(inst,ui)
     }
 
     // Use ptm only in the relevant roles
-    if(_.isEqual(inst.deviceRole, "PERIPHERAL_CFG"))
+    if(_.isEqual(inst.deviceRole, "PERIPHERAL_CFG") && !inst.hidePtm)
     {
         inst.ptm = false;
         ui.ptm.hidden = false;
@@ -473,6 +495,26 @@ function onExtAdvChange(inst,ui)
 }
 
 /*
+ *  ======== onHidePtmChange ========
+ * Show/hide the ptm configurable
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onHidePtmChange(inst,ui)
+{
+    // Use ptm only in the relevant roles
+    if(_.isEqual(inst.deviceRole, "PERIPHERAL_CFG") && !inst.hidePtm)
+    {
+        inst.ptm = false;
+        ui.ptm.hidden = false;
+    }
+    else
+    {
+        ui.ptm.hidden = true;
+    }
+}
+
+/*
  *  ======== onLockProjectChange ========
  * Lock or unlock the deviceRole configurable,
  * disable/enable the option to change the deviceRole.
@@ -485,6 +527,16 @@ function onLockProjectChange(inst,ui)
                        ui.deviceRole.readOnly = false;
 }
 
+/*
+ *  ======== onOadProjectChange ========
+ * Hide/show parameters
+ * @param inst  - Module instance containing the config that changed
+ * @param ui    - The User Interface object
+ */
+function onOadProjectChange(inst,ui)
+{
+    inst.oadProject ? ui.useRcosc.hidden = false : ui.useRcosc.hidden = true;
+}
 /*
  *  ======== onDisablePairingChange ========
  * When disablePairing is selected, change the bondPairing configurable

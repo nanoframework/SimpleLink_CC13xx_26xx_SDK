@@ -87,7 +87,6 @@ const config = {
             name: "bondIOCaps",
             displayName: "IO Capabilities",
             default: "GAPBOND_IO_CAP_DISPLAY_ONLY",
-            onChange: onbondIOCapsChange,
             longDescription: Docs.bondIOCapsLongDescription,
             options: [
                 { displayName: "Display Only Device",               name: "GAPBOND_IO_CAP_DISPLAY_ONLY"       },
@@ -286,33 +285,6 @@ function validate(inst, validation)
         validation.logWarning("The specification recommends that this value be set to no higher "
                               + "than 10 to avoid an attacker from learning too much about a "
                               + "private key before it is regenerated", inst, "ECCKeyRegenPolicy");
-    }
-}
-
-/*
- * ======== onbondIOCapsChange ========
- * When the GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT option is selected
- * the MITM and authenPairingOnly values are changed to false and to readOnly mode
- *
- * When other option is selected the readOnly mode is disabled
- *
- * @param inst  - Module instance containing the config that changed
- * @param ui    - The User Interface object
- */
-function onbondIOCapsChange(inst, ui)
-{
-    if(inst.bondIOCaps == "GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT")
-    {
-        inst.bondMITMProtection = false;
-        ui.bondMITMProtection.readOnly = true;
-
-		inst.authenPairingOnly = false;
-        ui.authenPairingOnly.readOnly = true;
-    }
-    else
-    {
-        ui.bondMITMProtection.readOnly = false;
-		ui.authenPairingOnly.readOnly = false;
     }
 }
 

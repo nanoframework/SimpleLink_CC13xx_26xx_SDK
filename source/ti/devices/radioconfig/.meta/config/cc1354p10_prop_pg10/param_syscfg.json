@@ -25,35 +25,19 @@
             "options": [
                 {
                     "name": "2gfsk50kbps",
-                    "displayName": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (FPGA)"
-                },
-                {
-                    "name": "2gfsk100kbps50dev868",
-                    "displayName": "100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)"
+                    "displayName": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings)"
                 },
                 {
                     "name": "2gfsk50kbps154g",
-                    "displayName": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (FPGA)"
-                },
-                {
-                    "name": "2gfsk100kbps154g",
-                    "displayName": "100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth (FPGA)"
-                },
-                {
-                    "name": "2gfsk200kbps154g",
-                    "displayName": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (FPGA)"
-                },
-                {
-                    "name": "2gfsk500kbps154g",
-                    "displayName": "500 kbps, 190 kHz Deviation, 2-GFSK, 1150 kHz RX Bandwidth (FPGA)"
-                },
-                {
-                    "name": "slr5kbps2gfsk",
-                    "displayName": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2 (FPGA)"
+                    "displayName": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings)"
                 },
                 {
                     "name": "2gfsk100kbps50dev915wsun2b",
-                    "displayName": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)"
+                    "displayName": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (Pre-silicon settings)"
+                },
+                {
+                    "name": "2gfsk200kbps100dev915wsun4b",
+                    "displayName": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Pre-silicon settings)"
                 },
                 {
                     "name": "custom868",
@@ -310,19 +294,6 @@
                     "description": "TX Power",
                     "default": "14",
                     "longDescription": ""
-                },
-                {
-                    "name": "txPowerHi",
-                    "displayName": "TX Power (dBm)",
-                    "description": "TX Power",
-                    "default": "20",
-                    "hidden": true
-                },
-                {
-                    "name": "highPA",
-                    "displayName": "High PA",
-                    "description": "Select if the High Power Amplifier on the device should be used",
-                    "default": false
                 },
                 {
                     "name": "txPower2400",
@@ -729,48 +700,26 @@
             {
                 "file": "setting_tc706.json",
                 "name": "2gfsk50kbps",
-                "description": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (FPGA)"
-            },
-            {
-                "file": "setting_tc737.json",
-                "name": "2gfsk100kbps50dev868",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
+                "description": "50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc706_154g.json",
                 "name": "2gfsk50kbps154g",
-                "description": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
-            },
-            {
-                "file": "setting_tc152_154g.json",
-                "name": "2gfsk100kbps154g",
-                "description": "100 kbps, 25 kHz Deviation, 2-GFSK, 137 kHz RX Bandwidth (FPGA)",
+                "description": "IEEE 802.15.4, 50 kbps, 25 kHz Deviation, 2-GFSK, 100 kHz RX Bandwidth (Pre-silicon settings)",
                 "options": "ieee_15_4g,disable_high_pa"
-            },
-            {
-                "file": "setting_tc746_154g.json",
-                "name": "2gfsk200kbps154g",
-                "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
-            },
-            {
-                "file": "setting_tc778_154g.json",
-                "name": "2gfsk500kbps154g",
-                "description": "500 kbps, 190 kHz Deviation, 2-GFSK, 1150 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
-            },
-            {
-                "file": "setting_tc880.json",
-                "name": "slr5kbps2gfsk",
-                "description": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2 (FPGA)"
             },
             {
                 "file": "setting_tc736.json",
                 "name": "2gfsk100kbps50dev915wsun2b",
-                "description": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (FPGA)",
-                "options": "ieee_15_4g"
+                "description": "Wi-SUN mode #2b, 100 kbps, 50 kHz Deviation, 2-GFSK, 196 kHz RX Bandwidth (Pre-silicon settings)",
+                "options": "ieee_15_4g,disable_high_pa"
+            },
+            {
+                "file": "setting_tc750.json",
+                "name": "2gfsk200kbps100dev915wsun4b",
+                "description": "Wi-SUN mode #4b, 200 kbps, 100 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Pre-silicon settings)",
+                "options": "ieee_15_4g,disable_high_pa"
             },
             {
                 "file": "setting_tc706_custom.json",
@@ -782,7 +731,8 @@
             {
                 "file": "setting_tc900.json",
                 "name": "2gfsk100kbps",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth(FPGA)"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth(FPGA)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc900_custom.json",

@@ -9,7 +9,7 @@ Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
- Copyright (c) 2013-2021, Texas Instruments Incorporated
+ Copyright (c) 2013-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,9 @@ Target Device: cc13xx_cc26xx
 #ifndef BLE_STACK_API_H
 #define BLE_STACK_API_H
 
+/*********************************************************************
+ * INCLUDES
+ */
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -59,6 +62,9 @@ extern "C" {
 #include <bcomdef.h>
 #include <icall_ble_api.h>
 
+/*********************************************************************
+* TYPEDEFS
+*/
 typedef ICall_EntityID          bleStack_entityId_t;
 typedef ICall_Hdr               bleStack_msgHdt_t;
 typedef ICall_Errno             bleStack_errno_t;
@@ -80,20 +86,49 @@ typedef struct
     uint8 eraseBondWhileInConn;
 } GapBond_params_t;
 
+typedef union
+{
+    uint8_t advHandle;
+    GapAdv_setTerm_t pSetTerm;
+    GapAdv_scanReqReceived_t pScanReqRcv;
+    GapAdv_truncData_t pTruncData;
+    GapScan_Evt_End_t pScanDis;
+    GapScan_Evt_AdvRpt_t pAdvReport;
+}GapAdv_data_t;
+
+typedef void (*pfnBleStkAdvCB_t) (uint32_t event,
+                                  GapAdv_data_t *pBuf,
+                                  uint32_t *arg);
+
+/*********************************************************************
+ * MACROS
+ */
 #define bleStack_malloc         ICall_malloc
 #define bleStack_free           ICall_free
 #define bleStack_mallocMsg      ICall_mallocMsg
 #define bleStack_freeMsg        ICall_freeMsg
 #define BLE_STACK_ERRNO_SUCCESS ICALL_ERRNO_SUCCESS
 
+/*********************************************************************
+ * FUNCTIONS
+ */
 #ifdef ICALL_NO_APP_EVENTS
 bleStack_errno_t bleStack_register(uint8_t *selfEntity, appCallback_t appCallback);
 #endif
 
-void      bleStack_createTasks();
-bStatus_t bleStack_initGap(uint8_t role, ICall_EntityID appSelfEntity, uint16_t paramUpdateDecision);
-bStatus_t bleStack_initGapBond(GapBond_params_t *pGapBondParams, void *bleApp_bondMgrCBs);
-bStatus_t bleStack_initGatt(uint8_t role, ICall_EntityID appSelfEntity, uint8_t *pAttDeviceName);
+extern void      bleStack_createTasks();
+
+// Stack Init
+extern bStatus_t bleStack_initGap(uint8_t role, ICall_EntityID appSelfEntity, uint16_t paramUpdateDecision);
+extern bStatus_t bleStack_initGapBond(GapBond_params_t *pGapBondParams, void *bleApp_bondMgrCBs);
+extern bStatus_t bleStack_initGatt(uint8_t role, ICall_EntityID appSelfEntity, uint8_t *pAttDeviceName);
+
+// Advertisement
+extern bStatus_t bleStk_initAdvSet(pfnBleStkAdvCB_t advCallback, uint8_t *advHandle,
+                              GapAdv_eventMaskFlags_t eventMask, GapAdv_params_t *advParams,
+                              uint16_t advDataLen ,uint8_t advData[],
+                              uint16_t scanRespDataLen, uint8_t scanRespData[]);
+void bleStk_getDevAddr(uint8_t wantIA, uint8_t *pAddr);
 
 #ifdef __cplusplus
 }

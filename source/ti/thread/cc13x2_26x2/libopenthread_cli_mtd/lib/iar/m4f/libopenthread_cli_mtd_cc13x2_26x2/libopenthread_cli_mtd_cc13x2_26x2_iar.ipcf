@@ -23,6 +23,7 @@
     </includePath>
 
     <defines>
+        <define>DeviceFamily_CC13X2_CC26X2</define>
         <define>HAVE_CONFIG_H</define>
         <define>_BSD_SOURCE=1</define>
         <define>_DEFAULT_SOURCE=1</define>

@@ -51,7 +51,7 @@ offers a proprietary custom setting for each of the frequency bands (169 MHz, 43
 * [Examples][2]
 
 [1]: /proprietary-rf/proprietary-rf-users-guide/sysconfig/proprietary-rf-driver.html#adding-rf-settings "Adding RF Settings"
-[2]: /proprietary-rf/proprietary-rf-users-guide/proprietary-rf-guide/examples-cc13x2_26x2.html#rf-driver-examples "Radio Configuration Examples"
+[2]: /proprietary-rf/proprietary-rf-users-guide/proprietary-rf-guide/examples-cc13xx_cc26xx.html#rf-driver-examples "Radio Configuration Examples"
 `;
 
 const rfDesignDescription = `
@@ -60,7 +60,7 @@ include in the design: **frequency bands**, use of **High-Power Amplifier** (for
 **RF front-end** (differential or single-ended), and **bias**. All designs are based on existing TI reference designs.
 
 Supported frequency bands are 169 MHz, 433 MHz, 868 MHz and 2.4 GHz. The devices use Power Amplifiers with 
-maximum output of 5 dBm, 13 dBm, 20 dBm, and 10 dBm (LAUNCHXL-CC1352P-4 only).
+maximum output of 5 dBm, 13 dBm, 20 dBm, and 10 dBm.
 
 Only certain combinations of frequency bands and power amplifiers are possible. 
 13 dBm is only used with the Sub-1 GHz frequency bands whereas 5 dBm is exclusively used by the 2.4 GHz band.

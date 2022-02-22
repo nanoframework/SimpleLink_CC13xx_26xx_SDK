@@ -31,6 +31,7 @@ CFLAGS = -I../../.. \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/third_party/mbedtls/repo/include \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/include \
+    -DDeviceFamily_CC13X2_CC26X2 \
     -DHAVE_CONFIG_H \
     -D_BSD_SOURCE=1 \
     -D_DEFAULT_SOURCE=1 \

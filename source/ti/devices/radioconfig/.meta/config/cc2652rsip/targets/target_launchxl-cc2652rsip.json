@@ -7,7 +7,7 @@
         "DevicePackage": "MOT 7x7",
         "FrontEnd": "ID",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC2652RSIP",
+        "RfDesign": "CC2652RSIP-EM",
         "DefaultCategory": "Settings",
         "IoSettingsIdle": [],
         "IoSettingsRx": [],

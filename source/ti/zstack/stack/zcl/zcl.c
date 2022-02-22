@@ -3005,6 +3005,7 @@ uint8_t *zclSerializeData( uint8_t dataType, void *attrData, uint8_t *buf )
       buf = zcl_buffer_uint32( buf, *((uint32_t*)attrData) );
       break;
 
+    case ZCL_DATATYPE_DATA40:
     case ZCL_DATATYPE_BITMAP40:
     case ZCL_DATATYPE_UINT40:
     case ZCL_DATATYPE_INT40:
@@ -3012,6 +3013,7 @@ uint8_t *zclSerializeData( uint8_t dataType, void *attrData, uint8_t *buf )
       buf = zcl_memcpy( buf, pStr, 5 );
       break;
 
+    case ZCL_DATATYPE_DATA48:
     case ZCL_DATATYPE_BITMAP48:
     case ZCL_DATATYPE_UINT48:
     case ZCL_DATATYPE_INT48:
@@ -3019,6 +3021,7 @@ uint8_t *zclSerializeData( uint8_t dataType, void *attrData, uint8_t *buf )
       buf = zcl_memcpy( buf, pStr, 6 );
       break;
 
+    case ZCL_DATATYPE_DATA56:
     case ZCL_DATATYPE_BITMAP56:
     case ZCL_DATATYPE_UINT56:
     case ZCL_DATATYPE_INT56:
@@ -3026,6 +3029,7 @@ uint8_t *zclSerializeData( uint8_t dataType, void *attrData, uint8_t *buf )
       buf = zcl_memcpy( buf, pStr, 7 );
       break;
 
+    case ZCL_DATATYPE_DATA64:
     case ZCL_DATATYPE_BITMAP64:
     case ZCL_DATATYPE_DOUBLE_PREC:
     case ZCL_DATATYPE_IEEE_ADDR:
@@ -3226,21 +3230,29 @@ uint8_t zclGetDataTypeLength( uint8_t dataType )
       len = 4;
       break;
 
+   case ZCL_DATATYPE_DATA40:
+   case ZCL_DATATYPE_BITMAP40:
    case ZCL_DATATYPE_UINT40:
    case ZCL_DATATYPE_INT40:
        len = 5;
        break;
 
+   case ZCL_DATATYPE_DATA48:
+   case ZCL_DATATYPE_BITMAP48:
    case ZCL_DATATYPE_UINT48:
    case ZCL_DATATYPE_INT48:
        len = 6;
        break;
 
+   case ZCL_DATATYPE_DATA56:
+   case ZCL_DATATYPE_BITMAP56:
    case ZCL_DATATYPE_UINT56:
    case ZCL_DATATYPE_INT56:
        len = 7;
        break;
 
+   case ZCL_DATATYPE_DATA64:
+   case ZCL_DATATYPE_BITMAP64:
    case ZCL_DATATYPE_DOUBLE_PREC:
    case ZCL_DATATYPE_IEEE_ADDR:
    case ZCL_DATATYPE_UINT64:

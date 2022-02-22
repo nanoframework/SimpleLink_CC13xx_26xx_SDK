@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2019-2021, Texas Instruments Incorporated
+ Copyright (c) 2019-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -318,8 +318,13 @@ static void NVOCMP_assert(bool cond, char *message, bool fatal)
 //*****************************************************************************
 // Page and Header Definitions
 //*****************************************************************************
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
+// CC26x4/CC13x4 devices flash page size is (1 << 11) or 0x800
+#define PAGE_SIZE_LSHIFT 11
+#else
 // CC26x2/CC13x2 devices flash page size is (1 << 13) or 0x2000
 #define PAGE_SIZE_LSHIFT 13
+#endif
 #if !defined (FLASH_PAGE_SIZE)
 #define FLASH_PAGE_SIZE  (1 << PAGE_SIZE_LSHIFT)
 #endif // FLASH_PAGE_SIZE

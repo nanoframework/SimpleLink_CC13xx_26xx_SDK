@@ -167,7 +167,7 @@
                                 ]
                             },
                             {
-                                "_name": "override_txstd_settings.json",
+                                "_name": "override_txstd_settings_10_dbm.json",
                                 "Element32b": [
                                     {
                                         "_type": "ELEMENT",
@@ -212,7 +212,7 @@
                                 ]
                             },
                             {
-                                "_name": "override_tx20_settings.json",
+                                "_name": "override_tx10dbm_settings.json",
                                 "Element32b": [
                                     {
                                         "_type": "ELEMENT",

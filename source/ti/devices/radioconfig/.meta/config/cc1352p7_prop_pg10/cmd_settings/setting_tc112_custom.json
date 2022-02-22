@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "Custom (50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings))",
-        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 430-520 MHz band. (Pre-silicon settings)",
+        "Name": "Custom (50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth)",
+        "Description": "50 kbps, 2-GFSK, 25 kHz deviation for 430-520 MHz band.",
         "Frequency": "433",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -140,89 +140,170 @@
                     {
                         "_name": "loDivider",
                         "$": "10"
+                    },
+                    {
+                        "_name": "pRegOverrideTxStd",
+                        "$": "0"
+                    },
+                    {
+                        "_name": "pRegOverrideTx20",
+                        "$": "0"
                     }
                 ],
-                "OverrideField": {
-                    "_name": "pRegOverride",
-                    "Block": [
-                        {
-                            "_name": "override_tc112.json",
-                            "Element32b": [
-                                {
-                                    "_type": "ADI_2HALFREG_OVERRIDE",
-                                    "_comment": "Tx: Configure PA ramp time, PACTL2.RC=0x3 (in ADI0, set PACTL2[4:3]=0x3)",
-                                    "$": "0,16,0x8,0x8,17,0x1,0x1"
-                                },
-                                {
-                                    "_type": "HW_REG_OVERRIDE",
-                                    "_comment": "Rx: Set AGC reference level to 0x1C (default: 0x2E)",
-                                    "$": "0x609C,0x001C"
-                                },
-                                {
+                "OverrideField": [
+                    {
+                        "_name": "pRegOverride",
+                        "Block": [
+                            {
+                                "_name": "override_tc112.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "ADI_2HALFREG_OVERRIDE",
+                                        "_comment": "Tx: Configure PA ramp time, PACTL2.RC=0x3 (in ADI0, set PACTL2[4:3]=0x3)",
+                                        "$": "0,16,0x8,0x8,17,0x1,0x1"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Rx: Set AGC reference level to 0x1C (default: 0x2E)",
+                                        "$": "0x609C,0x001C"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -6 dB (default: 0), trimmed for external bias and differential configuration",
+                                        "$": "0x000688A3"
+                                    },
+                                    {
+                                        "_type": "ADI_HALFREG_OVERRIDE",
+                                        "_comment": "Rx: Set anti-aliasing filter bandwidth to 0xD (in ADI0, set IFAMPCTL3[7:4]=0xD)",
+                                        "$": "0,61,0xF,0xD"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "TX: Reduce analog ramping wait time",
+                                        "$": "0x6028,0x001A"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_prop_common.json",
+                                "Element32b": {
                                     "_type": "ELEMENT",
-                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -7 dB (default: -2), trimmed for external bias and differential configuration",
-                                    "$": "0x000788A3"
-                                },
-                                {
-                                    "_type": "ADI_HALFREG_OVERRIDE",
-                                    "_comment": "Rx: Set anti-aliasing filter bandwidth to 0xD (in ADI0, set IFAMPCTL3[7:4]=0xD)",
-                                    "$": "0,61,0xF,0xD"
-                                },
-                                {
-                                    "_type": "HW_REG_OVERRIDE",
-                                    "_comment": "TX: Reduce analog ramping wait time",
-                                    "$": "0x6028,0x001A"
+                                    "_comment": "DC\/DC regulator: In Tx with 14 dBm PA setting, use DCDCCTL5[3:0]=0xF (DITHER_EN=1 and IPEAK=7). In Rx, use default settings.",
+                                    "$": "0x00F788D3"
                                 }
-                            ]
-                        },
-                        {
-                            "_name": "override_prop_common.json",
-                            "Element32b": {
-                                "_type": "ELEMENT",
-                                "_comment": "DC\/DC regulator: In Tx with 14 dBm PA setting, use DCDCCTL5[3:0]=0xF (DITHER_EN=1 and IPEAK=7). In Rx, use default settings.",
-                                "$": "0x00F788D3"
+                            },
+                            {
+                                "_name": "override_prop_common_sub1g.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW32_ARRAY_OVERRIDE",
+                                        "_comment": "TX: Set FSCA divider bias to 1",
+                                        "$": "0x405C,0x0001"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "TX: Set FSCA divider bias to 1",
+                                        "$": "0x08141131"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_patable_14dbm.json",
+                                "Element32b": {
+                                    "_type": "ADI_REG_OVERRIDE",
+                                    "_comment": "Tx: Set PA trim to max to maximize its output power (in ADI0, set PACTL0=0xF8)",
+                                    "$": "0,12,0xF8"
+                                }
                             }
-                        },
-                        {
-                            "_name": "override_prop_common_sub1g.json",
-                            "Element32b": [
-                                {
-                                    "_type": "HW32_ARRAY_OVERRIDE",
-                                    "_comment": "TX: Set FSCA divider bias to 1",
-                                    "$": "0x405C,0x0001"
-                                },
-                                {
-                                    "_type": "ELEMENT",
-                                    "_comment": "TX: Set FSCA divider bias to 1",
-                                    "$": "0x08141131"
+                        ]
+                    },
+                    {
+                        "_name": "pRegOverrideTxStd",
+                        "Block": [
+                            {
+                                "_name": "override_txstd_placeholder.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "TXSTDPA",
+                                        "_comment": "TX Standard power override",
+                                        "$": "0x00000000"
+                                    },
+                                    {
+                                        "_type": "ANADIV",
+                                        "_comment": "The ANADIV radio parameter based on LO divider and front end settings",
+                                        "$": "0x00000000"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_phy_tx_pa_ramp_genfsk_std.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Tx: Configure PA ramping, set wait time before turning off (0x1A ticks of 16\/24 us = 17.3 us).",
+                                        "$": "0x6028,0x001A"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Set TXRX pin to 0 in RX and high impedance in idle\/TX. ",
+                                        "$": "0x60A8,0x0401"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_patable_14dbm.json",
+                                "Element32b": {
+                                    "_type": "ADI_REG_OVERRIDE",
+                                    "_comment": "Tx: Set PA trim to max to maximize its output power (in ADI0, set PACTL0=0xF8)",
+                                    "$": "0,12,0xF8"
                                 }
-                            ]
-                        },
-                        {
-                            "_name": "override_phy_tx_pa_ramp_genfsk_std.json",
-                            "Element32b": [
-                                {
-                                    "_type": "HW_REG_OVERRIDE",
-                                    "_comment": "Tx: Configure PA ramping, set wait time before turning off (0x1A ticks of 16\/24 us = 17.3 us).",
-                                    "$": "0x6028,0x001A"
-                                },
-                                {
-                                    "_type": "HW_REG_OVERRIDE",
-                                    "_comment": "Set TXRX pin to 0 in RX and high impedance in idle\/TX. ",
-                                    "$": "0x60A8,0x0401"
-                                }
-                            ]
-                        },
-                        {
-                            "_name": "override_patable_14dbm.json",
-                            "Element32b": {
-                                "_type": "ADI_REG_OVERRIDE",
-                                "_comment": "Tx: Set PA trim to max to maximize its output power (in ADI0, set PACTL0=0xF8)",
-                                "$": "0,12,0xF8"
                             }
-                        }
-                    ]
-                }
+                        ]
+                    },
+                    {
+                        "_name": "pRegOverrideTx20",
+                        "Block": [
+                            {
+                                "_name": "override_tx20_placeholder.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "TX20PA",
+                                        "_comment": "TX HighPA power override",
+                                        "$": "0x00000000"
+                                    },
+                                    {
+                                        "_type": "ANADIV",
+                                        "_comment": "The ANADIV radio parameter based on LO divider and front end settings",
+                                        "$": "0x00000000"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_phy_tx_pa_ramp_genfsk_hpa.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Tx: Configure PA ramping, set wait time before turning off (0x1F ticks of 16\/24 us = 20.3 us).",
+                                        "$": "0x6028,0x001F"
+                                    },
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "Set TXRX pin to 0 in RX\/TX and high impedance in idle. ",
+                                        "$": "0x60A8,0x0001"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_patable_14dbm.json",
+                                "Element32b": {
+                                    "_type": "ADI_REG_OVERRIDE",
+                                    "_comment": "Tx: Set PA trim to max to maximize its output power (in ADI0, set PACTL0=0xF8)",
+                                    "$": "0,12,0xF8"
+                                }
+                            }
+                        ]
+                    }
+                ]
             },
             {
                 "_name": "CMD_FS",

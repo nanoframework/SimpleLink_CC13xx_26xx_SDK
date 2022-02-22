@@ -1,1 +1,0 @@
-this folder has pictures for the developers guide except the visio created one

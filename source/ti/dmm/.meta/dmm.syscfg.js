@@ -47,6 +47,7 @@ const stackDisplayNameMap = {
     custom: "Custom",
     easylink: "EasyLink",
     ti154stack: "TI 15.4 Stack",
+	  tiop: "TI OpenThread",
     zstack: "Z-Stack"
 };
 
@@ -247,6 +248,10 @@ const dmmConfig = [
         {
             name: "ti154stack",
             displayName: "TI 15.4 Stack"
+        },
+		{
+            name: "tiop",
+            displayName: "TI OpenThread"
         },
         {
             name: "zstack",
@@ -499,12 +504,28 @@ function getLibs(mod) {
     if (mod.$static.genLibs == true) {
         const boardName = easylinkUtil.getDeviceOrLaunchPadName(true);
 
+        /* Get current RTOS configuration information */
+        const rtos = system.getRTOS();
+        let rtosSuffix = "";
         let lib = "ti/dmm/lib/";
+
+        if (rtos === "freertos")
+        {
+            rtosSuffix ="_freertos";
+        }
+
         let compiler = system.compiler;
 
         lib += compiler + "/m4f/";
-        lib += "dmmlib" + ".a";
 
+	if (compiler == "gcc")
+	{
+	    lib += "libdmmlib" +  rtosSuffix + ".a";
+	}
+	else
+	{
+            lib += "dmmlib" + rtosSuffix + ".a";
+	}
         result.libs.push(lib);
     }
     return result;

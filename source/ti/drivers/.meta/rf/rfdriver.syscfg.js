@@ -40,6 +40,9 @@
 /* Common /ti/drivers utility functions */
 const Common = system.getScript("/ti/drivers/Common.js");
 
+/* Common radioconfig utility functions */
+const CommonRadioconfig = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
+
 /* Documentation for module config options */
 const Docs = system.getScript("/ti/drivers/rf/RF.docs.js");
 
@@ -283,6 +286,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
         displayName: Docs.coex.enable.displayName,
         description: Docs.coex.enable.description,
         longDescription: Docs.coex.enable.longDescription,
+        hidden: !isCoexSupport(),
         skipTests: ["configLongDescription"],
         default: false,
         onChange: (inst, ui) => onCoexEnableChanged(inst, ui, "coexEnable")
@@ -297,6 +301,7 @@ This option is deprecated and replaced by 'pinSelectionAntenna'.
                 displayName: Docs.coex.phy.displayName,
                 description: Docs.coex.phy.description,
                 longDescription: Docs.coex.phy.longDescription,
+                getDisabledOptions: getDisabledCoexPhyOptions,
                 hidden: true,
                 default: ["ble"],
                 minSelections: 1,
@@ -601,6 +606,28 @@ function isAntennaSwitchInPackage() {
 }
 
 /*
+ *  ======== isCoexSupport ========
+ *  Check if coex feature is supported by device.
+ *
+ *  @return - Bool
+ */
+function isCoexSupport() {
+    /* If device family:
+     * - cc13x2_cc26x2
+     * - cc13x2x7_cc13x2x7
+     * 
+     * AND not a sub1g only device
+     */
+    return (
+        (
+            !!deviceData.deviceId.match(/CC(13|26).2[RP][^7]/)
+            || !!deviceData.deviceId.match(/CC(13|26).2[RP]7/)
+        )
+        && !CommonRadioconfig.isSub1gOnlyDevice()
+    );
+}
+
+/*
  *******************************************************************************
  Get Functions
  *******************************************************************************
@@ -681,6 +708,42 @@ function getDisabledCoexModeOptions(inst)
         disabledOptions.push({
         name: "coexMode1WireGrant",
         reason: reason
+        });
+    }
+
+    return(disabledOptions);
+}
+
+/*
+ *  ======== getDisabledCoexPhyOptions ========
+ *  Generates a list of options that should be disabled in the coexPhy
+ *  drop-down.
+ *
+ * @param inst - Module instance object containing the config
+ * @returns    - Array of options that should be disabled
+ */
+function getDisabledCoexPhyOptions(inst)
+{
+    const device = deviceData.deviceId;
+    const board = ("board" in system.deviceData) ? system.deviceData.board.name : "custom"
+    const disabledOptions = [];
+    const reason = `Coex PHY not supported by device ${device} (board: ${board})`
+
+    /* IEEE Coex not supported */
+    if(!CommonRadioconfig.HAS_IEEE_15_4){
+        disabledOptions.push({
+            name: "ieee_15_4",
+            reason: reason
+        });
+    }
+
+    /* BLE Coex not supported */
+    if(!CommonRadioconfig.HAS_BLE
+        || device.match(/CC(13|26).(3|4)[RP]/)
+    ){
+        disabledOptions.push({
+                name: "ble",
+                reason: reason
         });
     }
 
@@ -1397,16 +1460,16 @@ function getLibs(mod) {
 
     /* get device information from DriverLib */
     const deviceId = system.deviceData.deviceId;
-    let family = DriverLib.getAttrs(deviceId).deviceDefine;
-    if (family != "") {
-        family = family.replace(/^DeviceFamily_/, "").replace(/X2X7/, "X2").toLowerCase();
+    let libName = DriverLib.getAttrs(deviceId).libName;
+    if (libName) {
+        libName = libName.replace(/x2x7/, "x2");
     }
 
     /* Create a GenLibs input argument */
     return {
         name: mod.$name,
         libs: [
-            `ti/drivers/rf/lib/${toolchain}/${isa}/rf_multiMode_${family}.a`
+            `ti/drivers/rf/lib/${toolchain}/${isa}/rf_multiMode_${libName}.a`
         ],
         deps: [
             "/ti/drivers"
@@ -1556,6 +1619,7 @@ let rfdriverModule = {
         onHardwareChanged
     },
     isCustomDesign: isCustomDesign,
+    isCoexSupport: isCoexSupport,
     getRfHardware: getRfHardware,
     getCoexConfig: function(phy = "ble") {
         return {

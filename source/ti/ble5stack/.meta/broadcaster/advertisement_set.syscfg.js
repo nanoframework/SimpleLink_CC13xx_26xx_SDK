@@ -46,11 +46,6 @@ const config = [
         name: "meshAdnPeri",
         default: false,
         hidden: true
-    },
-    {
-        name: "meshDeviceName",
-        default: "",
-        hidden: true
     }
 ];
 /*
@@ -90,12 +85,6 @@ function moduleInstances(inst)
             advData_args.GAP_ADTYPE_16BIT_MORE = true;
             advData_args.numOfUUIDs16More = 1;
             advData_args.UUID016More = 0xFFF0;
-
-            scanResData_args.GAP_ADTYPE_LOCAL_NAME_COMPLETE = true;
-            scanResData_args.completeLocalName = inst.meshDeviceName;
-            scanResData_args.GAP_ADTYPE_SLAVE_CONN_INTERVAL_RANGE = true;
-            scanResData_args.maxConnInterval = 130;
-            scanResData_args.GAP_ADTYPE_POWER_LEVEL = true;
         }
     }
 

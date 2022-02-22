@@ -3,31 +3,31 @@
         "Name": "LP_EM_CC1354P10_1",
         "Revision": [],
         "Description": "CC1354P10 LaunchPad Band 1",
-        "DeviceName": "CC1354P10RSK",
+        "DeviceName": "CC1354P10",
         "DevicePackage": "RSK 8x8",
         "FrontEnd": "XD",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC1352PEM-XD7793-XD24",
+        "RfDesign": "LP-CC1354P-8x8-XD7793-XD24-PA9093",
         "DefaultCategory": "Settings for 779 - 930 MHz band",
         "IoSettings": {
             "_name": "RF Switch",
             "IoPin": [
                 {
-                    "_name": "DIO28",
+                    "_name": "DIO34",
                     "ControlFunction": "Input\/Output",
                     "Idle": "Input tristate (Default)",
                     "Tx": "Output low",
                     "Rx": "Output low"
                 },
                 {
-                    "_name": "DIO29",
+                    "_name": "DIO3",
                     "ControlFunction": "Input\/Output",
                     "Idle": "Input tristate (Default)",
                     "Tx": "Output low",
                     "Rx": "Output low"
                 },
                 {
-                    "_name": "DIO30",
+                    "_name": "DIO35",
                     "ControlFunction": "Input\/Output",
                     "Idle": "Input tristate (Default)",
                     "Tx": "Output high",

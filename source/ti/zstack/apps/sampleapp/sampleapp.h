@@ -55,7 +55,6 @@ extern "C"
 /*********************************************************************
  * CONSTANTS
  *********************************************************************/
-#define SAMPLEAPP_KEY_EVT        			         0x4000
 #define SAMPLEAPP_END_DEVICE_REJOIN_EVT        0x0001
 
 #define SAMPLEAPP_END_DEVICE_REJOIN_DELAY	     10000

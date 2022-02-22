@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Pre-silicon settings)",
-        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Pre-silicon settings)",
+        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8",
+        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band",
         "Frequency": "2405",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -97,21 +97,48 @@
                 "OverrideField": [
                     {
                         "_name": "pRegOverride",
-                        "Block": {
-                            "_name": "override_ieee_802_15_4.json",
-                            "Element32b": [
-                                {
-                                    "_type": "ELEMENT",
-                                    "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
-                                    "$": "0x000F8883"
-                                },
-                                {
-                                    "_type": "ELEMENT",
-                                    "_comment": "Tx: Set DCDC settings IPEAK=3, dither = off",
-                                    "$": "0x00F388D3"
-                                }
-                            ]
-                        }
+                        "Block": [
+                            {
+                                "_name": "override_ieee_802_15_4.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
+                                        "$": "0x000F8883"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "Tx: Set DCDC settings IPEAK=3, dither = off",
+                                        "$": "0x00F388D3"
+                                    }
+                                ]
+                            },
+                            {
+                                "_name": "override_ieee_coex.json",
+                                "Element32b": [
+                                    {
+                                        "_type": "HW_REG_OVERRIDE",
+                                        "_comment": "CoEx: set the radio IOMUX to enable coex signals",
+                                        "$": "0x1110,0xCE30"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "CoEx: Enable CoEx",
+                                        "$": "0x000188f3"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "CoEx: Enable 32 bit write for the pointer",
+                                        "$": "0xc0040371"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
+                                        "_comment": "CoEx: Place the pointer to the configuration struct at byte index 220",
+                                        "$": "&coexConfig"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "_name": "pRegOverrideTxStd",
@@ -136,6 +163,11 @@
                                 "Element32b": [
                                     {
                                         "_type": "ELEMENT",
+                                        "_comment": "IEEE 15.4: Set IPEAK = 3 and DCDC dither off for TX",
+                                        "$": "0x00F388D3"
+                                    },
+                                    {
+                                        "_type": "ELEMENT",
                                         "_comment": "Set RTIM offset to default for standard PA",
                                         "$": "0x00008783"
                                     },
@@ -148,11 +180,6 @@
                                         "_type": "HW_REG_OVERRIDE",
                                         "_comment": "Set TXRX pin to 0 in RX and high impedance in idle\/TX. ",
                                         "$": "0x60A8,0x0401"
-                                    },
-                                    {
-                                        "_type": "ELEMENT",
-                                        "_comment": "Tx: Set DCDC settings IPEAK=3, dither = off",
-                                        "$": "0x00F388D3"
                                     }
                                 ]
                             }
@@ -181,23 +208,18 @@
                                 "Element32b": [
                                     {
                                         "_type": "ELEMENT",
-                                        "_comment": "Set RTIM offset to 3 for high power PA",
-                                        "$": "0x00038783"
+                                        "_comment": "IEEE 15.4: Set RTIM offset to 3 for high power PA",
+                                        "$": "0x00030783"
                                     },
                                     {
                                         "_type": "ELEMENT",
-                                        "_comment": "Set synth mux for high power PA",
+                                        "_comment": "IEEE 15.4: Set synth mux for high power PA",
                                         "$": "0x010206C3"
                                     },
                                     {
                                         "_type": "HW_REG_OVERRIDE",
-                                        "_comment": "Set TXRX pin to 0 in RX\/TX and high impedance in idle. ",
+                                        "_comment": "IEEE 15.4: Set TXRX pin to 0 in RX\/TX and high impedance in idle",
                                         "$": "0x60A8,0x0001"
-                                    },
-                                    {
-                                        "_type": "ELEMENT",
-                                        "_comment": "Tx: Set DCDC settings IPEAK=7, dither = off",
-                                        "$": "0x00F788D3"
                                     }
                                 ]
                             }

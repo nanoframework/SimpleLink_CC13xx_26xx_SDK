@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings)",
-        "Description": "50 kbps, 2-GFSK, 25 kHz deviation, IEEE 802.15.4g MR-FSK PHY mode, for 430-520 MHz band. (Pre-silicon settings)",
+        "Name": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth",
+        "Description": "50 kbps, 2-GFSK, 25 kHz deviation, IEEE 802.15.4g MR-FSK PHY mode, for 430-520 MHz band.",
         "Frequency": "433",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -183,8 +183,8 @@
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -7 dB (default: -2), trimmed for external bias and differential configuration",
-                                    "$": "0x000788A3"
+                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -6 dB (default: 0), trimmed for external bias and differential configuration",
+                                    "$": "0x000688A3"
                                 },
                                 {
                                     "_type": "ADI_HALFREG_OVERRIDE",

@@ -56,7 +56,8 @@
 
 #include "ti_drivers_config.h"
 #include "system.h"
-#include <ti/sysbios/knl/Task.h>
+
+#include "sched.h"
 
 
 /**
@@ -181,12 +182,23 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
     otError error = OT_ERROR_NONE;
 
+#ifdef SWITCH_NCP_TO_TRACE
+    // set the buffer to null if SWITCH_NCP_TO_TRACE is enabled
+    // because the uartWriteCallback does not actually trigger in this case
+    if(1 == g_switchNcp2Trace)
+    {
+        // clear the buffer because this UART_write will never trigger the callback function
+        // if SWITCH is enabled
+        PlatformUart_sendBuffer = NULL;
+    }
+#endif
+
     // Wait for UART to become available after UART callback
     while (PlatformUart_sendBuffer != NULL)
     {
         // Yield is necessary to indicate to the compiler that PlatformUart_sendBuffer
         // may change, preventing the compiler from generating an inescapable loop
-        Task_yield();
+        sched_yield();
     }
 //    otEXPECT_ACTION(PlatformUart_sendBuffer == NULL, error = OT_ERROR_BUSY);
 #ifdef SWITCH_NCP_TO_TRACE
@@ -199,12 +211,13 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
         //don't write to uart and instead call the call back, simulating uart write
         uartWriteCallback(PlatformUart_uartHandle, aBuf, aBufLength);
     }
+
 #else
     UART_write(PlatformUart_uartHandle, aBuf, aBufLength);
+
 #endif //SWITCH_NCP_TO_TRACE
 
     PlatformUart_sendBuffer = aBuf;
-
 exit:
     return error;
 }

@@ -12,11 +12,14 @@ Software layer architecture of these examples are as defined by the Wi-SUN FAN v
 
 6LoWPAN, RPL, IPv6, ICMPv6, UDP layers have been adapted from ARM mbed-os nanostack. (https://github.com/ARMmbed/mbed-os/tree/master/connectivity/nanostack)
 
+Refer to the src projects variant to be able to access the source code of the Wi-SUN stack and NCP interface. MAC layer is TI proprietary software and hence will be included as a library only. 
+
 
 Steps for building the examples
 --------------------------------
 
-Currently the projects are provided for CCS tool chain alone. No additional steps need to be taken while importing the projects. CCS will recognize the SDK installed automatically.
+Currently the projects are provided for CCS and IAR tool chain. 
+No additional steps need to be taken while importing the projects. CCS will recognize the SDK installed automatically.
 
 
 Peripherals Exercised

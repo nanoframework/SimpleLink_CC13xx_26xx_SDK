@@ -59,7 +59,7 @@ const RfDesign = Common.getScript("rfdesign");
  *  @preserve - list of configurables to preserve the value of
  */
 function reloadInstanceFromPhy(inst, ui, phyName, phyGroup, preserve) {
-    const cmdHandler = CmdHandler.get(phyGroup, phyName);
+    const cmdHandler = CmdHandler.get(phyGroup, phyName, inst.settingGroup === "Selectivity");
     const rfData = cmdHandler.getRfData();
     _.each(rfData, (value, key) => {
         // Do NOT refresh preserved configurables

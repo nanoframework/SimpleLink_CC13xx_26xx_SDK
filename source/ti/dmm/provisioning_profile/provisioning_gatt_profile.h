@@ -73,7 +73,7 @@ extern "C"
 #define PROVISIONING_EXT_NTWK_ID_LEN (8)
 
 // Length, in bytes, of the network channel mask mapping
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
 #define PROVISIONING_NTWK_CHNL_LEN (4)
 #else
 #define PROVISIONING_NTWK_CHNL_LEN (17)
@@ -88,6 +88,18 @@ extern "C"
 // Length, in bytes, of single byte attribute lengths
 #define PROVISIONING_GENERIC_LEN (1)
 
+#ifdef USEOT
+// Length, in bytes, of the short address
+#define PROVISIONING_SHORT_ADDR_LEN (2)
+
+// Length, in bytes, of the network name <Network Name Length = 16, Null terminator +1>
+#define PROVISIONING_NTWK_NAME_LEN (17)
+
+// Length, in bytes, of the network PSKd
+#define PROVISIONING_PROV_PSKD_LEN (8)
+#endif
+
+
 // Profile Parameters
 #define PROVPROFILE_NTWK_PAN_ID_CHAR            0  // RW uint8[2] - Network PAN ID characteristic index
 #define PROVPROFILE_EXT_NTWK_PAN_ID_CHAR        1  // RW uint8[8] - Extended Network PAN ID characteristic index
@@ -97,6 +109,12 @@ extern "C"
 #define PROVPROFILE_NTWK_KEY_CHAR               5  // RW uint8[16] - Network security key characteristic index
 #define PROVPROFILE_PROV_SENSOR_CHAR            6  // RW uint8 - Sensor provisioning start characteristic index
 #define PROVPROFILE_PROV_STATE_CHAR             7  // RN uint8 - Sensor provisioning state characteristic index
+#ifdef USEOT
+#define PROVPROFILE_PROV_PSKD_CHAR              8  // R uint8[6] "123456" HARDCODED
+#define PROVPROFILE_NTWK_NAME_CHAR              9  // RW uint8[16] -> 16 byte UTF8 string HARDCODED
+#define PROVPROFILE_NTWK_SHORT_ADDR_CHAR        10 // R uint8[2] - Network Short Address
+#define PROVPROFILE_NTWK_RESET_CHAR             11 // RW uint8 - Reset network
+#endif
 
 // Provisioning Profile Service UUID
 #define PROVPROFILE_SERV_UUID               0x1190
@@ -118,12 +136,18 @@ extern "C"
 #define PROVPROFILE_NTWK_KEY_CHAR_UUID               0x1196
 #define PROVPROFILE_PROV_SENSOR_CHAR_UUID            0x1197
 #define PROVPROFILE_PROV_STATE_CHAR_UUID             0x1198
+#ifdef USEOT
+#define PROVPROFILE_PROV_PSKD_CHAR_UUID              0x1199
+#define PROVPROFILE_NTWK_NAME_CHAR_UUID              0x119A
+#define PROVPROFILE_NTWK_SHORT_ADDR_CHAR_UUID        0x119B
+#define PROVPROFILE_NTWK_RESET_CHAR_UUID             0x119C
+#endif
 
 // Provisioning Characteristic Lengths in bytes
 #define PROVPROFILE_NTWK_PAN_ID_CHAR_LEN             (2)
 #define PROVPROFILE_EXT_NTWK_PAN_ID_CHAR_LEN         (8)
 #define PROVPROFILE_SENSOR_FREQ_CHAR_LEN             (1)
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
 #define PROVPROFILE_SENSOR_CHANNEL_CHAR_LEN          (4)
 #else
 #define PROVPROFILE_SENSOR_CHANNEL_CHAR_LEN          (17)
@@ -133,6 +157,19 @@ extern "C"
 #define PROVPROFILE_PROV_SENSOR_CHAR_LEN             (1)
 #define PROVPROFILE_PROV_STATE_CHAR_LEN              (1)
 #define PROVISIONING_GENERIC_CHAR_LEN                (1)
+
+#ifdef USEOT
+#define PROVPROFILE_PROV_PSKD_CHAR_LEN              (8)
+#define PROVPROFILE_NTWK_NAME_CHAR_LEN              (16)
+#define PROVPROFILE_NTWK_SHORT_ADDR_CHAR_LEN        (2)
+#define PROVPROFILE_NTWK_RESET_CHAR_LEN             (1)
+
+#define PROVPROFILE_ATTACH           (0xAA)
+#define PROVPROFILE_JOIN             (0xBB)
+#define PROVPROFILE_RESETDEVICE      (0x01)
+#define PROVPROFILE_RESETNETWORK     (0x02)
+#endif
+
 
 #define PROVPROFILE_PAN_CONNECT      (0xAA)
 #define PROVPROFILE_PAN_DISCONNECT   (0xDD)
@@ -224,6 +261,10 @@ extern bStatus_t ProvisioningProfile_SetParameter( uint8 param, uint8 len, void 
  *          uint16 pointer).
  */
 extern bStatus_t ProvisioningProfile_GetParameter( uint8 param, void *value );
+
+#ifdef USEOT
+extern void ProvisioningProfile_SetProvisionLock(bool state);
+#endif
 
 
 /*********************************************************************

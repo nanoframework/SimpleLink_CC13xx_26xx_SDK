@@ -1184,7 +1184,6 @@ int bt_le_ext_adv_set_data(struct bt_le_ext_adv *adv,
       // Only free if previously allocated
       if (!meshAdvFirst)
       {
-        ICall_free(advDataExt);
         status = GapAdv_prepareLoadByHandle(adv->handle,
                                             GAP_ADV_FREE_OPTION_ADV_DATA);
         BT_LE_PORTING_LAYER_ASSERT(SUCCESS == status);

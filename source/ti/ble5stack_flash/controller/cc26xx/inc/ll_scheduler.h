@@ -9,7 +9,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2009 $
+ $License: TI_TEXT 2009 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -46,6 +46,16 @@ extern "C"
 /*******************************************************************************
  * CONSTANTS
  */
+
+// Scheduler Constants
+#define LL_SCHED_START_IMMED        0
+#define LL_SCHED_START_EVENT        1
+#define LL_SCHED_START_PRIMARY      2
+//
+#define LL_SCHED_START_IMMED_PAD    (3 *  RAT_TICKS_IN_625US)
+#define LL_SCHED_PRE_CUTOFF         (10 * RAT_TICKS_IN_625US)
+#define LL_SCHED_POST_CUTOFF        (4 * RAT_TICKS_IN_625US)
+#define LL_SCHED_OVERHEAD           (LL_SCHED_PRE_CUTOFF + LL_SCHED_POST_CUTOFF)
 
 // Task ID
 #define LL_TASK_ID_ADVERTISER                    0x01

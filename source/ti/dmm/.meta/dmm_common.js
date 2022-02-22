@@ -71,7 +71,9 @@ const stackDisplayNames = {
     wsnNode: "WSN Node",
     zigbeeEndDevice: "Zigbee End Device",
     zigbeeRouter: "Zigbee Router",
-    zigbeeCoordinator: "Zigbee Coordinator"
+    zigbeeCoordinator: "Zigbee Coordinator",
+    threadFTD: "Thread FTD",
+    threadMTD: "Thread MTD"
 };
 
 // Settings for ti/devices/CCFG module
@@ -173,7 +175,16 @@ function stackRoles(isHidden)
         {
             name: "zigbeeCoordinator",
             displayName: stackDisplayNames.zigbeeCoordinator
-        }],
+        },
+        {    
+            name: "threadFTD",
+            displayName: stackDisplayNames.threadFTD
+        },
+        {
+            name: "threadMTD",
+            displayName: stackDisplayNames.threadMTD
+        }
+        ],
         onChange: stackRoleOnChange
     });
 }
@@ -314,7 +325,6 @@ function migrate(currTarget, migrationTarget, env, projectName = null)
 
     return(migrationValid);
 }
-
 
 /*
  *  ======== exports ========

@@ -401,9 +401,7 @@ const easyLinkModule = {
         "/ti/easylink/templates/ti_easylink_config.h.xdt":
             `/ti/easylink/templates/ti_easylink_config.h.xdt`,
         "/ti/easylink/templates/ti_easylink_config.c.xdt":
-            `/ti/easylink/templates/ti_easylink_config.c.xdt`,
-        "/ti/easylink/templates/device_config.opt.xdt":
-            `/ti/easylink/templates/device_config.opt.xdt`
+            `/ti/easylink/templates/ti_easylink_config.c.xdt`
     }
 };
 

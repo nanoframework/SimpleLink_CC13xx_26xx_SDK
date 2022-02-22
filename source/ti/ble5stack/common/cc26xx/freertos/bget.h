@@ -7,6 +7,10 @@
 #ifndef __BGET_H__
 #define __BGET_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PROTOTYPES
 
 #ifndef _
@@ -39,4 +43,7 @@ void	bufdump     _((void *buf));
 void	bpoold	    _((void *pool, int dumpalloc, int dumpfree));
 int	bpoolv	    _((void *pool));
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __BGET_H__

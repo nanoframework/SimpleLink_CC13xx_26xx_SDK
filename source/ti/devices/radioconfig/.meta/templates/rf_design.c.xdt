@@ -52,8 +52,9 @@ let nTable = 0;
 //   RF Frontend configuration
 // *********************************************************************************
 // RF design based on: `inst.rfDesign` (`mod.getCurrentDesign().RfDesign`)
-% for (const fb in mod.freqBands) {
-%   const target = mod.freqBands[fb];
+% const freqBands = mod.freqBands();
+% for (const fb in freqBands) {
+%   const target = freqBands[fb];
 %   if (target.hiPa && inst.pa20 === "none") {
 %     continue;
 %   }

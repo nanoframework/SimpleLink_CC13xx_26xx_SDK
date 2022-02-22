@@ -15,7 +15,11 @@
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc1314r10\/targets"
+                "$": ".\/..\/config\/pa_tables\/cc13x4_cc27x4_r10"
+            },
+            {
+                "_file": "ui_translation.json",
+                "$": ".\/..\/config\/cc1352r"
             },
             {
                 "_file": "param_definition.json",
@@ -23,11 +27,11 @@
             },
             {
                 "_file": "io_pin_definition.json",
-                "$": ".\/..\/config\/cc1352r\/targets"
+                "$": ".\/..\/config\/cc1354r10\/targets"
             },
             {
                 "_file": "io_register_definition.json",
-                "$": ".\/..\/config\/cc1312r"
+                "$": ".\/..\/config\/cc1354r10"
             },
             {
                 "_file": "param_cmd_mapping.json",

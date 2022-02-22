@@ -4,7 +4,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2009 $
+ $License: TI_TEXT 2009 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $

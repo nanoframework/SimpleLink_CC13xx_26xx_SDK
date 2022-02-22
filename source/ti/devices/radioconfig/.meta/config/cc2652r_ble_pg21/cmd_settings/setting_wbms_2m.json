@@ -249,7 +249,7 @@
                     {
                         "_name": "pRegOverride2Mbps",
                         "Block": {
-                            "_name": "override_ble5_setup_override_2mbps.json",
+                            "_name": "override_wbms_override_2mbps.json",
                             "Element32b": [
                                 {
                                     "_type": "HW_REG_OVERRIDE",
@@ -272,7 +272,7 @@
                     {
                         "_name": "pRegOverrideCoded",
                         "Block": {
-                            "_name": "override_ble5_setup_override_coded.json",
+                            "_name": "override_wbms_override_coded.json",
                             "Element32b": [
                                 {
                                     "_type": "HW_REG_OVERRIDE",

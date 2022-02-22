@@ -184,13 +184,13 @@ const config = {
             collapsed: true,
             config: [
                 {
-                    name: "ieeeIniGroup",
+                    name: "ieeeIniTxGroup",
                     displayName:
-                        Docs.coex.useCaseConfigGroupIeee.ini.displayName,
+                        Docs.coex.useCaseConfigGroupIeee.iniTx.displayName,
                     collapsed: false,
                     config: [
                         {
-                            name: "ieeeIniDefaultPriority",
+                            name: "ieeeIniTxDefaultPriority",
                             displayName: Docs.coex.defaultPriority.displayName,
                             description: Docs.coex.defaultPriority.description,
                             longDescription:
@@ -201,7 +201,7 @@ const config = {
                             onChange: updateCoexConfig
                         },
                         {
-                            name: "ieeeIniAssertRequestForRx",
+                            name: "ieeeIniTxAssertRequestForRx",
                             displayName:
                                 Docs.coex.assertRequestForRx.displayName,
                             description:
@@ -215,13 +215,13 @@ const config = {
                     ]
                 },
                 {
-                    name: "ieeeConGroup",
+                    name: "ieeeConTxGroup",
                     displayName:
-                        Docs.coex.useCaseConfigGroupIeee.con.displayName,
+                        Docs.coex.useCaseConfigGroupIeee.conTx.displayName,
                     collapsed: false,
                     config: [
                         {
-                            name: "ieeeConDefaultPriority",
+                            name: "ieeeConTxDefaultPriority",
                             displayName: Docs.coex.defaultPriority.displayName,
                             description: Docs.coex.defaultPriority.description,
                             longDescription:
@@ -232,7 +232,69 @@ const config = {
                             onChange: updateCoexConfig
                         },
                         {
-                            name: "ieeeConAssertRequestForRx",
+                            name: "ieeeConTxAssertRequestForRx",
+                            displayName:
+                                Docs.coex.assertRequestForRx.displayName,
+                            description:
+                                Docs.coex.assertRequestForRx.description,
+                            longDescription:
+                                Docs.coex.assertRequestForRx.longDescription,
+                            hidden: true,
+                            default: true,
+                            onChange: updateCoexConfig
+                        }
+                    ]
+                },
+                {
+                    name: "ieeeIniRxGroup",
+                    displayName:
+                        Docs.coex.useCaseConfigGroupIeee.iniRx.displayName,
+                    collapsed: false,
+                    config: [
+                        {
+                            name: "ieeeIniRxDefaultPriority",
+                            displayName: Docs.coex.defaultPriority.displayName,
+                            description: Docs.coex.defaultPriority.description,
+                            longDescription:
+                                Docs.coex.defaultPriority.longDescription,
+                            hidden: true,
+                            default: 0,
+                            options: coexLevelOptions,
+                            onChange: updateCoexConfig
+                        },
+                        {
+                            name: "ieeeIniRxAssertRequestForRx",
+                            displayName:
+                                Docs.coex.assertRequestForRx.displayName,
+                            description:
+                                Docs.coex.assertRequestForRx.description,
+                            longDescription:
+                                Docs.coex.assertRequestForRx.longDescription,
+                            hidden: true,
+                            default: true,
+                            onChange: updateCoexConfig
+                        }
+                    ]
+                },
+                {
+                    name: "ieeeConRxGroup",
+                    displayName:
+                        Docs.coex.useCaseConfigGroupIeee.conRx.displayName,
+                    collapsed: false,
+                    config: [
+                        {
+                            name: "ieeeConRxDefaultPriority",
+                            displayName: Docs.coex.defaultPriority.displayName,
+                            description: Docs.coex.defaultPriority.description,
+                            longDescription:
+                                Docs.coex.defaultPriority.longDescription,
+                            hidden: true,
+                            default: 0,
+                            options: coexLevelOptions,
+                            onChange: updateCoexConfig
+                        },
+                        {
+                            name: "ieeeConRxAssertRequestForRx",
                             displayName:
                                 Docs.coex.assertRequestForRx.displayName,
                             description:
@@ -272,15 +334,25 @@ function onCoexEnableChange(inst, ui)
 function updateCoexConfig(inst)
 {
     /* IEEE Use Case Config info */
-    coexConfig.ieeeInitiator = {
-        defaultPriority: priorityEnumLookup[inst.ieeeIniDefaultPriority],
+    coexConfig.ieeeInitiatorTx = {
+        defaultPriority: priorityEnumLookup[inst.ieeeIniTxDefaultPriority],
         assertRequestForRx:
-            requestEnumLookup[Number(inst.ieeeIniAssertRequestForRx)]
+            requestEnumLookup[Number(inst.ieeeIniTxAssertRequestForRx)]
     };
-    coexConfig.ieeeConnected = {
-        defaultPriority: priorityEnumLookup[inst.ieeeConDefaultPriority],
+    coexConfig.ieeeConnectedTx = {
+        defaultPriority: priorityEnumLookup[inst.ieeeConTxDefaultPriority],
         assertRequestForRx:
-        requestEnumLookup[Number(inst.ieeeConAssertRequestForRx)]
+        requestEnumLookup[Number(inst.ieeeConTxAssertRequestForRx)]
+    };
+    coexConfig.ieeeInitiatorRx = {
+        defaultPriority: priorityEnumLookup[inst.ieeeIniRxDefaultPriority],
+        assertRequestForRx:
+            requestEnumLookup[Number(inst.ieeeIniRxAssertRequestForRx)]
+    };
+    coexConfig.ieeeConnectedRx = {
+        defaultPriority: priorityEnumLookup[inst.ieeeConRxDefaultPriority],
+        assertRequestForRx:
+        requestEnumLookup[Number(inst.ieeeConRxAssertRequestForRx)]
     };
 }
 
@@ -347,6 +419,14 @@ function getRfDesignOptions()
     else if(deviceId === "CC2652R7RGZ")
     {
         newRfDesignOptions = [{name: "LP_CC2652R7"}];
+    }
+    else if(deviceId === "CC1311R3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC1311R3"}];
+    }
+    else if(deviceId === "CC1311P3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC1311P3"}];
     }
     else if(deviceId === "CC2651R3RGZ")
     {
@@ -598,10 +678,14 @@ function getRFConfigHiddenState(inst, cfgName)
             isVisible = !isCoPProject;
             break;
         }
-        case "ieeeIniDefaultPriority":
-        case "ieeeIniAssertRequestForRx":
-        case "ieeeConDefaultPriority":
-        case "ieeeConAssertRequestForRx":
+        case "ieeeIniTxDefaultPriority":
+        case "ieeeIniTxAssertRequestForRx":
+        case "ieeeConTxDefaultPriority":
+        case "ieeeConTxAssertRequestForRx":
+        case "ieeeIniRxDefaultPriority":
+        case "ieeeIniRxAssertRequestForRx":
+        case "ieeeConRxDefaultPriority":
+        case "ieeeConRxAssertRequestForRx":
         {
             isVisible = (inst.coexMode === "coexMode3Wire");
             break;

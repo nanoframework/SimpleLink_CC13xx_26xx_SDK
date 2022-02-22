@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8, 10 dBm (Preview)",
-        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Preview)",
+        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Release Candidate)",
+        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Release Candidate)",
         "Frequency": "2405",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -103,13 +103,13 @@
                                 "Element32b": [
                                     {
                                         "_type": "ELEMENT",
-                                        "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
-                                        "$": "0x000F8883"
+                                        "_comment": "IEEE 15.4: Set IPEAK = 3 and DCDC dither off for TX",
+                                        "$": "0x00F388D3"
                                     },
                                     {
-                                        "_type": "ADI_REG_OVERRIDE",
-                                        "_comment": "Set VCTRIM to 0 for 20 dBm PA",
-                                        "$": "1,26,0x00"
+                                        "_type": "ELEMENT",
+                                        "_comment": "Rx: Set LNA bias current offset to +15 to saturate trim to max (default: 0)",
+                                        "$": "0x000F8883"
                                     }
                                 ]
                             },

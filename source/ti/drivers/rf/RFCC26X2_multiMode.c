@@ -48,6 +48,7 @@
 #include DeviceFamily_constructPath(inc/hw_types.h)
 #include DeviceFamily_constructPath(inc/hw_rfc_rat.h)
 #include DeviceFamily_constructPath(inc/hw_rfc_dbell.h)
+#include DeviceFamily_constructPath(inc/hw_fcfg1.h)
 #include DeviceFamily_constructPath(driverlib/rfc.h)
 #include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
 #include DeviceFamily_constructPath(driverlib/ioc.h)
@@ -4172,11 +4173,11 @@ static void RF_detachOverrides(uint32_t* baseOverride, uint32_t* newOverride)
  */
 static bool RF_decodeOverridePointers(RF_RadioSetup* radioSetup, uint16_t** pTxPower, uint32_t** pRegOverride, uint32_t** pRegOverrideTxStd, uint32_t** pRegOverrideTx20)
 {
-    /* Read available RF modes from the PRCM register */
-    uint32_t availableRfModes = HWREG(PRCM_BASE + PRCM_O_RFCMODEHWOPT);
+    /* Read FCFG user ID register for device identification */
+    uint32_t fcfg1UserId = ChipInfo_GetUserId();
 
-    /* Decode if High Gain PA is even available. Bit 6 tells us PA availability. */
-    bool tx20FeatureAvailable = availableRfModes & PRCM_RFCMODEHWOPT_AVAIL_MODE6;
+    /* Decode if High Gain PA is even available. Bit FCFG1:USER_ID.PA tells us PA availability. */
+    bool tx20FeatureAvailable = (( fcfg1UserId & FCFG1_USER_ID_PA_M ) >> FCFG1_USER_ID_PA_S );
 
     /* Only decode the offset of those fields which exist on this device. */
     if (tx20FeatureAvailable)

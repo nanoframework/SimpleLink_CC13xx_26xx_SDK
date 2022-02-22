@@ -82,10 +82,10 @@ RF_Mode `symNames.rfMode` =
 `patchCode`
 };
 
+% cmdHandler.updateFrontendSettings();
 % const overrideCode = cmdHandler.generateOverrideCode(symNames.overrides, ceConfig).code;
 `overrideCode`
 
-% cmdHandler.updateFrontendSettings();
 % const cmds = cmdHandler.getCommands();
 % for (let j = 0; j < cmds.length; j++) {
 %   const cmd = cmds[j];

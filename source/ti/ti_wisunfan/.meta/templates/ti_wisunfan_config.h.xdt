@@ -38,22 +38,22 @@
 
 // Get network settings script
 const networkScript = system.getScript("/ti/ti_wisunfan/network_config/"
-+ "ti154stack_network_config");
++ "ti_wisunfan_network_config");
 
 // Get transmit power settings script
 const powerScript = system.getScript("/ti/ti_wisunfan/power_config/"
-+ "ti154stack_power_config");
++ "ti_wisunfan_power_config");
 
 // Get test mode settings script
 const testModeScript = system.getScript("/ti/ti_wisunfan/test_config/"
-+ "ti154stack_test_config");
++ "ti_wisunfan_test_config");
 
 // Get security settings script
 const securityScript = system.getScript("/ti/ti_wisunfan/security_config/"
-+ "ti154stack_security_config");
++ "ti_wisunfan_security_config");
 
 // Get common functions script
-const Common = system.getScript("/ti/ti_wisunfan/ti154stack_common.js");
+const Common = system.getScript("/ti/ti_wisunfan/ti_wisunfan_common.js");
 
 // Get the TI 15.4 module
 const inst = system.modules["/ti/ti_wisunfan/ti_wisunfan"].$static;

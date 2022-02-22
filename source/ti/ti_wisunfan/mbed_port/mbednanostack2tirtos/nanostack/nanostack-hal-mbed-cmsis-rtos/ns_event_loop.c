@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 #include "mbed_config_app.h"
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 #include "eventOS_scheduler.h"
 
@@ -26,20 +25,20 @@
 
 #include "ns_trace.h"
 
-/*static*/ Semaphore_Struct event_thread_sem_struct;
-/*static*/ Semaphore_Handle event_thread_sem_handle;
-/*static*/ Task_Handle event_thread_id;
-/*static*/ Task_Struct event_thread_struct;
+pthread_t event_thread_id;
+sem_t event_thread_sem_handle;
+
+
 static uint64_t event_thread_stk[MBED_CONF_NANOSTACK_HAL_EVENT_LOOP_THREAD_STACK_SIZE / 8];
 
-static void event_loop_thread(void *arg);
+static void *event_loop_thread(void *a0);
 
 extern void eventOS_dispatch_timac_event(void);
 
 void eventOS_scheduler_signal(void)
 {
     //tr_debug("signal %p", (void*)event_thread_id);
-    Semaphore_post(event_thread_sem_handle);
+    sem_post(&event_thread_sem_handle);
     //tr_debug("signalled %p", (void*)event_thread_id);
 }
 
@@ -48,15 +47,14 @@ void eventOS_scheduler_idle(void)
     //tr_debug("idle");
     eventOS_scheduler_mutex_release();
 
-    Semaphore_pend(event_thread_sem_handle, BIOS_WAIT_FOREVER);
+    sem_wait(&event_thread_sem_handle);
 
     eventOS_scheduler_mutex_wait();
     eventOS_dispatch_timac_event();
 }
 
-static void event_loop_thread(void *arg)
+static void *event_loop_thread(void *a0)
 {
-    (void)arg;
     eventOS_scheduler_mutex_wait();
     eventOS_scheduler_run(); //Does not return
 }
@@ -70,22 +68,39 @@ void ns_event_loop_init(void)
 
 void ns_event_loop_thread_create(void)
 {
-    Task_Params taskParams;
-    Semaphore_Params semParams;
+    pthread_attr_t      attrs;
+    struct sched_param  priParam;
+    int                 retc;
 
-    /* Construct a Semaphore object to be use as a flag, initial count 0 */
-    Semaphore_Params_init(&semParams);
-    Semaphore_construct(&event_thread_sem_struct, 0, &semParams);
-    event_thread_sem_handle = Semaphore_handle(&event_thread_sem_struct);
+    retc = sem_init(&event_thread_sem_handle, 0, 0);
+    if (retc != 0) {
+        while (1);
+    }
 
-    /* Construct ns event thread */
-    Task_Params_init(&taskParams);
-    taskParams.stackSize = sizeof(event_thread_stk);
-    taskParams.stack = (uint8_t*) &event_thread_stk;
-    taskParams.priority = 2;
-    Task_construct(&event_thread_struct, (Task_FuncPtr)event_loop_thread, &taskParams, NULL);
+    /* Initialize the attributes structure with default values */
+    pthread_attr_init(&attrs);
 
-    event_thread_id = Task_handle(&event_thread_struct);
+    /* Set priority, detach state, and stack size attributes */
+    priParam.sched_priority = 2;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, sizeof(event_thread_stk));
+#ifndef FREERTOS_SUPPORT
+    retc |= pthread_attr_setstack(&attrs, event_thread_stk, sizeof(event_thread_stk));
+#endif
+    attrs.stack = (void*)event_thread_stk;
+    if (retc != 0) {
+        /* failed to set attributes */
+        while (1) {}
+    }
+
+    retc = pthread_create(&event_thread_id, &attrs, event_loop_thread, NULL);
+    if (retc != 0) {
+        /* pthread_create() failed */
+        while (1) {}
+    }
+
+
 }
 
 void ns_event_loop_thread_start(void)

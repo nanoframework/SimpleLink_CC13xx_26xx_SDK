@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Texas Instruments Incorporated - http://www.ti.com
+ * Copyright (c) 2019-2021 Texas Instruments Incorporated - http://www.ti.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,6 +84,18 @@ function validate(inst, validation) {
     RFBase.validateFrontendSettings(inst, validation, PHY_GROUP);
 }
 
+/*
+ *  ======== phyTypeOnChange ========
+ *  Change handler for PHY type configurable
+ *
+ */
+function phyTypeOnChange(inst, ui) {
+    const phyType = inst.phyType;
+
+    // Refresh the instance
+    RFBase.reloadInstanceFromPhy(inst, ui, phyType, PHY_GROUP, ["txPower", "txPowerHi"]);
+}
+
 /*!
  *  ======== onPermissionChange ========
  *  Change permission according to permission configurable
@@ -107,6 +119,9 @@ function initConfigurables(configurables) {
         switch (item.name) {
         case "highPA":
             item.onChange = RFBase.highPaOnChange;
+            break;
+        case "phyType":
+            item.onChange = phyTypeOnChange;
             break;
         case "permission":
             item.onChange = onPermissionChange;

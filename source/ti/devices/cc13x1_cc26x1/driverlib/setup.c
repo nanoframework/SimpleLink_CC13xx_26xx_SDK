@@ -265,6 +265,20 @@ TrimAfterColdResetWakeupFromShutDown(uint32_t ui32Fcfg1Revision)
             ( HWREG( CCFG_BASE + CCFG_O_MODE_CONF_1 ) >> CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_S ));
     }
 
+    {
+        // Check if the RCOSC_HF trims have to be reloaded - this is a workaround needed on one specific production lot
+        uint32_t fcfg1MiscTrimReg = HWREG( FCFG1_BASE + FCFG1_O_MISC_TRIM );
+        if (( fcfg1MiscTrimReg & 0x80000000 ) == 0 ) {
+            // Reload the RCOSCHF_CTRIM with the CTRIM found in the FCFG1 shadow register.
+            HWREGB( AUX_DDI0_OSC_BASE + DDI_0_OSC_O_RCOSCHFCTL + 1 ) =
+               ((( HWREG( FCFG1_BASE + FCFG1_O_SHDW_OSC_BIAS_LDO_TRIM ) & FCFG1_SHDW_OSC_BIAS_LDO_TRIM_RCOSCHF_CTRIM_M ) >> FCFG1_SHDW_OSC_BIAS_LDO_TRIM_RCOSCHF_CTRIM_S ) ^ 0xC0 );
+            // Reload the RCOSCHF_FINE_RESISTOR trim with the MISC_TRIM[30:29] (Mask bits in [7:6]=0xC0, Data in [3:2](0xC) (shift(29-2))
+            HWREGB( AUX_DDI0_OSC_BASE + DDI_O_MASK4B + ( DDI_0_OSC_O_ATESTCTL * 2 ) + 2 ) = ( 0xC0 | (( fcfg1MiscTrimReg >> 27 ) & 0xC ));
+            // Set HFCTRIMFRACT_EN
+            HWREG( AUX_DDI0_OSC_BASE + DDI_O_SET + DDI_0_OSC_O_CTL1 ) = DDI_0_OSC_CTL1_RCOSCHFCTRIMFRACT_EN ;
+        }
+    }
+
     // Force DCDC to use RCOSC before starting up XOSC.
     // Clock loss detector does not use XOSC until SCLK_HF actually switches
     // and thus DCDC is not protected from clock loss on XOSC in that time frame.

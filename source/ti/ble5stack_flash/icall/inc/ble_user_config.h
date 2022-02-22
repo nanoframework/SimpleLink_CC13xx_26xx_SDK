@@ -319,11 +319,11 @@ extern "C"
 #if defined(CC13X2)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_DIFFERENTIAL |     \
-                                       RF_FE_INT_BIAS)
+                                       RF_FE_EXT_BIAS)
 #elif defined(CC13X2P)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_DIFFERENTIAL |     \
-                                       RF_FE_INT_BIAS)
+                                       RF_FE_EXT_BIAS)
 #elif defined(MY_CC26x2_BOARD)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_SINGLE_ENDED_RFP | \

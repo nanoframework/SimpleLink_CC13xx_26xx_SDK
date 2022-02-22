@@ -62,10 +62,6 @@ const templates = [
     {
         name: "/ti/easylink/templates/ti_easylink_oad_config.h.xdt",
         outputPath: "ti_easylink_oad_config.h"
-    },
-    {
-        name: "/ti/easylink/templates/device_config.opt.xdt",
-        outputPath: "device_config.opt"
     }
 ];
 

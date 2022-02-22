@@ -17,12 +17,12 @@
         "
         toolChain="TICLANG"
         outputType="staticLibrary"
-        artifactName="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/library/tirtos/ticlang/bin/wisun_ncp_lib_cc13x2"
+        artifactName="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/library/tirtos/ticlang/bin/wisun_ncp_lib_cc13x2"
         artifactExtension="a"
         device="Cortex M.CC1352R1F3"
         ignoreDefaultDeviceSettings="true"
         ignoreDefaultCCSSettings="true"
-        products="com.ti.SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV;com.ti.rtsc.XDCtools;"
+        products="com.ti.SIMPLELINK_CC13XX_CC26XX_SDK;com.ti.rtsc.XDCtools;"
         xdcToolsVersion="3_62_00_08_core"
         compilerBuildOptions="
             -I${PROJECT_ROOT}
@@ -51,25 +51,25 @@
             -I${XDC_CG_ROOT}/packages
             -I${PROJECT_ROOT}
             -I${PROJECT_ROOT}/${ConfigName}
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/common/nv
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/posix/ticlang
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/common/include
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/wisunfan_mac/services/saddr
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/wisunfan_mac/high_level
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/config
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/include
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src/core
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src/core/utils
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/examples/platforms
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/examples/ncp_ftd
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/third_party/ti_wisunfan/mbedtls/inc
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/third_party/mbed/nanostack/sal-stack-nanostack/source
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/third_party/mbed/frameworks/nanostack-libservice/mbed-client-libservice
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/third_party/mbed/frameworks/mbed-trace
-            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/third_party/mbed/nanostack/mbed-mesh-api
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/common/nv
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/posix/ticlang
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/common/include
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/wisunfan_mac/services/saddr
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/wisunfan_mac/high_level
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/config
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/include
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src/core
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/src/core/utils
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/examples/platforms
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/ncp_interface/examples/ncp_ftd
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/ti_wisunfan/mbedtls/inc
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/mbed/nanostack/sal-stack-nanostack/source
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/mbed/frameworks/nanostack-libservice/mbed-client-libservice
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/mbed/frameworks/mbed-trace
+            -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/mbed/nanostack/mbed-mesh-api
             -mlittle-endian
             -fdiagnostics-show-option 
         "
@@ -85,121 +85,121 @@
 
         "
         enableSysConfigTool="true"
-        sysConfigBuildOptions="--product ${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/.metadata/product.json"
+        sysConfigBuildOptions="--product ${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/.metadata/product.json"
         description="WiSUN NCP interface Library ">
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_config.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_config.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/changed_props_set.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/changed_props_set.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base_dispatcher.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base_dispatcher.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_uart.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_uart.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/changed_props_set.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/changed_props_set.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_base.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_uart.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/ncp/ncp_uart.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/ncp">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/hdlc/hdlc.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/hdlc">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/hdlc/hdlc.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/hdlc">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/hdlc/hdlc.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/hdlc">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/hdlc/hdlc.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/hdlc">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/openthread-spinel-config.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/openthread-spinel-config.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_platform.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_platform.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_buffer.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_buffer.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_decoder.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_decoder.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encoder.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encoder.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_buffer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_buffer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_decoder.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_decoder.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encoder.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encoder.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encrypter.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_encrypter.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_interface.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/lib/spinel/spinel_interface.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/lib/spinel">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/message_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/message_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/logging_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/logging_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/instance_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/api/instance_api.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/api">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/crc16.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/crc16.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/instance.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/instance.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/logging.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/logging.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/message.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/message.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/notifier.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/notifier.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/string.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/string.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tasklet.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tasklet.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/timer.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/timer.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tlvs.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tlvs.cpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/code_utils.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/code_utils.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/crc16.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/crc16.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/debug.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/debug.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/encoding.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/encoding.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/extension.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/extension.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/instance.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/instance.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/linked_list.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/linked_list.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/locator-getters.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/locator-getters.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/locator.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/locator.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/logging.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/logging.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/message.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/message.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/new.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/new.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/notifier.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/notifier.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/settings.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/settings.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/string.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/string.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tasklet.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tasklet.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/time.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/time.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/timer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/timer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tlvs.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/tlvs.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/trickle_timer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/src/core/common/trickle_timer.hpp" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/src/core/common">
         </file>
-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/examples/ncp_ftd/platform/misc.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/platform">
+        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/ti_wisunfan/apps/../../../../source/ti/ti_wisunfan/ncp_interface/examples/ncp_ftd/platform/misc.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="wisun_ncp/platform">
         </file>
         <property name="buildProfile" value="release"/>
         <property name="isHybrid" value="true"/>
-        <group id="wisun_ncp_interface.SIMPLELINK_CC13XX_CC26XX_SDK_154_DEV.Libraries.tiWiSunFan.TICLANG"/>
+        <group id="wisun_ncp_interface.SIMPLELINK_CC13XX_CC26XX_SDK.Libraries.tiWiSunFan.TICLANG"/>
 
     </project>
 </projectSpec>

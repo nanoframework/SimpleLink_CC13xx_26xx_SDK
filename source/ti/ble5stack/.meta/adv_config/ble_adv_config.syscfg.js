@@ -120,6 +120,12 @@ const config = {
             onChange: onPtmChange
         },
         {
+            name: "useRcosc",
+            displayName: "Use RCOSC",
+            default: false,
+            hidden: true,
+        },
+        {
             name: "peerConnParamUpdateRejectInd",
             displayName: "Peer Conn Param Update Reject Ind",
             longDescription: Docs.peerConnParamUpdateRejectIndLongDescription,

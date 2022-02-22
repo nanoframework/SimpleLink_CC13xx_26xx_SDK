@@ -221,17 +221,21 @@ function getSettingsOptions(options) {
  *  ======== addRfSettingDependency ========
  *  Creates an RF setting dependency module
  *
+ * @param inst - Module instance containing the config that changed
  * @param phyGroup - PROP, BLE, IEEE 802.15.4
  * @param phy  - added PHY
  * @param displayName  - PHY name to display
  *
  * @returns dictionary - containing a single RF setting dependency module
  */
-function addRfSettingDependency(phyGroup, phy, displayName) {
+function addRfSettingDependency(inst, phyGroup, phy, displayName) {
     const cmdHandler = CmdHandler.get(phyGroup, phy);
     const basePath = Common.basePath;
     const radioConfigArgs = {};
     let modName;
+
+    // Set parent NOT to be a protocol stack
+    radioConfigArgs.parent = "Custom";
 
     // Set up module names and arguments
     if (phyGroup === Common.PHY_PROP) {
@@ -263,9 +267,6 @@ function addRfSettingDependency(phyGroup, phy, displayName) {
         radioConfigArgs.phyType = phy;
     }
 
-    // Set parent NOT to be a protocol stack
-    radioConfigArgs.parent = "Custom";
-
     // Force an update of the permissions configurable
     radioConfigArgs.permission = "ReadWrite";
 
@@ -295,7 +296,7 @@ function moduleInstances(inst) {
         _.each(pi.settings, (phy) => {
             // Add module if selected
             if (selected.includes(phy.name)) {
-                dependencyModule.push(addRfSettingDependency(pg, phy.name, phy.displayName));
+                dependencyModule.push(addRfSettingDependency(inst, pg, phy.name, phy.displayName));
             }
         });
     });

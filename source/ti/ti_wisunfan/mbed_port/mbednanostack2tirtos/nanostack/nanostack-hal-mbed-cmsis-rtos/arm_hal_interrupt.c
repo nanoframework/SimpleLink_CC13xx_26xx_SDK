@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-#include <ti/sysbios/hal/Hwi.h>
-#include <ti/sysbios/knl/Task.h>
+#include <ti/drivers/dpl/HwiP.h>
 
 #include <arm_hal_interrupt.h>
+
+uint32_t key;
 
 void platform_critical_init(void)
 {
@@ -27,13 +28,11 @@ void platform_critical_init(void)
 void platform_enter_critical(void)
 {
     /* Enter critical section */
-    //Task_disable();
-    Hwi_disable();
+    key = HwiP_disable();
 }
 
 void platform_exit_critical(void)
 {
     /* Exit critical section */
-    Hwi_enable();
-    //Task_enable();
+    HwiP_restore(key);
 }

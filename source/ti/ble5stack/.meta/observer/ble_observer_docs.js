@@ -43,10 +43,10 @@ const Common = system.getScript("/ti/ble5stack/ble_common.js");
 // Long description for the scanPHY configuration parameter
 const scanPHYLongDescription = `The primary PHY that is used for scanning.\n
 __Default__: 1M\n
-Options | Description
---- | ---
-1 M | could
-Coded | sometimes
+Options |
+--- |
+1 M |
+Coded |
 `
 
 // Long description for the scanType configuration parameter

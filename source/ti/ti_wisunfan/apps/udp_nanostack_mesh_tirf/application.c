@@ -49,7 +49,7 @@
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/SPI.h>
-#include <ti/sysbios/knl/Clock.h>
+#include <ti/drivers/dpl/ClockP.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
@@ -463,7 +463,7 @@ void nanostack_wait_till_connect()
     if (_blocking)
     {
 #ifdef NWK_TEST
-        ticks_before_joining = Clock_getTicks();
+        ticks_before_joining = ClockP_getSystemTicks();
 #endif //NWK_TEST
 
         // wait till connection goes through
@@ -480,7 +480,7 @@ void nanostack_wait_till_connect()
         GPIO_write(CONFIG_GPIO_GLED, CONFIG_GPIO_LED_ON);
 
 #ifdef NWK_TEST
-        ticks_after_joining = Clock_getTicks();
+        ticks_after_joining = ClockP_getSystemTicks();
 #endif //NWK_TEST
     }
 }
@@ -558,17 +558,17 @@ int coap_recv_cb(int8_t service_id, uint8_t source_address[static 16],
     else if (request_ptr->msg_code == COAP_MSG_CODE_REQUEST_POST ||
              request_ptr->msg_code == COAP_MSG_CODE_REQUEST_PUT)
     {
-        bool success = TRUE;
+        bool success = true;
         if (request_ptr->payload_len != 2 || request_ptr->payload_ptr == NULL)
         {
             // Invalid payload length
-            success = FALSE;
+            success = false;
         }
         else if ((request_ptr->payload_ptr[0] != 0 && request_ptr->payload_ptr[0] != 1) ||
                  (request_ptr->payload_ptr[1] != 0 && request_ptr->payload_ptr[1] != 1))
         {
             // Invalid payload contents
-            success = FALSE;
+            success = false;
         }
         else
         {
@@ -583,7 +583,7 @@ int coap_recv_cb(int8_t service_id, uint8_t source_address[static 16],
             }
             else
             {
-                success = FALSE;
+                success = false;
             }
         }
 

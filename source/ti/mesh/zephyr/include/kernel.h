@@ -74,7 +74,7 @@
 
 static inline uint32_t k_uptime_get_32(void)
 {
-    return ((Clock_getTicks() * Clock_tickPeriod) / MSECS_TO_USECS);
+    return (((uint64_t)Clock_getTicks() * Clock_tickPeriod) / MSECS_TO_USECS);
 }
 
 static inline int64_t k_uptime_get(void)
@@ -98,9 +98,11 @@ static inline int64_t k_uptime_get(void)
 static inline int64_t k_uptime_delta(int64_t *reftime)
 {
     int64_t uptime, delta;
+    const int64_t MAX_VAL = ((uint64_t)UINT32_MAX * Clock_tickPeriod) / MSECS_TO_USECS;
 
     uptime = k_uptime_get();
-    delta = uptime - *reftime;
+    delta = uptime < *reftime ? (MAX_VAL) - *reftime + uptime :
+                                uptime - *reftime;
     *reftime = uptime;
 
     return delta;

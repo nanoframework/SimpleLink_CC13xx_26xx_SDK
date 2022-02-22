@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -50,8 +50,7 @@
 #include "stdlib.h"
 #include "stdbool.h"
 
-#include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/BIOS.h>
+#include <ti/drivers/dpl/ClockP.h>
 
 /***** Defines *****/
 
@@ -59,7 +58,7 @@
 
 typedef struct
 {
-    Clock_Handle clockHandle;
+    ClockP_Handle clockHandle;
     uint8_t taskId;
     uint32_t eventId;
     bool reload;
@@ -75,7 +74,7 @@ static TimerEntry_t* pTimerEntries = NULL;
 static TimerEntry_t* pDeleteTimerEntries = NULL;
 
 /***** Private function definitions *****/
-static void timerCb(xdc_UArg arg);
+static void timerCb(uintptr_t arg);
 static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeout, bool reload);
 static TimerEntry_t* getTimerEntry(uint8_t taskId, uint32_t eventId);
 
@@ -154,8 +153,8 @@ uint8_t OsalPortTimers_stopTimer(uint8_t taskId, uint32_t eventId)
     //Stop clock, remove from list and free memory
     if(pTimerEntry != NULL)
     {
-        Clock_stop(pTimerEntry->clockHandle);
-        Clock_delete(&(pTimerEntry->clockHandle));
+        ClockP_stop(pTimerEntry->clockHandle);
+        ClockP_delete(&(pTimerEntry->clockHandle));
 
         //is it first in list
         if(pTimerEntry == pTimerEntries)
@@ -216,8 +215,8 @@ uint32_t OsalPortTimers_getTimerTimeout(uint8_t taskId, uint32_t eventId)
 
     if(pTimerEntry != NULL)
     {
-        timeoutTicks = Clock_getTimeout(pTimerEntry->clockHandle);
-        timeout = timeoutTicks / (1000 / Clock_tickPeriod);
+        timeoutTicks = ClockP_getTimeout(pTimerEntry->clockHandle);
+        timeout = timeoutTicks / (1000 / ClockP_getSystemTickPeriod());
     }
 
     //Leave Critical Section
@@ -244,7 +243,7 @@ void OsalPortTimers_cleanUpTimers(void)
     while (current != NULL)
     {
         next = current->pNext;
-        Clock_delete(&(current->clockHandle));
+        ClockP_delete(&(current->clockHandle));
         OsalPort_free(current);
         current = next;
     }
@@ -282,7 +281,7 @@ void OsalPortTimers_registerCleanupEvent(uint8_t taskID, uint32_t eventID)
  *
  * @return  none
  */
-static void timerCb(xdc_UArg arg)
+static void timerCb(uintptr_t arg)
 {
     TimerEntry_t* pTimerEntry = (TimerEntry_t*) arg;
 
@@ -292,7 +291,7 @@ static void timerCb(xdc_UArg arg)
     /* if it is not a reload timer then free the entry */
     if(!pTimerEntry->reload)
     {
-        Clock_stop(pTimerEntry->clockHandle);
+        ClockP_stop(pTimerEntry->clockHandle);
 
         // find the element in the timer list and
         // extract it by updating prev and next ptrs
@@ -347,10 +346,10 @@ static void timerCb(xdc_UArg arg)
  */
 static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeout, bool reload)
 {
-    Clock_Params clkParams;
+    ClockP_Params clkParams;
     TimerEntry_t* pNewTimerEntry;
     uint8_t status = OsalPort_NO_TIMER_AVAIL;
-    uint32_t timeoutTicks = (timeout * (1000 / Clock_tickPeriod));
+    uint32_t timeoutTicks = (timeout * (1000 / ClockP_getSystemTickPeriod()));
     uintptr_t key;
 
     //Enter Critial Section
@@ -362,9 +361,9 @@ static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeo
     if(pNewTimerEntry)
     {
         //reset the time out
-        Clock_stop(pNewTimerEntry->clockHandle);
-        Clock_setTimeout(pNewTimerEntry->clockHandle, timeoutTicks);
-        Clock_start(pNewTimerEntry->clockHandle);
+        ClockP_stop(pNewTimerEntry->clockHandle);
+        ClockP_setTimeout(pNewTimerEntry->clockHandle, timeoutTicks);
+        ClockP_start(pNewTimerEntry->clockHandle);
     }
     else
     {
@@ -372,7 +371,7 @@ static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeo
 
         if(pNewTimerEntry != NULL)
         {
-            Clock_Params_init(&clkParams);
+            ClockP_Params_init(&clkParams);
             if(reload)
             {
                 clkParams.period = timeoutTicks;
@@ -383,9 +382,9 @@ static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeo
             }
 
             clkParams.startFlag = true;
-            clkParams.arg = (UArg) pNewTimerEntry;
+            clkParams.arg = (uintptr_t) pNewTimerEntry;
 
-            pNewTimerEntry->clockHandle = Clock_create(timerCb, timeoutTicks, &clkParams, NULL);
+            pNewTimerEntry->clockHandle = ClockP_create(timerCb, timeoutTicks, &clkParams);
 
             if(pNewTimerEntry->clockHandle != NULL)
             {
@@ -408,8 +407,8 @@ static uint8_t createTimerEntry(uint8_t taskId, uint32_t eventId, uint32_t timeo
 	                pLastTimerEntry->pNext = pNewTimerEntry;
 	            }
 
-	            Clock_setTimeout(pNewTimerEntry->clockHandle, timeoutTicks);
-	            Clock_start(pNewTimerEntry->clockHandle);
+	            ClockP_setTimeout(pNewTimerEntry->clockHandle, timeoutTicks);
+	            ClockP_start(pNewTimerEntry->clockHandle);
 
 	            status = OsalPort_SUCCESS;
             }

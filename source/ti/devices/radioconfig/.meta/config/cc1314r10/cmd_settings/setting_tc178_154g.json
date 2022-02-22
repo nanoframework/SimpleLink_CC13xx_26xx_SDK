@@ -149,13 +149,13 @@
                             "_name": "override_prop_common_sub1g.json",
                             "Element32b": [
                                 {
-                                    "_type": "ELEMENT",
-                                    "_comment": "Set RF_FSCA.ANADIV.DIV_SEL_BIAS = 1. Bits [0:16, 24, 30] are don't care..",
-                                    "$": "0x4001405D"
+                                    "_type": "HW32_ARRAY_OVERRIDE",
+                                    "_comment": "TX: Set FSCA divider bias to 1",
+                                    "$": "0x405C,0x0001"
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Set RF_FSCA.ANADIV.DIV_SEL_BIAS = 1. Bits [0:16, 24, 30] are don't care..",
+                                    "_comment": "TX: Set FSCA divider bias to 1",
                                     "$": "0x08141131"
                                 }
                             ]

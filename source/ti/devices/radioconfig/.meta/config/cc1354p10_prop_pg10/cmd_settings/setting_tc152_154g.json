@@ -149,13 +149,13 @@
                             "_name": "override_prop_common_sub1g.json",
                             "Element32b": [
                                 {
-                                    "_type": "ELEMENT",
-                                    "_comment": "Set RF_FSCA.ANADIV.DIV_SEL_BIAS = 1. Bits [0:16, 24, 30] are don't care..",
-                                    "$": "0x4001405D"
+                                    "_type": "HW32_ARRAY_OVERRIDE",
+                                    "_comment": "TX: Set FSCA divider bias to 1",
+                                    "$": "0x405C,0x0001"
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Set RF_FSCA.ANADIV.DIV_SEL_BIAS = 1. Bits [0:16, 24, 30] are don't care..",
+                                    "_comment": "TX: Set FSCA divider bias to 1",
                                     "$": "0x08141131"
                                 }
                             ]
@@ -274,6 +274,14 @@
                                     "$": "0x50D4,0x48F4"
                                 }
                             ]
+                        },
+                        {
+                            "_name": "override_patable_14dbm.json",
+                            "Element32b": {
+                                "_type": "ADI_REG_OVERRIDE",
+                                "_comment": "Tx: Set PA trim to max to maximize its output power (in ADI0, set PACTL0=0xF8)",
+                                "$": "0,12,0xF8"
+                            }
                         }
                     ]
                 }

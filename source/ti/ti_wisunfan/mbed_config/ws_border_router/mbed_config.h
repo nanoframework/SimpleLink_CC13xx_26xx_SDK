@@ -31,8 +31,14 @@
 #define MBED_CONF_MBED_MESH_API_OWN_CERTIFICATE_KEY                           WISUN_CLIENT_KEY
 #define MBED_CONF_MBED_MESH_API_ROOT_CERTIFICATE                              WISUN_ROOT_CERTIFICATE
 
+#ifdef FREERTOS_SUPPORT
+/* configuration for MBED mesh stack */
+#define MBED_CONF_MBED_MESH_API_HEAP_SIZE                                     80000
+#else
 /* configuration for MBED mesh stack */
 #define MBED_CONF_MBED_MESH_API_HEAP_SIZE                                     100000
+#endif
+
 #define MBED_CONF_MBED_MESH_API_HEAP_STAT_INFO                                &memory_heap_stat
 #define MBED_CONF_MBED_MESH_API_HEAP_STAT_INFO_DEFINITION                     mem_stat_t memory_heap_stat;
 #define MBED_CONF_MBED_MESH_API_USE_MALLOC_FOR_HEAP                           0

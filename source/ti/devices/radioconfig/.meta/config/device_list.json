@@ -1,6 +1,6 @@
 {
     "devicelist": {
-        "version": "2.23.0",
+        "version": "2.24.0",
         "DeviceGroup": [
             {
                 "Name": "Sub-1 GHz",
@@ -16,7 +16,15 @@
                     },
                     {
                         "DeviceName": {
-                            "_family": "Agama",
+                            "_family": "Thor",
+                            "$": "CC1354P10"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Thor",
                             "$": "CC1314R10"
                         },
                         "Brief": "Sub-1GHz",
@@ -66,22 +74,6 @@
                         "DeviceName": {
                             "_family": "Agama",
                             "$": "CC1352R"
-                        },
-                        "Brief": "Dual Band",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC2672P3"
-                        },
-                        "Brief": "Dual Band",
-                        "DeviceType": "Wireless MCU"
-                    },
-                    {
-                        "DeviceName": {
-                            "_family": "Agama",
-                            "$": "CC2672R3"
                         },
                         "Brief": "Dual Band",
                         "DeviceType": "Wireless MCU"
@@ -198,6 +190,22 @@
                 "Device": [
                     {
                         "DeviceName": {
+                            "_family": "Thor",
+                            "$": "CC2674R10"
+                        },
+                        "Brief": "2.4 GHz",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Thor",
+                            "$": "CC2674P10"
+                        },
+                        "Brief": "2.4 GHz",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
                             "_family": "Agama",
                             "$": "CC2652R7"
                         },
@@ -226,6 +234,22 @@
                             "$": "CC2651P3"
                         },
                         "Brief": "2.4 GHz",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2672P3"
+                        },
+                        "Brief": "Dual Band",
+                        "DeviceType": "Wireless MCU"
+                    },
+                    {
+                        "DeviceName": {
+                            "_family": "Agama",
+                            "$": "CC2672R3"
+                        },
+                        "Brief": "Dual Band",
                         "DeviceType": "Wireless MCU"
                     },
                     {

@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2021, Texas Instruments Incorporated
+ Copyright (c) 2014-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,13 @@
 #include "l2cap.h"
 
 #endif // ( CENTRAL_CFG | PERIPHERAL_CFG )
+
+
+#if (defined RTLS_CTE || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
+#include DeviceFamily_constructPath(rf_patches/rf_patch_cpe_multi_protocol_rtls.h)
+#elif defined (USE_DMM)
+#include DeviceFamily_constructPath(rf_patches/rf_patch_cpe_multi_protocol.h)
+#endif
 
 /*******************************************************************************
  * GLOBAL VARIABLES
@@ -141,6 +148,17 @@ void setBleUserConfig( icall_userCfg_t *userCfg )
     llUserConfig.maxWlElems    = stackConfig->maxWhiteListElems;
     llUserConfig.maxRlElems    = stackConfig->maxResolvListElems;
     llUserConfig.maxNumCteBufs = stackConfig->maxNumCteBuffers;
+
+    // Copy the RF_mode Object
+    memcpy(&rfMode, &RF_modeBle, sizeof(RF_Mode));
+
+    // Use the rtls cpe patch when RTLS is used
+#if (defined RTLS_CTE || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
+    rfMode.cpePatchFxn = &rf_patch_cpe_multi_protocol_rtls;
+    // Use the multi_protocol cpe patch when DMM is used
+#elif USE_DMM
+    rfMode.cpePatchFxn = &rf_patch_cpe_multi_protocol;
+#endif
 
     // RF Front End Mode and Bias (based on package)
     llUserConfig.rfFeModeBias  = userCfg->boardConfig->rfFeModeBias;
@@ -327,6 +345,17 @@ void setBleUserConfig( bleUserCfg_t *userCfg )
     llUserConfig.maxNumConns   = userCfg->maxNumConns;
     llUserConfig.numTxEntries  = userCfg->maxNumPDUs;
     llUserConfig.maxPduSize    = userCfg->maxPduSize;
+
+    // Copy the RF_mode Object
+    memcpy(&rfMode, &RF_modeBle, sizeof(RF_Mode));
+
+    // Use the rtls cpe patch when RTLS is used
+#if (defined RTLS_CTE || defined USE_PERIODIC_ADV || defined USE_PERIODIC_SCAN)
+    rfMode.cpePatchFxn = &rf_patch_cpe_multi_protocol_rtls;
+    // Use the multi_protocol cpe patch when DMM is used
+#elif USE_DMM
+    rfMode.cpePatchFxn = &rf_patch_cpe_multi_protocol;
+#endif
 
     // RF Front End Mode and Bias (based on package)
     llUserConfig.rfFeModeBias = userCfg->rfFeModeBias;

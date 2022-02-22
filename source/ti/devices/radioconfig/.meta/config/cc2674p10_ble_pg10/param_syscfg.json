@@ -7,7 +7,7 @@
             "options": [
                 {
                     "name": "bt5le1m",
-                    "displayName": "BLE, 1 Mbps, LE 1M (FPGA)"
+                    "displayName": "BLE, 1 Mbps, LE 1M (Pre-silicon settings)"
                 }
             ],
             "default": "bt5le1m"
@@ -263,19 +263,6 @@
             "longDescription": ""
         },
         {
-            "name": "txPowerHi",
-            "displayName": "TX Power (dBm)",
-            "description": "TX Power",
-            "default": "20",
-            "hidden": true
-        },
-        {
-            "name": "highPA",
-            "displayName": "High PA",
-            "description": "Select if the High Power Amplifier on the device should be used",
-            "default": false
-        },
-        {
             "name": "packetLengthBle",
             "displayName": "PDU Payload length",
             "description": "The PDU payload includes the Extended header, Advertising address and the Advertising data.",
@@ -288,7 +275,8 @@
             {
                 "file": "setting_bt5_le_1m.json",
                 "name": "bt5le1m",
-                "description": "BLE, 1 Mbps, LE 1M (FPGA)"
+                "description": "BLE, 1 Mbps, LE 1M (Pre-silicon settings)",
+                "options": "disable_high_pa"
             }
         ]
     }

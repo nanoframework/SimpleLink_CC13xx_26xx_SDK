@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2015-2021, Texas Instruments Incorporated
+ Copyright (c) 2015-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -147,7 +147,7 @@ extern void NPITask_sendToHost(uint8_t *pMsg);
 
 
 #ifdef __cplusplus
-{
+}
 #endif // extern "C"
 
 #endif // end of _NPITASK_H definition

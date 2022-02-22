@@ -72,7 +72,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2014-2021, Texas Instruments Incorporated
+ Copyright (c) 2014-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -334,7 +334,7 @@ extern "C"
 #ifndef SYSCFG
 #if defined(CC26XX)
 
-#if defined(CC26X2)
+#if defined(CC26X2) || defined(CC2652PSIP_LP)
 
   #define RF_FE_MODE_AND_BIAS           (RF_FE_DIFFERENTIAL |                 \
                                          RF_FE_INT_BIAS)
@@ -349,11 +349,11 @@ extern "C"
 #if defined(CC13X2)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_DIFFERENTIAL |     \
-                                       RF_FE_INT_BIAS)
+                                       RF_FE_EXT_BIAS)
 #elif defined(CC13X2P)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_DIFFERENTIAL |     \
-                                       RF_FE_INT_BIAS)
+                                       RF_FE_EXT_BIAS)
 #elif defined(MY_CC26x2_BOARD)
 
 #define RF_FE_MODE_AND_BIAS           (RF_FE_SINGLE_ENDED_RFP | \

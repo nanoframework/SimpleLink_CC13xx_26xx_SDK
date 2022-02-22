@@ -141,6 +141,14 @@ const boardSpecificCCFGSettings = {
         dioBootloaderBackdoor: 15,
         levelBootloaderBackdoor: "Active low"
     },
+    LP_CC1311P3_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
     LP_CC2652R7_CCFG_SETTINGS: {
         enableBootloader: true,
         enableBootloaderBackdoor: true,
@@ -158,7 +166,50 @@ const boardSpecificCCFGSettings = {
         enableBootloaderBackdoor: true,
         dioBootloaderBackdoor: 13,
         levelBootloaderBackdoor: "Active low"
-    }
+    },
+    LP_CC1354R10_RGZ_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_CC2674R10_FPGA_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_EM_CC1354P10_1_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_EM_CC1354P10_6_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_EM_CC1314R10_CCFG_SETTINGS: {
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 15,
+        levelBootloaderBackdoor: "Active low"
+    },
+    LP_EM_CC2653P10_CCFG_SETTINGS: {
+        xoscCapArray: true,
+        xoscCapArrayDelta: 0xC1,
+        enableBootloader: true,
+        enableBootloaderBackdoor: true,
+        dioBootloaderBackdoor: 13,
+        levelBootloaderBackdoor: "Active low"
+    },
+
 };
 
 // Get the LaunchPad specific CCFG Settings

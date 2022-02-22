@@ -67,6 +67,7 @@ const config = {
             name: "frontEndMode",
             displayName: "Front End Mode",
             default: "RF_FE_DIFFERENTIAL",
+            deprecated: true,
             longDescription: Docs.frontEndModeLongDescription,
             options: [
                 {
@@ -103,6 +104,7 @@ const config = {
             name: "biasConfiguration",
             displayName: "Bias Configuration",
             default: "RF_FE_INT_BIAS",
+            deprecated: true,
             longDescription: Docs.biasConfigurationLongDescription,
             options: [
                 {
@@ -337,7 +339,7 @@ function moduleInstances(inst)
 
     let args = {
         $name: "RF_BLE_Setting",
-        phyType: "bt5le1m",
+        phyType: "bt5le2m",
         codeExportConfig: radioSettings,
         paramVisibility: false,
         permission: "ReadOnly"
@@ -348,7 +350,7 @@ function moduleInstances(inst)
         args.highPA = true;
         if(inst.rfDesign == "LAUNCHXL-CC1352P-4" || inst.rfDesign == "LP_CC1352P7-4" || inst.rfDesign == "LP_CC2652PSIP")
         {
-            args.phyType = "bt5le1mp10";
+            args.phyType = "bt5le2mp10";
             args.txPowerHi = "10";
         }
     }
@@ -357,7 +359,6 @@ function moduleInstances(inst)
         name: "radioConfig",
         group: "bleRadioConfig",
         displayName: "BLE Radio Configuration",
-        description: "The BLE module is not using RF_Mode from ti_radio_config.c",
         moduleName: "/ti/devices/radioconfig/settings/ble",
         collapsed: true,
         args: args

@@ -61,49 +61,81 @@ const deviceToBoard = {
     CC1352P7: "LP_CC1352P7_1",
     CC2651P3: "LP_CC2651P3",
     CC2651R3: "LP_CC2651R3",
-    CC1311P3: "LP_CC1311P3"
+    CC1311P3: "LP_CC1311P3",
+    CC2674R10RGZ: "LP_CC2674R10_FPGA",
+    CC1354R10: "LP_CC1354R10_RGZ"
 };
 
 // Settings for ti/devices/CCFG module
 const easylinkCCFGSettings = {
     CC1312R1_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     CC1352R1_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: true
+        forceVddr: true,
+        enableBootloaderBackdoor: false
     },
     CC1352P1_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     CC1352P_2_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: true
+        forceVddr: true,
+        enableBootloaderBackdoor: false
     },
     CC1352P_4_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     CC26X2R1_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     CC2652RB_LAUNCHXL_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC2652PSIP_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC2652RSIP_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC1312R7_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC2652R7_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC1352P7_1_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
     },
     LP_CC1352P7_4_CCFG_SETTINGS: {
-        forceVddr: false
+        forceVddr: false,
+        enableBootloaderBackdoor: false
+    },
+    LP_CC2651P3_CCFG_SETTINGS: {
+        enableBootloaderBackdoor: false
+    },
+     LP_CC2651R3_CCFG_SETTINGS: {
+        enableBootloaderBackdoor: false
+    },
+    LP_CC1311P3_CCFG_SETTINGS: {
+        enableBootloaderBackdoor: false
+    },
+    LP_CC2674R10_FPGA_CCFG_SETTINGS: {        
+        forceVddr: false,
+        enableBootloaderBackdoor: false
+    },
+    LP_CC1354R10_RGZ_CCFG_SETTINGS: {
+        forceVddr: true,
+        enableBootloaderBackdoor: false
     }
 };
 
@@ -142,6 +174,10 @@ const supportedMigrations = {
     LP_CC1352P7_4: {
         CC1352P7RGZ: {},
         LP_CC1352P7_4: {}
+    },
+    LP_CC1354R10_RGZ: {
+        CC1354R10RGZ: {},
+        LP_CC1354R10_RGZ: {}
     },
     CC1312R1_LAUNCHXL: {
         CC1312R1F3RGZ: {},
@@ -255,6 +291,10 @@ const supportedMigrations = {
         CC1311P3RGZ: {disable: twoFourToSub1Text},
         LP_CC1311P3: {disable: twoFourToSub1Text}
     },
+    LP_CC2674R10_FPGA: {
+        CC2674R10RGZ: {},
+        LP_CC2674R10_FPGA: {}
+    },
 
     // Devices
     CC1352R1F3RGZ: {
@@ -275,6 +315,10 @@ const supportedMigrations = {
         CC1352P7RGZ: {},
         LP_CC1352P7_1: {},
         LP_CC1352P7_4: {}
+    },
+    CC1354R10RGZ: {
+        CC1354R10RGZ: {},
+        LP_CC1354R10_RGZ: {}
     },
     CC1312R1F3RGZ: {
         CC1312R1F3RGZ: {},
@@ -388,6 +432,10 @@ const supportedMigrations = {
         CC1312R7RGZ: {disable: twoFourToSub1Text},
         CC1311P3RGZ: {disable: twoFourToSub1Text},
         LP_CC1311P3: {disable: twoFourToSub1Text}
+    },
+    CC2674R10RGZ: {
+        LP_CC2674R10_FPGA: {},
+        CC2674R10RGZ: {}
     }
 };
 
@@ -717,6 +765,14 @@ function device2DeviceFamily(deviceId)
     {
         driverString = "DeviceFamily_CC13X0";
     }
+    else if(deviceId.match(/CC26.4/))
+    {
+        driverString = "DeviceFamily_CC26X4";
+    }
+    else if(deviceId.match(/CC13.4/))
+    {
+        driverString = "DeviceFamily_CC13X4";
+    }
     else if(deviceId.match(/CC26.0R2/))
     {
         driverString = "DeviceFamily_CC26X0R2";
@@ -805,6 +861,7 @@ function getDeviceOrLaunchPadName(convertToBoard)
 
         /* Strip off everything after and including the first '.' */
         name = name.replace(/\..*/, "");
+        
     }
 
     // Check if this is a standalone device without a LaunchPad

@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -368,6 +368,8 @@ extern void *GATT_bm_alloc(uint16 connHandle, uint8 opcode, uint16 size,
 /* the following API are not available for now */
 #define GAP_RegisterBondMgrCBs(...)                                                     (AssertHandler(0,0))
 
+#define GAP_DeInit(...)                                                                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GAP_DeInit, ##__VA_ARGS__))
+#define GAP_ReInit(...)                                                                 (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GAP_ReInit, ##__VA_ARGS__))
 // Link Establishment
 #define GAP_TerminateLinkReq(...)                                                       (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GAP_TerminateLinkReq , ##__VA_ARGS__))
 #define GAP_UpdateLinkParamReq(...)                                                     (icall_directAPI(ICALL_SERVICE_CLASS_BLE, (uint32_t) IDX_GAP_UpdateLinkParamReq , ##__VA_ARGS__))

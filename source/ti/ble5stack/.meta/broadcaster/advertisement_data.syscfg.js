@@ -72,6 +72,8 @@ const config = [
         name: "completeLocalName",
         displayName: "Complete Local Name",
         default: "",
+        getValue: getDeviceNameValue,
+        readOnly: true,
         hidden: true
     },
     {
@@ -1140,12 +1142,54 @@ function validate(inst, validation)
     }
 
     // Validate data length
-    let maxLength = 0;
-    inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].advType == "legacy" ? maxLength = Common.maxLegacyDataLen :
-                                                                              maxLength = Common.maxExtDataLen
+    let maxLength;
+    if (inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].advType == "legacy")
+    {
+        maxLength = Common.maxLegacyDataLen;
+    }
+    else // !Legacy
+    {
+        let connectable = inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].eventProps.includes("GAP_ADV_PROP_CONNECTABLE");
+        let scannable = inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].eventProps.includes("GAP_ADV_PROP_SCANNABLE");
+        // connectable & AdvData or scannable & ScanRspData
+        if ((connectable && !inst.hideAdvFlags) || (scannable  && inst.hideAdvFlags))
+        {
+
+            maxLength = Common.maxExtConnDataLen - Common.minExtHdrLen - Common.advAHdrLen;
+            // Adds Target Address Header
+            if (inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].eventProps.includes("GAP_ADV_PROP_DIRECTED"))
+            {
+                maxLength -= Common.targetAHdrLen;
+            }
+            // Adds TX Power Header
+            if (inst.$ownedBy["advParam"+inst.$ownedBy.numOfAdvSet].eventProps.includes("GAP_ADV_PROP_TX_POWER"))
+            {
+                maxLength -= Common.txPowerHdrLen;
+            }
+        }
+        // Scan Rsp Data & Connectable or Adv Data & Scannable
+        else if ((connectable && inst.hideAdvFlags) || (scannable  && !inst.hideAdvFlags))
+        {
+            maxLength = 0;
+        }
+        else
+        {
+            maxLength = Common.maxExtDataLen;
+        }
+    }
     if(Common.advDataTotalLength(inst, config) > maxLength)
     {
-        validation.logError("The current data length exceeds the allowed max length (" + maxLength + ")" ,inst);
+        // Adv Data or Scan RSP data is not allowed
+        if (maxLength <= 0)
+        {
+            inst.hideAdvFlags? validation.logError("Scan Rsp Data is not allowed in this advertising mode." ,inst)
+                               :validation.logError("Adv Data is not allowed in this advertising mode." ,inst);
+        }
+        // else, data length exceeded max length
+        else
+        {
+            validation.logError("The current data length exceeds the allowed max length (" + maxLength + ")" ,inst);
+        }
     }
 
     // Validate Complete Local Name
@@ -1494,6 +1538,17 @@ function hideAddress(instUIState,type,maxNum)
     {
         instUIState[type+"Address"+i].hidden = true;
     }
+}
+
+/*
+ * ======== getDeviceNameValue ========
+ * Returns the value of the ble module deviceName configurable
+ *
+ * @param inst  - Module instance containing the config that changed
+ */
+function getDeviceNameValue(inst)
+{
+    return system.modules["/ti/ble5stack/ble"].$static.deviceName;
 }
 
 /*

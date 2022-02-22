@@ -88,15 +88,23 @@ function getProjectName(project) {
 /*
  * CoEx use case configuration structure for IEEE 15.4
  */
-% const { ieeeInitiator: ieeeIni, ieeeConnected: ieeeCon } = radioScript.getCoexConfigIeee();
+% const { ieeeInitiatorTx: ieeeIniTx, ieeeConnectedTx: ieeeConTx, ieeeInitiatorRx: ieeeIniRx, ieeeConnectedRx: ieeeConRx } = radioScript.getCoexConfigIeee();
 RF_CoexOverride_IEEEUseCases coexConfigIeee = {
-    .ieeeInitiator = {
-        .priority = `ieeeIni.defaultPriority`,
-        .request = `ieeeIni.assertRequestForRx`
+    .ieeeInitiatorTx = {
+        .priority = `ieeeIniTx.defaultPriority`,
+        .request = `ieeeIniTx.assertRequestForRx`
     },
-    .ieeeConnected = {
-        .priority = `ieeeCon.defaultPriority`,
-        .request = `ieeeCon.assertRequestForRx`
+    .ieeeConnectedTx = {
+        .priority = `ieeeConTx.defaultPriority`,
+        .request = `ieeeConTx.assertRequestForRx`
+    },
+    .ieeeInitiatorRx = {
+        .priority = `ieeeIniRx.defaultPriority`,
+        .request = `ieeeIniRx.assertRequestForRx`
+    },
+    .ieeeConnectedRx = {
+        .priority = `ieeeConRx.defaultPriority`,
+        .request = `ieeeConRx.assertRequestForRx`
     }
 };
 % }

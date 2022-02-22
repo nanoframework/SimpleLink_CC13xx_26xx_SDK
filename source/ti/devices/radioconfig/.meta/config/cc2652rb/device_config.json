@@ -28,7 +28,7 @@
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc2652rb\/targets"
+                "$": ".\/..\/config\/cc1352p\/targets"
             },
             {
                 "_file": "io_pin_definition.json",

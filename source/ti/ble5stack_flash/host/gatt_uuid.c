@@ -9,7 +9,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2011 $
+ $License: TI_TEXT 2011 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -155,7 +155,7 @@ CONST uint8 centAddrResUUID[ATT_BT_UUID_SIZE] =
   LO_UINT16( CENTRAL_ADDRESS_RESOLUTION_UUID ), HI_UINT16( CENTRAL_ADDRESS_RESOLUTION_UUID )
 };
 
-// Central Address Resolution UUID
+// Resolvable Private Address Only UUID
 CONST uint8 resPrivAddrOnlyUUID[ATT_BT_UUID_SIZE] =
 {
   LO_UINT16( RESOLVABLE_PRIVATE_ADDRESS_ONLY_UUID ), HI_UINT16( RESOLVABLE_PRIVATE_ADDRESS_ONLY_UUID )

@@ -115,6 +115,11 @@ function phyTypeOnChange(inst, ui) {
     // Hide whitening if wBMS setting
     hasWBMS = phyType.includes("wbms");
     ui.whitening.hidden = hasWBMS;
+
+    if ("settingGroup" in ui) {
+        // The sensitivity v selectivity choice only applies to the BLE 2M PHY
+        ui.settingGroup.hidden = !phyType.includes("bt5le2m");
+    }
 }
 
 /*!
@@ -166,6 +171,7 @@ function initConfigurables(configurables) {
             item.onChange = RFBase.highPaOnChange;
             break;
         case "phyType":
+        case "settingGroup":
             item.onChange = phyTypeOnChange;
             break;
         case "permission":

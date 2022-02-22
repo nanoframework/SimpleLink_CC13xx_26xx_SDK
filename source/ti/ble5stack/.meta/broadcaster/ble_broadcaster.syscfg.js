@@ -113,8 +113,7 @@ function moduleInstances(inst)
         {
             const args = {
                 numOfAdvSet: i,
-                meshAdnPeri: meshAndPeri,
-                meshDeviceName: inst.deviceName
+                meshAdnPeri: meshAndPeri
             }
         
             dependencyModule.push({

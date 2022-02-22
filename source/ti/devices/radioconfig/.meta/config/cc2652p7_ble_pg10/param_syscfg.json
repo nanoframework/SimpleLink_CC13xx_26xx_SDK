@@ -7,27 +7,27 @@
             "options": [
                 {
                     "name": "bt5le1m",
-                    "displayName": "BLE, 1 Mbps, LE 1M (Preview settings)"
+                    "displayName": "BLE, 1 Mbps, LE 1M"
                 },
                 {
                     "name": "bt5le1madvnc",
-                    "displayName": "BLE, 1 Mbps, BT4 (Preview settings)"
+                    "displayName": "BLE, 1 Mbps, BT4"
                 },
                 {
                     "name": "bt5le2m",
-                    "displayName": "BLE, 2 Mbps, LE 2M (Preview settings)"
+                    "displayName": "BLE, 2 Mbps, LE 2M"
                 },
                 {
                     "name": "bt5lecodeds2",
-                    "displayName": "BLE, 500 kbps, LE Coded (Preview settings)"
+                    "displayName": "BLE, 500 kbps, LE Coded"
                 },
                 {
                     "name": "bt5lecodeds8",
-                    "displayName": "BLE, 125 kbps, LE Coded (Preview settings)"
+                    "displayName": "BLE, 125 kbps, LE Coded"
                 },
                 {
                     "name": "bt5le1mp10",
-                    "displayName": "BLE, 1 Mbps, LE 1M, 10 dBm (pre-silicon)"
+                    "displayName": "BLE, 1 Mbps, LE 1M, 10 dBm"
                 },
                 {
                     "name": "bt5le1madvncp10",
@@ -35,7 +35,7 @@
                 },
                 {
                     "name": "bt5le2mp10",
-                    "displayName": "BLE, 2 Mbps, LE 2M, 10 dBm (pre-silicon)"
+                    "displayName": "BLE, 2 Mbps, LE 2M, 10 dBm"
                 },
                 {
                     "name": "bt5lecodeds2p10",
@@ -309,7 +309,8 @@
             "name": "highPA",
             "displayName": "High PA",
             "description": "Select if the High Power Amplifier on the device should be used",
-            "default": false
+            "default": false,
+            "hidden": false
         },
         {
             "name": "packetLengthBle",
@@ -324,37 +325,37 @@
             {
                 "file": "setting_bt5_le_1m.json",
                 "name": "bt5le1m",
-                "description": "BLE, 1 Mbps, LE 1M (Preview settings)",
+                "description": "BLE, 1 Mbps, LE 1M",
                 "options": "5dBm"
             },
             {
                 "file": "setting_bt5_le_1m_adv_nc.json",
                 "name": "bt5le1madvnc",
-                "description": "BLE, 1 Mbps, BT4 (Preview settings)",
+                "description": "BLE, 1 Mbps, BT4",
                 "options": "5dBm"
             },
             {
                 "file": "setting_bt5_le_2m.json",
                 "name": "bt5le2m",
-                "description": "BLE, 2 Mbps, LE 2M (Preview settings)",
+                "description": "BLE, 2 Mbps, LE 2M",
                 "options": "5dBm"
             },
             {
                 "file": "setting_bt5_le_coded_s2.json",
                 "name": "bt5lecodeds2",
-                "description": "BLE, 500 kbps, LE Coded (Preview settings)",
+                "description": "BLE, 500 kbps, LE Coded",
                 "options": "5dBm"
             },
             {
                 "file": "setting_bt5_le_coded_s8.json",
                 "name": "bt5lecodeds8",
-                "description": "BLE, 125 kbps, LE Coded (Preview settings)",
+                "description": "BLE, 125 kbps, LE Coded",
                 "options": "5dBm"
             },
             {
                 "file": "setting_bt5_le_1m_10_dbm.json",
                 "name": "bt5le1mp10",
-                "description": "BLE, 1 Mbps, LE 1M, 10 dBm (pre-silicon)",
+                "description": "BLE, 1 Mbps, LE 1M, 10 dBm",
                 "options": "10dBm"
             },
             {
@@ -366,7 +367,7 @@
             {
                 "file": "setting_bt5_le_2m_10_dbm.json",
                 "name": "bt5le2mp10",
-                "description": "BLE, 2 Mbps, LE 2M, 10 dBm (pre-silicon)",
+                "description": "BLE, 2 Mbps, LE 2M, 10 dBm",
                 "options": "10dBm"
             },
             {

@@ -8,14 +8,6 @@
                 "PaSettingTable": {
                     "PaSetting": [
                         {
-                            "_text": "6.5",
-                            "Value": "0x003F"
-                        },
-                        {
-                            "_text": "6",
-                            "Value": "0x7A2B"
-                        },
-                        {
                             "_text": "5",
                             "Value": "0x701F"
                         },

@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "Wi-SUN mode #1b, 50 kbps, 25 kHz Deviation, 2-GFSK, 98 kHz RX Bandwidth (Pre-silicon settings)",
-        "Description": "50 kbps, 2-GFSK, 25 kHz deviation WiSUN mode #1b compatible PHY. (Pre-silicon settings)",
+        "Name": "Wi-SUN mode #1b, 50 kbps, 25 kHz Deviation, 2-GFSK, 98 kHz RX Bandwidth",
+        "Description": "50 kbps, 2-GFSK, 25 kHz deviation WiSUN mode #1b compatible PHY.",
         "Frequency": "918.2",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -79,7 +79,7 @@
                     },
                     {
                         "_name": "preamConf.nPreamBytes",
-                        "$": "4"
+                        "$": "7"
                     },
                     {
                         "_name": "preamConf.preamMode",
@@ -123,7 +123,7 @@
                     },
                     {
                         "_name": "txPower",
-                        "$": "0x9F3F"
+                        "$": "0xFFFF"
                     },
                     {
                         "_name": "pRegOverride",
@@ -146,14 +146,6 @@
                     "_name": "pRegOverride",
                     "Block": [
                         {
-                            "_name": "override_prop_common.json",
-                            "Element32b": {
-                                "_type": "ELEMENT",
-                                "_comment": "DC\/DC regulator: In Tx, use DCDCCTL5[3:0]=0x7 (DITHER_EN=0 and IPEAK=7).",
-                                "$": "0x00F788D3"
-                            }
-                        },
-                        {
                             "_name": "override_prop_common_sub1g.json",
                             "Element32b": [
                                 {
@@ -167,6 +159,14 @@
                                     "$": "0x08141131"
                                 }
                             ]
+                        },
+                        {
+                            "_name": "override_prop_common.json",
+                            "Element32b": {
+                                "_type": "ELEMENT",
+                                "_comment": "DC\/DC regulator: In Tx, use DCDCCTL5[3:0]=0x7 (DITHER_EN=0 and IPEAK=7).",
+                                "$": "0x00F788D3"
+                            }
                         },
                         {
                             "_name": "override_tc121.json",
@@ -213,8 +213,8 @@
                                 },
                                 {
                                     "_type": "HW_REG_OVERRIDE",
-                                    "_comment": "Rx: Set AGC reference level to 0x1F (default: 0x2E)",
-                                    "$": "0x609C,0x001F"
+                                    "_comment": "Rx: Set AGC reference level to 0x20 (default: 0x2E)",
+                                    "$": "0x609C,0x0020"
                                 },
                                 {
                                     "_type": "ELEMENT",
@@ -242,9 +242,9 @@
                                     "$": "0x5114,0x2323"
                                 },
                                 {
-                                    "_type": "ELEMENT",
-                                    "_comment": "Set LNA IB offset to 0xF",
-                                    "$": "0x000F8883"
+                                    "_type": "ADI_HALFREG_OVERRIDE",
+                                    "_comment": "Set LNA IB boost to 2",
+                                    "$": "0,5,0xF,0x2"
                                 },
                                 {
                                     "_type": "ELEMENT",

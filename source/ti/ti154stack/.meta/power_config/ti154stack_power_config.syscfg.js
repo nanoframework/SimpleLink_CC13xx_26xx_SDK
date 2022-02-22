@@ -225,6 +225,7 @@ function getTxPowerRFConfig(inst, freqBand, phyType, phyGroup)
     if((board.includes("CC1352P1") && freqBand === "freqBandSub1")
         || (board.includes("CC1352P7-1") && freqBand === "freqBandSub1")
         || (board.includes("CC1352P7_1") && freqBand === "freqBandSub1")
+        || (board.includes("CC1311P3") && freqBand === "freqBandSub1")
         || (((board.includes("CC1352P-2") || board.includes("CC1352P_2"))
         || (board.includes("CC1352P-4") || board.includes("CC1352P_4"))
         || (board.includes("CC1352P7-4") || board.includes("CC1352P7_4"))
@@ -236,7 +237,7 @@ function getTxPowerRFConfig(inst, freqBand, phyType, phyGroup)
         txPowerHiOptions = RfDesign.getTxPowerOptions(freq, true);
     }
 
-    return{
+    return {
         txPower: txPowerOptions,
         txPowerHi: txPowerHiOptions
     };

@@ -322,7 +322,9 @@ typedef struct {
     bool        temporaryUlaAddressState;
 } ipv6_interface_info_t;
 
+#ifdef HAVE_THREAD
 struct thread_info_s;
+#endif
 struct ws_info_s;
 struct mesh_callbacks_s;
 struct auth_info;

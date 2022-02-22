@@ -121,10 +121,6 @@ afAddrType_t sampleApp_DstAddr;
 #ifndef CUI_DISABLE
 CONST char zclSampleApp_appStr[] = "SampleApp";
 CUI_clientHandle_t gCuiHandle;
-// Key press parameters
-static Button_Handle keys = NULL;
-static Button_Handle gRightButtonHandle;
-static Button_Handle gLeftButtonHandle;
 #endif
 
 #if defined(USE_DMM) && defined(BLE_START) || !defined(CUI_DISABLE)
@@ -166,7 +162,6 @@ static uint8_t sampleApp_ProcessInDiscAttrsExtRspCmd( zclIncoming_t *pInMsg );
 
 #ifndef CUI_DISABLE
 static void zclSampleApp_processKey(uint8_t key, Button_EventMask buttonEvents);
-static void sampleApp_processKey(Button_Handle _btn);
 #endif
 
 #if defined (BDB_TL_TARGET) || defined (BDB_TL_INITIATOR)
@@ -255,17 +250,7 @@ static void sampleApp_process_loop( void )
             {
                 OsalPort_msgDeallocate((uint8_t*)pMsg);
             }
-#ifndef CUI_DISABLE
-          if(appServiceTaskEvents & SAMPLEAPP_KEY_EVT)
-          {
-              // Process Key Presses
-              sampleApp_processKey(keys);
-              keys = NULL;
-              appServiceTaskEvents &= ~SAMPLEAPP_KEY_EVT;
-          }
-#endif
-
-          // TODO: Add Functionality to Event Loop Processor
+            // TODO: Add Functionality to Event Loop Processor
 
 
 #if ZG_BUILD_ENDDEVICE_TYPE
@@ -891,7 +876,7 @@ static uint8_t sampleApp_ProcessInDiscAttrsExtRspCmd( zclIncoming_t *pInMsg )
 
 #ifndef CUI_DISABLE
 /*********************************************************************
- * @fn      sampleApp_processKey
+ * @fn      zclSampleApp_processKey
  *
  * @brief   Key event handler function
  *
@@ -917,38 +902,6 @@ static void zclSampleApp_processKey(uint8_t key, Button_EventMask buttonEvents)
         }
     }
 }
-
-
-/*********************************************************************
- * @fn      sampleApp_processKey
- * @brief   Key event handler function
- * @param   keysPressed - keys to be process in application context
- *********************************************************************/
-static void sampleApp_processKey(Button_Handle _btn)
-{
-    zstack_bdbStartCommissioningReq_t zstack_bdbStartCommissioningReq;
-    //Button 1
-    if(_btn == gLeftButtonHandle)
-    {
-        if(ZG_BUILD_COORDINATOR_TYPE && ZG_DEVICE_COORDINATOR_TYPE)
-        {
-
-            zstack_bdbStartCommissioningReq.commissioning_mode = BDB_COMMISSIONING_MODE_NWK_FORMATION | BDB_COMMISSIONING_MODE_NWK_STEERING | BDB_COMMISSIONING_MODE_FINDING_BINDING;
-            Zstackapi_bdbStartCommissioningReq(sampleApp_serviceTaskId,&zstack_bdbStartCommissioningReq);
-        }
-        else if (ZG_BUILD_JOINING_TYPE && ZG_DEVICE_JOINING_TYPE)
-        {
-            zstack_bdbStartCommissioningReq.commissioning_mode = BDB_COMMISSIONING_MODE_NWK_STEERING | BDB_COMMISSIONING_MODE_FINDING_BINDING;
-            Zstackapi_bdbStartCommissioningReq(sampleApp_serviceTaskId,&zstack_bdbStartCommissioningReq);
-        }
-    }
-    //Button 2
-    if(_btn == gRightButtonHandle)
-    {
-        Zstackapi_bdbResetLocalActionReq(sampleApp_serviceTaskId);
-    }
-}
-
 #endif // CUI_DISABLE
 /****************************************************************************
 ****************************************************************************/

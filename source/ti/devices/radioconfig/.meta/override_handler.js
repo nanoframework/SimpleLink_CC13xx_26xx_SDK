@@ -79,6 +79,19 @@ function init(cmds, highPA) {
 
             // Iterate override fields
             const overrideFields = Common.forceArray(cmd.OverrideField);
+
+            // Merge in front-end overrides
+            if ("OverridePatch" in cmd) {
+                for (let i = 0; i < cmd.OverridePatch.length; i++) {
+                    const feOvr = cmd.OverridePatch[i];
+                    if ("Block" in feOvr) {
+                        const blocks = Common.forceArray(overrideFields[i].Block);
+                        blocks.push(feOvr.Block);
+                        overrideFields[i].Block = blocks;
+                    }
+                }
+            }
+
             for (let i = 0; i < overrideFields.length; i++) {
                 const ovrField = overrideFields[i];
 
@@ -247,6 +260,10 @@ function generateStruct(override, data, custom) {
     // Generate the code
     for (const key in override) {
         if (key === "cmdName" || key === "ptrName") {
+            // eslint-disable-next-line no-continue
+            continue;
+        }
+        if (!("Element32b" in override[key])) {
             // eslint-disable-next-line no-continue
             continue;
         }

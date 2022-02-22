@@ -7,23 +7,23 @@
             "options": [
                 {
                     "name": "bt5le1m",
-                    "displayName": "BLE, 1 Mbps, LE 1M (Preview)"
+                    "displayName": "BLE, 1 Mbps, LE 1M (Release Candidate)"
                 },
                 {
                     "name": "bt5le1madvnc",
-                    "displayName": "BLE, 1 Mbps, BT4 (Preview)"
+                    "displayName": "BLE, 1 Mbps, BT4 (Release Candidate)"
                 },
                 {
                     "name": "bt5le2m",
-                    "displayName": "BLE, 2 Mbps, LE 2M (Preview)"
+                    "displayName": "BLE, 2 Mbps, LE 2M (Release Candidate)"
                 },
                 {
                     "name": "bt5lecodeds2",
-                    "displayName": "BLE, 500 kbps, LE Coded (Preview)"
+                    "displayName": "BLE, 500 kbps, LE Coded (Release Candidate)"
                 },
                 {
                     "name": "bt5lecodeds8",
-                    "displayName": "BLE, 125 kbps, LE Coded (Preview)"
+                    "displayName": "BLE, 125 kbps, LE Coded (Release Candidate)"
                 }
             ],
             "default": "bt5le1m"
@@ -291,27 +291,27 @@
             {
                 "file": "setting_bt5_le_1m.json",
                 "name": "bt5le1m",
-                "description": "BLE, 1 Mbps, LE 1M (Preview)"
+                "description": "BLE, 1 Mbps, LE 1M (Release Candidate)"
             },
             {
                 "file": "setting_bt5_le_1m_adv_nc.json",
                 "name": "bt5le1madvnc",
-                "description": "BLE, 1 Mbps, BT4 (Preview)"
+                "description": "BLE, 1 Mbps, BT4 (Release Candidate)"
             },
             {
                 "file": "setting_bt5_le_2m.json",
                 "name": "bt5le2m",
-                "description": "BLE, 2 Mbps, LE 2M (Preview)"
+                "description": "BLE, 2 Mbps, LE 2M (Release Candidate)"
             },
             {
                 "file": "setting_bt5_le_coded_s2.json",
                 "name": "bt5lecodeds2",
-                "description": "BLE, 500 kbps, LE Coded (Preview)"
+                "description": "BLE, 500 kbps, LE Coded (Release Candidate)"
             },
             {
                 "file": "setting_bt5_le_coded_s8.json",
                 "name": "bt5lecodeds8",
-                "description": "BLE, 125 kbps, LE Coded (Preview)"
+                "description": "BLE, 125 kbps, LE Coded (Release Candidate)"
             }
         ]
     }

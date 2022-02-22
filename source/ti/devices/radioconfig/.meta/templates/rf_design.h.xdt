@@ -66,8 +66,9 @@ const design = inst.rfDesign;
 % let structs = "";
 % let support = "";
 %
-% for (const fb in mod.freqBands) {
-%   const target = mod.freqBands[fb];
+% const freqBands = mod.freqBands();
+% for (const fb in freqBands) {
+%   const target = freqBands[fb];
 %   if (mod.isFreqBandSelected(inst, target)) {
 %     const paCode = mod.generateTxPowerHeader(inst, target);
 %     if (paCode !== null) {

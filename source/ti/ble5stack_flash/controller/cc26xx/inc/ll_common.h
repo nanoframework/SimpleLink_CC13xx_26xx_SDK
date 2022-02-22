@@ -10,7 +10,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2009 $
+ $License: TI_TEXT 2009 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $
@@ -1601,6 +1601,9 @@ typedef struct
 /*******************************************************************************
  * GLOBAL VARIABLES
  */
+
+// RF open parameter to specify PRCM Mode and pointers to CPE/MCE/RFE patches
+extern RF_Mode      rfMode;
 
 // FW Parameter structure (for Extended Data Length)
 extern rfOpImmedCmd_RW_FwParam_t fwParCmd;

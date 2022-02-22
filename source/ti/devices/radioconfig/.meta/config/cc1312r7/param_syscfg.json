@@ -73,7 +73,7 @@
                 },
                 {
                     "name": "ook48kbps",
-                    "displayName": "4.8 kbps, OOK, 39 kHz RX Bandwidth (Pre-silicon settings)"
+                    "displayName": "4.8 kbps, OOK, 39 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk48kbpstcxo_rx",
@@ -121,7 +121,7 @@
                 },
                 {
                     "name": "2gfsk300kbps75dev915wsun5",
-                    "displayName": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth"
+                    "displayName": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 496 kHz RX Bandwidth"
                 },
                 {
                     "name": "wbdsss480ksps30kbps",
@@ -154,27 +154,27 @@
             "options": [
                 {
                     "name": "2gfsk50kbps433mhz",
-                    "displayName": "50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings)"
+                    "displayName": "50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk200kbps433mhz",
-                    "displayName": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Pre-silicon settings)"
+                    "displayName": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
                 },
                 {
                     "name": "2gfsk50kbps433mhz154g",
-                    "displayName": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings)"
+                    "displayName": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
                 },
                 {
                     "name": "slr5kbps2gfsk433mhz",
-                    "displayName": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2 (Pre-silicon settings)"
+                    "displayName": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
                 },
                 {
                     "name": "slr2500bps2gfsk433mhz",
-                    "displayName": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4 (Pre-silicon settings)"
+                    "displayName": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
                 },
                 {
                     "name": "ook48kbps433mhz",
-                    "displayName": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth (Pre-silicon settings)"
+                    "displayName": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth"
                 },
                 {
                     "name": "custom433",
@@ -935,7 +935,7 @@
             {
                 "file": "setting_tc597.json",
                 "name": "ook48kbps",
-                "description": "4.8 kbps, OOK, 39 kHz RX Bandwidth (Pre-silicon settings)"
+                "description": "4.8 kbps, OOK, 39 kHz RX Bandwidth"
             },
             {
                 "file": "setting_tc594_rx.json",
@@ -1002,7 +1002,7 @@
             {
                 "file": "setting_tc154.json",
                 "name": "2gfsk300kbps75dev915wsun5",
-                "description": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 285 kHz RX Bandwidth",
+                "description": "Wi-SUN mode #5, 300 kbps, 75 kHz Deviation, 2-GFSK, 496 kHz RX Bandwidth",
                 "options": "ieee_15_4g"
             },
             {
@@ -1035,33 +1035,33 @@
             {
                 "file": "setting_tc112.json",
                 "name": "2gfsk50kbps433mhz",
-                "description": "50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings)"
+                "description": "50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth"
             },
             {
                 "file": "setting_tc148.json",
                 "name": "2gfsk200kbps433mhz",
-                "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Pre-silicon settings)"
+                "description": "200 kbps, 50 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth"
             },
             {
                 "file": "setting_tc112_154g.json",
                 "name": "2gfsk50kbps433mhz154g",
-                "description": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth (Pre-silicon settings)",
+                "description": "IEEE 802.15.4, 50 kbps, 25kHz Deviation, 2-GFSK, 78 kHz RX Bandwidth",
                 "options": "ieee_15_4g"
             },
             {
                 "file": "setting_tc440.json",
                 "name": "slr5kbps2gfsk433mhz",
-                "description": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2 (Pre-silicon settings)"
+                "description": "SimpleLink Long Range, 5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:2"
             },
             {
                 "file": "setting_tc441.json",
                 "name": "slr2500bps2gfsk433mhz",
-                "description": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4 (Pre-silicon settings)"
+                "description": "SimpleLink Long Range, 2.5 kbps (20 ksps), 5 kHz Deviation, 2-GFSK, 34 kHz RX Bandwidth, FEC = 1:2, DSSS = 1:4"
             },
             {
                 "file": "setting_tc599.json",
                 "name": "ook48kbps433mhz",
-                "description": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth (Pre-silicon settings)"
+                "description": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth"
             },
             {
                 "file": "setting_tc112_custom.json",

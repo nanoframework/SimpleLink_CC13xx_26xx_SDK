@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -798,11 +798,17 @@ ApiMac_status_t ApiMac_mlmeEnableCoex(bool enabled)
 {
     ieeeCoexEnabled = enabled;
 #ifdef IEEE_COEX_3_WIRE
-    coexOverrideUseCases.ieeeConnEstab.defaultPriority = coexConfigIeee.ieeeInitiator.priority;
-    coexOverrideUseCases.ieeeConnEstab.assertRequestForRx = coexConfigIeee.ieeeInitiator.request;
+    coexOverrideUseCases.ieeeConnEstabTx.defaultPriority = coexConfigIeee.ieeeInitiatorTx.priority;
+    coexOverrideUseCases.ieeeConnEstabTx.assertRequestForRx = coexConfigIeee.ieeeInitiatorTx.request;
 
-    coexOverrideUseCases.ieeeConnected.defaultPriority = coexConfigIeee.ieeeConnected.priority;
-    coexOverrideUseCases.ieeeConnected.assertRequestForRx = coexConfigIeee.ieeeConnected.request;
+    coexOverrideUseCases.ieeeConnectedTx.defaultPriority = coexConfigIeee.ieeeConnectedTx.priority;
+    coexOverrideUseCases.ieeeConnectedTx.assertRequestForRx = coexConfigIeee.ieeeConnectedTx.request;
+
+    coexOverrideUseCases.ieeeConnEstabRx.defaultPriority = coexConfigIeee.ieeeInitiatorRx.priority;
+    coexOverrideUseCases.ieeeConnEstabRx.assertRequestForRx = coexConfigIeee.ieeeInitiatorRx.request;
+
+    coexOverrideUseCases.ieeeConnectedRx.defaultPriority = coexConfigIeee.ieeeConnectedRx.priority;
+    coexOverrideUseCases.ieeeConnectedRx.assertRequestForRx = coexConfigIeee.ieeeConnectedRx.request;
 #endif
     return ApiMac_status_success;
 }

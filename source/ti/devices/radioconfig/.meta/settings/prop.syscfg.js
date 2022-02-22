@@ -420,12 +420,12 @@ function validateFrequency(inst) {
 
     const prop24 = BAND_24G;
     const highPA = highPaSupport && !prop24 ? inst.highPA : false;
-    const paSetting = RfDesign.getPaTable(freq, highPA);
+    const freqBand = RfDesign.getFrequencyBandByFreq(freq, highPA);
 
     // Check if PA table is supported
-    if (paSetting === null) {
+    if (freqBand === null) {
         // No PA-table, not a valid range
-        const freqRanges = RfDesign.freqBands;
+        const freqRanges = RfDesign.freqBands();
 
         const midFreq = parseInt(inst.freqBand);
         let msg = "Frequency out of range. Valid range:";

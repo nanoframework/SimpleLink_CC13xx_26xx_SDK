@@ -10,7 +10,7 @@ Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
- Copyright (c) 2019-2021, Texas Instruments Incorporated
+ Copyright (c) 2019-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -468,7 +468,8 @@ int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const
     struct bt_mesh_model_pub * curr_pub = NULL;
     struct bt_mesh_model_cb * curr_cb   = NULL;
     char * user_data                    = NULL;
-    struct bt_mesh_model_op * curr_ops  = (struct bt_mesh_model_op *)ICall_malloc(sizeof(struct bt_mesh_model_op) * op_len);
+    // Allocating space for op_len+1 opcodes, sicne last opcode must be a terminating opcode (all fields are 0).
+    struct bt_mesh_model_op * curr_ops  = (struct bt_mesh_model_op *)ICall_malloc(sizeof(struct bt_mesh_model_op) * (op_len + 1));
     if(!curr_ops)
     {
         return -1;
@@ -519,6 +520,10 @@ int bt_mesh_init_model_raw_init(uint16_t elem_index, uint16_t model_index, const
         // Copy the bt_mesh_model_op data
         memcpy((curr_ops + i), &temp_op, (sizeof(struct bt_mesh_model_op)));
     }
+
+    // Terminating ops list.
+    // ops list is terminated by an OP which all fields are set to 0
+    memset(curr_ops + op_len, 0, sizeof(struct bt_mesh_model_op));
 
     // In case the bt_mesh_model_cb pointer is not NULL
     // Do malloc and set the callback wrappers

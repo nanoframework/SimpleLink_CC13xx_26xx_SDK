@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2011-2021, Texas Instruments Incorporated
+ Copyright (c) 2011-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -543,6 +543,28 @@ void GAP_UpdateResolvingList_noGAPBondMgr(uint8_t *pIRK)
 {
   // Pass local IRK to the controller
   HCI_LE_AddDeviceToResolvingListCmd( 0, 0, 0, pIRK );
+}
+
+/*******************************************************************************
+ * This API is used to disable the RF
+ *
+ * Defined in gap.h.
+ */
+void GAP_DeInit( void )
+{
+  // Close the RF
+  MAP_LL_DeInit();
+}
+
+/*******************************************************************************
+ * This API is used to re-enable the RF
+ *
+ * Defined in gap.h.
+ */
+void GAP_ReInit( void )
+{
+  // Open the RF
+  MAP_LL_ReInit();
 }
 
 /*********************************************************************

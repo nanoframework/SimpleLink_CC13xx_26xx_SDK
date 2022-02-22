@@ -53,6 +53,16 @@ const bleDocs = [
             + "to minimize DC bias in the packet. Note that the setting only has effect if the commands "
             + "that support it are selected.\n\n"
             + "__Default__: True"
+    },
+    {
+        configurable: "settingGroup",
+        longDescription: "TI recommends to keep this option as the default value unless you have determined "
+            + "you are not impacted by errata Radio_03. To do so, please reference your device's errata sheet. "
+            + "In order to achieve best sensitivity, the radio can be configured to trade off selectivity. "
+            + "Changing the RF performance focus to selectivity may lead to radio sensitivity degradation on "
+            + "certain units for certain RX RSSI levels when using the Bluetooth LE 2M PHY.\n\n"
+            + "Note: The CC2642R-Q1 and CC2662R-Q1 are not required to use this setting.\n\n"
+            + "__Default__: Sensitivity"
     }
 ];
 

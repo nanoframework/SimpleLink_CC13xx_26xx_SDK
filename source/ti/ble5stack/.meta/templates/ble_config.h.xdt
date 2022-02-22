@@ -11,8 +11,27 @@
 
 
 const ble = system.modules["/ti/ble5stack/ble"].$static;
-
 const common = system.getScript("/ti/ble5stack/ble_common.js");
+const rfdesign = system.modules["/ti/devices/radioconfig/rfdesign"].$static;
+
+let bias = "RF_FE_INT_BIAS";
+let frontEnd = "RF_FE_DIFFERENTIAL";
+
+// Get the selected Bias from the rfdesign module
+if(rfdesign.fe24g.includes("X") || rfdesign.fe24g.includes("XS"))
+{
+    bias = "RF_FE_EXT_BIAS";
+}
+
+// Get the selected frontEnd mode from the rfdesign module
+if(rfdesign.fe24g.includes("RFP"))
+{
+    frontEnd = "RF_FE_SINGLE_ENDED_RFP";
+}
+else if(rfdesign.fe24g.includes("RFN"))
+{
+    frontEnd = "RF_FE_SINGLE_ENDED_RFN";
+}
 
 %%}
 
@@ -24,13 +43,12 @@ const common = system.getScript("/ti/ble5stack/ble_common.js");
 
 % if (ble){
 
-
-#define RF_FE_MODE_AND_BIAS            `ble.frontEndMode` | `ble.biasConfiguration`
+% if(rfdesign){
+#define RF_FE_MODE_AND_BIAS            `frontEnd` | `bias`
+%}
 
 // Default Tx Power Index
 #define DEFAULT_TX_POWER               `ble.defaultTxPower`
-
-
 
 extern uint8_t attDeviceName[GAP_DEVICE_NAME_LEN];
 

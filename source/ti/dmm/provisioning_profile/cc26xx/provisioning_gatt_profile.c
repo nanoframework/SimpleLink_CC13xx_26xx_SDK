@@ -83,19 +83,20 @@ CONST uint8 provisioningProfileNtwkPanIdCharUUID[ATT_UUID_SIZE] =
 {
   PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_NTWK_PAN_ID_CHAR_UUID)
 };
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
 // Extended Network PAN ID characteristic UUID
 CONST uint8 provisioningProfileExtNtwkPanIdCharUUID[ATT_UUID_SIZE] =
 {
   PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_EXT_NTWK_PAN_ID_CHAR_UUID)
 };
-#else
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
+#if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
 // Network Frequency of operation characteristic UUID
 CONST uint8 provisioningProfileSensorFreqCharUUID[ATT_UUID_SIZE] =
 {
   PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_SENSOR_FREQ_CHAR_UUID)
 };
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
 // Network channel list characteristic UUID
 CONST uint8 provisioningProfileSensorChannelCharUUID[ATT_UUID_SIZE] =
 { 
@@ -126,6 +127,29 @@ CONST uint8 provisioningProfileStateCharUUID[ATT_UUID_SIZE] =
 { 
   PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_PROV_STATE_CHAR_UUID)
 };
+#ifdef USEOT
+// Sensor provisioningProfile PSKd characteristic UUID
+CONST uint8 provisioningProfilePSKdCharUUID[ATT_UUID_SIZE] =
+{
+  PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_PROV_PSKD_CHAR_UUID)
+};
+// Sensor provisioningProfile Network Name characteristic UUID
+CONST uint8 provisioningProfileNtwkNameCharUUID[ATT_UUID_SIZE] =
+{
+  PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_NTWK_NAME_CHAR_UUID)
+};
+// Sensor provisioningProfile Short Address characteristic UUID
+CONST uint8 provisioningProfileShortAddrCharUUID[ATT_UUID_SIZE] =
+{
+  PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_NTWK_SHORT_ADDR_CHAR_UUID)
+};
+//Sensor provisioningProfile reset network characteristic UUID
+CONST uint8 provisioningProfileNtwkResetCharUUID[ATT_UUID_SIZE] =
+{
+  PROVPROFILE_CHAR_UUID_BASE128(PROVPROFILE_NTWK_RESET_CHAR_UUID)
+};
+#endif
+
 
 /*********************************************************************
  * EXTERNAL VARIABLES
@@ -157,7 +181,7 @@ static uint8_t provisioningProfileNtwkPanIdCharVal[PROVISIONING_NTWK_ID_LEN] = {
 // Provisioning Profile Network PAN ID Characteristic User Description
 static uint8_t provisioningProfileNtwkPanIdDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Network PAN ID";
 
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
 // Provisioning Profile Extended Network PAN ID Characteristic Properties
 static uint8_t provisioningProfileExtNtwkPanIdCharProps = GATT_PROP_READ;
 
@@ -166,17 +190,23 @@ static uint8_t provisioningProfileExtNtwkPanIdCharVal[PROVISIONING_EXT_NTWK_ID_L
 
 // Provisioning Profile Extended Network PAN ID Characteristic User Description
 static uint8_t provisioningProfileExtNtwkPanIdDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Extended Network PAN ID";
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
 
 #if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
 // Provisioning Profile Sensor Frequency Characteristic Properties
+#ifdef USEOT
+static uint8_t provisioningProfileSensorFreqCharProps = GATT_PROP_READ | GATT_PROP_WRITE;
+#else
 static uint8_t provisioningProfileSensorFreqCharProps = GATT_PROP_READ;
+#endif
 
 // Sensor Frequency Characteristic Value
 static uint8_t provisioningProfileSensorFreqCharVal = 0x00;
 
 #if defined(DMM_COLLECTOR)
 static uint8_t provisioningProfileSensorFreqDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Collector operating frequency";
+#elif defined(USEOT)
+static uint8_t provisioningProfileSensorFreqDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Sensor Channel";
 #else /* DMM_SENSOR */
 static uint8_t provisioningProfileSensorFreqDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Sensor operating frequency";
 #endif
@@ -186,11 +216,11 @@ static uint8_t provisioningProfileSensorFreqDataUserDesp[PROVISIONING_MAX_DESCRI
 static uint8_t provisioningProfileSensorChannelCharProps = GATT_PROP_READ | GATT_PROP_WRITE;
 
 // Sensor Channel Characteristic Value
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
 static uint8_t provisioningProfileSensorChannelCharVal[PROVISIONING_NTWK_CHNL_LEN] = {0x00, 0x00, 0x00, 0x00};
 #else
 static uint8_t provisioningProfileSensorChannelCharVal[PROVISIONING_NTWK_CHNL_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-#endif
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
 
 // Provisioning Profile Sensor Channel Characteristic User Description
 #if defined(DMM_ZEDSWITCH)
@@ -201,6 +231,8 @@ static uint8_t provisioningProfileSensorChannelDataUserDesp[PROVISIONING_MAX_DES
 static uint8_t provisioningProfileSensorChannelDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "ZC operating channels";
 #elif defined(DMM_COLLECTOR)
 static uint8_t provisioningProfileSensorChannelDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Collector operating channels";
+#elif defined(USEOT)
+static uint8_t provisioningProfileSensorChannelDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Sensor Channel Mask";
 #else
 static uint8_t provisioningProfileSensorChannelDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Sensor operating channels";
 #endif
@@ -224,6 +256,46 @@ static uint8_t provisioningProfileNtwkKeyCharVal[PROVISIONING_NTWK_KEY_LEN] = {0
 // Provisioning Profile Network Security Key Characteristic User Description
 static uint8_t provisioningProfileNtwkKeyDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Network Security Key";
 #endif
+
+#ifdef USEOT
+static bool provisionAttributeLock;
+// Provisioning Profile Network Name Characteristic Properties
+static uint8_t provisioningProfileNtwkNameCharProps = GATT_PROP_READ | GATT_PROP_WRITE;
+
+// Network Name Characteristic Value
+static uint8_t provisioningProfileNtwkNameCharVal[PROVISIONING_NTWK_NAME_LEN] = "TI-OpenThread";
+
+// Provisioning Profile Network Name Characteristic User Description
+static uint8_t provisioningProfileNtwkNameDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Network Name";
+
+// Provisioning Profile Short Address Characteristic Properties
+static uint8_t provisioningProfileShortAddrCharProps = GATT_PROP_READ;
+
+// Short Address Characteristic Value
+static uint8_t provisioningProfileShortAddrCharVal[PROVISIONING_SHORT_ADDR_LEN] = {0x00, 0x00};
+
+// Provisioning Profile Short Address Characteristic User Description
+static uint8_t provisioningProfileShortAddrDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Short Address";
+
+// Provisioning Profile PSKd Characteristic Properties
+static uint8_t provisioningProfilePSKdCharProps = GATT_PROP_READ;
+
+// PSKd Characteristic Value
+static uint8_t provisioningProfilePSKdCharVal[PROVISIONING_PROV_PSKD_LEN] = "PPSSKK";
+
+// Provisioning Profile PSKd Characteristic User Description
+static uint8_t provisioningProfilePSKdDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "PSKd";
+
+// Provisioning Profile Network Reset Characteristic Properties
+static uint8_t provisioningProfileNtwkResetCharProps = GATT_PROP_READ | GATT_PROP_WRITE;
+
+// Network Reset Characteristic Value
+static uint8_t provisioningProfileNtwkResetCharVal = 0x00;
+
+// Provisioning Profile Network Reset Characteristic User Description
+static uint8_t provisioningProfileNtwkResetDataUserDesp[PROVISIONING_MAX_DESCRIPTION_LEN] = "Reset Network";
+#endif /* USEOT */
+
 
 // Provisioning Profile Provision Sensor Characteristic Properties
 static uint8_t provisioningProfileSensorCharProps = GATT_PROP_READ | GATT_PROP_WRITE;
@@ -301,7 +373,7 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
           0,
           provisioningProfileNtwkPanIdDataUserDesp
         },
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
         // Extended Network PAN ID Characteristic Declaration
         {
           { ATT_BT_UUID_SIZE, characterUUID },
@@ -324,7 +396,8 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
             0,
             provisioningProfileExtNtwkPanIdDataUserDesp
           },
-#else
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
+#if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
           // Sensor Frequency Characteristic Declaration
           {
             { ATT_BT_UUID_SIZE, characterUUID },
@@ -335,7 +408,11 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
             // Sensor Frequency Characteristic Value
             {
               { ATT_UUID_SIZE, provisioningProfileSensorFreqCharUUID },
+#ifdef USEOT
+              GATT_PERMIT_AUTHEN_READ | GATT_PERMIT_AUTHEN_WRITE,
+#else
               GATT_PERMIT_AUTHEN_READ,
+#endif
               0,
               &provisioningProfileSensorFreqCharVal
             },
@@ -346,7 +423,7 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
               0,
               provisioningProfileSensorFreqDataUserDesp
             },
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
             // Sensor Channel Characteristic Declaration
             {
               { ATT_BT_UUID_SIZE, characterUUID },
@@ -416,6 +493,95 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
                     provisioningProfileNtwkKeyDataUserDesp
                   },
 #endif
+#ifdef USEOT
+                  // PSKd Characteristic Declaration
+                  {
+                    { ATT_BT_UUID_SIZE, characterUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    &provisioningProfilePSKdCharProps
+                  },
+                  // PSKd Characteristic Value
+                  {
+                    { ATT_UUID_SIZE, provisioningProfilePSKdCharUUID },
+                    GATT_PERMIT_AUTHEN_READ,
+                    0,
+                    provisioningProfilePSKdCharVal
+                  },
+                  // PSKd Characteristic User Description
+                  {
+                    { ATT_BT_UUID_SIZE, charUserDescUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    provisioningProfilePSKdDataUserDesp
+                  },
+
+                  // Network Name Characteristic Declaration
+                  {
+                    { ATT_BT_UUID_SIZE, characterUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    &provisioningProfileNtwkNameCharProps
+                  },
+                  // Network Name Characteristic Value
+                  {
+                    { ATT_UUID_SIZE, provisioningProfileNtwkNameCharUUID },
+                    GATT_PERMIT_AUTHEN_READ | GATT_PERMIT_AUTHEN_WRITE,
+                    0,
+                    provisioningProfileNtwkNameCharVal
+                  },
+                  // Network Name Characteristic User Description
+                  {
+                    { ATT_BT_UUID_SIZE, charUserDescUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    provisioningProfileNtwkNameDataUserDesp
+                  },
+
+                  // Short Address Characteristic Declaration
+                  {
+                    { ATT_BT_UUID_SIZE, characterUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    &provisioningProfileShortAddrCharProps
+                  },
+                  // Short Address Characteristic Value
+                  {
+                    { ATT_UUID_SIZE, provisioningProfileShortAddrCharUUID },
+                    GATT_PERMIT_AUTHEN_READ,
+                    0,
+                    provisioningProfileShortAddrCharVal
+                  },
+                  
+                   // Short Address Characteristic User Description
+                  {
+                    { ATT_BT_UUID_SIZE, charUserDescUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    provisioningProfileShortAddrDataUserDesp
+                  },
+                  // Network Reset Characteristic Declaration
+                  {
+                    { ATT_BT_UUID_SIZE, characterUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    &provisioningProfileNtwkResetCharProps
+                  },
+                  // Network Reset Characteristic Value
+                  {
+                    { ATT_UUID_SIZE, provisioningProfileNtwkResetCharUUID },
+                    GATT_PERMIT_AUTHEN_READ | GATT_PERMIT_AUTHEN_WRITE,
+                    0,
+                    &provisioningProfileNtwkResetCharVal
+                  },
+                  // Network Reset Characteristic User Description
+                  {
+                    { ATT_BT_UUID_SIZE, charUserDescUUID },
+                    GATT_PERMIT_READ,
+                    0,
+                    provisioningProfileNtwkResetDataUserDesp
+                  },
+#endif
                   // Provision Sensor Characteristic Declaration
                   {
                     { ATT_BT_UUID_SIZE, characterUUID },
@@ -430,7 +596,6 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
                       0,
                       &provisioningProfileSensorCharVal
                     },
-
                     // Provision Sensor Characteristic User Description
                     {
                       { ATT_BT_UUID_SIZE, charUserDescUUID },
@@ -438,6 +603,7 @@ static gattAttribute_t provisioningProfileAttrTbl[] =
                       0,
                       provisioningProfileSensorDataUserDesp
                     },
+
                     // Sensor Provisioning State Characteristic Declaration
                     {
                       { ATT_BT_UUID_SIZE, characterUUID },
@@ -520,6 +686,7 @@ CONST gattServiceCBs_t provisioningProfileCBs =
 bStatus_t ProvisioningProfile_AddService( uint32 services )
 {
   uint8 status;
+
   // Allocate Client Characteristic Configuration tables
   provisioningProfileStateDataConfig = (gattCharCfg_t *)ICall_malloc( sizeof(gattCharCfg_t) *
                                                             MAX_NUM_BLE_CONNS );
@@ -600,7 +767,7 @@ bStatus_t ProvisioningProfile_SetParameter( uint8 param, uint8 len, void *value 
         ret = bleInvalidRange;
       }
       break;
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
     case PROVPROFILE_EXT_NTWK_PAN_ID_CHAR:
       if ( len == PROVISIONING_EXT_NTWK_ID_LEN )
       {
@@ -611,7 +778,8 @@ bStatus_t ProvisioningProfile_SetParameter( uint8 param, uint8 len, void *value 
         ret = bleInvalidRange;
       }
       break;
-#else
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
+#if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
     case PROVPROFILE_SENSOR_FREQ_CHAR:
       if ( len == sizeof (uint8_t) )
       {
@@ -622,7 +790,7 @@ bStatus_t ProvisioningProfile_SetParameter( uint8 param, uint8 len, void *value 
         ret = bleInvalidRange;
       }
       break;
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
     case PROVPROFILE_SENSOR_CHANNEL_CHAR:
       if ( len == PROVISIONING_NTWK_CHNL_LEN )
       {
@@ -655,6 +823,20 @@ bStatus_t ProvisioningProfile_SetParameter( uint8 param, uint8 len, void *value 
       }
       break;
 #endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
+#ifdef USEOT
+    case PROVPROFILE_PROV_PSKD_CHAR:
+        VOID memcpy(provisioningProfilePSKdCharVal, value, PROVISIONING_PROV_PSKD_LEN);
+        break;
+    case PROVPROFILE_NTWK_NAME_CHAR:
+        VOID memcpy(provisioningProfileNtwkNameCharVal, value, PROVISIONING_NTWK_NAME_LEN);
+        break;
+    case PROVPROFILE_NTWK_SHORT_ADDR_CHAR:
+        VOID memcpy(provisioningProfileShortAddrCharVal, value, PROVISIONING_SHORT_ADDR_LEN);
+        break;
+    case PROVPROFILE_NTWK_RESET_CHAR:
+        provisioningProfileNtwkResetCharVal = *((uint8*)value);
+        break;
+#endif
     case PROVPROFILE_PROV_SENSOR_CHAR:
       if ( len == sizeof (uint8_t) )
       {
@@ -709,15 +891,16 @@ bStatus_t ProvisioningProfile_GetParameter( uint8 param, void *value )
     case PROVPROFILE_NTWK_PAN_ID_CHAR:
         VOID memcpy(value, provisioningProfileNtwkPanIdCharVal, PROVISIONING_NTWK_ID_LEN);
         break;
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
     case PROVPROFILE_EXT_NTWK_PAN_ID_CHAR:
         VOID memcpy(value, provisioningProfileExtNtwkPanIdCharVal, PROVISIONING_EXT_NTWK_ID_LEN);
         break;
-#else
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
+#if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
     case PROVPROFILE_SENSOR_FREQ_CHAR:
         *((uint8*)value) = provisioningProfileSensorFreqCharVal;
         break;
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
     case PROVPROFILE_SENSOR_CHANNEL_CHAR:
         VOID memcpy(value, provisioningProfileSensorChannelCharVal, PROVISIONING_NTWK_CHNL_LEN);
         break;
@@ -729,6 +912,20 @@ bStatus_t ProvisioningProfile_GetParameter( uint8 param, void *value )
         VOID memcpy(value, provisioningProfileNtwkKeyCharVal, PROVISIONING_NTWK_KEY_LEN);
         break;
 #endif
+#ifdef USEOT
+    case PROVPROFILE_PROV_PSKD_CHAR:
+        VOID memcpy(value, provisioningProfilePSKdCharVal, PROVISIONING_PROV_PSKD_LEN);
+        break;
+    case PROVPROFILE_NTWK_NAME_CHAR:
+        VOID memcpy(value, provisioningProfileNtwkNameCharVal, PROVISIONING_NTWK_NAME_LEN);
+        break;
+    case PROVPROFILE_NTWK_SHORT_ADDR_CHAR:
+        VOID memcpy(value, provisioningProfileShortAddrCharVal, PROVISIONING_SHORT_ADDR_LEN);
+        break;
+    case PROVPROFILE_NTWK_RESET_CHAR:
+        *((uint8*)value) = provisioningProfileNtwkResetCharVal;
+        break;
+#endif /* USEOT */
     case PROVPROFILE_PROV_SENSOR_CHAR:
         *((uint8*)value) = provisioningProfileSensorCharVal;
         break;
@@ -777,7 +974,7 @@ static bStatus_t ProvisioningProfile_ReadAttrCB(uint16_t connHandle,
     if(!memcmp(pAttr->type.uuid, provisioningProfileSensorCharUUID, pAttr->type.len) ||
 #if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
        !memcmp(pAttr->type.uuid, provisioningProfileSensorFreqCharUUID, pAttr->type.len) ||
-#endif
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) && !defined(USEOT) */
        !memcmp(pAttr->type.uuid, provisioningProfileStateCharUUID, pAttr->type.len) )
     {
       // No need for "GATT_SERVICE_UUID" or "GATT_CLIENT_CHAR_CFG_UUID" cases;
@@ -790,13 +987,13 @@ static bStatus_t ProvisioningProfile_ReadAttrCB(uint16_t connHandle,
       *pLen = PROVISIONING_NTWK_ID_LEN;
       VOID memcpy( pValue, pAttr->pValue, PROVISIONING_NTWK_ID_LEN );
     }
-#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH)
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
     else if(!memcmp(pAttr->type.uuid, provisioningProfileExtNtwkPanIdCharUUID, pAttr->type.len))
     {
       *pLen = PROVISIONING_EXT_NTWK_ID_LEN;
       VOID memcpy( pValue, pAttr->pValue, PROVISIONING_EXT_NTWK_ID_LEN );
     }
-#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) */
+#endif /* defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT) */
 
     else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorChannelCharUUID, pAttr->type.len))
     {
@@ -816,6 +1013,29 @@ static bStatus_t ProvisioningProfile_ReadAttrCB(uint16_t connHandle,
       VOID memcpy( pValue, pAttr->pValue, PROVISIONING_NTWK_KEY_LEN );
     }
 #endif
+#ifdef USEOT
+    else if(!memcmp(pAttr->type.uuid, provisioningProfilePSKdCharUUID, pAttr->type.len))
+    {
+      *pLen = PROVISIONING_PROV_PSKD_LEN;
+      VOID memcpy( pValue, pAttr->pValue, PROVISIONING_PROV_PSKD_LEN );
+    }
+
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileNtwkNameCharUUID, pAttr->type.len))
+    {
+      *pLen = PROVISIONING_NTWK_NAME_LEN;
+      VOID memcpy( pValue, pAttr->pValue, PROVISIONING_NTWK_NAME_LEN );
+    }
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileShortAddrCharUUID, pAttr->type.len))
+    {
+      *pLen = PROVISIONING_SHORT_ADDR_LEN;
+      VOID memcpy( pValue, pAttr->pValue, PROVISIONING_SHORT_ADDR_LEN );
+    }
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileNtwkResetCharUUID, pAttr->type.len))
+    {
+        *pLen = PROVISIONING_GENERIC_LEN;
+        *pValue = *pAttr->pValue;
+    }
+#endif /* USEOT */
     else
     {
       // Should never get here! (other characteristics do not have read permissions)
@@ -857,6 +1077,58 @@ static bStatus_t ProvisioningProfile_WriteAttrCB(uint16_t connHandle,
 
   if ( pAttr->type.len == ATT_UUID_SIZE )
   {
+#ifdef USEOT
+      if(!memcmp(pAttr->type.uuid, provisioningProfileNtwkResetCharUUID, pAttr->type.len))
+      {
+        if ( offset == 0 )
+        {
+          if ( len != 1)
+          {
+            status = ATT_ERR_INVALID_VALUE_SIZE;
+          }
+        }
+        else
+        {
+          status = ATT_ERR_ATTR_NOT_LONG;
+        }
+
+        // Write the value
+        if ( status == SUCCESS )
+        {
+            uint8 *pCurValue = (uint8 *)pAttr->pValue;
+            *pCurValue = pValue[0];
+            notifyApp = PROVPROFILE_NTWK_RESET_CHAR;
+        }
+      }
+      else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorCharUUID, pAttr->type.len))
+      {
+        // Verify that this is not a blob operation
+        if ( offset == 0 )
+        {
+          if ( len != 1 )
+          {
+            status = ATT_ERR_INVALID_VALUE_SIZE;
+          }
+        }
+        else
+        {
+          status = ATT_ERR_ATTR_NOT_LONG;
+        }
+
+        // Write the value
+        if ( status == SUCCESS )
+        {
+          uint8 *pCurValue = (uint8 *)pAttr->pValue;
+          *pCurValue = pValue[0];
+
+          notifyApp = PROVPROFILE_PROV_SENSOR_CHAR;
+        }
+      }
+      else if(provisionAttributeLock){
+          return ATT_ERR_INVALID_VALUE;
+      }//Beyond this point it's been confirmed that the provisionlock is disabled
+      else
+#endif
     if(!memcmp(pAttr->type.uuid, provisioningProfileNtwkPanIdCharUUID, pAttr->type.len))
     {
       if ( offset == 0 )
@@ -879,6 +1151,82 @@ static bStatus_t ProvisioningProfile_WriteAttrCB(uint16_t connHandle,
         notifyApp = PROVPROFILE_NTWK_PAN_ID_CHAR;
       }
     }
+#if !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorFreqCharUUID, pAttr->type.len))
+    {
+      // Verify that this is not a blob operation
+      if ( offset == 0 )
+      {
+        if ( len != 1 )
+        {
+          status = ATT_ERR_INVALID_VALUE_SIZE;
+        }
+      }
+      else
+      {
+        status = ATT_ERR_ATTR_NOT_LONG;
+      }
+
+      // Write the value
+      if ( status == SUCCESS )
+      {
+        uint8 *pCurValue = (uint8 *)pAttr->pValue;
+        *pCurValue = pValue[0];
+
+        notifyApp = PROVPROFILE_SENSOR_FREQ_CHAR;
+      }
+    }
+#endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH)  && !defined(USEOT) */
+#ifndef USEOT
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorCharUUID, pAttr->type.len))
+    {
+      // Verify that this is not a blob operation
+      if ( offset == 0 )
+      {
+        if ( len != 1 )
+        {
+          status = ATT_ERR_INVALID_VALUE_SIZE;
+        }
+      }
+      else
+      {
+        status = ATT_ERR_ATTR_NOT_LONG;
+      }
+
+      // Write the value
+      if ( status == SUCCESS )
+      {
+        uint8 *pCurValue = (uint8 *)pAttr->pValue;
+        *pCurValue = pValue[0];
+
+        notifyApp = PROVPROFILE_PROV_SENSOR_CHAR;
+      }
+    }
+#endif
+#if defined(DMM_ZEDSWITCH) || defined(DMM_ZRLIGHT) || defined(DMM_ZCSWITCH) || defined(USEOT)
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileExtNtwkPanIdCharUUID, pAttr->type.len))
+    {
+      if ( offset == 0 )
+      {
+        if ( len != PROVISIONING_EXT_NTWK_ID_LEN )
+        {
+          status = ATT_ERR_INVALID_VALUE_SIZE;
+        }
+      }
+      else
+      {
+        status = ATT_ERR_ATTR_NOT_LONG;
+      }
+
+      // Write the value
+      if ( status == SUCCESS )
+      {
+        VOID memcpy( pAttr->pValue, pValue, PROVISIONING_EXT_NTWK_ID_LEN );
+
+        notifyApp = PROVPROFILE_EXT_NTWK_PAN_ID_CHAR;
+      }
+    }
+#endif
     else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorChannelCharUUID, pAttr->type.len))
     {
       if ( offset == 0 )
@@ -927,6 +1275,32 @@ static bStatus_t ProvisioningProfile_WriteAttrCB(uint16_t connHandle,
     }
 #endif /* !defined(DMM_ZEDSWITCH) && !defined(DMM_ZRLIGHT) && !defined(DMM_ZCSWITCH) */
 
+#ifdef USEOT
+    else if(!memcmp(pAttr->type.uuid, provisioningProfileNtwkNameCharUUID, pAttr->type.len))
+    {
+      if ( offset == 0 )
+      {
+        if ( len > PROVISIONING_NTWK_NAME_LEN -1 )
+        {
+          status = ATT_ERR_INVALID_VALUE_SIZE;
+        }
+      }
+      else
+      {
+        status = ATT_ERR_ATTR_NOT_LONG;
+      }
+
+      // Write the value
+      if ( status == SUCCESS )
+      {
+        VOID memcpy( pAttr->pValue, pValue, PROVISIONING_NTWK_NAME_LEN-1 );
+        int i;
+        for(i = len; i< PROVISIONING_NTWK_NAME_LEN; i++)
+            pAttr->pValue[i] = '\0';
+        notifyApp = PROVPROFILE_NTWK_NAME_CHAR;
+      }
+    }
+#else
     else if(!memcmp(pAttr->type.uuid, provisioningProfileSensorCharUUID, pAttr->type.len))
     {
       // Verify that this is not a blob operation
@@ -951,6 +1325,7 @@ static bStatus_t ProvisioningProfile_WriteAttrCB(uint16_t connHandle,
         notifyApp = PROVPROFILE_PROV_SENSOR_CHAR;
       }
     }
+#endif /* USEOT */
 
     else
     {
@@ -975,9 +1350,14 @@ static bStatus_t ProvisioningProfile_WriteAttrCB(uint16_t connHandle,
     provisioningProfile_AppCBs->pfnRemoteDispalyProfileChange( notifyApp );
   }
 
-
   return ( status );
 }
 
+
+#ifdef USEOT
+void ProvisioningProfile_SetProvisionLock(bool state){
+    provisionAttributeLock = state;
+}
+#endif
 /*********************************************************************
 *********************************************************************/

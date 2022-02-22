@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Preview)",
-        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Preview)",
+        "Name": "IEEE 802.15.4-2006, 250 kbps, OQPSK, DSSS = 1:8 (Release Candidate)",
+        "Description": "IEEE 802.15.4 O-QPSK DSSS PHY (250 kbps) at 2450 MHz band (Release Candidate)",
         "Frequency": "2405",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -94,7 +94,7 @@
                             "Element32b": [
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "DC\/DC regulator: In Tx, use DCDCCTL5[3:0]=0x3 (DITHER_EN=0 and IPEAK=3).",
+                                    "_comment": "IEEE 15.4: Set IPEAK = 3 and DCDC dither off for TX",
                                     "$": "0x00F388D3"
                                 },
                                 {

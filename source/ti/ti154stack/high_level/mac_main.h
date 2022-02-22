@@ -9,36 +9,61 @@
 
  ******************************************************************************
  
- Copyright (c) 2005-2021, Texas Instruments Incorporated
- All rights reserved.
+ Copyright (c) 2005-2022, Texas Instruments Incorporated
 
- IMPORTANT: Your use of this Software is limited to those specific rights
- granted under the terms of a software license agreement between the user
- who downloaded the software, his/her employer (which must be your employer)
- and Texas Instruments Incorporated (the "License"). You may not use this
- Software unless you agree to abide by the terms of the License. The License
- limits your use, and you acknowledge, that the Software may not be modified,
- copied or distributed unless embedded on a Texas Instruments microcontroller
- or used solely and exclusively in conjunction with a Texas Instruments radio
- frequency transceiver, which is integrated into your product. Other than for
- the foregoing purpose, you may not use, reproduce, copy, prepare derivative
- works of, modify, distribute, perform, display or sell this Software and/or
- its documentation for any purpose.
+ All rights reserved not granted herein.
+ Limited License.
 
- YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
- NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
- TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
- NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
- LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
- INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
- OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT
- OF SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
- (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
+ Texas Instruments Incorporated grants a world-wide, royalty-free,
+ non-exclusive license under copyrights and patents it now or hereafter
+ owns or controls to make, have made, use, import, offer to sell and sell
+ ("Utilize") this software subject to the terms herein. With respect to the
+ foregoing patent license, such license is granted solely to the extent that
+ any such patent is necessary to Utilize the software alone. The patent
+ license shall not apply to any combinations which include this software,
+ other than combinations with devices manufactured by or for TI ("TI
+ Devices"). No hardware patent is licensed hereunder.
 
- Should you have any questions regarding your right to use this Software,
- contact Texas Instruments Incorporated at www.TI.com.
+ Redistributions must preserve existing copyright notices and reproduce
+ this license (including the above copyright notice and the disclaimer and
+ (if applicable) source code license limitations below) in the documentation
+ and/or other materials provided with the distribution.
+
+ Redistribution and use in binary form, without modification, are permitted
+ provided that the following conditions are met:
+
+   * No reverse engineering, decompilation, or disassembly of this software
+     is permitted with respect to any software provided in binary form.
+   * Any redistribution and use are licensed by TI for use only with TI Devices.
+   * Nothing shall obligate TI to provide you with source code for the software
+     licensed and provided to you in object code.
+
+ If software source code is provided to you, modification and redistribution
+ of the source code are permitted provided that the following conditions are
+ met:
+
+   * Any redistribution and use of the source code, including any resulting
+     derivative works, are licensed by TI for use only with TI Devices.
+   * Any redistribution and use of any object code compiled from the source
+     code and any resulting derivative works, are licensed by TI for use
+     only with TI Devices.
+
+ Neither the name of Texas Instruments Incorporated nor the names of its
+ suppliers may be used to endorse or promote products derived from this
+ software without specific prior written permission.
+
+ DISCLAIMER.
+
+ THIS SOFTWARE IS PROVIDED BY TI AND TI'S LICENSORS "AS IS" AND ANY EXPRESS
+ OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL TI AND TI'S LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
  
@@ -70,67 +95,117 @@ enum
   MAC_STARTING_ST       /* MAC coordinator is starting a network */
 };
 
-/* State machine events */
+/* State machine events, triggers MAC API and state transistion depending on state machine state.
+ * Note that many events require a specific MAC state for their intended action to take place. The
+ * comments below only outline their intended action. See hmac_global.c for the full state machine
+ * action/transition table. 
+ */
 enum
 {
-  MAC_API_DATA_REQ_EVT, /* MAP_macApiDataReq */
-  MAC_API_PURGE_REQ_EVT,
-  MAC_API_ASSOCIATE_REQ_EVT,
-  MAC_API_ASSOCIATE_RSP_EVT,
-  MAC_API_DISASSOCIATE_REQ_EVT,
-  MAC_API_ORPHAN_RSP_EVT,
-  MAC_API_POLL_REQ_EVT,
-  MAC_API_SCAN_REQ_EVT,
-  MAC_API_START_REQ_EVT,
-  MAC_API_SYNC_REQ_EVT,
-  MAC_API_WS_ASYNC_REQ_EVT,
-  MAC_API_PWR_ON_REQ_EVT,
-  MAC_RX_ASSOC_REQ_EVT,
-  MAC_RX_ASSOC_RSP_EVT,
-  MAC_RX_DISASSOC_EVT,
-  MAC_RX_DATA_REQ_EVT,
-  MAC_RX_PAN_CONFLICT_EVT,
-  MAC_RX_ORPHAN_EVT,
-  MAC_RX_BEACON_REQ_EVT,
-  MAC_RX_REALIGN_EVT,
-  MAC_RX_GTS_REQ_EVT,
-  MAC_RX_BEACON_EVT,
-  MAC_RX_DATA_IND_EVT,
-  MAC_TX_ASSOC_REQ_OK_EVT,
-  MAC_TX_ASSOC_REQ_FAIL_EVT,
-  MAC_TX_ASSOC_RSP_EVT,
-  MAC_TX_DISASSOC_EVT,
-  MAC_TX_ORPHAN_OK_EVT,
-  MAC_TX_ORPHAN_FAIL_EVT,
-  MAC_TX_BEACON_REQ_OK_EVT,
-  MAC_TX_BEACON_REQ_FAIL_EVT,
-  MAC_TX_REALIGN_OK_EVT,
-  MAC_TX_REALIGN_FAIL_EVT,
-  MAC_TX_DATA_REQ_OK_EVT,
-  MAC_TX_DATA_REQ_FAIL_EVT,
-  MAC_TX_DATA_REQ_PEND_EVT,
-  MAC_TX_CONFLICT_OK_EVT,
-  MAC_TIM_RESPONSE_WAIT_EVT,
-  MAC_TIM_FRAME_RESPONSE_EVT,
-  MAC_TIM_SCAN_EVT,
-  MAC_TIM_SYNC_EVT,
-  MAC_TIM_EXP_INDIRECT_EVT,
-  MAC_INT_SCAN_COMPLETE_EVT,
-  MAC_INT_ASSOC_FAILED_EVT,
-  MAC_INT_AUTO_POLL_EVT,
-  MAC_INT_START_COMPLETE_EVT,
-  MAC_INT_TX_COMPLETE_EVT,
-  MAC_INT_BEACON_RESP_TIM_EVT,
-  MAC_INT_BROADCAST_PEND_EVT,
-  MAC_NO_ACTION_EVT,
-  MAC_RX_ENHANCED_BEACON_REQ_EVT,
-  MAC_TX_ENHANCED_BEACON_REQ_OK_EVT,
-  MAC_TX_ENHANCED_BEACON_REQ_FAIL_EVT,
+  /* Triggered by corresponding MAC API call */
+  MAC_API_DATA_REQ_EVT,         /* Triggers macApiDataReq, builds and sends a MAC data frame */
+  MAC_API_PURGE_REQ_EVT,        /* Triggers macApiPurgeReq, request to purge data request from MAC data queue */
+  MAC_API_ASSOCIATE_REQ_EVT,    /* Triggers macApiAssociateReq, builds and sends a MAC association request frame */
+  MAC_API_ASSOCIATE_RSP_EVT,    /* Triggers macApiAssociateRsp, builds and sends a MAC association response frame */
+  MAC_API_DISASSOCIATE_REQ_EVT, /* Triggers macApiDisassociateReq, builds and sends a MAC disassociation request frame */
+  MAC_API_ORPHAN_RSP_EVT,       /* Triggers macApiOrphanRsp, builds and sends a MAC orphan notification response frame */
+  MAC_API_POLL_REQ_EVT,         /* Triggers macApiPollReq, builds and sends a data (poll) request frame */
+  MAC_API_SCAN_REQ_EVT,         /* Triggers macApiScanReq, initiates MAC ED, active, passive, or orphan
+                                   scan process (when MAC is in idle state) */
+  MAC_API_START_REQ_EVT,        /* Triggers macApiStartReq, starts the network on a coordinator device */
+  MAC_API_SYNC_REQ_EVT,         /* Triggers macApiSyncReq, builds and sends a sync request frame on a beacon device */
+  MAC_API_WS_ASYNC_REQ_EVT,     /* Triggers macApiWSAsyncReq, builds and sends an FH asynchronous request */
+  MAC_API_PWR_ON_REQ_EVT,       /* Triggers macApiPwrOnReq, currently unused */
+
+  /* Triggered by MAC frame RX */
+  MAC_RX_ASSOC_REQ_EVT,         /* Triggers macRxAssociateReq, handles association request RX */
+  MAC_RX_ASSOC_RSP_EVT,         /* Triggers macRxAssocRsp or macPollRxAssocRsp (if in poll state),
+                                   handles association response RX */
+  MAC_RX_DISASSOC_EVT,          /* Triggers macAssocRxDisassoc or macPollRxDisassoc (if in poll state),
+                                   handles disassocation request RX */
+  MAC_RX_DATA_REQ_EVT,          /* Triggers macRxDataReq, handles data request RX */
+  MAC_RX_PAN_CONFLICT_EVT,      /* Triggers macRxPanConflict, handles PAN ID conflict notification by sending sync
+                                   loss indication */
+  MAC_RX_ORPHAN_EVT,            /* Triggers macRxOrphan, handles orphan notification command frame RX */
+  MAC_RX_BEACON_REQ_EVT,        /* Triggers macRxBeaconReq, handles beacon request RX by sending beacon frame */
+  MAC_RX_REALIGN_EVT,           /* Triggers macRxCoordRealign or macScanRxCoordRealign (scan state),
+                                   handles coord realignment frame RX */
+  MAC_RX_GTS_REQ_EVT,           /* No action or state transition change on GTS req RX */
+  MAC_RX_BEACON_EVT,            /* Triggers macRxBeacon or macScanRxBeacon (scan state), handles beacon frame RX */
+  MAC_RX_DATA_IND_EVT,          /* Triggers macDataRxInd or macPollDataRxInd (poll state), handles data frame RX */
+
+  /* Triggered by MAC frame TX success or failure */
+  MAC_TX_ASSOC_REQ_OK_EVT,      /* On association req TX success, triggers start response timer
+                                   (macStartResponseTimer) */
+  MAC_TX_ASSOC_REQ_FAIL_EVT,    /* On association req TX fail, triggers failure handling (macAssocFailed)  */
+  MAC_TX_ASSOC_RSP_EVT,         /* On association rsp TX success, triggers comm status indication to app
+                                   (macCommStatusInd) */
+  MAC_TX_DISASSOC_EVT,          /* On disassocation notification TX success, triggers disassociation confirm
+                                   (macDisassocComplete) */
+  MAC_TX_ORPHAN_OK_EVT,         /* On orphan notification TX success, if in scanning state, setup scan timer
+                                   (macScanStartTimer) */
+  MAC_TX_ORPHAN_FAIL_EVT,       /* On orphan notification TX fail, if in scanning state, move on to next channel
+                                   to scan (macScanNextChan) */
+  MAC_TX_BEACON_REQ_OK_EVT,     /* On beacon req TX success, if in scanning state, setup scan timer
+                                   (macScanStartTimer) */
+  MAC_TX_BEACON_REQ_FAIL_EVT,   /* On beacon req TX fail, if in scanning state, move on to next channel to scan
+                                   (macScanNextChan) */
+  MAC_TX_REALIGN_OK_EVT,        /* On coord realignment TX success, if in starting state, continue with coord
+                                   realignment process (macStartContinue). Otherwise, send comm status indication
+                                   (macCommStatusInd). */
+  MAC_TX_REALIGN_FAIL_EVT,      /* On coord realignment TX fail, if in starting state, end realignment process
+                                   (macStartComplete) and transition to idle state. Otherwise, send comm status
+                                   indication (macCommStatusInd). */
+  MAC_TX_DATA_REQ_OK_EVT,       /* On data poll (request) TX success with no data pending, handle data request
+                                   completion (macAssocDataReqComplete or macPollDataReqComplete, depending
+                                   on MAC state) */
+  MAC_TX_DATA_REQ_FAIL_EVT,     /* On data poll (request) TX fail, handle identically to MAC_TX_DATA_REQ_OK_EVT
+                                   (data poll without pending data) */
+  MAC_TX_DATA_REQ_PEND_EVT,     /* On data poll (request) TX pending (ACK with pending bit set RX), start the
+                                   response frame timer (macStartFrameResponseTimer) */
+  MAC_TX_CONFLICT_OK_EVT,       /* On PAN ID conflict notification TX success, sends sync loss indication
+                                   (macPanConflictComplete) */
+
+  /* Triggered by timer event or starts timer event */
+  MAC_TIM_RESPONSE_WAIT_EVT,    /* On association resp timer timeout (triggered by macStartResponseTimer),
+                                   resends association request (macAssocDataReq) */
+  MAC_TIM_FRAME_RESPONSE_EVT,   /* On data poll pending data timer timeout (triggered by macStartFrameResponseTimer),
+                                   triggers timeout handling (macAssocFrameResponseTimeout or
+                                   macPollFrameResponseTimeout depending on MAC state) */
+  MAC_TIM_SCAN_EVT,             /* On API scan request (macApiScanReq), starts scanning process (macScanNextChan) */
+  MAC_TIM_SYNC_EVT,             /* Unused event */
+  MAC_TIM_EXP_INDIRECT_EVT,     /* On indirect frame expiration in the TX data queue, trigger handling function
+                                   (macIndirectExpire) */
+
+  /* Internal event */
+  MAC_INT_SCAN_COMPLETE_EVT,    /* On scan completion, triggers handling function (macScanComplete) */
+  MAC_INT_ASSOC_FAILED_EVT,     /* On association failure, triggers handling function (macAssocFailed) */
+  MAC_INT_AUTO_POLL_EVT,        /* On beacon RX in a beacon mode device, sends an automatic poll request
+                                   (macAutoPoll) */
+  MAC_INT_START_COMPLETE_EVT,   /* On macStartContinue completion, trigger the network start completion handler
+                                   (macStartComplete) */
+  MAC_INT_TX_COMPLETE_EVT,      /* On TX completion or certain other conditions, trigger TX of queued data
+                                   frames (macDataSend) */
+  MAC_INT_BEACON_RESP_TIM_EVT,  /* On data poll pending timer start (macStartFrameResponseTimer) in a beacon mode
+                                   device, start the data response frame timer (macBeaconStartFrameResponseTimer) */
+  MAC_INT_BROADCAST_PEND_EVT,   /* On beacon RX with pending broadcast frame on a beacon mode device, start the
+                                   broadcast frame timer (macStartBroadcastPendTimer)*/
+
+  /* Other events and additions to base MAC events */
+  MAC_NO_ACTION_EVT,                         /* No action taken when event is triggered */
+  MAC_RX_ENHANCED_BEACON_REQ_EVT,            /* On enhanced beacon request RX, handle by sending an enhanced or normal
+                                                beacon as requested (macRxEnhancedBeaconReq). Currently unsupported. */
+  MAC_TX_ENHANCED_BEACON_REQ_OK_EVT,         /* Unused event */
+  MAC_TX_ENHANCED_BEACON_REQ_FAIL_EVT,       /* Unused event */
   /* not needed MAC_RX_WS_ASYNC_IND_EVT, */
-  MAC_CSMA_TIM_EXP_EVT,
-  MAC_BC_TIM_EXP_EVT,
-  TX_BACKOFF_TIM_EXP_EVT,
-  RX_BACKOFF_TIM_EXP_EVT
+  MAC_CSMA_TIM_EXP_EVT,                      /* On CSMA delay timer expiration , trigger handler function
+                                                (macTxCsmaDelay) */
+  MAC_BC_TIM_EXP_EVT,                        /* On FH backoff timer expiration, trigger handler function
+                                                (macBcTimerHandler) */
+  TX_BACKOFF_TIM_EXP_EVT,                    /* On TX backoff timer expiration (requested by macRequestBackoff),
+                                                reschedule frame TX (macTxBackoffHandler) */
+  RX_BACKOFF_TIM_EXP_EVT                     /* On RX backoff timer expiration (requested by macRequestBackoff),
+                                                retry radio RX on command */
 };
 
 /* This must be set to the last API event in the enumeration */
@@ -139,15 +214,15 @@ enum
 /* Enumeration of action function table sets; maximum of 16 */
 enum
 {
-  MAC_MGMT_ACTION_1,
+  MAC_MGMT_ACTION_1,         // Set of management actions
   MAC_MGMT_ACTION_2,
-  MAC_SCAN_ACTION,
-  MAC_DEVICE_ACTION_1,
+  MAC_SCAN_ACTION,           // Set of scan actions
+  MAC_DEVICE_ACTION_1,       // Set of general actions for all devices
   MAC_DEVICE_ACTION_2,
-  MAC_COORD_ACTION_1,
+  MAC_COORD_ACTION_1,        // Set of actions for coordinator devices
   MAC_COORD_ACTION_2,
   MAC_COORD_ACTION_3,
-  MAC_BEACON_DEVICE_ACTION,
+  MAC_BEACON_DEVICE_ACTION,  // Set of actions for only beacon-mode devices
   MAC_ACTION_SET_MAX
 };
 
@@ -156,10 +231,13 @@ enum
 #define MAC_ACTION_SET(n)       ((n) >> 4)
 #define MAC_ACTION_ID(n)        ((n) & 0x0F)
 
-/* Enumeration of action functions; maximum of 16 per set */
+/* Enumeration of action functions; maximum of 16 per set.
+ * See hmac_global.c for the full state machine action/transition table.
+ * See above EVT enum for an overview of corresponding events to MAC actions.
+ */
 enum
 {
-  /* Mgmt set 1 */
+  /* Mgmt set 1: See mac_mgmt.c for function implmentations */
   MAC_NO_ACTION = MAC_ACTION_INIT(MAC_MGMT_ACTION_1),
   MAC_API_BAD_STATE,
   MAC_API_PENDING,
@@ -174,14 +252,14 @@ enum
   RX_BACKOFF_TIM_EXPIRY,
   NOP_BACKOFF_TIM_EXPIRY,
 
-  /* Mgmt set 2 */
+  /* Mgmt set 2: See mac_mgmt.c for function implmentations */
   MAC_API_PWR_ON_REQ = MAC_ACTION_INIT(MAC_MGMT_ACTION_2),
   MAC_API_DISASSOCIATE_REQ,
   MAC_DISASSOC_COMPLETE,
   MAC_RX_BEACON,
   MAC_RX_DISASSOC,
 
-  /* Scan */
+  /* Scan: See MAC_Init() for state->function mapping and mac_scan.c for function implementations */
   MAC_API_SCAN_REQ = MAC_ACTION_INIT(MAC_SCAN_ACTION),
   MAC_SCAN_COMPLETE,
   MAC_SCAN_FAILED_IN_PROGRESS,
@@ -189,7 +267,7 @@ enum
   MAC_SCAN_RX_BEACON,
   MAC_SCAN_START_TIMER,
 
-  /* Device set 1 */
+  /* Device set 1: See mac_device.c for function implementations */
   MAC_API_ASSOCIATE_REQ = MAC_ACTION_INIT(MAC_DEVICE_ACTION_1),
   MAC_API_POLL_REQ,
   MAC_ASSOC_DATA_REQ,
@@ -205,18 +283,18 @@ enum
   MAC_START_FRAME_RESPONSE_TIMER,
   MAC_START_RESPONSE_TIMER,
 
-  /* Device set 2 */
+  /* Device set 2: See mac_device.c for function implementations */
   MAC_ASSOC_RX_DISASSOC = MAC_ACTION_INIT(MAC_DEVICE_ACTION_2),
   MAC_POLL_RX_DISASSOC,
   MAC_SCAN_RX_COORD_REALIGN,
   MAC_RX_COORD_REALIGN,
   MAC_PAN_CONFLICT_COMPLETE,
 
-  /* Coordinator set 1 */
+  /* Coordinator set 1: See mac_coord.c/mac_beacon_coord.c for function implementations */
   MAC_API_START_REQ = MAC_ACTION_INIT(MAC_COORD_ACTION_1),
   MAC_START_CONTINUE,
 
-  /* Coordinator set 2 */
+  /* Coordinator set 2: See mac_coord.c for function implementations */
   MAC_API_ASSOCIATE_RSP = MAC_ACTION_INIT(MAC_COORD_ACTION_2),
   MAC_RX_ASSOC_REQ,
   MAC_RX_BEACON_REQ,
@@ -225,13 +303,13 @@ enum
   MAC_INDIRECT_EXPIRE,
   MAC_RX_ENHANCED_BEACON_REQ,
 
-  /* Coordinator set 3 */
+  /* Coordinator set 3: See mac_coord.c for function implementations */
   MAC_API_ORPHAN_RSP = MAC_ACTION_INIT(MAC_COORD_ACTION_3),
   MAC_API_PURGE_REQ,
   MAC_RX_ORPHAN,
   MAC_RX_PAN_CONFLICT,
 
-  /* Beacon device */
+  /* Beacon device: See mac_beacon_device.c for function implementations  */
   MAC_API_SYNC_REQ = MAC_ACTION_INIT(MAC_BEACON_DEVICE_ACTION),
   MAC_AUTO_POLL,
   MAC_BEACON_START_FRAME_RSP_TIMER,

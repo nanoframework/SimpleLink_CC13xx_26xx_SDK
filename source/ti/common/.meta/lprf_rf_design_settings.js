@@ -95,6 +95,9 @@ const boardSpecificRfDesignSettings = {
     LP_CC1352P7_4_RF_DESIGN_SETTINGS: {
         rfDesign: "LP_CC1352P7-4"
     },
+    LP_CC1311P3_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC1311P3"
+    },
     LP_CC2652R7_RF_DESIGN_SETTINGS: {
         rfDesign: "LP_CC2652R7"
     },
@@ -103,6 +106,24 @@ const boardSpecificRfDesignSettings = {
     },
     LP_CC2651P3_RF_DESIGN_SETTINGS: {
         rfDesign: "LP_CC2651P3"
+    },
+    LP_CC1354R10_RGZ_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC1354R10_RGZ"
+    },
+    LP_CC2674R10_FPGA_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_CC2674R10_FPGA"
+    },
+    LP_EM_CC1354P10_1_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_EM_CC1354P10_1"
+    },
+    LP_EM_CC1354P10_6_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_EM_CC1354P10_6"
+    },
+    LP_EM_CC1314R10_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_EM_CC1314R10"
+    },
+    LP_EM_CC2653P10_RF_DESIGN_SETTINGS: {
+        rfDesign: "LP_EM_CC2653P10"
     }
 };
 

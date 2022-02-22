@@ -50,6 +50,15 @@ const RfDesign = system.getScript("/ti/devices/radioconfig/rfdesign");
 const RadioConfig = system.getScript("/ti/devices/radioconfig/radioconfig_common.js");
 
 /* Description text for configurables */
+const rfDesignDescription = "Select which RF design to use as template";
+const rfDesignLongDescription = `The user must select an existing TI RF design \
+to reference for radio configuration. This value must match the Based on RF \
+Design parameter in the RF module.
+
+__Default__: The RF design reference selected in this project is automatically \
+configured based on the example. Please move to a custom board or see the \
+other examples provided in the SDK if another reference board is desired.`;
+
 const channelDescription = `The default IEEE 802.15.4 frequency channel for \
 the device`;
 
@@ -164,41 +173,121 @@ function moduleInstances(inst)
         args: radioConfigArgs
     };
 
-    var boardName = RadioConfig.getBoardName();
-
-    /* Special handling for the P-4 2.4GHz front end characterization settings */
-    if(boardName.match(/(LP_|LAUNCHXL-)CC1352P(7)?-4/))
-    {
-        radioConfigArgs.phyType = "ieee154p10";
-    }
-
-    // Add high PA options if present
-    if(deviceId.match(/CC(2652R|2674R|1352R1)/))
+    if(deviceId.match(/CC(265[12]R|2674R|1352R1|1354R)/))
     {
         cmdList.push("cmdRadioSetup");
-        // set TX power to the max value, this config is not important because
-        // it is reset by TI-OpenThread initialization code
-        // freq = 2405; just a value in 2.4GHz
-        // paEnable = false; to force normal PA options
         radioConfigArgs.txPower = RfDesign.getTxPowerOptions(2405, false)[0].name;
     }
-    else if(deviceId.match(/CC(2652P|2674P|1352P)/))
+    else if(deviceId.match(/CC(265[12]P|2653P|2674P|1352P)/))
     {
         cmdList.push("cmdRadioSetupPa");
         radioConfigArgs.highPA = true;
         radioConfigArgs.codeExportConfig.paExport = "combined";
-        // set TX power to the max value, this config is not important because
-        // it is reset by TI-OpenThread initialization code
-        // freq = 2405; just a value in 2.4GHz
-        // paEnable = true; to force high PA options
         radioConfigArgs.txPowerHi = RfDesign.getTxPowerOptions(2405, true)[0].name;
+    }
+    else if(deviceId.match(/CC(2654P|1354P)/))
+    {
+        // currently not characterized for high PA
+        cmdList.push("cmdRadioSetupPa");
+        radioConfigArgs.txPower = RfDesign.getTxPowerOptions(2405, false)[0].name;
     }
     else
     {
         throw new Error("Could not match platform to any known platform types");
     }
 
+    /* Special handling for the P-4 2.4GHz front end characterization settings */
+    if(inst.rfDesign.match(/(LP_|LAUNCHXL-)CC1352P(7)?-4/))
+    {
+        radioConfigArgs.phyType = "ieee154p10";
+        radioConfigArgs.txPowerHi = "10";
+    }
+
     return([radioConfigModule]);
+}
+
+/*
+ *  ======== getRfDesignOptions ========
+ *  Generates an array of SRFStudio compatible rfDesign options based on device
+ *
+ * @param deviceId - device being used
+ *
+ * @returns Array - Array of rfDesign options, if the device isn't supported,
+ *                  returns null
+ */
+function getRfDesignOptions()
+{
+    const deviceId = system.deviceData.deviceId;
+    let newRfDesignOptions = null;
+
+    if(deviceId === "CC1352P1F3RGZ")
+    {
+        newRfDesignOptions = [
+            {name: "LAUNCHXL-CC1352P-2"},
+            {name: "LAUNCHXL-CC1352P-4"}
+        ];
+    }
+    else if(deviceId === "CC1352R1F3RGZ")
+    {
+        newRfDesignOptions = [{name: "LAUNCHXL-CC1352R1"}];
+    }
+    else if(deviceId === "CC2652R1FRGZ")
+    {
+        newRfDesignOptions = [{name: "LAUNCHXL-CC26X2R1"}];
+    }
+    else if(deviceId === "CC2652RB1FRGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652RB"}];
+    }
+    else if(deviceId === "CC2652R1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652RSIP"}];
+    }
+    else if(deviceId === "CC2652P1FSIP")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652PSIP"}];
+    }
+    else if(deviceId === "CC2652R7RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2652R7"}];
+    }
+    else if(deviceId === "CC1352P7RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC1352P7-4"}];
+    }
+    else if(deviceId === "CC2651P3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651P3"}];
+    }
+    else if(deviceId === "CC2651R3RGZ")
+    {
+        newRfDesignOptions = [{name: "LP_CC2651R3"}];
+    }
+    else if(deviceId === "CC1354P10RSK")
+    {
+        newRfDesignOptions = [
+            {name: "LP_EM_CC1354P10_1"},
+            {name: "LP_EM_CC1354P10_6"}
+        ];
+    }
+    else if(deviceId === "CC1314R10RSK")
+    {
+        newRfDesignOptions = [{name: "LP_EM_CC1314R10"}];
+    }
+    else if(deviceId === "CC2653P10RSK")
+    {
+        newRfDesignOptions = [{name: "LP_EM_CC2653P10"}];
+    }
+    else if(deviceId === "CC2674R10RSK")
+    {
+        newRfDesignOptions = [{name: "LP_CC2674R10_FPGA"}];
+    }
+    else
+    {
+        throw new Error("Unknown deviceId " + deviceId + ".");
+    }
+
+    return(newRfDesignOptions);
 }
 
 /*!
@@ -210,33 +299,24 @@ function moduleInstances(inst)
  */
 function getTxPowerConfigOptions()
 {
+    /* TX power options are based on the chip, not the current RF design. There
+     * is no way to propagate the "based on" RF design into the RF design
+     * option. This may lead to some incorrect options in the TX power
+     * configurable.
+     */
     let txPowerValueList = [];
-    let phyName = "";
-    const tmp = system.getScript("/ti/devices/radioconfig/settings/ieee_15_4");
-    const rfSettings = _.cloneDeep(tmp.config);
-
-    if(deviceId.match(/CC2652P1FSIP/))
-    {
-        phyName = "ieee154p10";
-    }
-    else
-    {
-        phyName = "ieee154";
-    }
-
-    // Get the command handler for this phy instance
-    const cmdHandler = CmdHandler.get(RadioConfig.PHY_IEEE_15_4, phyName);
-    const freq = cmdHandler.getFrequency();
-
     // Regular PA options
-    txPowerValueList = _.concat(txPowerValueList, RfDesign.getTxPowerOptions(freq, false));
+    txPowerValueList = _.concat(txPowerValueList, RfDesign.getTxPowerOptions(2405, false));
     // High PA options (if available)
-    txPowerValueList = _.concat(txPowerValueList, RfDesign.getTxPowerOptions(freq, true));
+    if(deviceId.match(/CC(2652P|2674P|1352P)/))
+    {
+        txPowerValueList = _.concat(txPowerValueList, RfDesign.getTxPowerOptions(2405, true));
+    }
 
     // Round all tx power values
     _.forEach(txPowerValueList, (option) =>
     {
-        option.name = _.round(option.name);
+        option.name = _.round(parseInt(option.name));
     });
 
     // Remove any duplicates
@@ -270,6 +350,14 @@ function onCoexEnableChanged(inst, ui) {
  */
 const rfModule = {
     config: [
+        {
+            name: "rfDesign",
+            displayName: "Based On RF Design",
+            description: rfDesignDescription,
+            longDescription: rfDesignLongDescription,
+            options: getRfDesignOptions(),
+            default: getRfDesignOptions()[0].name
+        },
         {
             name: "channel",
             displayName: "Default Channel",
@@ -378,9 +466,18 @@ function validate(inst, validation)
     // Get the RF Design module
     const rfDesign = system.modules["/ti/devices/radioconfig/rfdesign"].$static;
 
-    if(rfDesign.rfDesign === "LAUNCHXL-CC1352P4" || rfDesign.rfDesign === "LAUNCHXL-CC1352P1")
+    if(rfDesign.rfDesign === "LAUNCHXL-CC1352P1")
     {
-       validation.logError(`Thread stack does not support this board configuration`, rfDesign, "rfDesign");
+        validation.logError(
+            `This stack does not support this board configuration`,
+            rfDesign, "rfDesign"
+        );
+    }
+
+    if(inst.rfDesign !== rfDesign.rfDesign)
+    {
+        validation.logError(`Must match ${system.getReference(rfDesign,
+            "rfDesign")} in the RF Design Module`, inst, "rfDesign");
     }
 }
 

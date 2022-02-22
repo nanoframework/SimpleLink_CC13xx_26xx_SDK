@@ -320,49 +320,94 @@
             },
             {
                 "_name": "CC1352PEM-XD7793-XD24-PA7793",
-                "FrequencyRange": {
-                    "Min": "770",
-                    "Max": "930",
-                    "PaSettingTable": {
-                        "PaSetting": [
-                            {
-                                "_text": "20",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x1B8ED2"
-                            },
-                            {
-                                "_text": "19",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x448CF"
-                            },
-                            {
-                                "_text": "18",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x48022"
-                            },
-                            {
-                                "_text": "17",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x2661C"
-                            },
-                            {
-                                "_text": "16",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x05618"
-                            },
-                            {
-                                "_text": "15",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x04812"
-                            },
-                            {
-                                "_text": "14",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x0380D"
-                            }
-                        ]
+                "FrequencyRange": [
+                    {
+                        "Min": "770",
+                        "Max": "930",
+                        "PaSettingTable": {
+                            "PaSetting": [
+                                {
+                                    "_text": "20",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x1B8ED2"
+                                },
+                                {
+                                    "_text": "19",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x448CF"
+                                },
+                                {
+                                    "_text": "18",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x48022"
+                                },
+                                {
+                                    "_text": "17",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x2661C"
+                                },
+                                {
+                                    "_text": "16",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x05618"
+                                },
+                                {
+                                    "_text": "15",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x04812"
+                                },
+                                {
+                                    "_text": "14",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x0380D"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Min": "2360",
+                        "Max": "2483",
+                        "PaSettingTable": {
+                            "PaSetting": [
+                                {
+                                    "_text": "20",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x3F75F5"
+                                },
+                                {
+                                    "_text": "19",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x3F61E2"
+                                },
+                                {
+                                    "_text": "18",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x3047E0"
+                                },
+                                {
+                                    "_text": "17",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x1B4FE5"
+                                },
+                                {
+                                    "_text": "16",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x1B39DE"
+                                },
+                                {
+                                    "_text": "15",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x1B2FDA"
+                                },
+                                {
+                                    "_text": "14",
+                                    "Value": "0xFFFF",
+                                    "TxHighPa": "0x1B27D6"
+                                }
+                            ]
+                        }
                     }
-                }
+                ]
             },
             {
                 "_name": "CC2652REM-7ID",

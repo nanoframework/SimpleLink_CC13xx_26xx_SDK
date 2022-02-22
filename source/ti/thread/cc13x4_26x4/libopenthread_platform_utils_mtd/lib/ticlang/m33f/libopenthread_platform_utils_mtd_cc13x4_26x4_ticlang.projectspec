@@ -42,6 +42,7 @@
             -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/include
             -DMBEDTLS_CONFIG_FILE=&apos;&quot;mbedtls-config-cc13x4_26x4.h&quot;&apos;
             -I${WorkspaceDirPath}/libmbedcrypto_cc13x4_26x4_ticlang/config
+            -DDeviceFamily_CC13X4_CC26X4
             -DOPENTHREAD_MTD=1
             -DOPENTHREAD_CONFIG_FILE=&apos;&quot;openthread-config-cc13x4_26x4-mtd.h&quot;&apos;
             -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE=&apos;&quot;openthread-core-cc13x4_26x4-config.h&quot;&apos;

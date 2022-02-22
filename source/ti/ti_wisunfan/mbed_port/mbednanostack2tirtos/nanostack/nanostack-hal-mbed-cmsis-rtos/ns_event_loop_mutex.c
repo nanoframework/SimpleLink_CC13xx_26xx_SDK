@@ -18,22 +18,21 @@
 #include "ns_event_loop_mutex.h"
 #include "stdint.h"
 
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/knl/Task.h>
+#include <pthread.h>
+#include <semaphore.h>
 
-static Semaphore_Struct ns_event_mutex_struct;
-static Semaphore_Handle ns_event_mutex_handle;
-static Task_Handle event_mutex_owner_id;
+pthread_t event_mutex_owner_id;
+sem_t ns_event_mutex_handle;
+
 static uint32_t owner_count = 0;
 
 void eventOS_scheduler_mutex_wait(void)
 {
-    Semaphore_pend(ns_event_mutex_handle, BIOS_WAIT_FOREVER);
+    sem_wait(&ns_event_mutex_handle);
 
     if (0 == owner_count) {
         /* store mutex owner task handle */
-        event_mutex_owner_id = Task_self();
+        event_mutex_owner_id = pthread_self();
     }
     owner_count++;
 }
@@ -45,22 +44,20 @@ void eventOS_scheduler_mutex_release(void)
         event_mutex_owner_id = NULL;
     }
 
-    Semaphore_post(ns_event_mutex_handle);
+    sem_post(&ns_event_mutex_handle);
 }
 
 uint8_t eventOS_scheduler_mutex_is_owner(void)
 {
-    return Task_self() == event_mutex_owner_id ? 1 : 0;
+    return pthread_self() == event_mutex_owner_id ? 1 : 0;
 }
 
 void ns_event_loop_mutex_init(void)
 {
-    Semaphore_Params semParams;
+    int retc;
 
-    /* Construct a Semaphore object to be use as a resource lock, initial count 1 */
-    Semaphore_Params_init(&semParams);
-    Semaphore_construct(&ns_event_mutex_struct, 1, &semParams);
-
-    /* Obtain instance handle */
-    ns_event_mutex_handle = Semaphore_handle(&ns_event_mutex_struct);
+    retc = sem_init(&ns_event_mutex_handle, 0, 1);
+    if (retc != 0) {
+        while (1);
+    }
 }

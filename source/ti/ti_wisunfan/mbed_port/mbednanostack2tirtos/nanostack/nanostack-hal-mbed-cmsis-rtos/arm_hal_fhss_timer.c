@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Clock.h>
+#include <ti/drivers/dpl/ClockP.h>
 
 #include "ns_types.h"
 #include "fhss_api.h"
@@ -30,9 +29,9 @@
 
 /* convert slots to ticks */
 #define US_PER_SLOT 50
-#define SLOTS_TO_TICKS(slots)    (((slots * US_PER_SLOT + Clock_tickPeriod/2) / Clock_tickPeriod))
-#define TICKS_TO_SLOTS(ticks)    (((ticks * Clock_tickPeriod + US_PER_SLOT/2) / US_PER_SLOT))
 
+#define SLOTS_TO_TICKS(slots)    ((((slots) * US_PER_SLOT + ClockP_getSystemTickPeriod()/2) / ClockP_getSystemTickPeriod()))
+#define TICKS_TO_SLOTS(ticks)    ((((ticks) * ClockP_getSystemTickPeriod() + US_PER_SLOT/2) / US_PER_SLOT))
 
 typedef void (*fhss_timer_callback_t)(const fhss_api_t *fhss_api, uint16_t);
 
@@ -41,8 +40,8 @@ typedef struct {
     uint32_t start_time;
     uint32_t stop_time;
     bool active;
-    Clock_Struct hal_timer_struct;
-    Clock_Handle hal_timer;
+    ClockP_Struct hal_timer_struct;
+    ClockP_Handle hal_timer;
 } fhss_timeout_s;
 
 static fhss_timeout_s fhss_timeout[NUMBER_OF_SIMULTANEOUS_TIMEOUTS] = {0};
@@ -52,7 +51,7 @@ static bool timer_initialized = false;
 static uint32_t read_current_time(void)
 {
     uint32_t tick_time;
-    tick_time = (Clock_getTicks() * Clock_tickPeriod);
+    tick_time = (ClockP_getSystemTicks() * ClockP_getSystemTickPeriod());
     return TICKS_TO_SLOTS(tick_time);
 }
 
@@ -102,9 +101,9 @@ static int platform_fhss_timer_start(uint32_t slots, void (*callback)(const fhss
 
     if (timer_initialized == false) {
         uint8_t i;
-        Clock_Params clkParams;
+        ClockP_Params clkParams;
 
-        Clock_Params_init(&clkParams);
+        ClockP_Params_init(&clkParams);
         clkParams.period = 0;
         clkParams.startFlag = false;
 
@@ -112,10 +111,9 @@ static int platform_fhss_timer_start(uint32_t slots, void (*callback)(const fhss
         for(i = 0; i < NUMBER_OF_SIMULTANEOUS_TIMEOUTS; i++)
         {
             /* Construct a periodic Clock Instance */
-            Clock_construct(&(fhss_timeout[i].hal_timer_struct), (Clock_FuncPtr)timer_callback,
+            fhss_timeout[i].hal_timer = ClockP_construct(&(fhss_timeout[i].hal_timer_struct), (ClockP_Fxn)timer_callback,
                             0, &clkParams);
 
-            fhss_timeout[i].hal_timer = Clock_handle(&(fhss_timeout[i].hal_timer_struct));
         }
 
         timer_initialized = true;
@@ -136,8 +134,8 @@ static int platform_fhss_timer_start(uint32_t slots, void (*callback)(const fhss
     fhss_tim->stop_time = fhss_tim->start_time + slots;
     fhss_tim->active = true;
 
-    Clock_setTimeout(fhss_tim->hal_timer, SLOTS_TO_TICKS(slots));
-    Clock_start(fhss_tim->hal_timer);
+    ClockP_setTimeout(fhss_tim->hal_timer, SLOTS_TO_TICKS(slots));
+    ClockP_start(fhss_tim->hal_timer);
 
     fhss_active_handle = (fhss_api_t*)callback_param;
     ret_val = 0;
@@ -154,7 +152,7 @@ static int platform_fhss_timer_stop(void (*callback)(const fhss_api_t *api, uint
         platform_exit_critical();
         return -1;
     }
-    Clock_stop(fhss_tim->hal_timer);
+    ClockP_stop(fhss_tim->hal_timer);
     fhss_tim->active = false;
     platform_exit_critical();
     return 0;

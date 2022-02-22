@@ -33,7 +33,7 @@
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc2651p3\/targets"
+                "$": ".\/..\/config\/pa_tables\/cc13x1_cc26x1_r3"
             },
             {
                 "_file": "io_pin_definition.json",
@@ -66,10 +66,6 @@
                 "_file": "param_cmd_mapping.json",
                 "_phy": "ble",
                 "$": ".\/..\/config\/cc1352p_ble_pg21"
-            },
-            {
-                "_file": "codegen.json",
-                "$": ".\/..\/config\/cc1352r_prop_pg21"
             },
             {
                 "_file": "radio_par_definitions.json",
@@ -110,12 +106,12 @@
             {
                 "_file": "frontend_settings.json",
                 "_phy": "ieee_15_4",
-                "$": ".\/..\/config\/cc2652p_ieee_15_4_pg21\/cmd_settings"
+                "$": ".\/..\/config\/cc2651p3_ieee_15_4_pg10\/cmd_settings"
             },
             {
                 "_file": "frontend_settings.json",
                 "_phy": "ble",
-                "$": ".\/..\/config\/cc2652p_ble_pg21\/cmd_settings"
+                "$": ".\/..\/config\/cc2651p3_ble_pg10\/cmd_settings"
             },
             {
                 "_file": "dummy_file_overrides.json",

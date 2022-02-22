@@ -263,19 +263,6 @@
                     "longDescription": ""
                 },
                 {
-                    "name": "txPowerHi",
-                    "displayName": "TX Power (dBm)",
-                    "description": "TX Power",
-                    "default": "20",
-                    "hidden": true
-                },
-                {
-                    "name": "highPA",
-                    "displayName": "High PA",
-                    "description": "Select if the High Power Amplifier on the device should be used",
-                    "default": false
-                },
-                {
                     "name": "txPower2400",
                     "displayName": "TX Power (dBm)",
                     "description": "TX Power",
@@ -680,7 +667,8 @@
             {
                 "file": "setting_tc900.json",
                 "name": "2gfsk100kbps",
-                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth(FPGA)"
+                "description": "100 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth(FPGA)",
+                "options": "disable_high_pa"
             },
             {
                 "file": "setting_tc900_custom.json",

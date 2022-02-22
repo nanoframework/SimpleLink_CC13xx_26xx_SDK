@@ -120,7 +120,7 @@ const LPName = rfDesign.rfDesign;
 -DNO_OSAL_SNV
 % }
 %
-% if(ccfg.srcClkLF == "LF RCOSC")
+% if(ccfg.srcClkLF == "LF RCOSC" || ble.useRcosc)
 % {
 
 -DUSE_RCOSC

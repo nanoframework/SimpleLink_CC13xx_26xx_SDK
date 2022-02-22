@@ -33,7 +33,7 @@
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc2652rsip\/targets"
+                "$": ".\/..\/config\/pa_tables\/cc26x2sip_r3"
             },
             {
                 "_file": "io_pin_definition.json",

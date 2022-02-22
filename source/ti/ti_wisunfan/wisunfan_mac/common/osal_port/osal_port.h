@@ -8,7 +8,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2004-2021, Texas Instruments Incorporated
+ Copyright (c) 2004-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -58,10 +58,9 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
-#include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/knl/Semaphore.h>
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/BIOS.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <ti/drivers/dpl/ClockP.h>
 
 /*********************************************************************
  * MACROS
@@ -163,7 +162,7 @@ typedef void * OsalPort_MsgQ;
  *
  * @return  Task ID
  */
-uint8_t OsalPort_registerTask(Task_Handle taskHndl, Semaphore_Handle taskSem, uint32_t * pEvent);
+uint8_t OsalPort_registerTask(void* taskHndl, void* taskSem, uint32_t * pEvent);
 
 
 /*********************************************************************
@@ -298,7 +297,7 @@ uint32_t OsalPort_waitEvent(uint8_t taskId);
  *
  * @return  none
  */
-void OsalPort_blockOnEvent(Task_Handle taskHndl);
+void OsalPort_blockOnEvent(void* taskHndl);
 
 /*********************************************************************
  * @fn      OsalPort_clearEvent

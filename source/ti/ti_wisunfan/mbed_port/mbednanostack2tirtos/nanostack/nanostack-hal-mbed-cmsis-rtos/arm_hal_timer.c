@@ -17,16 +17,17 @@
 #include "stdint.h"
 #include "stdbool.h"
 
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Clock.h>
+#include <ti/drivers/dpl/ClockP.h>
 
 /* convert slots to ticks */
 #define US_PER_SLOT 50
-#define SLOTS_TO_TICKS(slots)    (((slots * US_PER_SLOT + Clock_tickPeriod/2) / Clock_tickPeriod))
-#define TICKS_TO_SLOTS(ticks)    (((ticks * Clock_tickPeriod + US_PER_SLOT/2) / US_PER_SLOT))
 
-static Clock_Struct hal_timer_struct;
-static Clock_Handle hal_timer;
+#define SLOTS_TO_TICKS(slots)    ((((slots) * US_PER_SLOT + ClockP_getSystemTickPeriod()/2) / ClockP_getSystemTickPeriod()))
+#define TICKS_TO_SLOTS(ticks)    ((((ticks) * ClockP_getSystemTickPeriod() + US_PER_SLOT/2) / US_PER_SLOT))
+
+
+static ClockP_Struct hal_timer_struct;
+static ClockP_Handle hal_timer;
 
 static void (*arm_hal_callback)(void);
 
@@ -62,7 +63,7 @@ static void timer_loop_thread(void *arg)
 /*
  *  ======== clk0Fxn =======
  */
-static void clk0Fxn(UArg arg0)
+static void clk0Fxn(uintptr_t arg0)
 {
     static bool first = false;
 
@@ -87,12 +88,12 @@ static void clk0Fxn(UArg arg0)
 // Called once at boot
 void platform_timer_enable(void)
 {
-    static bool initialized = FALSE;
+    static bool initialized = false;
 
     if(!initialized)
     {
         /* Construct BIOS Objects */
-        Clock_Params clkParams;
+        ClockP_Params clkParams;
 
 #ifndef MBED_CONF_NANOSTACK_HAL_CRITICAL_SECTION_USABLE_FROM_INTERRUPT
         /* Create a task for running timer interrupts */
@@ -112,15 +113,13 @@ void platform_timer_enable(void)
         Task_construct(&timer_thread_struct, (Task_FuncPtr)timer_loop_thread, &taskParams, NULL);
 #endif //MBED_CONF_NANOSTACK_HAL_CRITICAL_SECTION_USABLE_FROM_INTERRUPT
 
-        Clock_Params_init(&clkParams);
+        ClockP_Params_init(&clkParams);
         clkParams.period = 0;
         clkParams.startFlag = false;
 
         /* Construct a periodic Clock Instance */
-        Clock_construct(&hal_timer_struct, (Clock_FuncPtr)clk0Fxn,
+        hal_timer = ClockP_construct(&hal_timer_struct, (ClockP_Fxn)clk0Fxn,
                         0, &clkParams);
-
-        hal_timer = Clock_handle(&hal_timer_struct);
 
         initialized = true;
     }
@@ -129,7 +128,7 @@ void platform_timer_enable(void)
 // Actually cancels a timer, not the opposite of enable
 void platform_timer_disable(void)
 {
-    Clock_stop(hal_timer);
+    ClockP_stop(hal_timer);
 }
 
 #include "ns_trace.h"
@@ -148,11 +147,11 @@ void platform_timer_start(uint16_t slots)
 
     //ticks = (slots * tickPeriod) / 5;
     //tr_info("timer_start ticks: %d - %d", slots, ticks);
-    Clock_stop(hal_timer);
-    Clock_setTimeout(hal_timer, ticks);
-    Clock_start(hal_timer);
+    ClockP_stop(hal_timer);
+    ClockP_setTimeout(hal_timer, ticks);
+    ClockP_start(hal_timer);
 
-    clockStartTime = Clock_getTicks();
+    clockStartTime = ClockP_getSystemTicks();
 }
 
 // This is called from inside platform_enter_critical - IRQs can't happen
@@ -160,9 +159,9 @@ uint16_t platform_timer_get_remaining_slots(void)
 {
     uint32_t elapsedTicks = 0;
     uint32_t timeoutTicks = 0;
-    uint32_t currentTicks = Clock_getTicks();
+    uint32_t currentTicks = ClockP_getSystemTicks();
 
-    if(Clock_isActive(hal_timer))
+    if(ClockP_isActive(hal_timer))
     {
         if(currentTicks > clockStartTime)
         {
@@ -173,7 +172,7 @@ uint16_t platform_timer_get_remaining_slots(void)
             elapsedTicks = currentTicks + (UINT32_MAX - clockStartTime);
         }
 
-        timeoutTicks = Clock_getTimeout(hal_timer);
+        timeoutTicks = ClockP_getTimeout(hal_timer);
     }
 
     return TICKS_TO_SLOTS(timeoutTicks - elapsedTicks);

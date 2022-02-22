@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -384,7 +384,6 @@ uint8_t maxConnReached = 0;
 #if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
 // Default - infinite scan
 uint16_t scanDuration = 0;
-uint8_t legacyScanFlag = 0;
 uint8_t numDev = 0;
 uint8_t scanSummarySent = 0;
 #endif
@@ -2830,9 +2829,9 @@ static void hci_tl_legacyScanEventCallbackProcess(hci_tl_ScanEvtCallback_t *evtC
           //{
           //  // Reject this report...
           //  //Free the message and the payload
-		  //
+          //
           //}
-	  	  //else
+          //else
           // END of Debug Code
 
           if ((extAdvRpt != NULL) && (extAdvRpt->subCode == HCI_BLE_EXTENDED_ADV_REPORT_EVENT))
@@ -2863,7 +2862,7 @@ static void hci_tl_legacyScanEventCallbackProcess(hci_tl_ScanEvtCallback_t *evtC
                     msg->pData[3]  = HCI_BLE_DIRECT_ADVERTISING_REPORT_EVENT;  //Forced
                     msg->pData[4]  = extAdvRpt->numRpts;
                     msg->pData[5]  = 1; //Connectable directed legacy advertising
-                    
+
                     msg->pData[6]  = extAdvRpt->addrType;
                     memcpy(&msg->pData[7], extAdvRpt->addr, B_ADDR_LEN);
                     msg->pData[13] = LL_DEV_ADDR_TYPE_RANDOM;
@@ -2878,7 +2877,7 @@ static void hci_tl_legacyScanEventCallbackProcess(hci_tl_ScanEvtCallback_t *evtC
                     HCI_TL_sendMemoryReport(0x3);
                     break;
                   }
-              }              
+              }
               else
 #endif
               {
@@ -3126,7 +3125,7 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
 
           HCI_TL_SendVSEvent(data, 5);
         }
-        else if( legacyScanFlag )
+        else
         {
           uint8_t *pDataOut = NULL;
           if( maxNumReports )
@@ -3162,21 +3161,17 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
             ICall_free(pDataOut);
           }
         }
-        else
-        {
-#endif
-          uint8_t data[7];
-          data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-          data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-          data[2] = 0;  // Status
-          data[3] = BREAK_UINT32(event, 0);
-          data[4] = BREAK_UINT32(event, 1);
-          data[5] = BREAK_UINT32(event, 2);
-          data[6] = BREAK_UINT32(event, 3);
-          HCI_TL_SendVSEvent(data, sizeof(data));
-#ifdef BLE3_CMD
-	}
-#endif
+#else // !BLE3_CMD
+        uint8_t data[7];
+        data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+        data[2] = 0;  // Status
+        data[3] = BREAK_UINT32(event, 0);
+        data[4] = BREAK_UINT32(event, 1);
+        data[5] = BREAK_UINT32(event, 2);
+        data[6] = BREAK_UINT32(event, 3);
+        HCI_TL_SendVSEvent(data, sizeof(data));
+#endif // BLE3_CMD
         if (pData)
         {
           ICall_free(pData);
@@ -3187,7 +3182,7 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
       case GAP_EVT_SCAN_DISABLED:
       {
 #ifdef BLE3_CMD
-        if( legacyScanFlag && !scanSummarySent )
+        if( !scanSummarySent )
         {
           uint8_t data[4];
           data[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_DISCOVERY_EVENT);
@@ -3197,35 +3192,29 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
           // Send the event
           HCI_TL_SendVSEvent(data, sizeof(data));
           numDev = 0;
-          legacyScanFlag = 0;
-        }
-        else if( legacyScanFlag && scanSummarySent )
-        {
-          legacyScanFlag = 0;
-          scanSummarySent = 0;
         }
         else
         {
-#endif
-          if (pData)
-          {
-            GapScan_Evt_End_t * advEndRpt = (GapScan_Evt_End_t *) pData;
-            uint8_t data[9];
-            data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-            data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-            data[2] = 0; // Status
-            data[3] = BREAK_UINT32(event, 0);
-            data[4] = BREAK_UINT32(event, 1);
-            data[5] = BREAK_UINT32(event, 2);
-            data[6] = BREAK_UINT32(event, 3);
-            data[7] = advEndRpt->reason;    //Reason
-            data[8] = advEndRpt->numReport; //Number of Report collected
-            HCI_TL_SendVSEvent(data, sizeof(data));
-            ICall_free(pData);
-          }
-#ifdef BLE3_CMD
+          scanSummarySent = 0;
         }
-#endif
+#else // !BLE3_CMD
+        if (pData)
+        {
+          GapScan_Evt_End_t * advEndRpt = (GapScan_Evt_End_t *) pData;
+          uint8_t data[9];
+          data[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+          data[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+          data[2] = 0; // Status
+          data[3] = BREAK_UINT32(event, 0);
+          data[4] = BREAK_UINT32(event, 1);
+          data[5] = BREAK_UINT32(event, 2);
+          data[6] = BREAK_UINT32(event, 3);
+          data[7] = advEndRpt->reason;    //Reason
+          data[8] = advEndRpt->numReport; //Number of Report collected
+          HCI_TL_SendVSEvent(data, sizeof(data));
+          ICall_free(pData);
+        }
+#endif // BLE_CMD
         if (pData)
         {
           ICall_free(pData);
@@ -3241,6 +3230,10 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
 
       default:
       {
+        if (pData)
+        {
+          ICall_free(pData);
+        }
         break;
       }
     }
@@ -3260,8 +3253,10 @@ static void host_tl_scanEvtCallbackProcess(scanEvtCallback_t * scanEvtCallback)
  */
 static void host_tl_sendAdvReport(uint32_t event, GapScan_Evt_AdvRpt_t * advRpt)
 {
+#ifndef BLE3_CMD
   hciPacket_t *msg;
   uint16_t totalLength = 0;
+#endif
   uint16_t remainingLength;
   uint8_t dataLen;
 
@@ -3284,120 +3279,113 @@ static void host_tl_sendAdvReport(uint32_t event, GapScan_Evt_AdvRpt_t * advRpt)
       dataLen = remainingLength;
     }
 #ifdef BLE3_CMD
-    if( legacyScanFlag )
+    // BLE3 reports only Legacy advertisement
+    if( advRpt->evtType & 0x10 )
     {
-      // BLE3 reports only Legacy advertisement
-      if( advRpt->evtType & 0x10 )
+      uint8_t rptLen = 13 + dataLen;
+      uint8_t *dataOut = NULL;
+
+      dataOut = (uint8_t *)osal_mem_alloc(rptLen);
+      if( dataOut )
       {
-        uint8_t rptLen = 13 + dataLen;
-        uint8_t *dataOut = NULL;
-
-        dataOut = (uint8_t *)osal_mem_alloc(rptLen);
-        if( dataOut )
+        if( (maxNumReports) && (numDev < maxNumReports) ||
+            (!maxNumReports))
         {
-          if( (maxNumReports) && (numDev < maxNumReports)
-             || (!maxNumReports))
-          {
-            // Build the event
-            dataOut[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
-            dataOut[1] = HI_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
-            dataOut[2] = 0; // status
-            dataOut[3] = getAgamaToBLE3EventProp(advRpt->evtType); // adv type
-            dataOut[4] = advRpt->addrType;
-            // Peer's address
-            osal_memcpy(&dataOut[5], advRpt->addr, B_ADDR_LEN);
-            dataOut[11] = (uint8_t)advRpt->rssi;
-            dataOut[12] = dataLen;
-            // Copy the advData
-            osal_memcpy(&dataOut[13], advRpt->pData, dataLen);
+          // Build the event
+          dataOut[0] = LO_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
+          dataOut[1] = HI_UINT16(HCI_EXT_GAP_DEVICE_INFO_EVENT);
+          dataOut[2] = 0; // status
+          dataOut[3] = getAgamaToBLE3EventProp(advRpt->evtType); // adv type
+          dataOut[4] = advRpt->addrType;
+          // Peer's address
+          osal_memcpy(&dataOut[5], advRpt->addr, B_ADDR_LEN);
+          dataOut[11] = (uint8_t)advRpt->rssi;
+          dataOut[12] = dataLen;
+          // Copy the advData
+          osal_memcpy(&dataOut[13], advRpt->pData, dataLen);
 
-            HCI_TL_SendVSEvent(dataOut, rptLen);
+          HCI_TL_SendVSEvent(dataOut, rptLen);
 
-            // Saving the device info
-            deviceInfoArr[numDev].evtType = dataOut[3];
-            deviceInfoArr[numDev].addrType = dataOut[4];
-            osal_memcpy(deviceInfoArr[numDev].addr, advRpt->addr, B_ADDR_LEN);
-            numDev++;
-          }
-        }
-        //Free the message and the payload
-        if (dataOut)
-        {
-          ICall_free(dataOut);
+          // Saving the device info
+          deviceInfoArr[numDev].evtType = dataOut[3];
+          deviceInfoArr[numDev].addrType = dataOut[4];
+          osal_memcpy(deviceInfoArr[numDev].addr, advRpt->addr, B_ADDR_LEN);
+          numDev++;
         }
       }
+      //Free the message and the payload
+      if (dataOut)
+      {
+        ICall_free(dataOut);
+      }
+    }
+#else // !BLE3_CMD
+    // OSAL message header + HCI event header + data
+    totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + \
+                  GAP_SCAN_EVENT_HEADER + GAP_SCAN_EVENT_LENGTH + dataLen;
+
+    // allocate memory for OSAL hdr + packet
+    msg = (hciPacket_t *)ICall_allocMsg(totalLength);
+    if (msg)
+    {
+      // message type, HCI event type
+      msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
+      msg->hdr.status = 0xFF;
+
+      // packet
+      msg->pData    = (uint8_t*)(msg+1);
+      msg->pData[0] = HCI_EVENT_PACKET;
+      msg->pData[1] = HCI_VE_EVENT_CODE;
+      msg->pData[2] = GAP_SCAN_EVENT_LENGTH + GAP_SCAN_EVENT_HEADER + dataLen;
+
+      msg->pData[3] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+      msg->pData[4] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+      msg->pData[5] = 0; // Status
+      msg->pData[6] = BREAK_UINT32(event, 0);
+      msg->pData[7] = BREAK_UINT32(event, 1);
+      msg->pData[8] = BREAK_UINT32(event, 2);
+      msg->pData[9] = BREAK_UINT32(event, 3);
+      msg->pData[10] = advRpt->evtType;  //Start of the event structure.
+      msg->pData[11] = advRpt->addrType;
+      memcpy(&msg->pData[12], advRpt->addr, B_ADDR_LEN);
+      msg->pData[18] = advRpt->primPhy;
+      msg->pData[19] = advRpt->secPhy;
+      msg->pData[20] = advRpt->advSid;
+      msg->pData[21] = advRpt->txPower;
+      msg->pData[22] = advRpt->rssi;
+      msg->pData[23] = advRpt->directAddrType;
+      memcpy(&msg->pData[24], advRpt->directAddr, B_ADDR_LEN);
+      msg->pData[30] = LO_UINT16(advRpt->periodicAdvInt);
+      msg->pData[31] = HI_UINT16(advRpt->periodicAdvInt);
+      msg->pData[32] = LO_UINT16(dataLen);
+      msg->pData[33] = HI_UINT16(dataLen);
+      // copy data
+      if (advRpt->dataLen)
+      {
+          memcpy(&msg->pData[34], advRpt->pData + (advRpt->dataLen - remainingLength) , dataLen);
+      }
+
+      if (remainingLength > MAX_REPORT_DATA_SIZE)
+      {
+          // This is not the last packet
+          msg->pData[10] &= AE_EVT_TYPE_COMPLETE_MASK;
+          msg->pData[10] |= AE_EVT_TYPE_INCOMPLETE_MORE_TO_COME;
+      }
+
+      // Send to High Layer.
+      if (HCI_TL_CommandStatusCB)
+      {
+        HCI_TL_CommandStatusCB(msg->pData, HCI_EVENT_MIN_LENGTH + msg->pData[2]);
+      }
+
+      // We're done with this message.
+      ICall_freeMsg(msg);
     }
     else
     {
-#endif
-      // OSAL message header + HCI event header + data
-      totalLength = sizeof(hciPacket_t) + HCI_EVENT_MIN_LENGTH + \
-                    GAP_SCAN_EVENT_HEADER + GAP_SCAN_EVENT_LENGTH + dataLen;
-
-      // allocate memory for OSAL hdr + packet
-      msg = (hciPacket_t *)ICall_allocMsg(totalLength);
-      if (msg)
-      {
-        // message type, HCI event type
-        msg->hdr.event  = HCI_CTRL_TO_HOST_EVENT;
-        msg->hdr.status = 0xFF;
-
-        // packet
-        msg->pData    = (uint8_t*)(msg+1);
-        msg->pData[0] = HCI_EVENT_PACKET;
-        msg->pData[1] = HCI_VE_EVENT_CODE;
-        msg->pData[2] = GAP_SCAN_EVENT_LENGTH + GAP_SCAN_EVENT_HEADER + dataLen;
-
-        msg->pData[3] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        msg->pData[4] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        msg->pData[5] = 0; // Status
-        msg->pData[6] = BREAK_UINT32(event, 0);
-        msg->pData[7] = BREAK_UINT32(event, 1);
-        msg->pData[8] = BREAK_UINT32(event, 2);
-        msg->pData[9] = BREAK_UINT32(event, 3);
-        msg->pData[10] = advRpt->evtType;  //Start of the event structure.
-        msg->pData[11] = advRpt->addrType;
-        memcpy(&msg->pData[12], advRpt->addr, B_ADDR_LEN);
-        msg->pData[18] = advRpt->primPhy;
-        msg->pData[19] = advRpt->secPhy;
-        msg->pData[20] = advRpt->advSid;
-        msg->pData[21] = advRpt->txPower;
-        msg->pData[22] = advRpt->rssi;
-        msg->pData[23] = advRpt->directAddrType;
-        memcpy(&msg->pData[24], advRpt->directAddr, B_ADDR_LEN);
-        msg->pData[30] = LO_UINT16(advRpt->periodicAdvInt);
-        msg->pData[31] = HI_UINT16(advRpt->periodicAdvInt);
-        msg->pData[32] = LO_UINT16(dataLen);
-        msg->pData[33] = HI_UINT16(dataLen);
-        // copy data
-        if (advRpt->dataLen)
-        {
-            memcpy(&msg->pData[34], advRpt->pData + (advRpt->dataLen - remainingLength) , dataLen);
-        }
-
-        if (remainingLength > MAX_REPORT_DATA_SIZE)
-        {
-            // This is not the last packet
-            msg->pData[10] &= AE_EVT_TYPE_COMPLETE_MASK;
-            msg->pData[10] |= AE_EVT_TYPE_INCOMPLETE_MORE_TO_COME;
-        }
-
-        // Send to High Layer.
-        if (HCI_TL_CommandStatusCB)
-        {
-          HCI_TL_CommandStatusCB(msg->pData, HCI_EVENT_MIN_LENGTH + msg->pData[2]);
-        }
-
-        // We're done with this message.
-        ICall_freeMsg(msg);
-      }
-      else
-      {
-          HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
-      }
-#ifdef BLE3_CMD
+      HCI_TL_sendSystemReport(HOST_TL_ID, LL_STATUS_ERROR_OUT_OF_HEAP, HCI_EXT_GAP_ADV_SCAN_EVENT);
     }
-#endif
+#endif // BLE3_CMD
     // Update the local variable to send the rest of the payload.
     remainingLength-=dataLen;
   }while(remainingLength > 0);
@@ -3465,16 +3453,17 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
 {
   if (advEvtCallback)
   {
+#ifndef BLE3_CMD
     uint8_t status = SUCCESS;
-    uint32_t event = advEvtCallback->event;
     uint8_t dataLen = 0;
-    uint8_t *dataOut = NULL;
-
     // Handle is always the first byte
     uint8_t advHandle = *(uint8_t *)(advEvtCallback->pData);
-
     // Don't include handle since it was already extracted
     void *pData = (char *)advEvtCallback->pData + 1;
+#endif
+
+    uint8_t *dataOut = NULL;
+    uint32_t event = advEvtCallback->event;
 
     switch(event)
     {
@@ -3493,7 +3482,15 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
         HCI_TL_SendVSEvent(dataOut, totalLength);
         break;
       }
-#endif
+
+      case GAP_EVT_ADV_START_AFTER_ENABLE:
+      case GAP_EVT_ADV_END_AFTER_DISABLE:
+      {
+        // Do not use these events for BLE3 Commands
+        // for BLE3 use GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT and GAP_ADV_END_DISCOVERABLE_DONE_EVENT
+        break;
+      }
+#else // !BLE3_CMD
       case GAP_EVT_ADV_SET_TERMINATED:
         // Extract status
         status = ((GapAdv_setTerm_t *)pData)->status;
@@ -3520,49 +3517,35 @@ static void host_tl_advEvtCallbackProcess(advEvtCallback_t *advEvtCallback)
       case GAP_EVT_INSUFFICIENT_MEMORY:
         // TODO
         break;
+#endif // BLE3_CMD
 
-#ifdef BLE3_CMD
-      case GAP_EVT_ADV_START_AFTER_ENABLE:
-      case GAP_EVT_ADV_END_AFTER_DISABLE:
-      {
-        // Do not use these events for BLE3 Commands
-        // for BLE3 use GAP_ADV_MAKE_DISCOVERABLE_DONE_EVENT and GAP_ADV_END_DISCOVERABLE_DONE_EVENT
-        break;
-      }
-#endif
       default:
         // The default values set above will be used
         break;
     }
 
-#ifdef BLE3_CMD
-    // This event will be sent only for extended advertising set
-    if( advHandle != advHandleLegacy)
+#ifndef BLE3_CMD
+    // Allocate data to send over TL
+    uint8_t totalLength = HCI_EXT_GAP_ADV_EVENT_MIN_LENGTH + dataLen;
+    dataOut = (uint8_t *)osal_mem_alloc(totalLength);
+
+    // If data was allocated
+    if(dataOut)
     {
-#endif
-      // Allocate data to send over TL
-      uint8_t totalLength = HCI_EXT_GAP_ADV_EVENT_MIN_LENGTH + dataLen;
-      dataOut = (uint8_t *)osal_mem_alloc(totalLength);
+      dataOut[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+      dataOut[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
+      dataOut[2] = status;
+      dataOut[3] = BREAK_UINT32(event, 0);
+      dataOut[4] = BREAK_UINT32(event, 1);
+      dataOut[5] = BREAK_UINT32(event, 2);
+      dataOut[6] = BREAK_UINT32(event, 3);
+      dataOut[7] = advHandle;
+      dataOut[8] = dataLen;
+      osal_memcpy(&dataOut[9], (uint8_t *) pData, dataLen);
 
-      // If data was allocated
-      if(dataOut)
-      {
-        dataOut[0] = LO_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        dataOut[1] = HI_UINT16(HCI_EXT_GAP_ADV_SCAN_EVENT);
-        dataOut[2] = status;
-        dataOut[3] = BREAK_UINT32(event, 0);
-        dataOut[4] = BREAK_UINT32(event, 1);
-        dataOut[5] = BREAK_UINT32(event, 2);
-        dataOut[6] = BREAK_UINT32(event, 3);
-        dataOut[7] = advHandle;
-        dataOut[8] = dataLen;
-        osal_memcpy(&dataOut[9], (uint8_t *) pData, dataLen);
-
-        HCI_TL_SendVSEvent(dataOut, totalLength);
-      }
-#ifdef BLE3_CMD
+      HCI_TL_SendVSEvent(dataOut, totalLength);
     }
-#endif
+#endif // !BLE3_CMD
 
     //Free the message and the payload
     if (dataOut)
@@ -5716,8 +5699,8 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       stat = GapConfig_SetParameter(pBuf[0],            // param
                                     &pBuf[1]);         // pValue
       break;
-    }    
-    
+    }
+
 #if (HOST_CONFIG & (CENTRAL_CFG | PERIPHERAL_CFG))
     case HCI_EXT_GAP_TERMINATE_LINK:
     {
@@ -6865,7 +6848,7 @@ static uint8_t processExtMsgGAP(uint8_t cmdID, hciExtCmd_t *pCmd, uint8_t *pRspD
       stat = GapScan_enable(0, scanDuration, maxNumReports);
       if( stat == SUCCESS )
       {
-        legacyScanFlag = 1;
+        // Do nothing
       }
 	  else
       {
@@ -8801,22 +8784,6 @@ uint8_t getAgamaToBLE3EventProp( uint8_t eventType )
 
   return eventProp;
 }
-
-#if ( HOST_CONFIG & ( CENTRAL_CFG | OBSERVER_CFG ) )
-/*********************************************************************
- * @fn      HCI_TL_SetLegacyScanFlag
- *
- * @brief   Set legacy scan flag
- *
- * @param   flag - 1 to enable CC2640 scan report format
- *
- * @return  None
- */
-void HCI_TL_SetLegacyScanFlag( uint8_t flag )
-{
-  legacyScanFlag = flag;
-}
-#endif
 
 #endif // BLE3_CMD
 

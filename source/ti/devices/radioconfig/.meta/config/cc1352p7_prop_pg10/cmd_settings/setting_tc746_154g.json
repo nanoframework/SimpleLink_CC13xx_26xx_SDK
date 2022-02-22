@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth (Pre-silicon settings)",
-        "Description": "200 kbps, 2-GFSK, 50 kHz deviation, IEEE 802.15.4g FSK PHY mode, for 863-930 MHz band.(Pre-silicon settings)",
+        "Name": "200 kbps, 50 kHz Deviation, 2-GFSK, 311 kHz RX Bandwidth",
+        "Description": "200 kbps, 2-GFSK, 50 kHz deviation, IEEE 802.15.4g FSK PHY mode, for 863-930 MHz band.",
         "Frequency": "915",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -159,8 +159,8 @@
                                 "Element32b": [
                                     {
                                         "_type": "ADI_2HALFREG_OVERRIDE",
-                                        "_comment": "Tx: Configure PA ramp time, PACTL2.RC=0x3 (in ADI0, set PACTL2[4:3]=0x1)",
-                                        "$": "0,16,0x8,0x8,17,0x1,0x0"
+                                        "_comment": "Tx: Configure PA ramp time, PACTL2.RC=0x1 (in ADI0, set PACTL2[4:3]=0x1)",
+                                        "$": "0,16,0x8,0x8,17,0x1,0x1"
                                     },
                                     {
                                         "_type": "HW_REG_OVERRIDE",

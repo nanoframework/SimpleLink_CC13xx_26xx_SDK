@@ -1885,7 +1885,7 @@ static void gapBondMgr_LinkTerm(uint16_t connHandle)
       eraseAllBonds = FALSE;
 
       // Reset bonds to delete table
-      MAP_osal_memset(bondsToDelete, FALSE, sizeof(bondsToDelete));
+      MAP_osal_memset(bondsToDelete, FALSE, sizeof (uint8_t) * gapBond_maxBonds);
     }
     // See if we are to erase the local bond info
     else if(eraseLocalInfo == TRUE)
@@ -2703,7 +2703,9 @@ static uint8_t gapBondMgrFindEmpty(void)
   // use the LRU bond.
   if(gapBond_removeLRUBond)
   {
-    return  gapBondMgrGetLruBondIndex();
+    idx = gapBondMgrGetLruBondIndex();
+    gapBondMgrEraseBonding(idx);
+    return (idx);
   }
 
   return (gapBond_maxBonds);

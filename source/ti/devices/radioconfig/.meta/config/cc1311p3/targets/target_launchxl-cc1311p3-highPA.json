@@ -7,7 +7,7 @@
         "DevicePackage": "VQFN 7x7",
         "FrontEnd": "XD",
         "PaSettings": "pasettings.json",
-        "RfDesign": "CC1311-P3EM-7XD7793-PA915",
+        "RfDesign": "LP-CC1311P3_20dBm",
         "DefaultCategory": "Settings for Proprietary 779 - 930 MHz",
         "IoSettings": {
             "_name": "RF Switch",

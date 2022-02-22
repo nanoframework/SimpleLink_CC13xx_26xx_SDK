@@ -27,6 +27,7 @@ CFLAGS = -I../../.. \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc13x2_26x2.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_cc13x2_26x2_ticlang/config \
+    -DDeviceFamily_CC13X2_CC26X2 \
     -mcpu=cortex-m4 \
     -march=armv7e-m \
     -mthumb \

@@ -1,6 +1,0 @@
----
-- hosts: localhost
-
-  roles:
-    - ansible-role-conan
-    - { role: ansible-role-swtools }

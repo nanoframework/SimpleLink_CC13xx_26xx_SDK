@@ -209,11 +209,17 @@ RF   __| rx |__| tx |__| rx |___
     },
     useCaseConfigGroupIeee: {
         displayName: "IEEE Use Case Configuration",
-        ini: {
-            displayName: "Connection Establishment"
+        iniTx: {
+            displayName: "TX Connection Establishment"
         },
-        con: {
-            displayName: "Connected"
+        conTx: {
+            displayName: "TX Connected"
+        },
+        iniRx: {
+            displayName: "RX Connection Establishment"
+        },
+        conRx: {
+            displayName: "RX Connected"
         }
     }
 };

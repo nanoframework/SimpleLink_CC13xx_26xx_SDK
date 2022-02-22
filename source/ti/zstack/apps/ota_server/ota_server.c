@@ -180,7 +180,7 @@ static Button_Handle keys = NULL;
 static Button_Handle gRightButtonHandle;
 static Button_Handle gLeftButtonHandle;
 
-static uint8_t otaServer_MinBlockReqDelay = OTA_CLIENT_MIN_BLOCK_PERIOD;
+static uint16_t otaServer_MinBlockReqDelay = OTA_CLIENT_MIN_BLOCK_PERIOD;
 
 // Table used to match transaction sequence numbers in ota responses
 static otaSeqNumEntry_t SeqNumEntryTable[SEQ_NUM_ENTRY_MAX];

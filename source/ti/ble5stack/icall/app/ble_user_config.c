@@ -10,7 +10,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -266,7 +266,7 @@ coexUseCaseConfig_t coexSysConfig = {
 // RF Driver API Table
 rfDrvTblPtr_t rfDriverTableBLE[] =
   { (uint32)RF_open,
-    (uint32)driverTable_fnSpinlock, // RF_close
+    (uint32)RF_close, // RF_close
 #ifdef RF_SINGLEMODE
     (uint32)RF_postCmd,
 #else // !RF_SINGLEMODE

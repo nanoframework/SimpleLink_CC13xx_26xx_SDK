@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "Wi-SUN mode #3, 150 kbps, 37.5 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Pre-silicon settings)",
-        "Description": "150 kbps, 2-GFSK, 37.5 kHz deviation WiSUN mode #3 compatible PHY. (Pre-silicon settings)",
+        "Name": "Wi-SUN mode #3, 150 kbps, 37.5 kHz Deviation, 2-GFSK, 273 kHz RX Bandwidth (Preview)",
+        "Description": "150 kbps, 2-GFSK, 37.5 kHz deviation WiSUN mode #3 compatible PHY. (Preview)",
         "Frequency": "915.2",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -79,7 +79,7 @@
                     },
                     {
                         "_name": "preamConf.nPreamBytes",
-                        "$": "4"
+                        "$": "3"
                     },
                     {
                         "_name": "preamConf.preamMode",
@@ -123,7 +123,7 @@
                     },
                     {
                         "_name": "txPower",
-                        "$": "0x9F3F"
+                        "$": "0xFFFF"
                     },
                     {
                         "_name": "pRegOverride",
@@ -146,14 +146,6 @@
                     "_name": "pRegOverride",
                     "Block": [
                         {
-                            "_name": "override_prop_common.json",
-                            "Element32b": {
-                                "_type": "ELEMENT",
-                                "_comment": "DC\/DC regulator: In Tx, use DCDCCTL5[3:0]=0x7 (DITHER_EN=0 and IPEAK=7).",
-                                "$": "0x00F788D3"
-                            }
-                        },
-                        {
                             "_name": "override_prop_common_sub1g.json",
                             "Element32b": [
                                 {
@@ -167,6 +159,14 @@
                                     "$": "0x08141131"
                                 }
                             ]
+                        },
+                        {
+                            "_name": "override_prop_common.json",
+                            "Element32b": {
+                                "_type": "ELEMENT",
+                                "_comment": "DC\/DC regulator: In Tx, use DCDCCTL5[3:0]=0x7 (DITHER_EN=0 and IPEAK=7).",
+                                "$": "0x00F788D3"
+                            }
                         },
                         {
                             "_name": "override_tc142.json",
@@ -238,7 +238,7 @@
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -4 dB (default: -2), trimmed for external bias and differential configuration",
+                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -4 dB at 779-930 MHz",
                                     "$": "0x000488A3"
                                 },
                                 {

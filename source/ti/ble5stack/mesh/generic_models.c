@@ -9,7 +9,7 @@ Target Device: cc13xx_cc26xx
 
 ******************************************************************************
 
- Copyright (c) 2013-2021, Texas Instruments Incorporated
+ Copyright (c) 2013-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -348,10 +348,10 @@ static void gen_onoff_publish(struct bt_mesh_model *model)
 {
     int err;
 
-    // When working from external host, the 'msg' should
-    // be allocated here (instead of using the pre-allocated
-    // 'msg' from the model).
-    struct net_buf_simple *msg = model->pub->msg;
+    // When working from external host,
+    // Should use local allocation instead of
+    // NET_BUF_SIMPLE
+    struct net_buf_simple *msg = NET_BUF_SIMPLE(2 + 3);
 
     if (model->pub->addr == BT_MESH_ADDR_UNASSIGNED) {
         return;

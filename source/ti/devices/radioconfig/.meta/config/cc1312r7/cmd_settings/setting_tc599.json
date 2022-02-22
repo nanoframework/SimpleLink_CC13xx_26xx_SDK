@@ -1,7 +1,7 @@
 {
     "setting": {
-        "Name": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth (Pre-silicon settings)",
-        "Description": "4.8 kbps OOK for 433 MHz band. (Pre-silicon settings)",
+        "Name": "4.8 kbps, OOK, 34.1 kHz RX Bandwidth",
+        "Description": "4.8 kbps OOK for 433 MHz band.",
         "Frequency": "433",
         "Patch": {
             "Define": "RF_MODE_AUTO",
@@ -165,8 +165,8 @@
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by 0 dB (default: -2), trimmed for external bias and differential configuration",
-                                    "$": "0x000088A3"
+                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -2 dB",
+                                    "$": "0x000288A3"
                                 },
                                 {
                                     "_type": "ADI_HALFREG_OVERRIDE",

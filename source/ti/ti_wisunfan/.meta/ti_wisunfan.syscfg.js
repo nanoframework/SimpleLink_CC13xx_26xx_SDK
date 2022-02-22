@@ -32,31 +32,34 @@
  */
 
 /*
- *  ======== ti154stack.syscfg.js ========
+ *  ======== ti_wisunfan.syscfg.js ========
  */
 
 // Get radio settings script
 const radioScript = system.getScript("/ti/ti_wisunfan/rf_config/"
-    + "ti154stack_rf_config");
+    + "ti_wisunfan_rf_config");
 
 // Get network settings script
 const networkScript = system.getScript("/ti/ti_wisunfan/network_config/"
-    + "ti154stack_network_config");
+    + "ti_wisunfan_network_config");
 
 // Get transmit power settings script
 const powerScript = system.getScript("/ti/ti_wisunfan/power_config/"
-    + "ti154stack_power_config");
+    + "ti_wisunfan_power_config");
 
 // Get test mode settings script
 const testModeScript = system.getScript("/ti/ti_wisunfan/test_config/"
-    + "ti154stack_test_config");
+    + "ti_wisunfan_test_config");
 
 // Get security settings script
 const securityScript = system.getScript("/ti/ti_wisunfan/security_config/"
-    + "ti154stack_security_config");
+    + "ti_wisunfan_security_config");
 
 // Get top level setting descriptions
-const docs = system.getScript("/ti/ti_wisunfan/ti154stack_docs.js");
+const docs = system.getScript("/ti/ti_wisunfan/ti_wisunfan_docs.js");
+
+// Get common utility functions
+const Common = system.getScript("/ti/ti_wisunfan/ti_wisunfan_common.js");
 
 // Static implementation of 15.4 module
 const moduleStatic = {
@@ -70,6 +73,14 @@ const moduleStatic = {
             description: docs.lockProject.description,
             longDescription: docs.lockProject.longDescription,
             onChange: onLockProjectChange
+        },
+        {
+            name: "genLibs",
+            displayName: "Generate Wi-SUN Libraries",
+            default: true,
+            hidden: true,
+            description: docs.genLibs.description,
+            longDescription: docs.genLibs.longDescription
         },
         {
             name: "project",
@@ -281,6 +292,76 @@ function validate(inst, vo)
  */
 
 /*
+ * ======== getLibs ========
+ * Contribute libraries to linker command file
+ *
+ * @param inst  - 15.4 module instance
+ * @returns     - Object containing the name of component, array of dependent
+ *                components, and array of library names
+ */
+function getLibs(inst)
+{
+    const libs = [];
+    const board = Common.getLaunchPadFromDevice();
+
+    if(inst.$static.genLibs)
+    {
+        // Get device ID and toolchain to select appropriate libs
+        const GenLibs = system.getScript("/ti/utils/build/GenLibs.syscfg.js");
+        const toolchain = GenLibs.getToolchainDir();
+        const rtos = system.getRTOS();
+
+        // Generate correct maclib library to link based on device, security
+        // level, and frequency band selected
+        let basePath = "ti/ti_wisunfan/wisunfan_mac/lib/" + toolchain;
+
+        let security;
+        switch(inst.$static.secureLevel)
+        {
+            case "macSecureAndCommissioning": security = "sm_"; break;
+            case "macSecureDisabled": security = "nosecure_"; break;
+            default: security = "secure_"; break;
+        }
+
+        let devType;
+        if(board.includes("R7") || board.includes("P7"))
+        {
+            devType = Common.isSub1GHzDevice() ? "cc13x2x7" : "cc26x2x7";
+            basePath += "/m4f/";
+        }
+        else if(board.includes("R3") || board.includes("P3"))
+        {
+            devType = Common.isSub1GHzDevice() ? "cc13x1" : "cc26x1";
+            basePath += "/m4/";
+        }
+        else // cc13x2/cc26x2
+        {
+            devType = Common.isSub1GHzDevice() ? "cc13x2" : "cc26x2";
+            basePath += "/m4f/";
+        }
+        const freq = (inst.$static.freqBand === "freqBand24") ? "_2_4g" : "";
+        let rtosPath = (rtos === "tirtos7") ? "_tirtos7" : "";
+        if (rtos === "freertos")
+        {
+            rtosPath = "_freertos";
+        }
+
+        const maclibName = "maclib_" + security + devType + freq + rtosPath;
+        const maclib = basePath + maclibName + ".a";
+        libs.push(maclib);
+    }
+
+    // Create a GenLibs input argument
+    const linkOpts = {
+        name: "/ti/ti_wisunfan",
+        deps: [],
+        libs: libs
+    };
+
+    return(linkOpts);
+}
+
+/*
  *  ======== moduleInstances ========
  *  Determines what modules are added as non-static submodules
  *
@@ -350,14 +431,19 @@ function modules(inst)
  *  ======== ti154StackModule ========
  *  Define the TI 15.4 Stack module properties and methods
  */
-const ti154StackModule = {
+const ti_wisunfanStackModule = {
     displayName: "TI Wi-SUN FAN Stack",
-    description: docs.ti154stackModule.description,
-    longDescription: docs.ti154stackModule.longDescription,
+    description: docs.ti_wisunfanModule.description,
+    longDescription: docs.ti_wisunfanModule.longDescription,
     moduleStatic: moduleStatic,
     templates: {
         "/ti/ti_wisunfan/templates/ti_wisunfan_config.h.xdt": true,
-        "/ti/ti_wisunfan/templates/ti_wisunfan_features.h.xdt": true
+        "/ti/ti_wisunfan/templates/ti_wisunfan_features.h.xdt": true,
+        "/ti/utils/build/GenLibs.cmd.xdt":
+        {
+            modName: "/ti/ti_wisunfan/ti_wisunfan",
+            getLibs: getLibs
+        }
     }
 };
 
@@ -365,4 +451,4 @@ const ti154StackModule = {
  *  ======== exports ========
  *  Export the TI 15.4 Stack module definition
  */
-exports = ti154StackModule;
+exports = ti_wisunfanStackModule;

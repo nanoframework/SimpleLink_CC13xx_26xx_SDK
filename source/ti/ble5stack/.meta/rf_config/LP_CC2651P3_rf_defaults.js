@@ -44,7 +44,7 @@ const radioConfigParams = {
     txPowerSize: "RF_BLE_TX_POWER_TABLE_SIZE",
     paExport: "combined",
     overrides: "pOverrides_ble",
-    stackOverride: "ti/ble5stack/icall/inc/ble_overrides.h",
+    stackOverride: "ti/ble5stack_flash/icall/inc/ble_overrides.h",
     stackOverrideMacro: "BLE_STACK_OVERRIDES",
     useMulti: true,
     cmdList_ble: []

@@ -10,36 +10,61 @@
 
  ******************************************************************************
  
- Copyright (c) 2013-2021, Texas Instruments Incorporated
- All rights reserved.
+ Copyright (c) 2013-2022, Texas Instruments Incorporated
 
- IMPORTANT: Your use of this Software is limited to those specific rights
- granted under the terms of a software license agreement between the user
- who downloaded the software, his/her employer (which must be your employer)
- and Texas Instruments Incorporated (the "License"). You may not use this
- Software unless you agree to abide by the terms of the License. The License
- limits your use, and you acknowledge, that the Software may not be modified,
- copied or distributed unless embedded on a Texas Instruments microcontroller
- or used solely and exclusively in conjunction with a Texas Instruments radio
- frequency transceiver, which is integrated into your product. Other than for
- the foregoing purpose, you may not use, reproduce, copy, prepare derivative
- works of, modify, distribute, perform, display or sell this Software and/or
- its documentation for any purpose.
+ All rights reserved not granted herein.
+ Limited License.
 
- YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
- NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
- TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
- NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
- LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
- INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
- OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT
- OF SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
- (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
+ Texas Instruments Incorporated grants a world-wide, royalty-free,
+ non-exclusive license under copyrights and patents it now or hereafter
+ owns or controls to make, have made, use, import, offer to sell and sell
+ ("Utilize") this software subject to the terms herein. With respect to the
+ foregoing patent license, such license is granted solely to the extent that
+ any such patent is necessary to Utilize the software alone. The patent
+ license shall not apply to any combinations which include this software,
+ other than combinations with devices manufactured by or for TI ("TI
+ Devices"). No hardware patent is licensed hereunder.
 
- Should you have any questions regarding your right to use this Software,
- contact Texas Instruments Incorporated at www.TI.com.
+ Redistributions must preserve existing copyright notices and reproduce
+ this license (including the above copyright notice and the disclaimer and
+ (if applicable) source code license limitations below) in the documentation
+ and/or other materials provided with the distribution.
+
+ Redistribution and use in binary form, without modification, are permitted
+ provided that the following conditions are met:
+
+   * No reverse engineering, decompilation, or disassembly of this software
+     is permitted with respect to any software provided in binary form.
+   * Any redistribution and use are licensed by TI for use only with TI Devices.
+   * Nothing shall obligate TI to provide you with source code for the software
+     licensed and provided to you in object code.
+
+ If software source code is provided to you, modification and redistribution
+ of the source code are permitted provided that the following conditions are
+ met:
+
+   * Any redistribution and use of the source code, including any resulting
+     derivative works, are licensed by TI for use only with TI Devices.
+   * Any redistribution and use of any object code compiled from the source
+     code and any resulting derivative works, are licensed by TI for use
+     only with TI Devices.
+
+ Neither the name of Texas Instruments Incorporated nor the names of its
+ suppliers may be used to endorse or promote products derived from this
+ software without specific prior written permission.
+
+ DISCLAIMER.
+
+ THIS SOFTWARE IS PROVIDED BY TI AND TI'S LICENSORS "AS IS" AND ANY EXPRESS
+ OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL TI AND TI'S LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
  
@@ -72,10 +97,10 @@
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC26XX.h>
 #include <ti/drivers/dpl/HwiP.h>
+#include <ti/drivers/dpl/SystemP.h>
 
-#include <xdc/runtime/System.h>
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Semaphore.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 #include "rom_jt_154.h"
 
@@ -104,13 +129,10 @@
  *                                           Typedefs
  * ------------------------------------------------------------------------------------------------
  */
-Task_Struct macTask;        /* not static so you can see in ROV */
-static Task_Handle macTaskHndl;
-static Task_Params macTaskParams;
-static uint8_t macTaskStack[MAC_TASK_STACK_SIZE];
+pthread_t macThread;
+sem_t macSemHandle;
 
-Semaphore_Struct macSem;  /* not static so you can see in ROV */
-static Semaphore_Handle macSemHandle;
+static uint8_t macTaskStack[MAC_TASK_STACK_SIZE];
 
 static uint32_t macEvents = 0;
 static uint32_t macTaskEvents = 0;
@@ -187,7 +209,7 @@ extern TRNG_Handle TRNG_handle;
  */
 static void macApp(macCmd_t *pMsg);
 static void macInit(macUserCfg_t *pUserCfg);
-static void macTaskFxn(UArg a0, UArg a1);
+static void *macTaskFxn(void *a0);
 extern uint8 MAC_MlmeGetReqSize( uint8 pibAttribute );
 extern uint8 MAC_MlmeGetSecurityReqSize( uint8 pibAttribute );
 extern uint8 MAC_MlmeFHGetReqSize( uint16 pibAttribute );
@@ -211,27 +233,47 @@ uint8_t macTaskInit(macUserCfg_t *pUserCfg)
 {
     /* create semaphores for messages / events
      */
-    Semaphore_Params semParam;
-    Semaphore_Params_init(&semParam);
-    semParam.mode = Semaphore_Mode_COUNTING;
-    Semaphore_construct(&macSem, 0, &semParam);
-    macSemHandle = Semaphore_handle(&macSem);
+    pthread_attr_t      attrs;
+    struct sched_param  priParam;
+    int                 retc;
 
-    /* create the Mac Task
+    /* create semaphores for messages / events
      */
-    Task_Params_init(&macTaskParams);
-    macTaskParams.stackSize = MAC_TASK_STACK_SIZE;
-    macTaskParams.priority = MAC_TASK_PRIORITY;
-    macTaskParams.stack = &macTaskStack;
-    macTaskParams.arg0 = (xdc_UArg) pUserCfg;
-    Task_construct(&macTask, macTaskFxn, &macTaskParams, NULL);
-    macTaskHndl = Task_handle(&macTask);
+    retc = sem_init(&macSemHandle, 0, 0);
+    if (retc != 0) {
+        while (1);
+    }
 
+    /* create the Mac Thread
+     */
+
+    /* Initialize the attributes structure with default values */
+    pthread_attr_init(&attrs);
+
+    /* Set priority, detach state, and stack size attributes */
+    priParam.sched_priority = MAC_TASK_PRIORITY;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
+    retc |= pthread_attr_setstacksize(&attrs, MAC_TASK_STACK_SIZE);
+#ifndef FREERTOS_SUPPORT
+    retc |= pthread_attr_setstack(&attrs, macTaskStack, MAC_TASK_STACK_SIZE);
+#endif
+    attrs.stack = (void*)macTaskStack;
+    if (retc != 0) {
+        /* failed to set attributes */
+        while (1) {}
+    }
+
+    retc = pthread_create(&macThread, &attrs, macTaskFxn, pUserCfg);
+    if (retc != 0) {
+        /* pthread_create() failed */
+        while (1) {}
+    }
 #ifdef TIMAC_ROM_IMAGE_BUILD
   TIMAC_ROM_Init();
 #endif
 
-    _macTaskId = OsalPort_registerTask(macTaskHndl, macSemHandle, &macTaskEvents);
+    _macTaskId = OsalPort_registerTask(macThread, &macSemHandle, &macTaskEvents);
     macMainSetTaskId(_macTaskId);
 
     return _macTaskId;
@@ -252,9 +294,9 @@ uint8_t macTaskInit(macUserCfg_t *pUserCfg)
  * @return      MAC Task ID.
  **************************************************************************************************
  */
-Task_Handle* macTaskGetTaskHndl(void)
+void* macTaskGetTaskHndl(void)
 {
-    return &macTaskHndl;
+    return macThread;
 }
 
 /**************************************************************************************************
@@ -330,7 +372,8 @@ static void macInit(macUserCfg_t *pUserCfg)
   status = Random_seedAutomatic();
 
   if (status != Random_STATUS_SUCCESS) {
-      System_abort("Random_seedAutomatic() failed");
+      while(1);
+//      SystemP_abort("Random_seedAutomatic() failed");
   }
 #endif /* USE_DMM */
 
@@ -344,7 +387,8 @@ static void macInit(macUserCfg_t *pUserCfg)
   if (!Crypto_handle)
   {
     /* abort */
-      System_abort("Crypto open failed");
+      while(1);
+//      SystemP_abort("Crypto open failed");
   }
 
   HalAesInit();
@@ -382,13 +426,15 @@ static void macInit(macUserCfg_t *pUserCfg)
   if (!AESCCM_handle)
   {
       /* abort */
-        System_abort("Crypto open failed");
+      while(1);
+//        SystemP_abort("Crypto open failed");
   }
 #ifdef FEATURE_SECURE_COMMISSIONING
   if (!TRNG_handle)
   {
       /* abort */
-      System_abort("TRNG open failed");
+      while(1);
+      // SystemP_abort("TRNG open failed");
   }
 #endif /* FEATURE_SECURE_COMMISSIONING */
 #endif /*!defined(DeviceFamily_CC13X2) && !defined(DeviceFamily_CC26X2) && !defined(DeviceFamily_CC13X2X7)*/
@@ -448,7 +494,7 @@ static void macInit(macUserCfg_t *pUserCfg)
  **************************************************************************************************
  */
 #include "dbg.h"
-static void macTaskFxn(UArg a0, UArg a1)
+static void *macTaskFxn(void *a0)
 {
   macEvent_t          *pMsg;
   macEventHdr_t       hdr;
@@ -467,8 +513,6 @@ static void macTaskFxn(UArg a0, UArg a1)
   while(1)
   {
       macEvents = OsalPort_waitEvent(_macTaskId);
-
-      Task_disable();
 
       OsalPort_clearEvent(_macTaskId, macEvents);
       DBG_PRINT1(0, "macEvents:%d", macEvents);
@@ -623,7 +667,6 @@ static void macTaskFxn(UArg a0, UArg a1)
 
       macEvents = 0;
 
-      Task_enable();
   }
 }
 

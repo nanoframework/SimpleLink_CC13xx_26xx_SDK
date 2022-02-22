@@ -218,7 +218,7 @@
                                 },
                                 {
                                     "_type": "ELEMENT",
-                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -1 dB (default: -2), trimmed for external bias and differential configuration",
+                                    "_comment": "Rx: Set RSSI offset to adjust reported RSSI by -1 dB at 779-930 MHz",
                                     "$": "0x000188A3"
                                 },
                                 {

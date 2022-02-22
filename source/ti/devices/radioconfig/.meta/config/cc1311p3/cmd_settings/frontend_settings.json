@@ -8,7 +8,7 @@
                         "Min": "770",
                         "Max": "930",
                         "Command": {
-                            "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                            "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                             "Field": [
                                 {
                                     "_name": "config.frontEndMode",
@@ -25,7 +25,7 @@
                         "Min": "0",
                         "Max": "0",
                         "Command": {
-                            "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                            "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                             "Field": [
                                 {
                                     "_name": "config.frontEndMode",
@@ -47,7 +47,7 @@
                         "Min": "770",
                         "Max": "930",
                         "Command": {
-                            "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                            "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                             "Field": [
                                 {
                                     "_name": "config.frontEndMode",
@@ -64,7 +64,7 @@
                         "Min": "0",
                         "Max": "0",
                         "Command": {
-                            "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                            "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                             "Field": [
                                 {
                                     "_name": "config.frontEndMode",
@@ -82,7 +82,7 @@
             {
                 "_name": "XS_RFP",
                 "Command": {
-                    "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                    "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                     "Field": [
                         {
                             "_name": "config.frontEndMode",
@@ -98,7 +98,7 @@
             {
                 "_name": "XS_RFN",
                 "Command": {
-                    "_name": "CMD_PROP_RADIO_DIV_SETUP",
+                    "_name": "CMD_PROP_RADIO_DIV_SETUP_PA",
                     "Field": [
                         {
                             "_name": "config.frontEndMode",

@@ -33,6 +33,21 @@
             "default": "bt5le1m"
         },
         {
+            "name": "settingGroup",
+            "displayName": "RF Designation",
+            "description": "Prioritize selectivity or sensitivity",
+            "options": [
+                {
+                    "name": "Sensitivity"
+                },
+                {
+                    "name": "Selectivity"
+                }
+            ],
+            "default": "Sensitivity",
+            "hidden": true
+        },
+        {
             "name": "parent",
             "displayName": "Parent",
             "default": "Stack",

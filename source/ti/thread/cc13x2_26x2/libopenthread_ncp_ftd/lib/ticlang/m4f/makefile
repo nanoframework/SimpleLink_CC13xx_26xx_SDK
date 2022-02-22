@@ -27,6 +27,7 @@ CFLAGS = -I../../.. \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc13x2_26x2.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_cc13x2_26x2_ticlang/config \
+    -DDeviceFamily_CC13X2_CC26X2 \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_SPINEL_CONFIG_OPENTHREAD_MESSAGE_ENABLE=1 \
     -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \
@@ -59,6 +60,7 @@ CPPFLAGS = -I../../.. \
     -I${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/third_party/openthread/include \
     -DMBEDTLS_CONFIG_FILE='"mbedtls-config-cc13x2_26x2.h"' \
     -I${WorkspaceDirPath}/libmbedcrypto_cc13x2_26x2_ticlang/config \
+    -DDeviceFamily_CC13X2_CC26X2 \
     -DOPENTHREAD_FTD=1 \
     -DOPENTHREAD_SPINEL_CONFIG_OPENTHREAD_MESSAGE_ENABLE=1 \
     -DOPENTHREAD_PROJECT_CORE_CONFIG_FILE='"openthread-core-cc13x2_26x2-config.h"' \

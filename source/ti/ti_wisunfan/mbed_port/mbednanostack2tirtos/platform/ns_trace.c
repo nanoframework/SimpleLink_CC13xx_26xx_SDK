@@ -9,46 +9,70 @@
 
  ******************************************************************************
  
- Copyright (c) 2011-2021, Texas Instruments Incorporated
- All rights reserved.
+ Copyright (c) 2011-2022, Texas Instruments Incorporated
 
- IMPORTANT: Your use of this Software is limited to those specific rights
- granted under the terms of a software license agreement between the user
- who downloaded the software, his/her employer (which must be your employer)
- and Texas Instruments Incorporated (the "License"). You may not use this
- Software unless you agree to abide by the terms of the License. The License
- limits your use, and you acknowledge, that the Software may not be modified,
- copied or distributed unless embedded on a Texas Instruments microcontroller
- or used solely and exclusively in conjunction with a Texas Instruments radio
- frequency transceiver, which is integrated into your product. Other than for
- the foregoing purpose, you may not use, reproduce, copy, prepare derivative
- works of, modify, distribute, perform, display or sell this Software and/or
- its documentation for any purpose.
+ All rights reserved not granted herein.
+ Limited License.
 
- YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
- NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
- TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
- NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
- LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
- INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
- OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT
- OF SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
- (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
+ Texas Instruments Incorporated grants a world-wide, royalty-free,
+ non-exclusive license under copyrights and patents it now or hereafter
+ owns or controls to make, have made, use, import, offer to sell and sell
+ ("Utilize") this software subject to the terms herein. With respect to the
+ foregoing patent license, such license is granted solely to the extent that
+ any such patent is necessary to Utilize the software alone. The patent
+ license shall not apply to any combinations which include this software,
+ other than combinations with devices manufactured by or for TI ("TI
+ Devices"). No hardware patent is licensed hereunder.
 
- Should you have any questions regarding your right to use this Software,
- contact Texas Instruments Incorporated at www.TI.com.
+ Redistributions must preserve existing copyright notices and reproduce
+ this license (including the above copyright notice and the disclaimer and
+ (if applicable) source code license limitations below) in the documentation
+ and/or other materials provided with the distribution.
+
+ Redistribution and use in binary form, without modification, are permitted
+ provided that the following conditions are met:
+
+   * No reverse engineering, decompilation, or disassembly of this software
+     is permitted with respect to any software provided in binary form.
+   * Any redistribution and use are licensed by TI for use only with TI Devices.
+   * Nothing shall obligate TI to provide you with source code for the software
+     licensed and provided to you in object code.
+
+ If software source code is provided to you, modification and redistribution
+ of the source code are permitted provided that the following conditions are
+ met:
+
+   * Any redistribution and use of the source code, including any resulting
+     derivative works, are licensed by TI for use only with TI Devices.
+   * Any redistribution and use of any object code compiled from the source
+     code and any resulting derivative works, are licensed by TI for use
+     only with TI Devices.
+
+ Neither the name of Texas Instruments Incorporated nor the names of its
+ suppliers may be used to endorse or promote products derived from this
+ software without specific prior written permission.
+
+ DISCLAIMER.
+
+ THIS SOFTWARE IS PROVIDED BY TI AND TI'S LICENSORS "AS IS" AND ANY EXPRESS
+ OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL TI AND TI'S LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
  
  
  *****************************************************************************/
 
-#include <xdc/runtime/System.h>
+#include <ti/drivers/dpl/SystemP.h>
 
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Semaphore.h>
+#include <semaphore.h>
 
 #include "ns_trace.h"
 #include "itm_private.h"
@@ -125,8 +149,8 @@ typedef enum
 
 char tmpStr[DEFAULT_TRACE_TMP_LINE_LEN];
 
-static Semaphore_Struct ns_trace_mutex_struct;
-static Semaphore_Handle ns_trace_mutex_handle;
+static sem_t ns_trace_mutex_handle;
+char ns_buf[256];
 
 void ns_trace_init(void)
 {
@@ -135,14 +159,12 @@ void ns_trace_init(void)
       48000000,
       ITM_115200
     };
-    Semaphore_Params semParams;
+    int retc;
 
-    /* Construct a Semaphore object to be use as a resource lock, initial count 1 */
-    Semaphore_Params_init(&semParams);
-    Semaphore_construct(&ns_trace_mutex_struct, 1, &semParams);
-
-    /* Obtain instance handle */
-    ns_trace_mutex_handle = Semaphore_handle(&ns_trace_mutex_struct);
+    retc = sem_init(&ns_trace_mutex_handle, 0, 1);
+    if (retc != 0) {
+        while (1);
+    }
 
     // Disable module
     SCS_DEMCR &= (~SCS_DEMCR_TRCEN);
@@ -213,8 +235,9 @@ void ns_trace_printf(uint8_t dlevel, const char *grp, const char *fmt, ...)
 
 void ns_trace_vprintf(uint8_t dlevel, const char *grp, const char *fmt, va_list ap)
 {
-    Semaphore_pend(ns_trace_mutex_handle, BIOS_WAIT_FOREVER);
-
+    sem_wait(&ns_trace_mutex_handle);
+#ifndef EXCLUDE_TRACE
+    int len_written = 0;
     /*
      * This function assumes tirtos cfg file redirects System_printf to ns_put_char_blocking:
      *
@@ -223,32 +246,43 @@ void ns_trace_vprintf(uint8_t dlevel, const char *grp, const char *fmt, va_list 
      * System.SupportProxy = SysCallback;
      * SysCallback.putchFxn = "&ns_put_char_blocking";
      */
-
     switch (dlevel) {
         case (TRACE_LEVEL_ERROR):
-            System_printf("%s[ERR ][%-4s]: ", VT100_COLOR_ERROR, grp);
+            len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "%s[ERR ][%-4s]: ", VT100_COLOR_ERROR, grp);
             break;
         case (TRACE_LEVEL_WARN):
-            System_printf("%s[WARN][%-4s]: ", VT100_COLOR_WARN, grp);
+            len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "%s[ERR ][%-4s]: ", VT100_COLOR_WARN, grp);
             break;
         case (TRACE_LEVEL_INFO):
-            System_printf("%s[INFO][%-4s]: ", VT100_COLOR_INFO, grp);
+            len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "%s[INFO][%-4s]: ", VT100_COLOR_INFO, grp);
             break;
         case (TRACE_LEVEL_DEBUG):
-            System_printf("%s[DBG ][%-4s]: ", VT100_COLOR_DEBUG, grp);
+            len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "%s[DBG ][%-4s]: ", VT100_COLOR_DEBUG, grp);
             break;
         default:
-            System_printf("                ");
+            len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "                ", grp);
             break;
     }
+    for(int x = 0; x < len_written; x++)
+    {
 
-    System_vprintf(fmt, ap);
-    System_flush();
+        ns_put_char_blocking(ns_buf[x]);
+    }
+
+    len_written = SystemP_vsnprintf(ns_buf, sizeof(ns_buf), fmt, ap);
+    for(int x = 0; x < len_written; x++)
+    {
+        ns_put_char_blocking(ns_buf[x]);
+    }
 
     //add zero color VT100 and new line
-    System_printf("\x1b[0m\n\r");
-
-    Semaphore_post(ns_trace_mutex_handle);
+    len_written = SystemP_snprintf(ns_buf, sizeof(ns_buf), "\x1b[0m\n\r", grp);
+    for(int x = 0; x < len_written; x++)
+    {
+        ns_put_char_blocking(ns_buf[x]);
+    }
+#endif
+    sem_post(&ns_trace_mutex_handle);
 }
 
 void ns_enable_module(void)
@@ -385,7 +419,7 @@ char *ns_trace_array(const uint8_t *buf, uint16_t len)
     const uint8_t *ptr = buf;
     char overflow = 0;
     for (i = 0; i < len; i++) {
-        int retval = System_snprintf(tmpStr, DEFAULT_TRACE_TMP_LINE_LEN, "%02x:", *ptr++);
+        int retval = SystemP_snprintf(tmpStr, DEFAULT_TRACE_TMP_LINE_LEN, "%02x:", *ptr++);
         if (retval <= 0 || retval > DEFAULT_TRACE_TMP_LINE_LEN) {
             overflow = 1;
             break;
@@ -404,4 +438,3 @@ char *ns_trace_array(const uint8_t *buf, uint16_t len)
 
     return tmpStr;
 }
-

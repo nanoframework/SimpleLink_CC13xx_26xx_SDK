@@ -9,7 +9,7 @@
 
  ******************************************************************************
  
- Copyright (c) 2016-2021, Texas Instruments Incorporated
+ Copyright (c) 2016-2022, Texas Instruments Incorporated
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -250,7 +250,6 @@ extern uint8_t HCI_TL_processStructuredEvent(ICall_Hdr *pEvt);
 status_t BLE3ToAgama_setParam( uint16_t id, uint16_t value );
 uint16_t getBLE3ToAgamaEventProp( uint8_t eventType);
 uint8_t getAgamaToBLE3EventProp( uint8_t eventType );
-void HCI_TL_SetLegacyScanFlag( uint8_t flag );
 
 #endif
 

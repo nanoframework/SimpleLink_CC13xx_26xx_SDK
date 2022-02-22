@@ -172,8 +172,7 @@ Changelog
 
 ### Version 3.20.00
 
-- Added freertos support
-- Added support for LP-CC2652RSIP and LP-CC2652PSIP modules
+- Added support for LP-CC2652RSIP modules
 - Fixed security vulnerability where received packet length was not being
   verified before copying
 
@@ -191,4 +190,10 @@ Changelog
 
 ### Version 4.30.00
 
+- Added CC2652PSIP support, excluding rfWsn examples
 - GPIO driver has replaced pin driver 
+
+### Version 4.40.00
+
+- Added CC2652PSIP support for rfWsnConcentrator, rfWsnNode, rfWsnNodeIntFlashOadClientPApp, and rfWsnNodeIntFlashOadClientUApp
+- TIRTOS7 is used for CC13X2 and CC26X2 devices

@@ -86,10 +86,6 @@
                         "PaSettingTable": {
                             "PaSetting": [
                                 {
-                                    "_text": "5.5",
-                                    "Value": "0x003F"
-                                },
-                                {
                                     "_text": "5",
                                     "Value": "0x762E"
                                 },
@@ -258,10 +254,6 @@
                         "PaSettingTable": {
                             "PaSetting": [
                                 {
-                                    "_text": "5.5",
-                                    "Value": "0x003F"
-                                },
-                                {
                                     "_text": "5",
                                     "Value": "0x762E"
                                 },
@@ -380,10 +372,6 @@
                     "PaSettingTable": {
                         "PaSetting": [
                             {
-                                "_text": "5.5",
-                                "Value": "0x003F"
-                            },
-                            {
                                 "_text": "5",
                                 "Value": "0x762E"
                             },
@@ -494,17 +482,12 @@
                 }
             },
             {
-                "_name": "CC1352-P7EM-XD7793-XD24-PA24_10dBm",
+                "_name": "LP-CC1352P7-4_10dBm",
                 "FrequencyRange": {
                     "Min": "2360",
                     "Max": "2500",
                     "PaSettingTable": {
                         "PaSetting": [
-                            {
-                                "_text": "11",
-                                "Value": "0xFFFF",
-                                "TxHighPa": "0x104F66"
-                            },
                             {
                                 "_text": "10",
                                 "Value": "0xFFFF",

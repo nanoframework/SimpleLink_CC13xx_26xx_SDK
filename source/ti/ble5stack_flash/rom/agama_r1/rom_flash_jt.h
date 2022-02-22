@@ -33,7 +33,7 @@
  $Target Device: DEVICES $
 
  ******************************************************************************
- $License: TISD 2014 $
+ $License: TI_TEXT 2014 $
  ******************************************************************************
  $Release Name: PACKAGE NAME $
  $Release Date: PACKAGE RELEASE DATE $

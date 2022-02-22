@@ -25,7 +25,7 @@
             },
             {
                 "_file": "ui_translation.json",
-                "$": ".\/..\/config\/cc2652r7"
+                "$": ".\/..\/config\/cc1352r"
             },
             {
                 "_file": "targets.json",
@@ -33,7 +33,7 @@
             },
             {
                 "_file": "pasettings.json",
-                "$": ".\/..\/config\/cc2652r7\/targets"
+                "$": ".\/..\/config\/pa_tables\/cc13x2_cc26x2_r7"
             },
             {
                 "_file": "io_pin_definition.json",
